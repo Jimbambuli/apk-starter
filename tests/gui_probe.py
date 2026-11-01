@@ -1,0 +1,123 @@
+"""Drive the management window headless (GDK_BACKEND=broadway) and print what it shows as JSON.
+
+Usage: gui_probe.py DATA_HOME APK START_RECORD [SCREENSHOT.png]
+Steps: list -> install APK (portal unavailable) -> start -> uninstall with data; optional screenshot of the first list.
+"""
+import json
+import sys
+from pathlib import Path
+
+import gi
+
+gi.require_version("Gtk", "4.0")
+gi.require_version("Gsk", "4.0")
+gi.require_version("Adw", "1")
+gi.require_version("Graphene", "1.0")
+from gi.repository import Adw, Gdk, Gio, GLib, Graphene, Gsk, Gtk  # noqa: E402
+
+from apk_starter import gui  # noqa: E402
+from apk_starter.paths import Paths  # noqa: E402
+
+data_home, apk, record = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3]
+shot = sys.argv[4] if len(sys.argv) > 4 else None
+paths = Paths(data_home=data_home, cache_home=data_home / "cache", prefix=data_home / "prefix")
+report: dict = {}
+
+
+def titles(win) -> list[str]:
+    out, child = [], win.listbox.get_first_child()
+    while child is not None:
+        out.append(child.get_title())
+        child = child.get_next_sibling()
+    return out
+
+
+def wait(cond, then, tries=100) -> None:
+    def tick():
+        try:
+            ok = cond()
+            if ok:
+                then()
+        except Exception as e:                      # never hang: report and stop
+            report["error"] = repr(e)
+            app.quit()
+            return False
+        if ok:
+            return False
+        if tries <= 1:
+            report["timeout"] = then.__name__
+            app.quit()
+        else:
+            wait(cond, then, tries - 1)
+        return False
+    GLib.timeout_add(50, tick)
+
+
+def screenshot(win, path: str) -> None:
+    content = win.get_content()
+    w, h = content.get_width(), content.get_height()
+    rect = Graphene.Rect().init(0, 0, w, h)
+    bg = Gdk.RGBA()
+    bg.parse("#fafafb")                             # libadwaita window background (light)
+    snap = Gtk.Snapshot()
+    snap.append_color(bg, rect)
+    Gtk.WidgetPaintable.new(content).snapshot(snap, w, h)
+    renderer = Gsk.CairoRenderer()
+    renderer.realize_for_display(Gdk.Display.get_default())
+    try:
+        renderer.render_texture(snap.to_node(), rect).save_to_png(path)
+    finally:
+        renderer.unrealize()
+
+
+def activate(a) -> None:
+    Gtk.IconTheme.get_for_display(Gdk.Display.get_default()).add_search_path(
+        str(Path(__file__).resolve().parent.parent / "data/icons"))
+    shown = []
+    original = gui.Window.show_rows
+    gui.Window.show_rows = lambda self, rows: (original(self, rows), shown.append(len(rows)))
+    win = gui.Window(a, paths, None, ["sh", "-c", f'echo "$@" > {record}', "sh"])
+    win.present()
+
+    def listed():
+        report["listed"] = titles(win)
+        report["page"] = win.stack.get_visible_child_name()
+        if shot:                                    # let one frame draw the list first
+            GLib.timeout_add(700, lambda: (screenshot(win, shot), install())[1])
+        else:
+            install()
+
+    def install():
+        win.install(apk)
+        wait(lambda: len(shown) > 1 and win.rows, installed)
+        return False
+
+    def installed():
+        report["after_install"] = titles(win)
+        report["pkg"] = pkg = "org.example.demo"
+        win.activate_action("win.start", GLib.Variant("s", pkg))
+        wait(lambda: Path(record).exists() and Path(record).read_text(), lambda: started(pkg))
+
+    def started(pkg):
+        report["started"] = Path(record).read_text().split()
+        paths.data(pkg).mkdir(parents=True, exist_ok=True)
+        win.ask_uninstall(pkg)
+        dialog = win.get_visible_dialog()
+        report["dialog"] = dialog.get_heading()
+        dialog.get_extra_child().set_active(True)
+        dialog.emit("response", "ok")
+        wait(lambda: pkg not in win.rows, removed)
+
+    def removed():
+        report["after_remove"] = titles(win)
+        report["page_end"] = win.stack.get_visible_child_name()
+        report["data_left"] = paths.data(report["pkg"]).exists()
+        app.quit()
+
+    wait(lambda: shown and win.get_width() > 0, listed)
+
+
+app = Adw.Application(application_id="io.github.Jimbambuli.ApkStarter.Probe", flags=Gio.ApplicationFlags.NON_UNIQUE)
+app.connect("activate", activate)
+app.run([sys.argv[0]])
+print(json.dumps(report))

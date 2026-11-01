@@ -38,6 +38,12 @@ class Paths:
     def meta(self, pkg: str) -> Path:
         return self.apps_dir() / f"{_safe(pkg)}.json"
 
+    def icon(self, pkg: str) -> Path:
+        return self.apps_dir() / f"{_safe(pkg)}.png"
+
+    def lock(self, pkg: str) -> Path:
+        return self.cache_home / "apk-starter" / "locks" / f"{_safe(pkg)}.lock"
+
     def data(self, pkg: str) -> Path:
         return self.data_home / "data" / _safe(pkg)
 

@@ -1,0 +1,242 @@
+"""Management window (GTK 4 + libadwaita): list, start, install and remove apps.
+
+All work is done by the same functions as the command line (cli.py); this module only shows and asks."""
+import os
+import sys
+import threading
+from collections.abc import Callable, Mapping
+from pathlib import Path
+
+from .cli import APP_ID, _lang, clear_data, install_apk, remove_app
+from .errors import StarterError
+from .gui_model import AppRow, load_rows, start_argv
+from .paths import Paths
+
+try:
+    import gi
+    gi.require_version("Gtk", "4.0")
+    gi.require_version("Gdk", "4.0")
+    gi.require_version("Adw", "1")
+    from gi.repository import Adw, Gdk, Gio, GLib, Gtk
+except (ImportError, ValueError) as e:      # pragma: no cover - depends on the system
+    raise StarterError(f"the window needs GTK 4 and libadwaita: {e}") from None
+
+APK_MIME = "application/vnd.android.package-archive"
+
+
+def _message(e: BaseException) -> str:
+    if isinstance(e, StarterError):
+        return str(e)
+    if isinstance(e, OSError):
+        return f"{e.strerror or e}" + (f": {e.filename}" if e.filename else "")
+    return f"unexpected error: {e!r}"
+
+
+class Window(Adw.ApplicationWindow):
+    def __init__(self, app: Adw.Application, paths: Paths, lang: str | None, launcher: list[str]):
+        super().__init__(application=app, title="APK Starter", default_width=640, default_height=560)
+        self.paths, self.lang, self.launcher = paths, lang, launcher
+        self.rows: dict[str, AppRow] = {}
+
+        install = Gtk.Button(label="Install APK…", tooltip_text="Choose an APK file and add it to the menu")
+        install.add_css_class("suggested-action")
+        install.connect("clicked", lambda _b: self.choose_apk())
+        header = Adw.HeaderBar()
+        header.pack_start(install)
+
+        self.listbox = Gtk.ListBox(selection_mode=Gtk.SelectionMode.NONE, valign=Gtk.Align.START)
+        self.listbox.add_css_class("boxed-list")
+        clamp = Adw.Clamp(child=self.listbox, margin_top=24, margin_bottom=24, margin_start=12, margin_end=12)
+        self.stack = Gtk.Stack()
+        self.stack.add_named(Adw.StatusPage(icon_name=APP_ID, title="No apps installed",
+                                            description="Install an APK or drop one here."), "empty")
+        self.stack.add_named(Gtk.ScrolledWindow(child=clamp, hscrollbar_policy=Gtk.PolicyType.NEVER), "list")
+        self.toasts = Adw.ToastOverlay(child=self.stack)
+        view = Adw.ToolbarView(content=self.toasts)
+        view.add_top_bar(header)
+        self.set_content(view)
+
+        drop = Gtk.DropTarget.new(Gdk.FileList, Gdk.DragAction.COPY)
+        drop.connect("drop", self.on_drop)
+        self.add_controller(drop)
+
+        for name, handler in (("start", lambda p: self.start(p, log=False)),
+                              ("start-log", lambda p: self.start(p, log=True)),
+                              ("open-logs", lambda _p: self.open_logs()),
+                              ("clear-data", self.ask_clear_data),
+                              ("uninstall", self.ask_uninstall)):
+            action = Gio.SimpleAction.new(name, GLib.VariantType.new("s"))
+            action.connect("activate", lambda _a, v, h=handler: h(v.get_string()))
+            self.add_action(action)
+        self.refresh()
+
+    # -- helpers -----------------------------------------------------------------------------------------
+    def toast(self, text: str) -> None:
+        self.toasts.add_toast(Adw.Toast(title=GLib.markup_escape_text(text), timeout=6))
+
+    def background(self, work: Callable[[], object], done: Callable[[object], None] | None = None,
+                   refresh: bool = True) -> None:
+        """Run file and portal work off the main loop; report errors as a toast, then refresh the list."""
+        def thread() -> None:
+            try:
+                result, error = work(), None
+            except Exception as e:                  # shown to the user, never a traceback
+                result, error = None, e
+            GLib.idle_add(finish, result, error)
+
+        def finish(result, error) -> bool:
+            if error is not None:
+                self.toast(_message(error))
+            elif done is not None:
+                done(result)
+            if refresh:
+                self.refresh()
+            return False
+
+        threading.Thread(target=thread, daemon=True).start()
+
+    # -- list ----------------------------------------------------------------------------------------------
+    def refresh(self) -> None:
+        self.background(lambda: load_rows(self.paths), self.show_rows, refresh=False)
+
+    def show_rows(self, rows: list[AppRow]) -> None:
+        self.rows = {r.package: r for r in rows}
+        self.listbox.remove_all()
+        for r in rows:
+            self.listbox.append(self.make_row(r))
+        self.stack.set_visible_child_name("list" if rows else "empty")
+
+    def make_row(self, r: AppRow) -> Gtk.Widget:
+        details = [r.version] if r.version else []
+        details.append(f"data {GLib.format_size(r.size)}" if r.size else "no data")
+        row = Adw.ActionRow(title=r.label, subtitle=" · ".join(details), use_markup=False,
+                            tooltip_text=r.package)
+        image = Gtk.Image(pixel_size=48, icon_name=APP_ID)
+        if r.icon is not None:
+            try:
+                image.set_from_paintable(Gdk.Texture.new_from_filename(str(r.icon)))
+            except GLib.Error:
+                pass
+        row.add_prefix(image)
+
+        target = GLib.Variant("s", r.package)
+        start = Gtk.Button(label="Start", valign=Gtk.Align.CENTER, action_name="win.start", action_target=target)
+        menu = Gio.Menu()
+        for label, action in (("Start with log", "win.start-log"), ("Open log folder", "win.open-logs"),
+                              ("Delete data…", "win.clear-data"), ("Uninstall…", "win.uninstall")):
+            item = Gio.MenuItem.new(label, None)
+            item.set_action_and_target_value(action, target)
+            menu.append_item(item)
+        more = Gtk.MenuButton(icon_name="view-more-symbolic", menu_model=menu, valign=Gtk.Align.CENTER,
+                              tooltip_text="More")
+        more.add_css_class("flat")
+        row.add_suffix(start)
+        row.add_suffix(more)
+        return row
+
+    # -- actions -------------------------------------------------------------------------------------------
+    def start(self, pkg: str, log: bool) -> None:
+        label = self.rows[pkg].label if pkg in self.rows else pkg
+        try:
+            proc = Gio.Subprocess.new(start_argv(self.launcher, pkg, log), Gio.SubprocessFlags.NONE)
+        except GLib.Error as e:
+            self.toast(f"cannot start {label}: {e.message}")
+            return
+
+        def ended(p: Gio.Subprocess, res) -> None:
+            p.wait_finish(res)
+            if p.get_if_exited() and p.get_exit_status() != 0:
+                hint = " – see the log folder" if log else " – try “Start with log”"
+                self.toast(f"{label} ended with exit code {p.get_exit_status()}{hint}")
+        proc.wait_async(None, ended)
+        if log:
+            self.toast(f"{label} starts with a log")
+
+    def open_logs(self) -> None:
+        folder = self.paths.logs_dir()
+        try:
+            folder.mkdir(parents=True, exist_ok=True)
+        except OSError as e:
+            self.toast(_message(e))
+            return
+        launcher = Gtk.FileLauncher.new(Gio.File.new_for_path(str(folder)))
+
+        def opened(lnc: Gtk.FileLauncher, res) -> None:
+            try:
+                lnc.launch_finish(res)
+            except GLib.Error as e:
+                self.toast(f"cannot open {folder}: {e.message}")
+        launcher.launch(self, None, opened)
+
+    def choose_apk(self) -> None:
+        apks = Gtk.FileFilter(name="Android apps")
+        apks.add_suffix("apk")
+        apks.add_mime_type(APK_MIME)
+        filters = Gio.ListStore.new(Gtk.FileFilter)
+        filters.append(apks)
+        dialog = Gtk.FileDialog(title="Install APK", filters=filters, default_filter=apks)
+
+        def chosen(d: Gtk.FileDialog, res) -> None:
+            try:
+                f = d.open_finish(res)
+            except GLib.Error:                      # cancelled
+                return
+            if f is not None and f.get_path():
+                self.install(Path(f.get_path()))
+        dialog.open(self, None, chosen)
+
+    def on_drop(self, _target, files, _x, _y) -> bool:
+        paths = [f.get_path() for f in files.get_files()]
+        for p in paths:
+            if p:
+                self.install(Path(p))
+        return any(paths)
+
+    def install(self, apk: Path) -> None:
+        self.toast(f"Installing {apk.name}…")
+        self.background(lambda: install_apk(self.paths, apk, self.lang),
+                        lambda info: self.toast(f"{info.label} installed"))
+
+    def _confirm(self, heading: str, body: str, verb: str, then: Callable[[], None],
+                 extra: Gtk.Widget | None = None) -> None:
+        dialog = Adw.AlertDialog(heading=heading, body=body)
+        dialog.add_response("cancel", "Cancel")
+        dialog.add_response("ok", verb)
+        dialog.set_response_appearance("ok", Adw.ResponseAppearance.DESTRUCTIVE)
+        dialog.set_default_response("cancel")
+        dialog.set_close_response("cancel")
+        if extra is not None:
+            dialog.set_extra_child(extra)
+        dialog.connect("response", lambda _d, resp: then() if resp == "ok" else None)
+        dialog.present(self)
+
+    def ask_clear_data(self, pkg: str) -> None:
+        label = self.rows[pkg].label if pkg in self.rows else pkg
+        self._confirm(f"Delete the data of {label}?",
+                      "The app stays installed. Its settings, accounts and files are deleted.", "Delete Data",
+                      lambda: self.background(lambda: clear_data(self.paths, pkg),
+                                              lambda _r: self.toast(f"Data of {label} deleted")))
+
+    def ask_uninstall(self, pkg: str) -> None:
+        label = self.rows[pkg].label if pkg in self.rows else pkg
+        purge = Gtk.CheckButton(label="Also delete app data")
+        self._confirm(f"Uninstall {label}?", "The app and its menu entry are removed.", "Uninstall",
+                      lambda: self.background(lambda: remove_app(self.paths, pkg, purge.get_active()),
+                                              lambda _r: self.toast(f"{label} uninstalled")),
+                      extra=purge)
+
+
+def default_launcher() -> list[str]:
+    """How to start an app: run this very program again (`/app/bin/apk-starter` inside the Flatpak)."""
+    return [sys.executable, os.path.realpath(sys.argv[0])]
+
+
+def run(paths: Paths, env: Mapping[str, str], launcher: list[str] | None = None) -> int:
+    app = Adw.Application(application_id=APP_ID)
+    lang = _lang(env)
+
+    def activate(a: Adw.Application) -> None:
+        win = a.get_active_window() or Window(a, paths, lang, launcher or default_launcher())
+        win.present()
+    app.connect("activate", activate)
+    return app.run([sys.argv[0]])

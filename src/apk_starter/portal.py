@@ -1,7 +1,6 @@
-"""XDG desktop portals: DynamicLauncher (menu entries) and FileChooser. `gi` is imported only inside functions."""
+"""XDG desktop portal DynamicLauncher (menu entries). `gi` is imported only inside functions."""
 import re
 import uuid
-from pathlib import Path
 
 from .apkinfo import PACKAGE_RE
 from .cli import APP_ID
@@ -130,20 +129,3 @@ def uninstall_launcher(pkg: str) -> None:
         if isinstance(e, PortalUnavailable) or not not_found:
             raise
 
-
-def choose_apk() -> Path:
-    Gio, GLib = _gi()
-    conn = _connect(Gio, GLib)
-
-    def open_file(token: str):
-        opts = {"handle_token": GLib.Variant("s", token), "modal": GLib.Variant("b", True),
-                "filters": GLib.Variant("a(sa(us))", [("Android apps", [(0, "*.apk"),
-                                                                        (1, "application/vnd.android.package-archive")])])}
-        return GLib.Variant("(ssa{sv})", ("", "Open APK", opts))
-
-    response, results = _request(conn, Gio, GLib, "org.freedesktop.portal.FileChooser", "OpenFile", open_file)
-    uris = results.get("uris") or []
-    path = Gio.File.new_for_uri(uris[0]).get_path() if response == 0 and uris else None
-    if not path:
-        raise UsageError("no APK selected")
-    return Path(path)

@@ -18,11 +18,20 @@ alias apk-starter='flatpak run --file-forwarding io.github.Jimbambuli.ApkStarter
 
 ## Use
 
+Open **APK Starter** from the application menu (or run `apk-starter` without arguments) to get a small window that
+lists the installed apps with their icon, version and data size. From there you can start an app (also with a log),
+open the log folder, delete an app's data, uninstall it, and install a new APK with **Install APK…** or by dropping
+the file onto the window. Every installed app also gets its own menu entry.
+
+The same is available on the command line:
+
 ```
+apk-starter                          # open the window
 apk-starter @@ app.apk @@            # start an app (@@ lets Flatpak pass the file into the sandbox)
 apk-starter --install @@ app.apk @@  # add it to the application menu (asks via the desktop portal)
 apk-starter --list                   # installed apps
 apk-starter --remove PACKAGE [--purge]
+apk-starter --remove-all [--purge]   # remove every installed app and its menu entry
 apk-starter --log @@ app.apk @@      # write a log that atl-doctor can read
 apk-starter --log=FILE @@ app.apk @@ # same, to a chosen file (must be writable inside the sandbox,
                                      # e.g. under ~/.var/app/io.github.Jimbambuli.ApkStarter/)
@@ -40,6 +49,10 @@ Double-clicking an APK in the file manager and starting an installed app from th
 
 Data lives under `~/.var/app/io.github.Jimbambuli.ApkStarter/data/`: `apps/` (installed APKs), `data/<package>/`
 (app data), `logs/` (logs from `--log`).
+
+Uninstalling: run `apk-starter --remove-all` before `flatpak uninstall io.github.Jimbambuli.ApkStarter`.
+`flatpak uninstall` does not remove the menu entries of the installed apps; desktops hide them once APK Starter is
+gone, but the files stay in `~/.local/share/xdg-desktop-portal/` (and come back if you install APK Starter again).
 
 Bring your own APK – this project ships ATL and its free dependencies only, no apps. Apps that need Google Play
 Services, Jetpack Compose or ARM-only native libraries are not expected to work.

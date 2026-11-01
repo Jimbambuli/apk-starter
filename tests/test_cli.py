@@ -32,7 +32,6 @@ def box(tmp_path, monkeypatch):
     fake.PortalUnavailable = PortalUnavailable
     fake.install_launcher = lambda pkg, label, icon: calls.append(("install", pkg, label, icon))
     fake.uninstall_launcher = lambda pkg: calls.append(("uninstall", pkg))
-    fake.choose_apk = lambda: pytest.fail("file chooser not expected")
     monkeypatch.setitem(sys.modules, "apk_starter.portal", fake)
     monkeypatch.setattr(apk_starter, "portal", fake, raising=False)
     prefix = tmp_path / "prefix"
@@ -127,3 +126,40 @@ def test_file_errors_end_as_one_line_exit_1(box, capsys):
     assert main(["--install", str(box.apk)], env=box.env) == 1
     err = capsys.readouterr().err
     assert err.startswith("apk-starter: ") and "Traceback" not in err
+
+
+def test_install_keeps_icon_and_remove_deletes_it(box):
+    from apkgen import Res, arsc_table, png_bytes
+    arsc, ids = arsc_table(PKG, [Res("string", "app_name", {"": "Demo"}), Res("mipmap", "ic", {"": "res/a.png"})])
+    apk = make_apk(box.tmp / "icon.apk", manifest=axml_manifest(label=ids["string/app_name"], icon=ids["mipmap/ic"]),
+                   arsc=arsc, files={"res/a.png": png_bytes(96, 96)})
+    assert main(["--install", str(apk)], env=box.env) == 0
+    icon = box.data / "apps" / f"{PKG}.png"
+    assert icon.read_bytes() == png_bytes(96, 96)
+    assert main(["--remove", PKG], env=box.env) == 0
+    assert not icon.exists()
+
+
+def test_remove_all(box, capsys):
+    assert main(["--install", str(box.apk)], env=box.env) == 0
+    assert main([PKG], env=box.env) == 0
+    assert main(["--remove-all", "--purge"], env=box.env) == 0
+    assert box.calls[-1] == ("uninstall", PKG)
+    assert not (box.data / "apps" / f"{PKG}.apk").exists() and not (box.data / "data" / PKG).exists()
+    assert main(["--remove-all"], env=box.env) == 0          # nothing left: still fine
+
+
+def test_no_arguments_without_display_is_usage_error(box, capsys):
+    assert main([], env=box.env) == 2
+    err = capsys.readouterr().err
+    assert "usage: apk-starter" in err and "no display" in err
+
+
+def test_no_arguments_with_display_opens_window(box, monkeypatch):
+    fake = types.ModuleType("apk_starter.gui")
+    seen = []
+    fake.run = lambda paths, env: seen.append(paths.data_home) or 0
+    monkeypatch.setitem(sys.modules, "apk_starter.gui", fake)
+    monkeypatch.setattr(apk_starter, "gui", fake, raising=False)
+    assert main([], env={**box.env, "WAYLAND_DISPLAY": "wayland-0"}) == 0
+    assert seen == [box.data]
