@@ -5,7 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
-"Report-Msgid-Bugs-To: https://github.com/Jimbambuli/apk-starter/issues\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-01 13:44+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -35,19 +36,27 @@ msgid ""
 "desktop. It is built on Android Translation Layer (ATL) and translates the "
 "app's calls to GTK, Wayland and the usual Linux libraries instead of running "
 "a full Android system."
-msgstr "APK Starter spouští jednotlivou aplikaci pro Android z jejího souboru APK na linuxové ploše. Je postaven na Android Translation Layer (ATL) a překládá volání aplikace na GTK, Wayland a běžné linuxové knihovny, místo aby provozoval celý systém Android."
+msgstr ""
+"APK Starter spouští jednotlivou aplikaci pro Android z jejího souboru APK na "
+"linuxové ploše. Je postaven na Android Translation Layer (ATL) a překládá "
+"volání aplikace na GTK, Wayland a běžné linuxové knihovny, místo aby "
+"provozoval celý systém Android."
 
 #: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:18
 msgid ""
 "Bring your own APK: open it, double-click it, or add it to the application "
 "menu."
-msgstr "Použijte vlastní APK: otevřete jej, poklepejte na něj nebo jej přidejte do nabídky aplikací."
+msgstr ""
+"Použijte vlastní APK: otevřete jej, poklepejte na něj nebo jej přidejte do "
+"nabídky aplikací."
 
 #: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:19
 msgid ""
 "A small window lists your apps with icon, version and data size; start, "
 "uninstall or delete their data from there."
-msgstr "Malé okno zobrazuje vaše aplikace s ikonou, verzí a velikostí dat; odtud je můžete spustit, odinstalovat nebo smazat jejich data."
+msgstr ""
+"Malé okno zobrazuje vaše aplikace s ikonou, verzí a velikostí dat; odtud je "
+"můžete spustit, odinstalovat nebo smazat jejich data."
 
 #: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:21
 msgid "Each app keeps its own data folder."
@@ -62,7 +71,10 @@ msgid ""
 "No apps are included and no Google services are provided. Apps that need "
 "Google Play services, Jetpack Compose, ARM-only native code, the camera, "
 "Bluetooth or telephony may not work."
-msgstr "Nejsou přiloženy žádné aplikace ani služby Google. Aplikace, které potřebují služby Google Play, Jetpack Compose, nativní kód pouze pro ARM, fotoaparát, Bluetooth nebo telefonii, nemusí fungovat."
+msgstr ""
+"Nejsou přiloženy žádné aplikace ani služby Google. Aplikace, které potřebují "
+"služby Google Play, Jetpack Compose, nativní kód pouze pro ARM, fotoaparát, "
+"Bluetooth nebo telefonii, nemusí fungovat."
 
 #: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:28
 msgid "Android is a trademark of Google LLC."
@@ -73,7 +85,10 @@ msgid ""
 "The Android robot in the icon is reproduced or modified from work created "
 "and shared by Google and used according to terms described in the Creative "
 "Commons 3.0 Attribution License."
-msgstr "Robot Android v ikoně je převzat nebo upraven z díla, které vytvořila a sdílí společnost Google, a je používán v souladu s podmínkami licence Creative Commons Uveďte původ 3.0."
+msgstr ""
+"Robot Android v ikoně je převzat nebo upraven z díla, které vytvořila a "
+"sdílí společnost Google, a je používán v souladu s podmínkami licence "
+"Creative Commons Uveďte původ 3.0."
 
 #: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:40
 msgid "The app list with three free apps from F-Droid"
@@ -119,288 +134,330 @@ msgstr "poškozený soubor resources.arsc"
 msgid "corrupt AndroidManifest.xml"
 msgstr "poškozený soubor AndroidManifest.xml"
 
-#: src/apk_starter/cli.py:41
+#: src/apk_starter/cli.py:42
 msgid "--log= needs a file name"
 msgstr "--log= vyžaduje název souboru"
 
-#: src/apk_starter/cli.py:64
+#: src/apk_starter/cli.py:65
 #, python-brace-format
 msgid ""
 "cannot read {file}: no such file (inside the Flatpak sandbox only paths "
 "passed with --file-forwarding are visible: {command})"
-msgstr "nelze přečíst {file}: soubor neexistuje (v izolovaném prostředí Flatpak jsou vidět jen cesty předané pomocí --file-forwarding: {command})"
+msgstr ""
+"nelze přečíst {file}: soubor neexistuje (v izolovaném prostředí Flatpak jsou "
+"vidět jen cesty předané pomocí --file-forwarding: {command})"
 
-#: src/apk_starter/cli.py:67 src/apk_starter/cli.py:176
+#: src/apk_starter/cli.py:68 src/apk_starter/cli.py:209
 #, python-brace-format
 msgid "not installed: {package}"
 msgstr "není nainstalováno: {package}"
 
-#: src/apk_starter/cli.py:122
+#: src/apk_starter/cli.py:117
+#, python-brace-format
+msgid "Preparing {app} for this computer…"
+msgstr "Příprava {app} pro tento počítač…"
+
+#: src/apk_starter/cli.py:133
+#, python-brace-format
+msgid "{app} could not be prepared in advance: {reason}"
+msgstr "{app} nebylo možné připravit předem: {reason}"
+
+#: src/apk_starter/cli.py:155
 #, python-brace-format
 msgid ""
 "{app} is installed without a menu entry: the DynamicLauncher portal is not "
 "available; start the app with: {command}"
-msgstr "Aplikace {app} je nainstalována bez položky v nabídce: portál DynamicLauncher není dostupný; spusťte aplikaci příkazem: {command}"
+msgstr ""
+"Aplikace {app} je nainstalována bez položky v nabídce: portál "
+"DynamicLauncher není dostupný; spusťte aplikaci příkazem: {command}"
 
-#: src/apk_starter/cli.py:126
+#: src/apk_starter/cli.py:159
 #, python-brace-format
 msgid "{app} is installed without a menu entry: {reason}"
 msgstr "Aplikace {app} je nainstalována bez položky v nabídce: {reason}"
 
-#: src/apk_starter/cli.py:160
+#: src/apk_starter/cli.py:193
 #, python-brace-format
 msgid "cannot remove {folder}: {reason}"
 msgstr "nelze odstranit {folder}: {reason}"
 
-#: src/apk_starter/cli.py:180
+#: src/apk_starter/cli.py:213
 msgid ""
 "the DynamicLauncher portal is not available; the menu entry was not removed"
-msgstr "portál DynamicLauncher není dostupný; položka v nabídce nebyla odstraněna"
+msgstr ""
+"portál DynamicLauncher není dostupný; položka v nabídce nebyla odstraněna"
 
-#: src/apk_starter/cli.py:182
+#: src/apk_starter/cli.py:215
 #, python-brace-format
 msgid "the menu entry was not removed: {reason}"
 msgstr "položka v nabídce nebyla odstraněna: {reason}"
 
-#: src/apk_starter/cli.py:215
+#: src/apk_starter/cli.py:248
 msgid "(no arguments: open the management window)"
 msgstr "(bez argumentů: otevře okno správy)"
 
-#: src/apk_starter/cli.py:216
+#: src/apk_starter/cli.py:249
 msgid "Start Android apps (APK) with Android Translation Layer."
 msgstr "Spouští aplikace pro Android (APK) pomocí Android Translation Layer."
 
-#: src/apk_starter/cli.py:218
+#: src/apk_starter/cli.py:251
 msgid ""
 "write a log for atl-doctor (default: logs/<package>-<time>.log); use --"
 "log=FILE"
-msgstr "zapíše protokol pro atl-doctor (výchozí: logs/<balíček>-<čas>.log); jiný soubor pomocí --log=FILE"
+msgstr ""
+"zapíše protokol pro atl-doctor (výchozí: logs/<balíček>-<čas>.log); jiný "
+"soubor pomocí --log=FILE"
 
-#: src/apk_starter/cli.py:219
+#: src/apk_starter/cli.py:252
 msgid "override the SDK level passed to ATL"
 msgstr "přepíše úroveň SDK předávanou ATL"
 
-#: src/apk_starter/cli.py:220
+#: src/apk_starter/cli.py:253
 msgid "window size (remembered per app)"
 msgstr "velikost okna (pamatuje se pro každou aplikaci)"
 
-#: src/apk_starter/cli.py:221
+#: src/apk_starter/cli.py:254
 msgid "with --remove/--remove-all: also delete the app data"
 msgstr "s --remove/--remove-all: smaže i data aplikace"
 
-#: src/apk_starter/cli.py:223
+#: src/apk_starter/cli.py:256
 msgid "install the APK and add a menu entry"
 msgstr "nainstaluje APK a přidá položku do nabídky"
 
-#: src/apk_starter/cli.py:224
+#: src/apk_starter/cli.py:257
 msgid "list installed apps"
 msgstr "vypíše nainstalované aplikace"
 
-#: src/apk_starter/cli.py:225
+#: src/apk_starter/cli.py:258
 msgid "remove an installed app"
 msgstr "odinstaluje nainstalovanou aplikaci"
 
-#: src/apk_starter/cli.py:227
+#: src/apk_starter/cli.py:260
 msgid ""
 "remove all installed apps and their menu entries (before uninstalling the "
 "Flatpak)"
-msgstr "odstraní všechny nainstalované aplikace a jejich položky v nabídce (před odinstalací Flatpaku)"
+msgstr ""
+"odstraní všechny nainstalované aplikace a jejich položky v nabídce (před "
+"odinstalací Flatpaku)"
 
-#: src/apk_starter/cli.py:228
+#: src/apk_starter/cli.py:261
 msgid "show the version and exit"
 msgstr "zobrazí verzi a skončí"
 
-#: src/apk_starter/cli.py:262
+#: src/apk_starter/cli.py:295
 msgid ""
 "--install, --list, --remove, --remove-all and --version take no other "
 "arguments"
-msgstr "--install, --list, --remove, --remove-all a --version nepřijímají žádné další argumenty"
+msgstr ""
+"--install, --list, --remove, --remove-all a --version nepřijímají žádné "
+"další argumenty"
 
-#: src/apk_starter/cli.py:264
+#: src/apk_starter/cli.py:297
 msgid "--purge only works with --remove or --remove-all"
 msgstr "--purge funguje jen s --remove nebo --remove-all"
 
-#: src/apk_starter/cli.py:289
+#: src/apk_starter/cli.py:322
 msgid "no APK given and no display for the window"
 msgstr "nebylo zadáno APK a pro okno není k dispozici displej"
 
-#: src/apk_starter/cli.py:293
+#: src/apk_starter/cli.py:326
 msgid "no APK given"
 msgstr "nebylo zadáno APK"
+
+#: src/apk_starter/cli.py:367 src/apk_starter/cli.py:385
+#, python-brace-format
+msgid "the Android runtime could not be prepared in advance: {reason}"
+msgstr "běhové prostředí Androidu nebylo možné připravit předem: {reason}"
+
+#: src/apk_starter/cli.py:389
+msgid "Preparing apps for this computer…"
+msgstr "Příprava aplikací pro tento počítač…"
+
+#: src/apk_starter/dexopt.py:140
+#, python-brace-format
+msgid "cannot run {program}: {reason}"
+msgstr "nelze spustit {program}: {reason}"
+
+#: src/apk_starter/dexopt.py:193
+msgid "Preparing the Android runtime for this computer…"
+msgstr "Příprava běhového prostředí Androidu pro tento počítač…"
 
 #: src/apk_starter/errors.py:23
 #, python-brace-format
 msgid "unexpected error: {error}"
 msgstr "neočekávaná chyba: {error}"
 
-#: src/apk_starter/gui.py:23
+#: src/apk_starter/gui.py:24
 #, python-brace-format
 msgid "the window needs GTK 4 and libadwaita: {reason}"
 msgstr "okno vyžaduje GTK 4 a libadwaita: {reason}"
 
-#: src/apk_starter/gui.py:36
+#: src/apk_starter/gui.py:39
 msgid "Install APK…"
 msgstr "Instalovat APK…"
 
-#: src/apk_starter/gui.py:36
+#: src/apk_starter/gui.py:39
 msgid "Choose an APK file and add it to the menu"
 msgstr "Vybrat soubor APK a přidat jej do nabídky"
 
-#: src/apk_starter/gui.py:41
+#: src/apk_starter/gui.py:44
 msgid "Working…"
 msgstr "Probíhá zpracování…"
 
-#: src/apk_starter/gui.py:48
+#: src/apk_starter/gui.py:51
 msgid "No apps installed"
 msgstr "Nejsou nainstalovány žádné aplikace"
 
-#: src/apk_starter/gui.py:49
+#: src/apk_starter/gui.py:52
 msgid "Install an APK or drop one here."
 msgstr "Nainstalujte APK nebo jej sem přetáhněte."
 
-#: src/apk_starter/gui.py:79
+#: src/apk_starter/gui.py:87
 msgid "Close"
 msgstr "Zavřít"
 
-#: src/apk_starter/gui.py:115
+#: src/apk_starter/gui.py:132
 msgid "Cannot read the app list"
 msgstr "Nelze načíst seznam aplikací"
 
-#: src/apk_starter/gui.py:126
+#: src/apk_starter/gui.py:143
 #, python-brace-format
 msgid "data {size}"
 msgstr "data {size}"
 
-#: src/apk_starter/gui.py:126
+#: src/apk_starter/gui.py:143
 msgid "no data"
 msgstr "žádná data"
 
-#: src/apk_starter/gui.py:138
+#: src/apk_starter/gui.py:155
 msgid "Start"
 msgstr "Spustit"
 
-#: src/apk_starter/gui.py:140
+#: src/apk_starter/gui.py:157
 msgid "Start with log"
 msgstr "Spustit s protokolem"
 
-#: src/apk_starter/gui.py:140
+#: src/apk_starter/gui.py:157
 msgid "Open log folder"
 msgstr "Otevřít složku protokolů"
 
-#: src/apk_starter/gui.py:141
+#: src/apk_starter/gui.py:158
 msgid "Delete data…"
 msgstr "Smazat data…"
 
-#: src/apk_starter/gui.py:141
+#: src/apk_starter/gui.py:158
 msgid "Uninstall…"
 msgstr "Odinstalovat…"
 
-#: src/apk_starter/gui.py:146
+#: src/apk_starter/gui.py:163
 msgid "More"
 msgstr "Více"
 
-#: src/apk_starter/gui.py:158
+#: src/apk_starter/gui.py:175
 #, python-brace-format
 msgid "Cannot start {app}"
 msgstr "Aplikaci {app} nelze spustit"
 
-#: src/apk_starter/gui.py:163
+#: src/apk_starter/gui.py:180
 msgid "See the log folder."
 msgstr "Podívejte se do složky protokolů."
 
-#: src/apk_starter/gui.py:163
+#: src/apk_starter/gui.py:180
 msgid "Try “Start with log” and look at the log."
 msgstr "Zkuste „Spustit s protokolem“ a prohlédněte si protokol."
 
-#: src/apk_starter/gui.py:165
+#: src/apk_starter/gui.py:182
 #, python-brace-format
 msgid "{app} ended with exit code {code}"
 msgstr "Aplikace {app} skončila s návratovým kódem {code}"
 
-#: src/apk_starter/gui.py:167
+#: src/apk_starter/gui.py:184
 #, python-brace-format
 msgid "{app} was killed by signal {signal}"
 msgstr "Aplikace {app} byla ukončena signálem {signal}"
 
-#: src/apk_starter/gui.py:170
+#: src/apk_starter/gui.py:187
 #, python-brace-format
 msgid "{app} starts with a log"
 msgstr "Aplikace {app} se spouští s protokolem"
 
-#: src/apk_starter/gui.py:177 src/apk_starter/gui.py:185
+#: src/apk_starter/gui.py:194 src/apk_starter/gui.py:202
 msgid "Cannot open the log folder"
 msgstr "Nelze otevřít složku protokolů"
 
-#: src/apk_starter/gui.py:189
+#: src/apk_starter/gui.py:206
 msgid "Android apps"
 msgstr "Aplikace pro Android"
 
-#: src/apk_starter/gui.py:194
+#: src/apk_starter/gui.py:211
 msgid "Install APK"
 msgstr "Instalovat APK"
 
-#: src/apk_starter/gui.py:214
+#: src/apk_starter/gui.py:233 src/apk_starter/gui.py:235
 #, python-brace-format
 msgid "{app} installed"
 msgstr "Aplikace {app} nainstalována"
 
-#: src/apk_starter/gui.py:215
+#: src/apk_starter/gui.py:237
 #, python-brace-format
 msgid "Cannot install {file}"
 msgstr "{file} nelze nainstalovat"
 
-#: src/apk_starter/gui.py:220
+#: src/apk_starter/gui.py:242
 msgid "Cancel"
 msgstr "Zrušit"
 
-#: src/apk_starter/gui.py:232
+#: src/apk_starter/gui.py:254
 #, python-brace-format
 msgid "Delete the data of {app}?"
 msgstr "Smazat data aplikace {app}?"
 
-#: src/apk_starter/gui.py:233
+#: src/apk_starter/gui.py:255
 msgid ""
 "The app stays installed. Its settings, accounts and files are deleted. Close "
 "the app first."
-msgstr "Aplikace zůstane nainstalována. Její nastavení, účty a soubory budou smazány. Nejprve aplikaci zavřete."
+msgstr ""
+"Aplikace zůstane nainstalována. Její nastavení, účty a soubory budou "
+"smazány. Nejprve aplikaci zavřete."
 
-#: src/apk_starter/gui.py:234
+#: src/apk_starter/gui.py:256
 msgid "Delete Data"
 msgstr "Smazat data"
 
-#: src/apk_starter/gui.py:236
+#: src/apk_starter/gui.py:258
 #, python-brace-format
 msgid "Data of {app} deleted"
 msgstr "Data aplikace {app} smazána"
 
-#: src/apk_starter/gui.py:237
+#: src/apk_starter/gui.py:259
 #, python-brace-format
 msgid "Cannot delete the data of {app}"
 msgstr "Data aplikace {app} nelze smazat"
 
-#: src/apk_starter/gui.py:241
+#: src/apk_starter/gui.py:263
 msgid "Also delete app data"
 msgstr "Smazat i data aplikace"
 
-#: src/apk_starter/gui.py:244 src/apk_starter/gui.py:246
+#: src/apk_starter/gui.py:266 src/apk_starter/gui.py:268
 #, python-brace-format
 msgid "{app} uninstalled"
 msgstr "Aplikace {app} odinstalována"
 
-#: src/apk_starter/gui.py:247
+#: src/apk_starter/gui.py:269
 #, python-brace-format
 msgid "Uninstall {app}?"
 msgstr "Odinstalovat aplikaci {app}?"
 
-#: src/apk_starter/gui.py:248
+#: src/apk_starter/gui.py:270
 msgid "The app and its menu entry are removed. Close the app first."
-msgstr "Aplikace a její položka v nabídce budou odstraněny. Nejprve aplikaci zavřete."
+msgstr ""
+"Aplikace a její položka v nabídce budou odstraněny. Nejprve aplikaci zavřete."
 
-#: src/apk_starter/gui.py:248
+#: src/apk_starter/gui.py:270
 msgid "Uninstall"
 msgstr "Odinstalovat"
 
-#: src/apk_starter/gui.py:250
+#: src/apk_starter/gui.py:272
 #, python-brace-format
 msgid "Cannot uninstall {app}"
 msgstr "Aplikaci {app} nelze odinstalovat"
@@ -446,7 +503,7 @@ msgstr "nelze použít spolu s argumentem %s"
 msgid "invalid %(type)s value: %(value)r"
 msgstr "neplatná hodnota %(type)s: %(value)r"
 
-#: src/apk_starter/launch.py:26
+#: src/apk_starter/launch.py:28
 #, python-brace-format
 msgid "invalid --size, expected WxH: {value}"
 msgstr "neplatná hodnota --size, očekáváno WxH: {value}"

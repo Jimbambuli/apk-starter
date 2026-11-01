@@ -1,8 +1,10 @@
 """Build the android-translation-layer command line, environment and per-app data."""
+import dataclasses
+import hashlib
 import json
 import os
 import re
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from pathlib import Path
 
 from .apkinfo import ApkInfo
@@ -92,3 +94,29 @@ def build_env(paths: Paths, pkg: str, base: Mapping[str, str]) -> dict[str, str]
     old = base.get("LD_LIBRARY_PATH", "")
     env["LD_LIBRARY_PATH"] = f"{art}:{old}" if old else art
     return env
+
+
+def cached_apk_info(paths: Paths, apk: Path, lang: str | None,
+                    read: Callable[[Path, str | None], ApkInfo]) -> ApkInfo:
+    """Like Android's package cache: parse an APK once, keyed by path, size, mtime and language (F182).
+    The icon is not kept: starting does not need it."""
+    path = os.path.abspath(apk)
+    st = os.stat(path)
+    key = [path, st.st_size, st.st_mtime_ns, lang]
+    f = paths.cache_home / "apk-starter" / "apkinfo" / (hashlib.sha256(path.encode()).hexdigest()[:32] + ".json")
+    try:
+        d = json.loads(f.read_text(encoding="utf-8"))
+        if d.pop("key") == key:
+            return ApkInfo(path=Path(apk), icon=None, **d)
+    except (OSError, ValueError, KeyError, TypeError, AttributeError):
+        pass
+    info = read(apk, lang)
+    d = {k: v for k, v in dataclasses.asdict(info).items() if k not in ("path", "icon")}
+    try:
+        f.parent.mkdir(parents=True, exist_ok=True)
+        tmp = f.with_name(f"{f.name}.{os.getpid()}.tmp")
+        tmp.write_text(json.dumps({"key": key, **d}), encoding="utf-8")
+        os.replace(tmp, f)
+    except OSError:
+        pass
+    return info

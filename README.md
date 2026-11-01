@@ -50,6 +50,12 @@ Double-clicking an APK in the file manager and starting an installed app from th
 Data lives under `~/.var/app/io.github.Jimbambuli.ApkStarter/data/`: `apps/` (installed APKs), `data/<package>/`
 (app data), `logs/` (logs from `--log`).
 
+Like Android, installing compiles an app for your processor (shown as «Preparing …»), so its first start is as
+fast as later ones; the Android runtime itself is prepared once and again after an update of APK Starter. An APK
+started without installing is compiled quickly at its first start and fully in the background while it runs. The
+compiled code lives in `~/.var/app/io.github.Jimbambuli.ApkStarter/cache/art/`; deleting it is safe, it is made
+again.
+
 Uninstalling: run `apk-starter --remove-all` before `flatpak uninstall io.github.Jimbambuli.ApkStarter`.
 `flatpak uninstall` does not remove the menu entries of the installed apps; desktops hide them once APK Starter is
 gone, but the files stay in `~/.local/share/xdg-desktop-portal/` (and come back if you install APK Starter again).

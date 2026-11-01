@@ -7,7 +7,8 @@ import threading
 from collections.abc import Callable, Mapping
 from pathlib import Path
 
-from .cli import APP_ID, clear_data, install_apk, lang_from_env, remove_app
+from . import dexopt
+from .cli import APP_ID, clear_data, install_apk, lang_from_env, prepare_all, remove_app
 from .errors import StarterError, describe_error
 from .i18n import _
 from .gui_model import AppRow, load_rows, start_argv
@@ -26,9 +27,11 @@ APK_MIME = "application/vnd.android.package-archive"
 
 
 class Window(Adw.ApplicationWindow):
-    def __init__(self, app: Adw.Application, paths: Paths, lang: str | None, launcher: list[str]):
+    def __init__(self, app: Adw.Application, paths: Paths, lang: str | None, launcher: list[str],
+                 env: Mapping[str, str] | None = None):
         super().__init__(application=app, title="APK Starter", default_width=640, default_height=560)
         self.paths, self.lang, self.launcher = paths, lang, launcher
+        self.env = dict(os.environ if env is None else env)
         self.rows: dict[str, AppRow] = {}
         self.busy = 0                               # running install/remove/clear jobs
         self.generation = 0                         # newest list load; older results are dropped
@@ -51,6 +54,8 @@ class Window(Adw.ApplicationWindow):
         self.toasts = Adw.ToastOverlay(child=self.stack)
         view = Adw.ToolbarView(content=self.toasts)
         view.add_top_bar(header)
+        self.banner = Adw.Banner(revealed=False)            # «Preparing …» while compiling for this computer
+        view.add_top_bar(self.banner)
         self.set_content(view)
 
         drop = Gtk.DropTarget.new(Gdk.FileList, Gdk.DragAction.COPY)
@@ -66,6 +71,9 @@ class Window(Adw.ApplicationWindow):
             action.connect("activate", lambda _a, v, h=handler: h(v.get_string()))
             self.add_action(action)
         self.refresh()
+        if not dexopt.runtime_ready(self.paths, self.env) or dexopt.stale_installed(self.paths):
+            # after a Flatpak update: rebuild once in the background; apps started meanwhile wait for the runtime
+            self.background(lambda: prepare_all(self.paths, self.env, self.progress), None, "")
 
     # -- helpers -----------------------------------------------------------------------------------------
     def toast(self, text: str) -> None:
@@ -93,6 +101,7 @@ class Window(Adw.ApplicationWindow):
             if job:
                 self.busy -= 1
                 self.spinner.set_visible(self.busy > 0)
+                self.banner.set_revealed(self.banner.get_revealed() and self.busy > 0)
             if error is not None:
                 self.alert(failed, describe_error(error))
             elif done is not None:
@@ -105,6 +114,14 @@ class Window(Adw.ApplicationWindow):
             self.busy += 1
             self.spinner.set_visible(True)
         threading.Thread(target=thread, daemon=True).start()
+
+    def progress(self, text: str) -> None:
+        """Called from worker threads."""
+        def show() -> bool:
+            self.banner.set_title(GLib.markup_escape_text(text))
+            self.banner.set_revealed(self.busy > 0)
+            return False
+        GLib.idle_add(show)
 
     # -- list ----------------------------------------------------------------------------------------------
     def refresh(self) -> None:
@@ -210,9 +227,14 @@ class Window(Adw.ApplicationWindow):
         return any(paths)
 
     def install(self, apk: Path) -> None:
-        self.background(lambda: install_apk(self.paths, apk, self.lang),
-                        lambda info: self.toast(_("{app} installed").format(app=info.label)),
-                        _("Cannot install {file}").format(file=apk.name))
+        warnings: list[str] = []
+        def done(info) -> None:
+            if warnings:
+                self.alert(_("{app} installed").format(app=info.label), "\n".join(warnings))
+            else:
+                self.toast(_("{app} installed").format(app=info.label))
+        self.background(lambda: install_apk(self.paths, apk, self.lang, self.env, self.progress, warnings.append),
+                        done, _("Cannot install {file}").format(file=apk.name))
 
     def _confirm(self, heading: str, body: str, verb: str, then: Callable[[], None],
                  extra: Gtk.Widget | None = None) -> None:
@@ -261,7 +283,7 @@ def run(paths: Paths, env: Mapping[str, str], launcher: list[str] | None = None)
     lang = lang_from_env(env)
 
     def activate(a: Adw.Application) -> None:
-        win = a.get_active_window() or Window(a, paths, lang, launcher or default_launcher())
+        win = a.get_active_window() or Window(a, paths, lang, launcher or default_launcher(), env)
         win.present()
     app.connect("activate", activate)
     return app.run([sys.argv[0]])

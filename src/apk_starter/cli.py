@@ -6,16 +6,17 @@ import json
 import os
 import shutil
 import sys
-from collections.abc import Iterator, Mapping
+import threading
+from collections.abc import Callable, Iterator, Mapping
 from datetime import datetime
 from pathlib import Path
 
 from .apkinfo import PACKAGE_RE, ApkInfo, read_apk_info
 from .errors import ApkError, StarterError, UsageError, describe_error
 from .i18n import _
-from . import i18n
-from .launch import (DEFAULT_SIZE, build_command, build_env, parse_size, prepare_apk, remember_size,
-                     remembered_size, sdk_for)
+from . import dexopt, i18n
+from .launch import (DEFAULT_SIZE, build_command, build_env, cached_apk_info, parse_size, prepare_apk,
+                     remember_size, remembered_size, sdk_for)
 from .paths import Paths
 from .run import (default_log_path, header_fields, read_build_info, run_atl, runtime_name)
 
@@ -103,12 +104,44 @@ def install_app(paths: Paths, info: ApkInfo) -> None:
     _write_atomic(paths.meta(info.package), json.dumps(meta).encode("utf-8"))
 
 
-def install_apk(paths: Paths, apk: Path, lang: str | None) -> ApkInfo:
-    """Copy the APK into apps/ and add a menu entry through the DynamicLauncher portal."""
+def _stderr(text: str) -> None:
+    print(f"apk-starter: {text}", file=sys.stderr, flush=True)
+
+
+def prepare_installed(paths: Paths, env: Mapping[str, str], info: ApkInfo, report: Callable[[str], None],
+                      warn: Callable[[str], None]) -> None:
+    """Install dexopt: runtime, app code (FULL) and native libraries (in parallel). On failure the app still
+    works: ART compiles at the start and ATL unpacks, as before; the reason is reported."""
+    try:
+        dexopt.ensure_runtime(paths, env, report)
+        report(_("Preparing {app} for this computer…").format(app=info.label))
+        failed: list[Exception] = []
+        def natives() -> None:
+            try:
+                dexopt.extract_natives(paths, info.package, paths.apk(info.package))
+            except (StarterError, OSError) as e:
+                failed.append(e)
+        t = threading.Thread(target=natives)
+        t.start()
+        try:
+            dexopt.compile_app(paths, env, str(paths.apk(info.package)), dexopt.FULL)
+        finally:
+            t.join()
+        if failed:
+            raise failed[0]
+    except (StarterError, OSError) as e:
+        warn(_("{app} could not be prepared in advance: {reason}").format(app=info.label,
+                                                                            reason=describe_error(e)))
+
+
+def install_apk(paths: Paths, apk: Path, lang: str | None, env: Mapping[str, str] | None = None,
+                report: Callable[[str], None] = _stderr, warn: Callable[[str], None] = _stderr) -> ApkInfo:
+    """Copy the APK into apps/, compile it for this computer and add a menu entry (DynamicLauncher portal)."""
     from . import portal
     info = read_apk_info(apk, lang)
     with package_lock(paths, info.package):
         install_app(paths, info)
+        prepare_installed(paths, os.environ if env is None else env, info, report, warn)
         icon = info.icon
         if icon is None:
             try:
@@ -282,7 +315,7 @@ def _main(argv: list[str], env: Mapping[str, str]) -> int:
             print(f"apk-starter: {line}", file=sys.stderr)
         return 1 if errors else 0
     if args.install:
-        install_apk(paths, Path(args.install), lang_from_env(env))
+        install_apk(paths, Path(args.install), lang_from_env(env), env)
         return 0
     if not tail and log is None and args.sdk is None and not args.size:
         if not any(env.get(v) for v in DISPLAY_VARS):
@@ -297,7 +330,7 @@ def _main(argv: list[str], env: Mapping[str, str]) -> int:
 def _start(paths: Paths, args, log, tail: list[str], env: Mapping[str, str]) -> int:
     target, atl_args = tail[0], tail[1:]
     apk = resolve_target(paths, target)
-    info = read_apk_info(apk, lang_from_env(env))
+    info = cached_apk_info(paths, apk, lang_from_env(env), read_apk_info)
     if args.size:
         size = parse_size(args.size)
     else:
@@ -316,4 +349,51 @@ def _start(paths: Paths, args, log, tail: list[str], env: Mapping[str, str]) -> 
         remember_size(paths, info.package, size)
     header = header_fields(info, read_build_info(paths.build_info()), runtime_name(), cmd, started, VERSION) \
         if log_path else {}
-    return run_atl(cmd, child_env, log_path, header)
+    later = _prepare_start(paths, env, str(apk_path))
+    background = threading.Thread(target=_compile_later, args=(paths, env, later))
+    background.start()
+    try:
+        return run_atl(cmd, child_env, log_path, header)
+    finally:
+        background.join()       # the Flatpak instance (and every process in it) ends with this one
+
+
+def _prepare_start(paths: Paths, env: Mapping[str, str], location: str) -> list[str]:
+    """Before ATL: runtime if needed (e.g. after a Flatpak update), the app with QUICK if it has no current
+    code (direct start, F180). Returns the APKs to compile with FULL in the background while the app runs."""
+    try:
+        dexopt.ensure_runtime(paths, env, _stderr)
+    except (StarterError, OSError) as e:
+        _stderr(_("the Android runtime could not be prepared in advance: {reason}").format(reason=describe_error(e)))
+        return []
+    flt = dexopt.app_filter(paths, location)
+    if flt is None:
+        try:
+            dexopt.compile_app(paths, env, location, dexopt.QUICK)
+        except (StarterError, OSError):
+            pass                # ART compiles it at the start, as before
+    later = [] if flt == dexopt.FULL else [location]
+    return later + [loc for loc in dexopt.stale_installed(paths) if loc != location]
+
+
+def prepare_all(paths: Paths, env: Mapping[str, str], report: Callable[[str], None]) -> None:
+    """Window opened after a Flatpak update (or before anything was prepared): runtime and all apps, once.
+    A failure is only noted on stderr: ART then compiles at the start, as before."""
+    try:
+        dexopt.ensure_runtime(paths, env, report)
+    except (StarterError, OSError) as e:
+        _stderr(_("the Android runtime could not be prepared in advance: {reason}").format(reason=describe_error(e)))
+        return
+    stale = dexopt.stale_installed(paths)
+    if stale:
+        report(_("Preparing apps for this computer…"))
+    _compile_later(paths, env, stale)
+
+
+def _compile_later(paths: Paths, env: Mapping[str, str], locations: list[str]) -> None:
+    """Like Android's background dexopt: idle priority, renamed into place, a running app keeps its files."""
+    for loc in locations:
+        try:
+            dexopt.compile_app(paths, env, loc, dexopt.FULL, idle=True)
+        except (StarterError, OSError):
+            pass                # stays QUICK (or ART's own); tried again at the next start

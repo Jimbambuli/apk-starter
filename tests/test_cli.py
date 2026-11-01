@@ -8,10 +8,12 @@ import pytest
 
 import apk_starter
 from apk_starter.cli import main, split_log_option
+from apk_starter import dexopt
 from apk_starter.errors import StarterError
 from apkgen import axml_manifest, make_apk
 
 FAKE = Path(__file__).with_name("fake_atl.py")
+FAKE_ART = Path(__file__).with_name("fake_art.py")
 PKG = "org.example.demo"
 DEFAULT_ICON = b"<svg/>"
 
@@ -26,6 +28,11 @@ def box(tmp_path, monkeypatch):
     bindir = tmp_path / "bin"
     bindir.mkdir()
     (bindir / "android-translation-layer").symlink_to(FAKE)
+    for prog in ("dalvikvm", "dex2oat"):
+        (bindir / prog).symlink_to(FAKE_ART)
+    info = tmp_path / "flatpak-info"
+    info.write_text("[Instance]\napp-commit=aaaa\n")
+    monkeypatch.setattr(dexopt, "FLATPAK_INFO", info)
     record = tmp_path / "record.json"
     calls = []
     fake = types.ModuleType("apk_starter.portal")
@@ -39,10 +46,13 @@ def box(tmp_path, monkeypatch):
     (prefix / "share/icons/hicolor/scalable/apps/io.github.Jimbambuli.ApkStarter.svg").write_bytes(DEFAULT_ICON)
     env = {"XDG_DATA_HOME": str(tmp_path / "data"), "XDG_CACHE_HOME": str(tmp_path / "cache"),
            "APK_STARTER_PREFIX": str(prefix), "PATH": f"{bindir}:{os.environ['PATH']}",
-           "FAKE_ATL_RECORD": str(record), "LANG": "de_CH.UTF-8"}
+           "FAKE_ATL_RECORD": str(record), "LANG": "de_CH.UTF-8", "FAKE_ART_RECORD": str(tmp_path / "art.jsonl")}
     apk = make_apk(tmp_path / "demo.apk", manifest=axml_manifest())
+    def art():
+        f = tmp_path / "art.jsonl"
+        return [json.loads(line) for line in f.read_text().splitlines()] if f.exists() else []
     return types.SimpleNamespace(env=env, record=record, calls=calls, apk=apk, tmp=tmp_path, fake=fake,
-                                 data=tmp_path / "data")
+                                 data=tmp_path / "data", art=art, info=info)
 
 
 def test_log_flag_does_not_eat_apk():
@@ -215,3 +225,106 @@ def test_remove_all_goes_on_after_a_failure(box, capsys, monkeypatch):
     assert main(["--remove-all"], env=box.env) == 1
     assert not (box.data / "apps" / f"{PKG}.apk").exists()          # the next app was still removed
     assert "cannot remove a.broken: busy" in capsys.readouterr().err
+
+
+# -- ahead-of-time preparation (dexopt.py) ------------------------------------------------------------------
+def _flt(call):
+    return next(a.split("=", 1)[1] for a in call["args"] if a.startswith("--compiler-filter="))
+
+
+def _dex(call):
+    return next(a.split("=", 1)[1] for a in call["args"] if a.startswith("--dex-file="))
+
+
+def test_install_prepares_runtime_app_and_natives_before_the_menu_entry(box, capsys):
+    apk = make_apk(box.tmp / "libs.apk", manifest=axml_manifest(), files={"lib/x86_64/libx.so": b"x"})
+    order = []
+    box.fake.install_launcher = lambda *a: order.append(len(box.art()))
+    assert main(["--install", str(apk)], env=box.env) == 0
+    art = box.art()
+    installed = str(box.data / "apps" / f"{PKG}.apk")
+    assert [c["prog"] for c in art] == ["dalvikvm", "dex2oat", "dex2oat"]
+    assert _dex(art[2]) == installed and _flt(art[2]) == "speed"
+    assert order == [3]                                          # menu entry after the preparation
+    assert (box.data / "data" / PKG / f"{PKG}.apk_" / "lib" / "libx.so").read_bytes() == b"x"
+    assert "Preparing the Android runtime" in capsys.readouterr().err     # progress on stderr
+
+
+def test_install_goes_on_when_preparing_fails(box, capsys):
+    box.env["FAKE_ART_FAIL"] = "dex2oat"
+    assert main(["--install", str(box.apk)], env=box.env) == 0
+    assert (box.data / "apps" / f"{PKG}.apk").exists() and box.calls[-1][0] == "install"
+    assert "something went wrong" in capsys.readouterr().err
+
+
+def test_installed_app_starts_without_compiling(box):
+    assert main(["--install", str(box.apk)], env=box.env) == 0
+    n = len(box.art())
+    assert main([PKG], env=box.env) == 0
+    assert len(box.art()) == n
+    assert json.loads(box.record.read_text())["argv"][0] == str(box.data / "apps" / f"{PKG}.apk")
+
+
+def test_direct_start_verifies_first_and_compiles_fully_afterwards(box):
+    link = box.tmp / "cache" / "apk-starter" / "launch" / f"{PKG}.apk"
+    paths = apk_starter.paths.Paths.from_env(box.env)
+    box.env["FAKE_ATL_CHECK"] = str(dexopt.cache_file(paths, str(link)))
+    assert main([str(box.apk)], env=box.env) == 0
+    art = box.art()
+    assert [c["prog"] for c in art] == ["dalvikvm", "dex2oat", "dex2oat", "dex2oat"]
+    assert _dex(art[2]) == str(link) and _flt(art[2]) == "verify" and not art[2]["sched_idle"]
+    assert json.loads(box.record.read_text())["check"]           # compiled code was there when ATL started
+    assert _flt(art[3]) == "speed" and art[3]["sched_idle"]       # full pass in the background
+    assert dexopt.app_filter(paths, str(link)) == "speed"
+    assert main([str(box.apk)], env=box.env) == 0
+    assert len(box.art()) == 4
+
+
+def test_after_a_flatpak_update_runtime_and_apps_are_rebuilt(box):
+    other = make_apk(box.tmp / "other.apk", manifest=axml_manifest(package="org.example.other"))
+    assert main(["--install", str(box.apk)], env=box.env) == 0
+    assert main(["--install", str(other)], env=box.env) == 0
+    n = len(box.art())
+    box.info.write_text("[Instance]\napp-commit=bbbb\n")
+    assert main([PKG], env=box.env) == 0
+    new = box.art()[n:]
+    assert [c["prog"] for c in new[:2]] == ["dalvikvm", "dex2oat"]   # ART checks the runtime again, ghax
+    assert (_dex(new[2]).endswith(f"{PKG}.apk"), _flt(new[2]), new[2]["sched_idle"]) == (True, "verify", False)
+    rest = sorted((_dex(c).rsplit("/", 1)[1], _flt(c), c["sched_idle"]) for c in new[3:])
+    assert rest == [("org.example.demo.apk", "speed", True), ("org.example.other.apk", "speed", True)]
+
+
+def test_start_works_when_the_runtime_cannot_be_prepared(box, capsys):
+    box.env["FAKE_ART_FAIL"] = "dalvikvm"
+    assert main([str(box.apk)], env=box.env) == 0
+    assert [c["prog"] for c in box.art()] == ["dalvikvm"]            # ART does it at the start, as before
+    assert box.record.exists() and "something went wrong" in capsys.readouterr().err
+
+
+def test_apk_details_are_read_once_per_apk(box, monkeypatch):
+    import apk_starter.cli as cli
+    seen = []
+    real = cli.read_apk_info
+    monkeypatch.setattr(cli, "read_apk_info", lambda p, lang=None: seen.append(p) or real(p, lang))
+    assert main([str(box.apk)], env=box.env) == 0
+    assert main([str(box.apk)], env=box.env) == 0
+    assert len(seen) == 1
+    os.utime(box.apk, ns=(0, os.stat(box.apk).st_mtime_ns + 10**9))
+    assert main([str(box.apk)], env=box.env) == 0
+    assert len(seen) == 2
+    rec = json.loads(box.record.read_text())
+    assert rec["argv"][rec["argv"].index("--sdk-int") + 1] == "34"
+
+
+def test_window_rebuild_prepares_runtime_and_every_stale_app(box):
+    from apk_starter.cli import prepare_all
+    assert main(["--install", str(box.apk)], env=box.env) == 0
+    box.info.write_text("[Instance]\napp-commit=bbbb\n")
+    paths = apk_starter.paths.Paths.from_env(box.env)
+    msgs = []
+    prepare_all(paths, box.env, msgs.append)
+    assert dexopt.runtime_ready(paths) and dexopt.stale_installed(paths) == []
+    assert msgs == ["Preparing the Android runtime for this computer…", "Preparing apps for this computer…"]
+    n = len(box.art())
+    prepare_all(paths, box.env, msgs.append)
+    assert len(box.art()) == n and len(msgs) == 2

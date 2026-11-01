@@ -5,7 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
-"Report-Msgid-Bugs-To: https://github.com/Jimbambuli/apk-starter/issues\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-01 13:44+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -35,19 +36,28 @@ msgid ""
 "desktop. It is built on Android Translation Layer (ATL) and translates the "
 "app's calls to GTK, Wayland and the usual Linux libraries instead of running "
 "a full Android system."
-msgstr "APK Starter exécute une application Android à partir de son fichier APK sur le bureau Linux. Il repose sur Android Translation Layer (ATL) et traduit les appels de l’application vers GTK, Wayland et les bibliothèques Linux habituelles, au lieu de faire tourner un système Android complet."
+msgstr ""
+"APK Starter exécute une application Android à partir de son fichier APK sur "
+"le bureau Linux. Il repose sur Android Translation Layer (ATL) et traduit "
+"les appels de l’application vers GTK, Wayland et les bibliothèques Linux "
+"habituelles, au lieu de faire tourner un système Android complet."
 
 #: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:18
 msgid ""
 "Bring your own APK: open it, double-click it, or add it to the application "
 "menu."
-msgstr "Apportez votre propre APK : ouvrez-le, double-cliquez dessus ou ajoutez-le au menu des applications."
+msgstr ""
+"Apportez votre propre APK : ouvrez-le, double-cliquez dessus ou ajoutez-le "
+"au menu des applications."
 
 #: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:19
 msgid ""
 "A small window lists your apps with icon, version and data size; start, "
 "uninstall or delete their data from there."
-msgstr "Une petite fenêtre affiche vos applications avec leur icône, leur version et la taille de leurs données ; vous pouvez les lancer, les désinstaller ou effacer leurs données depuis cette fenêtre."
+msgstr ""
+"Une petite fenêtre affiche vos applications avec leur icône, leur version et "
+"la taille de leurs données ; vous pouvez les lancer, les désinstaller ou "
+"effacer leurs données depuis cette fenêtre."
 
 #: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:21
 msgid "Each app keeps its own data folder."
@@ -55,14 +65,20 @@ msgstr "Chaque application dispose de son propre dossier de données."
 
 #: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:22
 msgid "An optional log helps to find out why an app does not work."
-msgstr "Un journal facultatif aide à comprendre pourquoi une application ne fonctionne pas."
+msgstr ""
+"Un journal facultatif aide à comprendre pourquoi une application ne "
+"fonctionne pas."
 
 #: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:24
 msgid ""
 "No apps are included and no Google services are provided. Apps that need "
 "Google Play services, Jetpack Compose, ARM-only native code, the camera, "
 "Bluetooth or telephony may not work."
-msgstr "Aucune application n’est fournie et aucun service Google n’est disponible. Les applications qui nécessitent les services Google Play, Jetpack Compose, du code natif uniquement ARM, la caméra, le Bluetooth ou la téléphonie risquent de ne pas fonctionner."
+msgstr ""
+"Aucune application n’est fournie et aucun service Google n’est disponible. "
+"Les applications qui nécessitent les services Google Play, Jetpack Compose, "
+"du code natif uniquement ARM, la caméra, le Bluetooth ou la téléphonie "
+"risquent de ne pas fonctionner."
 
 #: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:28
 msgid "Android is a trademark of Google LLC."
@@ -73,7 +89,10 @@ msgid ""
 "The Android robot in the icon is reproduced or modified from work created "
 "and shared by Google and used according to terms described in the Creative "
 "Commons 3.0 Attribution License."
-msgstr "Le robot Android de l’icône est reproduit ou modifié à partir d’une œuvre créée et partagée par Google et utilisé conformément aux conditions de la licence Creative Commons Attribution 3.0."
+msgstr ""
+"Le robot Android de l’icône est reproduit ou modifié à partir d’une œuvre "
+"créée et partagée par Google et utilisé conformément aux conditions de la "
+"licence Creative Commons Attribution 3.0."
 
 #: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:40
 msgid "The app list with three free apps from F-Droid"
@@ -87,7 +106,9 @@ msgstr "{file} est trop volumineux ({size} octets)"
 #: src/apk_starter/apkinfo.py:88
 #, python-brace-format
 msgid "split APK bundles (.apks/.xapk) are not supported yet: {file}"
-msgstr "les paquets APK fractionnés (.apks/.xapk) ne sont pas encore pris en charge : {file}"
+msgstr ""
+"les paquets APK fractionnés (.apks/.xapk) ne sont pas encore pris en "
+"charge : {file}"
 
 #: src/apk_starter/apkinfo.py:94 src/apk_starter/apkinfo.py:115
 #, python-brace-format
@@ -119,288 +140,334 @@ msgstr "resources.arsc corrompu"
 msgid "corrupt AndroidManifest.xml"
 msgstr "AndroidManifest.xml corrompu"
 
-#: src/apk_starter/cli.py:41
+#: src/apk_starter/cli.py:42
 msgid "--log= needs a file name"
 msgstr "--log= nécessite un nom de fichier"
 
-#: src/apk_starter/cli.py:64
+#: src/apk_starter/cli.py:65
 #, python-brace-format
 msgid ""
 "cannot read {file}: no such file (inside the Flatpak sandbox only paths "
 "passed with --file-forwarding are visible: {command})"
-msgstr "impossible de lire {file} : fichier introuvable (dans le bac à sable Flatpak, seuls les chemins transmis avec --file-forwarding sont visibles : {command})"
+msgstr ""
+"impossible de lire {file} : fichier introuvable (dans le bac à sable "
+"Flatpak, seuls les chemins transmis avec --file-forwarding sont visibles : "
+"{command})"
 
-#: src/apk_starter/cli.py:67 src/apk_starter/cli.py:176
+#: src/apk_starter/cli.py:68 src/apk_starter/cli.py:209
 #, python-brace-format
 msgid "not installed: {package}"
 msgstr "non installé : {package}"
 
-#: src/apk_starter/cli.py:122
+#: src/apk_starter/cli.py:117
+#, python-brace-format
+msgid "Preparing {app} for this computer…"
+msgstr "Préparation de {app} pour cet ordinateur…"
+
+#: src/apk_starter/cli.py:133
+#, python-brace-format
+msgid "{app} could not be prepared in advance: {reason}"
+msgstr "{app} n’a pas pu être préparé à l’avance : {reason}"
+
+#: src/apk_starter/cli.py:155
 #, python-brace-format
 msgid ""
 "{app} is installed without a menu entry: the DynamicLauncher portal is not "
 "available; start the app with: {command}"
-msgstr "{app} est installé sans entrée de menu : le portail DynamicLauncher n’est pas disponible ; lancez l’application avec : {command}"
+msgstr ""
+"{app} est installé sans entrée de menu : le portail DynamicLauncher n’est "
+"pas disponible ; lancez l’application avec : {command}"
 
-#: src/apk_starter/cli.py:126
+#: src/apk_starter/cli.py:159
 #, python-brace-format
 msgid "{app} is installed without a menu entry: {reason}"
 msgstr "{app} est installé sans entrée de menu : {reason}"
 
-#: src/apk_starter/cli.py:160
+#: src/apk_starter/cli.py:193
 #, python-brace-format
 msgid "cannot remove {folder}: {reason}"
 msgstr "impossible de supprimer {folder} : {reason}"
 
-#: src/apk_starter/cli.py:180
+#: src/apk_starter/cli.py:213
 msgid ""
 "the DynamicLauncher portal is not available; the menu entry was not removed"
-msgstr "le portail DynamicLauncher n’est pas disponible ; l’entrée de menu n’a pas été supprimée"
+msgstr ""
+"le portail DynamicLauncher n’est pas disponible ; l’entrée de menu n’a pas "
+"été supprimée"
 
-#: src/apk_starter/cli.py:182
+#: src/apk_starter/cli.py:215
 #, python-brace-format
 msgid "the menu entry was not removed: {reason}"
 msgstr "l’entrée de menu n’a pas été supprimée : {reason}"
 
-#: src/apk_starter/cli.py:215
+#: src/apk_starter/cli.py:248
 msgid "(no arguments: open the management window)"
 msgstr "(sans argument : ouvre la fenêtre de gestion)"
 
-#: src/apk_starter/cli.py:216
+#: src/apk_starter/cli.py:249
 msgid "Start Android apps (APK) with Android Translation Layer."
 msgstr "Lancer des applications Android (APK) avec Android Translation Layer."
 
-#: src/apk_starter/cli.py:218
+#: src/apk_starter/cli.py:251
 msgid ""
 "write a log for atl-doctor (default: logs/<package>-<time>.log); use --"
 "log=FILE"
-msgstr "écrire un journal pour atl-doctor (par défaut : logs/<paquet>-<heure>.log) ; fichier au choix avec --log=FILE"
+msgstr ""
+"écrire un journal pour atl-doctor (par défaut : logs/<paquet>-<heure>.log) ; "
+"fichier au choix avec --log=FILE"
 
-#: src/apk_starter/cli.py:219
+#: src/apk_starter/cli.py:252
 msgid "override the SDK level passed to ATL"
 msgstr "remplacer le niveau de SDK transmis à ATL"
 
-#: src/apk_starter/cli.py:220
+#: src/apk_starter/cli.py:253
 msgid "window size (remembered per app)"
 msgstr "taille de la fenêtre (mémorisée pour chaque application)"
 
-#: src/apk_starter/cli.py:221
+#: src/apk_starter/cli.py:254
 msgid "with --remove/--remove-all: also delete the app data"
-msgstr "avec --remove/--remove-all : effacer aussi les données de l’application"
+msgstr ""
+"avec --remove/--remove-all : effacer aussi les données de l’application"
 
-#: src/apk_starter/cli.py:223
+#: src/apk_starter/cli.py:256
 msgid "install the APK and add a menu entry"
 msgstr "installer l’APK et ajouter une entrée de menu"
 
-#: src/apk_starter/cli.py:224
+#: src/apk_starter/cli.py:257
 msgid "list installed apps"
 msgstr "lister les applications installées"
 
-#: src/apk_starter/cli.py:225
+#: src/apk_starter/cli.py:258
 msgid "remove an installed app"
 msgstr "désinstaller une application installée"
 
-#: src/apk_starter/cli.py:227
+#: src/apk_starter/cli.py:260
 msgid ""
 "remove all installed apps and their menu entries (before uninstalling the "
 "Flatpak)"
-msgstr "supprimer toutes les applications installées et leurs entrées de menu (avant de désinstaller le Flatpak)"
+msgstr ""
+"supprimer toutes les applications installées et leurs entrées de menu (avant "
+"de désinstaller le Flatpak)"
 
-#: src/apk_starter/cli.py:228
+#: src/apk_starter/cli.py:261
 msgid "show the version and exit"
 msgstr "afficher la version et quitter"
 
-#: src/apk_starter/cli.py:262
+#: src/apk_starter/cli.py:295
 msgid ""
 "--install, --list, --remove, --remove-all and --version take no other "
 "arguments"
-msgstr "--install, --list, --remove, --remove-all et --version n’acceptent aucun autre argument"
+msgstr ""
+"--install, --list, --remove, --remove-all et --version n’acceptent aucun "
+"autre argument"
 
-#: src/apk_starter/cli.py:264
+#: src/apk_starter/cli.py:297
 msgid "--purge only works with --remove or --remove-all"
 msgstr "--purge ne fonctionne qu’avec --remove ou --remove-all"
 
-#: src/apk_starter/cli.py:289
+#: src/apk_starter/cli.py:322
 msgid "no APK given and no display for the window"
 msgstr "aucun APK indiqué et aucun affichage pour la fenêtre"
 
-#: src/apk_starter/cli.py:293
+#: src/apk_starter/cli.py:326
 msgid "no APK given"
 msgstr "aucun APK indiqué"
+
+#: src/apk_starter/cli.py:367 src/apk_starter/cli.py:385
+#, python-brace-format
+msgid "the Android runtime could not be prepared in advance: {reason}"
+msgstr "l’environnement d’exécution Android n’a pas pu être préparé à l’avance : {reason}"
+
+#: src/apk_starter/cli.py:389
+msgid "Preparing apps for this computer…"
+msgstr "Préparation des applications pour cet ordinateur…"
+
+#: src/apk_starter/dexopt.py:140
+#, python-brace-format
+msgid "cannot run {program}: {reason}"
+msgstr "impossible d’exécuter {program} : {reason}"
+
+#: src/apk_starter/dexopt.py:193
+msgid "Preparing the Android runtime for this computer…"
+msgstr "Préparation de l’environnement d’exécution Android pour cet ordinateur…"
 
 #: src/apk_starter/errors.py:23
 #, python-brace-format
 msgid "unexpected error: {error}"
 msgstr "erreur inattendue : {error}"
 
-#: src/apk_starter/gui.py:23
+#: src/apk_starter/gui.py:24
 #, python-brace-format
 msgid "the window needs GTK 4 and libadwaita: {reason}"
 msgstr "la fenêtre nécessite GTK 4 et libadwaita : {reason}"
 
-#: src/apk_starter/gui.py:36
+#: src/apk_starter/gui.py:39
 msgid "Install APK…"
 msgstr "Installer un APK…"
 
-#: src/apk_starter/gui.py:36
+#: src/apk_starter/gui.py:39
 msgid "Choose an APK file and add it to the menu"
 msgstr "Choisir un fichier APK et l’ajouter au menu"
 
-#: src/apk_starter/gui.py:41
+#: src/apk_starter/gui.py:44
 msgid "Working…"
 msgstr "En cours…"
 
-#: src/apk_starter/gui.py:48
+#: src/apk_starter/gui.py:51
 msgid "No apps installed"
 msgstr "Aucune application installée"
 
-#: src/apk_starter/gui.py:49
+#: src/apk_starter/gui.py:52
 msgid "Install an APK or drop one here."
 msgstr "Installez un APK ou déposez-le ici."
 
-#: src/apk_starter/gui.py:79
+#: src/apk_starter/gui.py:87
 msgid "Close"
 msgstr "Fermer"
 
-#: src/apk_starter/gui.py:115
+#: src/apk_starter/gui.py:132
 msgid "Cannot read the app list"
 msgstr "Impossible de lire la liste des applications"
 
-#: src/apk_starter/gui.py:126
+#: src/apk_starter/gui.py:143
 #, python-brace-format
 msgid "data {size}"
 msgstr "données : {size}"
 
-#: src/apk_starter/gui.py:126
+#: src/apk_starter/gui.py:143
 msgid "no data"
 msgstr "aucune donnée"
 
-#: src/apk_starter/gui.py:138
+#: src/apk_starter/gui.py:155
 msgid "Start"
 msgstr "Lancer"
 
-#: src/apk_starter/gui.py:140
+#: src/apk_starter/gui.py:157
 msgid "Start with log"
 msgstr "Lancer avec journal"
 
-#: src/apk_starter/gui.py:140
+#: src/apk_starter/gui.py:157
 msgid "Open log folder"
 msgstr "Ouvrir le dossier des journaux"
 
-#: src/apk_starter/gui.py:141
+#: src/apk_starter/gui.py:158
 msgid "Delete data…"
 msgstr "Effacer les données…"
 
-#: src/apk_starter/gui.py:141
+#: src/apk_starter/gui.py:158
 msgid "Uninstall…"
 msgstr "Désinstaller…"
 
-#: src/apk_starter/gui.py:146
+#: src/apk_starter/gui.py:163
 msgid "More"
 msgstr "Plus"
 
-#: src/apk_starter/gui.py:158
+#: src/apk_starter/gui.py:175
 #, python-brace-format
 msgid "Cannot start {app}"
 msgstr "Impossible de lancer {app}"
 
-#: src/apk_starter/gui.py:163
+#: src/apk_starter/gui.py:180
 msgid "See the log folder."
 msgstr "Consultez le dossier des journaux."
 
-#: src/apk_starter/gui.py:163
+#: src/apk_starter/gui.py:180
 msgid "Try “Start with log” and look at the log."
 msgstr "Essayez « Lancer avec journal » et consultez le journal."
 
-#: src/apk_starter/gui.py:165
+#: src/apk_starter/gui.py:182
 #, python-brace-format
 msgid "{app} ended with exit code {code}"
 msgstr "{app} s’est terminé avec le code de sortie {code}"
 
-#: src/apk_starter/gui.py:167
+#: src/apk_starter/gui.py:184
 #, python-brace-format
 msgid "{app} was killed by signal {signal}"
 msgstr "{app} a été arrêté par le signal {signal}"
 
-#: src/apk_starter/gui.py:170
+#: src/apk_starter/gui.py:187
 #, python-brace-format
 msgid "{app} starts with a log"
 msgstr "{app} démarre avec un journal"
 
-#: src/apk_starter/gui.py:177 src/apk_starter/gui.py:185
+#: src/apk_starter/gui.py:194 src/apk_starter/gui.py:202
 msgid "Cannot open the log folder"
 msgstr "Impossible d’ouvrir le dossier des journaux"
 
-#: src/apk_starter/gui.py:189
+#: src/apk_starter/gui.py:206
 msgid "Android apps"
 msgstr "Applications Android"
 
-#: src/apk_starter/gui.py:194
+#: src/apk_starter/gui.py:211
 msgid "Install APK"
 msgstr "Installer un APK"
 
-#: src/apk_starter/gui.py:214
+#: src/apk_starter/gui.py:233 src/apk_starter/gui.py:235
 #, python-brace-format
 msgid "{app} installed"
 msgstr "{app} installé"
 
-#: src/apk_starter/gui.py:215
+#: src/apk_starter/gui.py:237
 #, python-brace-format
 msgid "Cannot install {file}"
 msgstr "Impossible d’installer {file}"
 
-#: src/apk_starter/gui.py:220
+#: src/apk_starter/gui.py:242
 msgid "Cancel"
 msgstr "Annuler"
 
-#: src/apk_starter/gui.py:232
+#: src/apk_starter/gui.py:254
 #, python-brace-format
 msgid "Delete the data of {app}?"
 msgstr "Effacer les données de {app} ?"
 
-#: src/apk_starter/gui.py:233
+#: src/apk_starter/gui.py:255
 msgid ""
 "The app stays installed. Its settings, accounts and files are deleted. Close "
 "the app first."
-msgstr "L’application reste installée. Ses réglages, comptes et fichiers sont supprimés. Fermez d’abord l’application."
+msgstr ""
+"L’application reste installée. Ses réglages, comptes et fichiers sont "
+"supprimés. Fermez d’abord l’application."
 
-#: src/apk_starter/gui.py:234
+#: src/apk_starter/gui.py:256
 msgid "Delete Data"
 msgstr "Effacer les données"
 
-#: src/apk_starter/gui.py:236
+#: src/apk_starter/gui.py:258
 #, python-brace-format
 msgid "Data of {app} deleted"
 msgstr "Données de {app} effacées"
 
-#: src/apk_starter/gui.py:237
+#: src/apk_starter/gui.py:259
 #, python-brace-format
 msgid "Cannot delete the data of {app}"
 msgstr "Impossible d’effacer les données de {app}"
 
-#: src/apk_starter/gui.py:241
+#: src/apk_starter/gui.py:263
 msgid "Also delete app data"
 msgstr "Effacer aussi les données de l’application"
 
-#: src/apk_starter/gui.py:244 src/apk_starter/gui.py:246
+#: src/apk_starter/gui.py:266 src/apk_starter/gui.py:268
 #, python-brace-format
 msgid "{app} uninstalled"
 msgstr "{app} désinstallé"
 
-#: src/apk_starter/gui.py:247
+#: src/apk_starter/gui.py:269
 #, python-brace-format
 msgid "Uninstall {app}?"
 msgstr "Désinstaller {app} ?"
 
-#: src/apk_starter/gui.py:248
+#: src/apk_starter/gui.py:270
 msgid "The app and its menu entry are removed. Close the app first."
-msgstr "L’application et son entrée de menu sont supprimées. Fermez d’abord l’application."
+msgstr ""
+"L’application et son entrée de menu sont supprimées. Fermez d’abord "
+"l’application."
 
-#: src/apk_starter/gui.py:248
+#: src/apk_starter/gui.py:270
 msgid "Uninstall"
 msgstr "Désinstaller"
 
-#: src/apk_starter/gui.py:250
+#: src/apk_starter/gui.py:272
 #, python-brace-format
 msgid "Cannot uninstall {app}"
 msgstr "Impossible de désinstaller {app}"
@@ -446,7 +513,7 @@ msgstr "non autorisé avec l’argument %s"
 msgid "invalid %(type)s value: %(value)r"
 msgstr "valeur %(type)s invalide : %(value)r"
 
-#: src/apk_starter/launch.py:26
+#: src/apk_starter/launch.py:28
 #, python-brace-format
 msgid "invalid --size, expected WxH: {value}"
 msgstr "--size invalide, format attendu WxH : {value}"
