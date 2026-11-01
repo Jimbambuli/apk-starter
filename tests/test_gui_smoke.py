@@ -59,6 +59,7 @@ def test_window_lists_installs_starts_and_uninstalls(tmp_path):
                       "pkg": "org.example.demo", "started": ["org.example.demo"],
                       "clear_dialog": "Delete the data of Demo?", "dialog": "Uninstall Demo?", "after_remove": [],
                       "page_end": "empty", "data_left": False, "busy_end": False}, out.stderr
+    assert "CRITICAL" not in out.stderr and "WARNING" not in out.stderr, out.stderr     # e.g. gtk_widget_is_ancestor
 
 
 @needs_broadway
@@ -132,11 +133,14 @@ def test_search_sort_keys_narrow_layout_and_remembered_state(tmp_path):
                              env=env, capture_output=True, text=True, timeout=60)
     report = json.loads(out.stdout.strip().splitlines()[-1])
     assert report == {
-        "restored": ["org.b.bravo", "Bravo", ["Alpha", "Bravo", "Charlie"]],
+        "restored": ["org.b.bravo", "Bravo", ["Alpha", "Bravo", "Charlie"]], "opened_focus_on_start": True,
         "search": [["Charlie"], "org.c.charlie"], "kept_after_search": "org.c.charlie",
         "by_size": ["Bravo", "Alpha", "Charlie"], "by_started": ["Bravo", "Charlie", "Alpha"],
         "ctrl_f_in_search": True, "enter_to_list": True, "delete_key": "Uninstall Charlie?",
-        "started": ["org.c.charlie"], "system_titlebar": [False, True, {"system_titlebar": True}],
+        "started": ["org.c.charlie"], "focus_on_start": False,
+        "settings": {"apps": {"org.c.charlie": {"titlebar": "system-navigation", "log": True}}},
+        "debug_locks_log": [True, False], "debug_started": ["--debug", "--", "org.c.charlie"],
+        "debug_off_after_start": [False, False, True, True],
         "saved": {"width": 500, "height": 600, "sort": "started", "selected": "org.c.charlie"},
         "narrow_list": [True, False], "narrow_details": [False, True, True, "Bravo"],
         "narrow_back": [True, False]}, out.stderr

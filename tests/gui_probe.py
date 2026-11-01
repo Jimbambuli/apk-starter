@@ -128,7 +128,8 @@ def activate(a) -> None:
 
     def cleared(pkg):
         paths.data(pkg).mkdir(parents=True, exist_ok=True)
-        win.activate_action("win.uninstall", GLib.Variant("s", pkg))
+        win.focus_list()                            # the Delete key in the list, as a user does
+        win.on_key(None, Gdk.keyval_from_name("Delete"), 0, Gdk.ModifierType(0))
         d = win.dialog
         report["dialog"] = d.heading
         d.extra.set_active(True)

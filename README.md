@@ -26,10 +26,12 @@ Install a new APK with **+** or by dropping it anywhere onto the window. The win
 colour scheme and accent colour and keeps the desktop's own title bar (plain GTK 4); it remembers its size, the sort
 order and the chosen app. Every installed app also gets its own menu entry.
 
-The apps get a title bar with a back button, drawn in the desktop's GTK theme, so it looks like the title bars of
-the other windows; Escape and the back button of the mouse go back as well. **Title bar from the system** in the
-main menu (☰) gives them the desktop's own title bar instead (where the compositor draws one, e.g. KDE Plasma),
-without the back button.
+Below **Start**, each app has its own **Window bar** (remembered): **With back button** (the default) is a title
+bar drawn in the desktop's GTK theme with a back button; under KDE it gets the buttons and the height of the KWin
+decoration. **From the system** is the desktop's own title bar (where the compositor draws one, e.g. KDE Plasma),
+without the back button; **From the system + navigation bar** adds Android's navigation bar under the window (◁ back,
+○ the app's first page, □ its open pages). Escape and the back button of the mouse always go back. **Log** (also
+remembered per app) records every start of the app, also from its menu entry; **Debug** is for one start only.
 
 The same is available on the command line:
 
@@ -62,9 +64,9 @@ Data lives under `~/.var/app/io.github.Jimbambuli.ApkStarter/data/`: `apps/` (in
 
 Diagnose levels, for finding out why an app misbehaves under ATL (with
 [atl-doctor](https://github.com/Jimbambuli/atl-doctor)): a normal start loads nothing extra. **Log** (`--log`,
-«Start with log») writes ATL's output plus what atl-doctor's JVMTI agent sees on the fast runtime (lifecycle
+«Log» ticked) writes ATL's output plus what atl-doctor's JVMTI agent sees on the fast runtime (lifecycle
 callbacks; the agent comes 3 s after the start, so exceptions of the start itself come with Debug); the app runs at
-almost full speed. **Debug** (`--debug`, «Start with debug») records a folder: the agent attached as soon as the
+almost full speed. **Debug** (`--debug`, «Debug» ticked) records a folder: the agent attached as soon as the
 runtime runs (exceptions with stack, also caught ones, lifecycle), the calls of ATL's stub methods (counted by ATL
 itself), a time line from ART's sampling profiler, the view trees and a verbose Android log; the app runs only a
 little slower (no full method trace, which made apps lose their own start-up races). **Show report** in the window or
@@ -94,7 +96,8 @@ change of them at once:
 - `--filesystem=host-os:ro`: the system's files under `/run/host` (read only) – the themes and icons in
   `/usr/share/themes` and `/usr/share/icons`;
 - `--filesystem=xdg-config/gtk-4.0:ro` and `--filesystem=xdg-config/gtk-3.0:ro`: your GTK settings (read only);
-  those of GTK 3 count where there are none for GTK 4.
+  those of GTK 3 count where there are none for GTK 4, and under KDE `gtk-3.0/assets` holds the pictures of the
+  KWin window buttons for the apps' title bars.
 
 Without them (e.g. `flatpak override --user --nofilesystem=host-os io.github.Jimbambuli.ApkStarter`) everything
 works with GTK's default theme in the desktop's light or dark variant.

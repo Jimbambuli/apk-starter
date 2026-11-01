@@ -7,6 +7,7 @@ from pathlib import Path
 
 from . import dexopt
 from .cli import data_size, list_installed
+from .i18n import _
 from .paths import Paths
 
 SORT_KEYS = ("name", "started", "installed", "size")
@@ -116,3 +117,40 @@ def start_argv(launcher: list[str], pkg: str, level: str | None) -> list[str]:
     """Apps run as a separate `apk-starter PACKAGE` process, exactly as from their menu entry; level: None,
     "log" or "debug" (Spec 12)."""
     return launcher + ([f"--{level}", "--", pkg] if level else [pkg])
+
+
+SIDE_BY_SIDE = 1000         # details at least this wide: facts and recordings next to each other
+DETAILS_MAX = (720, 1240)   # readable width of the details: one column, two columns
+
+
+def details_layout(width: int) -> tuple[bool, int]:
+    """Details of `width` px (without margins): (facts and recordings side by side, extra right margin that keeps
+    them at a readable width). They stand left, next to the list, and grow with the window."""
+    side_by_side = width >= SIDE_BY_SIDE
+    return side_by_side, max(0, width - DETAILS_MAX[side_by_side])
+
+
+SIGNALS = {6: "SIGABRT", 9: "SIGKILL", 11: "SIGSEGV", 15: "SIGTERM"}
+
+
+def crash_meaning(exited: bool, status: int) -> str | None:
+    """What the end of an app means (Spec 14), None for a normal end: exit 0 or SIGTERM. `status` is the exit code
+    of `apk-starter PACKAGE` (128+N when ATL died of signal N) or, if it did not exit, its signal."""
+    signal = None if exited else status
+    if exited and 128 < status < 128 + 65:
+        signal = status - 128
+    if (exited and status == 0) or signal == 15:
+        return None
+    if signal is None:
+        if status == 10:
+            return _("Exit code 10: crash (an exception the app did not catch)")
+        if status == 1:
+            return _("Exit code 1: a function that ATL does not support yet")
+        return _("Exit code {code}: the app ended itself with this code").format(code=status)
+    if signal == 11:
+        return _("SIGSEGV: memory error")
+    if signal == 6:
+        return _("SIGABRT: aborted by the runtime or a library")
+    if signal == 9:
+        return _("SIGKILL: ended by the system (too little memory?)")
+    return _("Signal {signal}").format(signal=SIGNALS.get(signal, signal))

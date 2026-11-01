@@ -63,6 +63,7 @@ def activate(a) -> None:
 
     def listed():
         report["restored"] = [win.selected, win.details_title.get_text(), titles(win)]
+        report["opened_focus_on_start"] = win.get_focus() is win.start_button
         win.search.set_text("CHA")
         wait(lambda: titles(win) == ["Charlie"], searched)
 
@@ -89,11 +90,20 @@ def activate(a) -> None:
 
     def started():
         report["started"] = Path(record).read_text().split()
-        menu = win.lookup_action("system-titlebar")
-        before = menu.get_state().get_boolean()
-        win.activate_action("win.system-titlebar", None)          # the check item in the main menu
-        report["system_titlebar"] = [before, menu.get_state().get_boolean(),
-                                     json.loads(paths.settings().read_text())]
+        report["focus_on_start"] = win.get_focus() is win.start_button
+        win.titlebar_choice.set_selected(2)                       # From the system + navigation bar
+        win.log_check.set_active(True)
+        report["settings"] = json.loads(paths.settings().read_text())
+        win.debug_check.set_active(True)
+        report["debug_locks_log"] = [win.log_check.get_active(), win.log_check.get_sensitive()]
+        Path(record).unlink()
+        win.start_button.emit("clicked")
+        wait(lambda: Path(record).exists() and Path(record).read_text(), debug_started)
+
+    def debug_started():
+        report["debug_started"] = Path(record).read_text().split()
+        report["debug_off_after_start"] = [win.debug, win.debug_check.get_active(), win.log_check.get_active(),
+                                           win.log_check.get_sensitive()]
         win.set_default_size(500, 600)              # remembered at close, used by the next window
         win.close()
         GLib.timeout_add(100, reopen)

@@ -12,10 +12,10 @@ from . import dexopt, diag, theme
 from .cli import APP_ID, clear_data, install_apk, lang_from_env, prepare_all, remove_app
 from .errors import StarterError, describe_error
 from .i18n import _
-from .gui_model import (AppRow, WindowState, filter_rows, is_narrow, key_action, load_rows, load_state,
-                        save_state, sort_rows, start_argv)
+from .gui_model import (AppRow, WindowState, crash_meaning, details_layout, filter_rows, is_narrow, key_action,
+                        load_rows, load_state, save_state, sort_rows, start_argv)
 from .paths import Paths
-from .settings import Settings, load_settings, save_settings
+from .settings import TITLEBARS, load_settings, save_settings
 
 # The host's themes and icons (Spec 14): XDG_DATA_DIRS has to be complete before GTK reads it for the first time.
 _data_dirs = theme.data_dirs_with_host(os.environ.get("XDG_DATA_DIRS"))
@@ -33,8 +33,8 @@ except (ImportError, ValueError) as e:      # pragma: no cover - depends on the 
 APK_MIME = "application/vnd.android.package-archive"
 RECORDINGS_SHOWN = 5
 SIDE_WIDTH = 300
-DETAILS_MAX = 640
 DETAILS_MARGIN = 28
+TEXT_CHARS = 64                 # readable line length of the details' texts
 
 CSS = """
 .app-name { font-size: 1.7em; font-weight: 700; }
@@ -45,7 +45,6 @@ CSS = """
 .start-button { font-size: 1.15em; font-weight: 700; padding: 8px 28px; border-radius: 999px; }
 .facts { border: 1px solid alpha(currentColor, 0.15); border-radius: 12px; padding: 14px 18px;
          background-color: alpha(currentColor, 0.03); }
-.toast { border-radius: 999px; padding: 8px 20px; margin: 18px; }
 .drop-zone { border: 3px dashed alpha(currentColor, 0.45); border-radius: 18px; margin: 12px;
              background-color: @theme_bg_color; }
 .progress-bar { padding: 6px 12px; border-bottom: 1px solid alpha(currentColor, 0.12);
@@ -133,7 +132,10 @@ class Window(Gtk.ApplicationWindow):
         self.dialog: Dialog | None = None
         self.narrow = False
         self.page = "list"                          # narrow window: "list" or "details"
-        self.toast_timer = 0
+        self.layout = (False, 0)                    # facts and recordings side by side, extra right margin
+        self.debug = False                          # «Debug» ticked; never remembered (Spec 14)
+        self.start_button: Gtk.Button | None = None
+        self.blocks: Gtk.Box | None = None          # facts and recordings
 
         self.search = Gtk.SearchEntry(placeholder_text=_("Search apps"), hexpand=True)
         self.search.connect("search-changed", lambda _e: self.show_list())
@@ -147,12 +149,9 @@ class Window(Gtk.ApplicationWindow):
                               tooltip_text=_("Sort"))
         install = Gtk.Button(icon_name="list-add-symbolic", tooltip_text=_("Install APK…"))
         install.connect("clicked", lambda _b: self.choose_apk())
-        main_menu = Gio.Menu()
-        main_menu.append(_("Title bar from the system (no back button)"), "win.system-titlebar")
-        menu = Gtk.MenuButton(icon_name="open-menu-symbolic", menu_model=main_menu, tooltip_text=_("Main menu"))
         self.spinner = Gtk.Spinner(visible=False, spinning=True, tooltip_text=_("Working…"))
         top = Gtk.Box(spacing=6, margin_top=10, margin_bottom=8, margin_start=10, margin_end=10)
-        for w in (self.search, sort, install, menu, self.spinner):
+        for w in (self.search, sort, install, self.spinner):
             top.append(w)
         self.listbox = Gtk.ListBox(selection_mode=Gtk.SelectionMode.SINGLE, activate_on_single_click=False)
         self.listbox.add_css_class("navigation-sidebar")
@@ -170,7 +169,7 @@ class Window(Gtk.ApplicationWindow):
                                halign=Gtk.Align.START, margin_top=10, margin_start=10)
         self.back.connect("clicked", lambda _b: self.go_back())
         self.details = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=18, margin_top=24, margin_bottom=24,
-                               margin_start=DETAILS_MARGIN, margin_end=DETAILS_MARGIN)
+                               margin_start=DETAILS_MARGIN, margin_end=DETAILS_MARGIN, halign=Gtk.Align.FILL)
         detail_side = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, hexpand=True)
         detail_side.append(self.back)
         detail_side.append(Gtk.ScrolledWindow(child=self.details, vexpand=True, hscrollbar_policy=Gtk.PolicyType.NEVER))
@@ -195,14 +194,6 @@ class Window(Gtk.ApplicationWindow):
         body.append(self.banner)
         body.append(self.stack)
 
-        self.toast_label = label("", wrap=True, xalign=0.5)
-        toast = Gtk.Box()
-        toast.add_css_class("toast")
-        toast.add_css_class("osd")
-        toast.append(self.toast_label)
-        self.toasts = Gtk.Revealer(child=toast, reveal_child=False, halign=Gtk.Align.CENTER,
-                                   valign=Gtk.Align.END, transition_type=Gtk.RevealerTransitionType.SLIDE_UP,
-                                   can_target=False)
         drop_hint = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12, valign=Gtk.Align.CENTER)
         drop_hint.append(Gtk.Image(icon_name=APP_ID, pixel_size=96))
         drop_hint.append(label(_("Drop the APK to install it"), "welcome-title", xalign=0.5))
@@ -214,7 +205,6 @@ class Window(Gtk.ApplicationWindow):
                                       transition_type=Gtk.RevealerTransitionType.CROSSFADE)
         overlay = Gtk.Overlay(child=body)
         overlay.add_overlay(self.drop_zone)
-        overlay.add_overlay(self.toasts)
         self.set_child(overlay)
 
         drop = Gtk.DropTarget.new(Gdk.FileList, Gdk.DragAction.COPY)
@@ -226,9 +216,7 @@ class Window(Gtk.ApplicationWindow):
         keys.connect("key-pressed", self.on_key)
         self.add_controller(keys)
 
-        for name, handler in (("start", lambda p: self.start(p, None)),
-                              ("start-log", lambda p: self.start(p, "log")),
-                              ("start-debug", lambda p: self.start(p, "debug")),
+        for name, handler in (("start", lambda p: self.start(p, "debug" if self.debug else None)),
                               ("show-report", self.show_report),
                               ("open-logs", lambda _p: self.open_logs()),
                               ("clear-data", self.ask_clear_data),
@@ -239,11 +227,6 @@ class Window(Gtk.ApplicationWindow):
         sort_action = Gio.SimpleAction.new_stateful("sort", GLib.VariantType.new("s"), GLib.Variant("s", self.sort))
         sort_action.connect("activate", lambda a, v: (a.set_state(v), self.set_sort(v.get_string())))
         self.add_action(sort_action)
-        # the apps' title bar (Spec 13): ATL's with the back button, or the desktop's; read by every start
-        titlebar_action = Gio.SimpleAction.new_stateful(
-            "system-titlebar", None, GLib.Variant("b", load_settings(self.paths.settings()).system_titlebar))
-        titlebar_action.connect("activate", self.toggle_system_titlebar)
-        self.add_action(titlebar_action)
         self.connect("close-request", lambda _w: self.remember() or False)
         self.stack.set_visible_child_name("loading")
         self.refresh()
@@ -267,19 +250,6 @@ class Window(Gtk.ApplicationWindow):
         return box
 
     # -- helpers -----------------------------------------------------------------------------------------
-    def toast(self, text: str) -> None:
-        """Short confirmation, shown at once for 4 s."""
-        self.toast_label.set_text(text)
-        self.toasts.set_reveal_child(True)
-        if self.toast_timer:
-            GLib.source_remove(self.toast_timer)
-
-        def hide() -> bool:
-            self.toast_timer = 0
-            self.toasts.set_reveal_child(False)
-            return False
-        self.toast_timer = GLib.timeout_add_seconds(4, hide)
-
     def alert(self, heading: str, body: str) -> None:
         """Errors and warnings stay until the user closes them."""
         Dialog(self, heading, body, [("close", _("Close"))]).present()
@@ -333,14 +303,18 @@ class Window(Gtk.ApplicationWindow):
     # -- layout: wide = list + details, narrow = one page at a time ----------------------------------------
     def do_size_allocate(self, width: int, height: int, baseline: int) -> None:
         Gtk.ApplicationWindow.do_size_allocate(self, width, height, baseline)
-        margin = max(DETAILS_MARGIN, (width - (0 if is_narrow(width) else SIDE_WIDTH) - DETAILS_MAX) // 2)
-        if is_narrow(width) != self.narrow or margin != self.details.get_margin_start():
-            GLib.idle_add(lambda: self.set_narrow(is_narrow(width), margin) or False)
+        layout = details_layout(width - (0 if is_narrow(width) else SIDE_WIDTH + 1) - 2 * DETAILS_MARGIN)
+        if is_narrow(width) != self.narrow or layout != self.layout:
+            GLib.idle_add(lambda: self.set_narrow(is_narrow(width), layout) or False)
 
-    def set_narrow(self, narrow: bool, margin: int) -> None:
-        """Details keep a readable width: wide windows get wider margins instead of longer lines."""
-        self.details.set_margin_start(margin)
-        self.details.set_margin_end(margin)
+    def set_narrow(self, narrow: bool, layout: tuple[bool, int]) -> None:
+        """Details stand left, next to the list, and grow with the window up to a readable width; a very wide
+        window shows the facts and the recordings side by side."""
+        if layout != self.layout:
+            self.layout = layout
+            self.details.set_margin_end(DETAILS_MARGIN + layout[1])
+            if self.blocks is not None:
+                self.blocks.set_orientation(Gtk.Orientation.HORIZONTAL if layout[0] else Gtk.Orientation.VERTICAL)
         if narrow == self.narrow:
             return
         self.narrow = narrow
@@ -433,14 +407,14 @@ class Window(Gtk.ApplicationWindow):
             self.listbox.select_row(row)
             row.grab_focus()
 
-    def toggle_system_titlebar(self, action: Gio.SimpleAction, _param) -> None:
-        on = not action.get_state().get_boolean()
+    def save_app_setting(self, pkg: str, **changes) -> bool:
+        """Per app, for every start of it (also from its menu entry)."""
         try:
-            save_settings(self.paths.settings(), Settings(system_titlebar=on))
+            save_settings(self.paths.settings(), load_settings(self.paths.settings()).with_app(pkg, **changes))
         except OSError as e:
             self.alert(_("Could not save the setting"), describe_error(e))
-            return
-        action.set_state(GLib.Variant("b", on))
+            return False
+        return True
 
     def set_sort(self, key: str) -> None:
         self.sort = key
@@ -467,37 +441,73 @@ class Window(Gtk.ApplicationWindow):
 
     # -- details -------------------------------------------------------------------------------------------
     def show_details(self) -> None:
+        focus = self.get_focus()
+        refocus = focus is None or focus.is_ancestor(self.details)
+        if refocus:
+            self.set_focus(None)                    # never leave the focus on a widget that goes away
+        self.start_button = self.blocks = None
         while (child := self.details.get_first_child()) is not None:
             self.details.remove(child)
         r = self.rows.get(self.selected or "")
         if r is None:
+            self.debug = False
             return
+        if getattr(self, "debug_for", None) != r.package:
+            self.debug = False                      # «Debug» is never remembered, also not across apps
+        self.debug_for = r.package
         target = GLib.Variant("s", r.package)
+        app = load_settings(self.paths.settings()).app(r.package)
 
         head = Gtk.Box(spacing=20)
         head.append(app_image(r, 96))
         names = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4, valign=Gtk.Align.CENTER)
-        self.details_title = label(r.label, "app-name", wrap=True, selectable=True)
+        self.details_title = label(r.label, "app-name", wrap=True, max_width_chars=TEXT_CHARS)
         names.append(self.details_title)
-        names.append(label(r.package, "dim-label", selectable=True, wrap=True))
+        names.append(label(r.package, "dim-label", selectable=True, wrap=True, focusable=False))
         head.append(names)
         self.details.append(head)
 
+        # Start / window bar / Log / Debug, one below the other (Spec 14)
         start = Gtk.Button(label=_("Start"), action_name="win.start", action_target=target,
                            halign=Gtk.Align.START)
         start.add_css_class("suggested-action")
         start.add_css_class("start-button")
-        more = Gtk.Box(spacing=8)
-        for text, action in ((_("Start with log"), "win.start-log"), (_("Start with debug"), "win.start-debug")):
-            more.append(Gtk.Button(label=text, action_name=action, action_target=target))
+        self.start_button = start
+        bar = Gtk.Box(spacing=8)
+        bar.append(label(_("Window bar:"), valign=Gtk.Align.CENTER))
+        names_ = {"system": _("From the system"), "atl": _("With back button"),
+                  "system-navigation": _("From the system + navigation bar")}
+        order = ("system", "atl", "system-navigation")
+        assert set(order) == set(TITLEBARS)
+        choice = Gtk.DropDown.new_from_strings([names_[k] for k in order])
+        choice.set_selected(order.index(app.titlebar))
+        choice.connect("notify::selected",
+                       lambda d, _p, p=r.package: self.save_app_setting(p, titlebar=order[d.get_selected()]))
+        bar.append(choice)
+        log = Gtk.CheckButton(label=_("Log"), active=app.log or self.debug, sensitive=not self.debug)
+        debug = Gtk.CheckButton(label=_("Debug"), active=self.debug)
+        hint = label(_("Debug runs a little slower; use it for error reports."), "dim-label", "caption", wrap=True,
+                     max_width_chars=TEXT_CHARS, visible=self.debug, margin_start=26)
+
+        def log_toggled(b: Gtk.CheckButton, pkg=r.package) -> None:
+            if not self.debug and b.get_active() != load_settings(self.paths.settings()).app(pkg).log:
+                self.save_app_setting(pkg, log=b.get_active())
+
+        def debug_toggled(b: Gtk.CheckButton, pkg=r.package) -> None:
+            """Debug includes the log: ticks and locks «Log» while it is ticked."""
+            self.debug = b.get_active()
+            hint.set_visible(self.debug)
+            log.set_sensitive(not self.debug)
+            log.set_active(self.debug or load_settings(self.paths.settings()).app(pkg).log)
+        log.connect("toggled", log_toggled)
+        debug.connect("toggled", debug_toggled)
+        self.debug_check, self.log_check, self.titlebar_choice = debug, log, choice
         starts = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
-        starts.append(start)
-        starts.append(more)
-        starts.append(label(_("Debug runs a little slower; use it for error reports."), "dim-label", "caption",
-                            wrap=True))
+        for w in (start, bar, log, debug, hint):
+            starts.append(w)
         self.details.append(starts)
 
-        facts = Gtk.Grid(column_spacing=24, row_spacing=8)
+        facts = Gtk.Grid(column_spacing=24, row_spacing=8, valign=Gtk.Align.START)
         facts.add_css_class("facts")
         lines = ((_("Version"), r.version or "–"),
                  (_("Target SDK"), str(r.target_sdk) if r.target_sdk else "–"),
@@ -508,15 +518,15 @@ class Window(Gtk.ApplicationWindow):
                   else _("Not prepared yet (done at the next start)")))
         for i, (key, value) in enumerate(lines):
             facts.attach(label(key, "dim-label"), 0, i, 1, 1)
-            facts.attach(label(value, wrap=True, selectable=True, hexpand=True), 1, i, 1, 1)
-        self.details.append(facts)
+            facts.attach(label(value, wrap=True, selectable=True, hexpand=True, focusable=False), 1, i, 1, 1)
 
-        heading = Gtk.Box(spacing=8, margin_top=6)
+        recordings = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
+        heading = Gtk.Box(spacing=8)
         heading.append(label(_("Recordings"), "section-title", hexpand=True, valign=Gtk.Align.CENTER))
         logs = Gtk.Button(label=_("Open log folder"), action_name="win.open-logs", action_target=target)
         logs.add_css_class("flat")
         heading.append(logs)
-        self.details.append(heading)
+        recordings.append(heading)
         recs = diag.recordings(self.paths, r.package)
         if recs:
             kinds = {"log": _("Log"), "debug": _("Debug")}
@@ -529,10 +539,16 @@ class Window(Gtk.ApplicationWindow):
                 save.connect("clicked", lambda _b, n=i, p=r.package: self.show_report(p, n, save=True))
                 line.append(show)
                 line.append(save)
-                self.details.append(line)
+                recordings.append(line)
         else:
-            self.details.append(label(_("None yet. Start the app with log or with debug to record one."),
-                                      "dim-label", wrap=True))
+            recordings.append(label(_("None yet. Tick “Log” or “Debug” and start the app to record one."),
+                                    "dim-label", wrap=True, max_width_chars=TEXT_CHARS))
+        side_by_side = self.layout[0]
+        self.blocks = Gtk.Box(spacing=18, homogeneous=True, orientation=Gtk.Orientation.HORIZONTAL if side_by_side
+                              else Gtk.Orientation.VERTICAL)
+        self.blocks.append(facts)
+        self.blocks.append(recordings)
+        self.details.append(self.blocks)
 
         self.details.append(Gtk.Separator(margin_top=6))
         danger = Gtk.Box(spacing=8)
@@ -541,32 +557,45 @@ class Window(Gtk.ApplicationWindow):
         uninstall.add_css_class("danger-text")         # calm until the question, which is red
         danger.append(uninstall)
         self.details.append(danger)
+        if refocus and (not self.narrow or self.page == "details"):
+            start.grab_focus()                      # not the name (a focused label shows all of it selected)
 
     # -- actions -------------------------------------------------------------------------------------------
     def start(self, pkg: str, level: str | None) -> None:
+        """level None: as from the menu entry (with a log if «Log» is ticked for the app), or "debug"."""
         label_ = self.rows[pkg].label if pkg in self.rows else pkg
         try:
             proc = Gio.Subprocess.new(start_argv(self.launcher, pkg, level), Gio.SubprocessFlags.NONE)
         except GLib.Error as e:
             self.alert(_("Cannot start {app}").format(app=label_), e.message)
             return
+        before = {rec.path for rec in diag.recordings(self.paths, pkg)}
 
         def ended(p: Gio.Subprocess, res) -> None:
             p.wait_finish(res)
-            hint = _("Look at “Show report”.") if level else _("Try “Start with log”, then “Show report”.")
-            if p.get_if_exited() and p.get_exit_status() != 0:
-                self.alert(_("{app} ended with exit code {code}").format(app=label_, code=p.get_exit_status()), hint)
-            elif p.get_if_signaled():
-                self.alert(_("{app} was killed by signal {signal}").format(app=label_, signal=p.get_term_sig()), hint)
+            exited = p.get_if_exited()
+            meaning = crash_meaning(exited, p.get_exit_status() if exited else p.get_term_sig())
+            if meaning is not None:
+                new = [rec for rec in diag.recordings(self.paths, pkg) if rec.path not in before]
+                self.crashed(pkg, label_, meaning, bool(new))
             if pkg in self.rows:
                 self.refresh()                      # «last started», recordings
         proc.wait_async(None, ended)
-        if level == "log":
-            self.toast(_("{app} starts with a log").format(app=label_))
-        elif level == "debug":
-            self.toast(_("{app} starts with debug; it runs a little slower").format(app=label_))
+        if level == "debug" and self.debug:
+            self.debug = False                      # never remembered: off after the start
+            if self.selected == pkg and getattr(self, "debug_check", None) is not None:
+                self.debug_check.set_active(False)
+
+    def crashed(self, pkg: str, label_: str, meaning: str, recorded: bool) -> None:
+        """A real crash, not a normal end (exit 0, SIGTERM): what it means, and the report of this run."""
+        meaning_label = label(meaning, "dim-label", "caption", wrap=True, max_width_chars=56)
+        if recorded:
+            buttons = [("close", _("Close")), ("report", _("Show report"))]
         else:
-            self.toast(_("{app} starts").format(app=label_))
+            buttons = [("close", _("Close"))]
+            meaning_label.set_text(meaning + "\n" + _("Tick “Log” and start the app again to get a report."))
+        Dialog(self, _("{app} ended unexpectedly.").format(app=label_), "", buttons,
+               lambda resp: self.show_report(pkg) if resp == "report" else None, extra=meaning_label).present()
 
     def show_report(self, pkg: str, index: int = 0, save: bool = False) -> None:
         label_ = self.rows[pkg].label if pkg in self.rows else pkg
@@ -622,8 +651,6 @@ class Window(Gtk.ApplicationWindow):
             self.search.set_text("")
             if warnings:
                 self.alert(_("{app} installed").format(app=info.label), "\n".join(warnings))
-            else:
-                self.toast(_("{app} installed").format(app=info.label))
         self.progress(_("Installing {file}…").format(file=apk.name))
         self.background(lambda: install_apk(self.paths, apk, self.lang, self.env, self.progress, warnings.append),
                         done, _("Cannot install {file}").format(file=apk.name))
@@ -638,8 +665,7 @@ class Window(Gtk.ApplicationWindow):
         self._confirm(_("Delete the data of {app}?").format(app=label_),
                       _("The app stays installed. Its settings, accounts and files are deleted. "
                         "Close the app first."), _("Delete Data"),
-                      lambda: self.background(lambda: clear_data(self.paths, pkg),
-                                              lambda _r: self.toast(_("Data of {app} deleted").format(app=label_)),
+                      lambda: self.background(lambda: clear_data(self.paths, pkg), None,
                                               _("Cannot delete the data of {app}").format(app=label_)))
 
     def ask_uninstall(self, pkg: str) -> None:
@@ -652,8 +678,6 @@ class Window(Gtk.ApplicationWindow):
                 self.page = "list"
             if warnings:
                 self.alert(_("{app} uninstalled").format(app=label_), "\n".join(warnings))
-            else:
-                self.toast(_("{app} uninstalled").format(app=label_))
         self._confirm(_("Uninstall {app}?").format(app=label_),
                       _("The app and its menu entry are removed. Close the app first."), _("Uninstall"),
                       lambda: self.background(lambda: remove_app(self.paths, pkg, purge.get_active()), removed,
@@ -773,8 +797,6 @@ class ReportWindow(Gtk.Window):
             path.write_text(diag.report_text(self.report), encoding="utf-8")
         except OSError as e:
             self.win.alert(_("Cannot save the report"), describe_error(e))
-            return
-        self.win.toast(_("Report saved"))
 
 
 class ThemeWatcher:

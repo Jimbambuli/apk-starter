@@ -93,3 +93,20 @@ def test_start_argv():
         ["/app/bin/apk-starter", "--log", "--", "org.a.app"]
     assert start_argv(["/app/bin/apk-starter"], "org.a.app", "debug") == \
         ["/app/bin/apk-starter", "--debug", "--", "org.a.app"]
+
+
+def test_details_grow_left_aligned_and_split_when_very_wide():
+    from apk_starter.gui_model import details_layout
+    assert details_layout(500) == (False, 0)
+    assert details_layout(900) == (False, 180)
+    assert details_layout(1000) == (True, 0)
+    assert details_layout(1600) == (True, 360)
+
+
+def test_crash_meaning_only_for_real_crashes():
+    from apk_starter.gui_model import crash_meaning
+    assert crash_meaning(True, 0) is None and crash_meaning(True, 128 + 15) is None and crash_meaning(False, 15) is None
+    assert "10" in crash_meaning(True, 10) and "ATL" in crash_meaning(True, 1)
+    assert "3" in crash_meaning(True, 3)
+    assert crash_meaning(True, 128 + 11).startswith("SIGSEGV") and crash_meaning(False, 6).startswith("SIGABRT")
+    assert "memory" in crash_meaning(True, 128 + 9)
