@@ -7,7 +7,7 @@ import threading
 from collections.abc import Callable, Mapping
 from pathlib import Path
 
-from . import dexopt
+from . import dexopt, diag
 from .cli import APP_ID, clear_data, install_apk, lang_from_env, prepare_all, remove_app
 from .errors import StarterError, describe_error
 from .i18n import _
@@ -62,8 +62,10 @@ class Window(Adw.ApplicationWindow):
         drop.connect("drop", self.on_drop)
         self.add_controller(drop)
 
-        for name, handler in (("start", lambda p: self.start(p, log=False)),
-                              ("start-log", lambda p: self.start(p, log=True)),
+        for name, handler in (("start", lambda p: self.start(p, None)),
+                              ("start-log", lambda p: self.start(p, "log")),
+                              ("start-debug", lambda p: self.start(p, "debug")),
+                              ("show-report", self.show_report),
                               ("open-logs", lambda _p: self.open_logs()),
                               ("clear-data", self.ask_clear_data),
                               ("uninstall", self.ask_uninstall)):
@@ -154,7 +156,8 @@ class Window(Adw.ApplicationWindow):
         target = GLib.Variant("s", r.package)
         start = Gtk.Button(label=_("Start"), valign=Gtk.Align.CENTER, action_name="win.start", action_target=target)
         menu = Gio.Menu()
-        for label, action in ((_("Start with log"), "win.start-log"), (_("Open log folder"), "win.open-logs"),
+        for label, action in ((_("Start with log"), "win.start-log"), (_("Start with debug"), "win.start-debug"),
+                              (_("Show report"), "win.show-report"), (_("Open log folder"), "win.open-logs"),
                               (_("Delete data…"), "win.clear-data"), (_("Uninstall…"), "win.uninstall")):
             item = Gio.MenuItem.new(label, None)
             item.set_action_and_target_value(action, target)
@@ -167,24 +170,30 @@ class Window(Adw.ApplicationWindow):
         return row
 
     # -- actions -------------------------------------------------------------------------------------------
-    def start(self, pkg: str, log: bool) -> None:
+    def start(self, pkg: str, level: str | None) -> None:
         label = self.rows[pkg].label if pkg in self.rows else pkg
         try:
-            proc = Gio.Subprocess.new(start_argv(self.launcher, pkg, log), Gio.SubprocessFlags.NONE)
+            proc = Gio.Subprocess.new(start_argv(self.launcher, pkg, level), Gio.SubprocessFlags.NONE)
         except GLib.Error as e:
             self.alert(_("Cannot start {app}").format(app=label), e.message)
             return
 
         def ended(p: Gio.Subprocess, res) -> None:
             p.wait_finish(res)
-            hint = _("See the log folder.") if log else _("Try “Start with log” and look at the log.")
+            hint = _("Look at “Show report”.") if level else _("Try “Start with log”, then “Show report”.")
             if p.get_if_exited() and p.get_exit_status() != 0:
                 self.alert(_("{app} ended with exit code {code}").format(app=label, code=p.get_exit_status()), hint)
             elif p.get_if_signaled():
                 self.alert(_("{app} was killed by signal {signal}").format(app=label, signal=p.get_term_sig()), hint)
         proc.wait_async(None, ended)
-        if log:
+        if level == "log":
             self.toast(_("{app} starts with a log").format(app=label))
+        elif level == "debug":
+            self.toast(_("{app} starts with debug; it runs much slower").format(app=label))
+
+    def show_report(self, pkg: str) -> None:
+        label = self.rows[pkg].label if pkg in self.rows else pkg
+        ReportDialog(self, pkg, label).present(self)
 
     def open_logs(self) -> None:
         folder = self.paths.logs_dir()
@@ -271,6 +280,105 @@ class Window(Adw.ApplicationWindow):
                       lambda: self.background(lambda: remove_app(self.paths, pkg, purge.get_active()), removed,
                                               _("Cannot uninstall {app}").format(app=label)),
                       extra=purge)
+
+
+class ReportDialog(Adw.Dialog):
+    """«Show report»: the recordings of one app (newest first) and atl-doctor's report of the chosen one."""
+
+    def __init__(self, win: Window, pkg: str, label: str):
+        super().__init__(title=_("Report: {app}").format(app=label), content_width=760, content_height=640)
+        self.win, self.label = win, label
+        self.recordings = diag.recordings(win.paths, pkg)
+        self.report = None
+        self.generation = 0
+        header = Adw.HeaderBar()
+        self.save = Gtk.Button(label=_("Save Report…"), sensitive=False)
+        self.save.connect("clicked", lambda _b: self.ask_save())
+        header.pack_end(self.save)
+        kinds = {"log": _("Log"), "debug": _("Debug")}
+        names = [f"{r.started:%Y-%m-%d %H:%M:%S} · {kinds[r.kind]}" for r in self.recordings]
+        self.choice = Gtk.DropDown.new_from_strings(names or [""])
+        self.choice.set_tooltip_text(_("Recording"))
+        self.choice.set_visible(bool(names))
+        self.choice.connect("notify::selected", lambda d, _p: self.load(d.get_selected()))
+        header.pack_start(self.choice)
+
+        self.sections = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=18)
+        clamp = Adw.Clamp(child=self.sections, maximum_size=720, margin_top=18, margin_bottom=18, margin_start=12,
+                          margin_end=12)
+        self.stack = Gtk.Stack()
+        self.stack.add_named(Adw.StatusPage(icon_name="document-open-recent-symbolic", title=_("No recordings"),
+                                            description=_("Start the app with log or with debug first.")), "none")
+        self.stack.add_named(Adw.Spinner(), "loading")
+        self.stack.add_named(Gtk.ScrolledWindow(child=clamp, hscrollbar_policy=Gtk.PolicyType.NEVER), "report")
+        view = Adw.ToolbarView(content=self.stack)
+        view.add_top_bar(header)
+        self.set_child(view)
+        if self.recordings:
+            self.load(0)
+        else:
+            self.stack.set_visible_child_name("none")
+
+    def load(self, index: int) -> None:
+        if not 0 <= index < len(self.recordings):
+            return
+        self.generation += 1
+        generation, path = self.generation, self.recordings[index].path
+        self.report = None
+        self.save.set_sensitive(False)
+        self.stack.set_visible_child_name("loading")
+
+        def work():
+            report = diag.load_report(path)
+            return report, diag.report_view(report)
+
+        def done(result) -> None:
+            if generation == self.generation:
+                self.report = result[0]
+                self.show(result[1])
+        self.win.background(work, done, _("Cannot read the report"), job=False)
+
+    def show(self, view: list[diag.ReportSection]) -> None:
+        while (child := self.sections.get_first_child()) is not None:
+            self.sections.remove(child)
+        for section in view:
+            group = Adw.PreferencesGroup(title=GLib.markup_escape_text(section.title))
+            for item in section.items:
+                if item.details:
+                    row = Adw.ExpanderRow(title=item.title, use_markup=False)
+                    text = Gtk.Label(label=item.details, xalign=0, wrap=True, selectable=True, margin_top=8,
+                                     margin_bottom=8, margin_start=12, margin_end=12)
+                    text.add_css_class("monospace")
+                    row.add_row(text)
+                else:
+                    row = Adw.ActionRow(title=item.title, use_markup=False)
+                group.add(row)
+            self.sections.append(group)
+        self.stack.set_visible_child_name("report")
+        self.save.set_sensitive(True)
+
+    def ask_save(self) -> None:
+        rec = self.recordings[self.choice.get_selected()]
+        name = (rec.path.stem if rec.kind == "log" else rec.path.name) + "-report.txt"
+        dialog = Gtk.FileDialog(title=_("Save Report"), initial_name=name)
+
+        def chosen(d: Gtk.FileDialog, res) -> None:
+            try:
+                f = d.save_finish(res)
+            except GLib.Error:                      # cancelled
+                return
+            if f is not None and f.get_path():
+                self.save_to(Path(f.get_path()))
+        dialog.save(self.win, None, chosen)
+
+    def save_to(self, path: Path) -> None:
+        """atl-doctor's text report, the same as `apk-starter --report`."""
+        try:
+            path.write_text(diag.report_text(self.report), encoding="utf-8")
+        except OSError as e:
+            self.win.alert(_("Cannot save the report"), describe_error(e))
+            return
+        self.win.toast(_("Report saved"))
 
 
 def default_launcher() -> list[str]:

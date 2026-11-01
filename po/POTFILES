@@ -6,6 +6,7 @@ src/apk_starter/arsc.py
 src/apk_starter/axml.py
 src/apk_starter/cli.py
 src/apk_starter/dexopt.py
+src/apk_starter/diag.py
 src/apk_starter/errors.py
 src/apk_starter/gui.py
 src/apk_starter/i18n.py

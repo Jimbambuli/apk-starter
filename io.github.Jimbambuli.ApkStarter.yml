@@ -106,6 +106,9 @@ modules:
     build-commands:
       - make -j$FLATPAK_BUILDER_N_JOBS ____PREFIX=/app ____LIBDIR=lib
       - make ____PREFIX=/app ____LIBDIR=lib install
+      # ART's JVMTI plugin (not in ____art_all): loaded only for «Start with log/debug» (atl-doctor's agent).
+      - make -j$FLATPAK_BUILDER_N_JOBS ____PREFIX=/app ____LIBDIR=lib libopenjdkjvmti
+      - install -Dm755 out/host/linux-x86/lib64/libopenjdkjvmti.so /app/lib/art/libopenjdkjvmti.so
     sources:
       - type: git
         url: https://gitlab.com/Jimbambuli/art_standalone.git
@@ -146,7 +149,32 @@ modules:
       - type: git
         url: https://gitlab.com/Jimbambuli/android_translation_layer.git
         branch: apk-starter
-        commit: 9fb941275b1011c6ab47877beedc91210fa21f7e
+        commit: 184cc9a6d4769023f32214741ced4cd749603850
+
+  # atl-doctor (public, fixed commit): JVMTI agent and trace counter for «Start with log/debug», its Python
+  # package for the recorder and «Show report», and the stub list of exactly this ATL (for stub hits).
+  - name: atl-doctor
+    buildsystem: simple
+    build-commands:
+      - meson setup _build agent --prefix=/app -Djdk=$JAVA_HOME
+      - ninja -C _build libatl_doctor_agent.so atl-doctor-tracecount
+      - install -Dm755 -t /app/lib/atl-doctor _build/libatl_doctor_agent.so _build/atl-doctor-tracecount
+      - cp -r atl_doctor /app/share/apk-starter/atl_doctor
+      - install -Dm644 LICENSE /app/share/licenses/io.github.Jimbambuli.ApkStarter/atl-doctor-LICENSE
+      - >-
+        PYTHONPATH=/app/share/apk-starter python3 -c "import pathlib, sys;
+        from atl_doctor.sources.stubs import build_stub_list, save_stub_tsv;
+        jars = sorted(pathlib.Path('/app/lib/java/dex/android_translation_layer').glob('*.jar'));
+        save_stub_tsv(build_stub_list(pathlib.Path('atl-src'), jars), pathlib.Path('/app/share/apk-starter/stubs.tsv'))"
+      - find /app/share/apk-starter/atl_doctor -name __pycache__ -prune -exec rm -rf {} +
+    sources:
+      - type: git
+        url: https://github.com/Jimbambuli/atl-doctor.git
+        commit: 73d5e292b69da61fde83dafbe2400bfe471686a2
+      - type: git
+        url: https://gitlab.com/Jimbambuli/android_translation_layer.git
+        commit: 184cc9a6d4769023f32214741ced4cd749603850
+        dest: atl-src
 
   - name: apk-starter
     buildsystem: simple

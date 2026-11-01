@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 13:44+0000\n"
+"POT-Creation-Date: 2026-11-01 14:45+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -134,11 +134,19 @@ msgstr "poškozený soubor resources.arsc"
 msgid "corrupt AndroidManifest.xml"
 msgstr "poškozený soubor AndroidManifest.xml"
 
-#: src/apk_starter/cli.py:42
+#: src/apk_starter/cli.py:44
+msgid "--log and --debug exclude each other"
+msgstr "--log a --debug se navzájem vylučují"
+
+#: src/apk_starter/cli.py:46
 msgid "--log= needs a file name"
 msgstr "--log= vyžaduje název souboru"
 
-#: src/apk_starter/cli.py:65
+#: src/apk_starter/cli.py:46
+msgid "--debug= needs a folder name"
+msgstr "--debug= vyžaduje název složky"
+
+#: src/apk_starter/cli.py:72
 #, python-brace-format
 msgid ""
 "cannot read {file}: no such file (inside the Flatpak sandbox only paths "
@@ -147,22 +155,22 @@ msgstr ""
 "nelze přečíst {file}: soubor neexistuje (v izolovaném prostředí Flatpak jsou "
 "vidět jen cesty předané pomocí --file-forwarding: {command})"
 
-#: src/apk_starter/cli.py:68 src/apk_starter/cli.py:209
+#: src/apk_starter/cli.py:75 src/apk_starter/cli.py:223
 #, python-brace-format
 msgid "not installed: {package}"
 msgstr "není nainstalováno: {package}"
 
-#: src/apk_starter/cli.py:117
+#: src/apk_starter/cli.py:124
 #, python-brace-format
 msgid "Preparing {app} for this computer…"
 msgstr "Příprava {app} pro tento počítač…"
 
-#: src/apk_starter/cli.py:133
+#: src/apk_starter/cli.py:127
 #, python-brace-format
 msgid "{app} could not be prepared in advance: {reason}"
 msgstr "{app} nebylo možné připravit předem: {reason}"
 
-#: src/apk_starter/cli.py:155
+#: src/apk_starter/cli.py:169
 #, python-brace-format
 msgid ""
 "{app} is installed without a menu entry: the DynamicLauncher portal is not "
@@ -171,36 +179,36 @@ msgstr ""
 "Aplikace {app} je nainstalována bez položky v nabídce: portál "
 "DynamicLauncher není dostupný; spusťte aplikaci příkazem: {command}"
 
-#: src/apk_starter/cli.py:159
+#: src/apk_starter/cli.py:173
 #, python-brace-format
 msgid "{app} is installed without a menu entry: {reason}"
 msgstr "Aplikace {app} je nainstalována bez položky v nabídce: {reason}"
 
-#: src/apk_starter/cli.py:193
+#: src/apk_starter/cli.py:207
 #, python-brace-format
 msgid "cannot remove {folder}: {reason}"
 msgstr "nelze odstranit {folder}: {reason}"
 
-#: src/apk_starter/cli.py:213
+#: src/apk_starter/cli.py:227
 msgid ""
 "the DynamicLauncher portal is not available; the menu entry was not removed"
 msgstr ""
 "portál DynamicLauncher není dostupný; položka v nabídce nebyla odstraněna"
 
-#: src/apk_starter/cli.py:215
+#: src/apk_starter/cli.py:229
 #, python-brace-format
 msgid "the menu entry was not removed: {reason}"
 msgstr "položka v nabídce nebyla odstraněna: {reason}"
 
-#: src/apk_starter/cli.py:248
+#: src/apk_starter/cli.py:263
 msgid "(no arguments: open the management window)"
 msgstr "(bez argumentů: otevře okno správy)"
 
-#: src/apk_starter/cli.py:249
+#: src/apk_starter/cli.py:264
 msgid "Start Android apps (APK) with Android Translation Layer."
 msgstr "Spouští aplikace pro Android (APK) pomocí Android Translation Layer."
 
-#: src/apk_starter/cli.py:251
+#: src/apk_starter/cli.py:266
 msgid ""
 "write a log for atl-doctor (default: logs/<package>-<time>.log); use --"
 "log=FILE"
@@ -208,31 +216,37 @@ msgstr ""
 "zapíše protokol pro atl-doctor (výchozí: logs/<balíček>-<čas>.log); jiný "
 "soubor pomocí --log=FILE"
 
-#: src/apk_starter/cli.py:252
+#: src/apk_starter/cli.py:268
+msgid ""
+"record the app for atl-doctor: method trace, view trees, verbose log; much "
+"slower (default: logs/<package>-<time>/); use --debug=DIR"
+msgstr "nahrát aplikaci pro atl-doctor: trasování metod, stromy pohledů, podrobný protokol; výrazně pomalejší (výchozí: logs/<package>-<time>/); použijte --debug=SLOŽKA"
+
+#: src/apk_starter/cli.py:270
 msgid "override the SDK level passed to ATL"
 msgstr "přepíše úroveň SDK předávanou ATL"
 
-#: src/apk_starter/cli.py:253
+#: src/apk_starter/cli.py:271
 msgid "window size (remembered per app)"
 msgstr "velikost okna (pamatuje se pro každou aplikaci)"
 
-#: src/apk_starter/cli.py:254
+#: src/apk_starter/cli.py:272
 msgid "with --remove/--remove-all: also delete the app data"
 msgstr "s --remove/--remove-all: smaže i data aplikace"
 
-#: src/apk_starter/cli.py:256
+#: src/apk_starter/cli.py:274
 msgid "install the APK and add a menu entry"
 msgstr "nainstaluje APK a přidá položku do nabídky"
 
-#: src/apk_starter/cli.py:257
+#: src/apk_starter/cli.py:275
 msgid "list installed apps"
 msgstr "vypíše nainstalované aplikace"
 
-#: src/apk_starter/cli.py:258
+#: src/apk_starter/cli.py:276
 msgid "remove an installed app"
 msgstr "odinstaluje nainstalovanou aplikaci"
 
-#: src/apk_starter/cli.py:260
+#: src/apk_starter/cli.py:278
 msgid ""
 "remove all installed apps and their menu entries (before uninstalling the "
 "Flatpak)"
@@ -240,36 +254,40 @@ msgstr ""
 "odstraní všechny nainstalované aplikace a jejich položky v nabídce (před "
 "odinstalací Flatpaku)"
 
-#: src/apk_starter/cli.py:261
+#: src/apk_starter/cli.py:280
+msgid ""
+"show the report of a log or debug recording (default: the newest; a package "
+"name: its newest)"
+msgstr "zobrazit zprávu z nahrávky s protokolem nebo laděním (výchozí: nejnovější; název balíčku: jeho nejnovější)"
+
+#: src/apk_starter/cli.py:282
 msgid "show the version and exit"
 msgstr "zobrazí verzi a skončí"
 
-#: src/apk_starter/cli.py:295
+#: src/apk_starter/cli.py:316
 msgid ""
-"--install, --list, --remove, --remove-all and --version take no other "
-"arguments"
-msgstr ""
-"--install, --list, --remove, --remove-all a --version nepřijímají žádné "
-"další argumenty"
+"--install, --list, --remove, --remove-all, --report and --version take no "
+"other arguments"
+msgstr "--install, --list, --remove, --remove-all, --report a --version nepřijímají další argumenty"
 
-#: src/apk_starter/cli.py:297
+#: src/apk_starter/cli.py:318
 msgid "--purge only works with --remove or --remove-all"
 msgstr "--purge funguje jen s --remove nebo --remove-all"
 
-#: src/apk_starter/cli.py:322
+#: src/apk_starter/cli.py:347
 msgid "no APK given and no display for the window"
 msgstr "nebylo zadáno APK a pro okno není k dispozici displej"
 
-#: src/apk_starter/cli.py:326
+#: src/apk_starter/cli.py:351
 msgid "no APK given"
 msgstr "nebylo zadáno APK"
 
-#: src/apk_starter/cli.py:367 src/apk_starter/cli.py:385
+#: src/apk_starter/cli.py:401 src/apk_starter/cli.py:419
 #, python-brace-format
 msgid "the Android runtime could not be prepared in advance: {reason}"
 msgstr "běhové prostředí Androidu nebylo možné připravit předem: {reason}"
 
-#: src/apk_starter/cli.py:389
+#: src/apk_starter/cli.py:423
 msgid "Preparing apps for this computer…"
 msgstr "Příprava aplikací pro tento počítač…"
 
@@ -281,6 +299,35 @@ msgstr "nelze spustit {program}: {reason}"
 #: src/apk_starter/dexopt.py:193
 msgid "Preparing the Android runtime for this computer…"
 msgstr "Příprava běhového prostředí Androidu pro tento počítač…"
+
+#: src/apk_starter/diag.py:65
+#, python-brace-format
+msgid "debug needs atl-doctor: {reason}"
+msgstr "ladění vyžaduje atl-doctor: {reason}"
+
+#: src/apk_starter/diag.py:119
+#, python-brace-format
+msgid "no such recording: {file}"
+msgstr "taková nahrávka neexistuje: {file}"
+
+#: src/apk_starter/diag.py:123
+#, python-brace-format
+msgid "no recording of {package}; start it with --log or --debug"
+msgstr "žádná nahrávka {package}; spusťte s --log nebo --debug"
+
+#: src/apk_starter/diag.py:124
+msgid "no recordings yet; start an app with --log or --debug"
+msgstr "zatím žádné nahrávky; spusťte aplikaci s --log nebo --debug"
+
+#: src/apk_starter/diag.py:134
+#, python-brace-format
+msgid "the report needs atl-doctor: {reason}"
+msgstr "zpráva vyžaduje atl-doctor: {reason}"
+
+#: src/apk_starter/diag.py:140
+#, python-brace-format
+msgid "cannot read the recording {file}: {reason}"
+msgstr "nahrávku {file} nelze přečíst: {reason}"
 
 #: src/apk_starter/errors.py:23
 #, python-brace-format
@@ -312,107 +359,120 @@ msgstr "Nejsou nainstalovány žádné aplikace"
 msgid "Install an APK or drop one here."
 msgstr "Nainstalujte APK nebo jej sem přetáhněte."
 
-#: src/apk_starter/gui.py:87
+#: src/apk_starter/gui.py:89
 msgid "Close"
 msgstr "Zavřít"
 
-#: src/apk_starter/gui.py:132
+#: src/apk_starter/gui.py:134
 msgid "Cannot read the app list"
 msgstr "Nelze načíst seznam aplikací"
 
-#: src/apk_starter/gui.py:143
+#: src/apk_starter/gui.py:145
 #, python-brace-format
 msgid "data {size}"
 msgstr "data {size}"
 
-#: src/apk_starter/gui.py:143
+#: src/apk_starter/gui.py:145
 msgid "no data"
 msgstr "žádná data"
 
-#: src/apk_starter/gui.py:155
+#: src/apk_starter/gui.py:157
 msgid "Start"
 msgstr "Spustit"
 
-#: src/apk_starter/gui.py:157
+#: src/apk_starter/gui.py:159
 msgid "Start with log"
 msgstr "Spustit s protokolem"
 
-#: src/apk_starter/gui.py:157
+#: src/apk_starter/gui.py:159
+msgid "Start with debug"
+msgstr "Spustit s laděním"
+
+#: src/apk_starter/gui.py:160
+msgid "Show report"
+msgstr "Zobrazit zprávu"
+
+#: src/apk_starter/gui.py:160
 msgid "Open log folder"
 msgstr "Otevřít složku protokolů"
 
-#: src/apk_starter/gui.py:158
+#: src/apk_starter/gui.py:161
 msgid "Delete data…"
 msgstr "Smazat data…"
 
-#: src/apk_starter/gui.py:158
+#: src/apk_starter/gui.py:161
 msgid "Uninstall…"
 msgstr "Odinstalovat…"
 
-#: src/apk_starter/gui.py:163
+#: src/apk_starter/gui.py:166
 msgid "More"
 msgstr "Více"
 
-#: src/apk_starter/gui.py:175
+#: src/apk_starter/gui.py:178
 #, python-brace-format
 msgid "Cannot start {app}"
 msgstr "Aplikaci {app} nelze spustit"
 
-#: src/apk_starter/gui.py:180
-msgid "See the log folder."
-msgstr "Podívejte se do složky protokolů."
+#: src/apk_starter/gui.py:183
+msgid "Look at “Show report”."
+msgstr "Viz „Zobrazit zprávu“."
 
-#: src/apk_starter/gui.py:180
-msgid "Try “Start with log” and look at the log."
-msgstr "Zkuste „Spustit s protokolem“ a prohlédněte si protokol."
+#: src/apk_starter/gui.py:183
+msgid "Try “Start with log”, then “Show report”."
+msgstr "Zkuste „Spustit s protokolem“ a pak „Zobrazit zprávu“."
 
-#: src/apk_starter/gui.py:182
+#: src/apk_starter/gui.py:185
 #, python-brace-format
 msgid "{app} ended with exit code {code}"
 msgstr "Aplikace {app} skončila s návratovým kódem {code}"
 
-#: src/apk_starter/gui.py:184
+#: src/apk_starter/gui.py:187
 #, python-brace-format
 msgid "{app} was killed by signal {signal}"
 msgstr "Aplikace {app} byla ukončena signálem {signal}"
 
-#: src/apk_starter/gui.py:187
+#: src/apk_starter/gui.py:190
 #, python-brace-format
 msgid "{app} starts with a log"
 msgstr "Aplikace {app} se spouští s protokolem"
 
-#: src/apk_starter/gui.py:194 src/apk_starter/gui.py:202
+#: src/apk_starter/gui.py:192
+#, python-brace-format
+msgid "{app} starts with debug; it runs much slower"
+msgstr "{app} se spouští s laděním; běží výrazně pomaleji"
+
+#: src/apk_starter/gui.py:203 src/apk_starter/gui.py:211
 msgid "Cannot open the log folder"
 msgstr "Nelze otevřít složku protokolů"
 
-#: src/apk_starter/gui.py:206
+#: src/apk_starter/gui.py:215
 msgid "Android apps"
 msgstr "Aplikace pro Android"
 
-#: src/apk_starter/gui.py:211
+#: src/apk_starter/gui.py:220
 msgid "Install APK"
 msgstr "Instalovat APK"
 
-#: src/apk_starter/gui.py:233 src/apk_starter/gui.py:235
+#: src/apk_starter/gui.py:242 src/apk_starter/gui.py:244
 #, python-brace-format
 msgid "{app} installed"
 msgstr "Aplikace {app} nainstalována"
 
-#: src/apk_starter/gui.py:237
+#: src/apk_starter/gui.py:246
 #, python-brace-format
 msgid "Cannot install {file}"
 msgstr "{file} nelze nainstalovat"
 
-#: src/apk_starter/gui.py:242
+#: src/apk_starter/gui.py:251
 msgid "Cancel"
 msgstr "Zrušit"
 
-#: src/apk_starter/gui.py:254
+#: src/apk_starter/gui.py:263
 #, python-brace-format
 msgid "Delete the data of {app}?"
 msgstr "Smazat data aplikace {app}?"
 
-#: src/apk_starter/gui.py:255
+#: src/apk_starter/gui.py:264
 msgid ""
 "The app stays installed. Its settings, accounts and files are deleted. Close "
 "the app first."
@@ -420,47 +480,92 @@ msgstr ""
 "Aplikace zůstane nainstalována. Její nastavení, účty a soubory budou "
 "smazány. Nejprve aplikaci zavřete."
 
-#: src/apk_starter/gui.py:256
+#: src/apk_starter/gui.py:265
 msgid "Delete Data"
 msgstr "Smazat data"
 
-#: src/apk_starter/gui.py:258
+#: src/apk_starter/gui.py:267
 #, python-brace-format
 msgid "Data of {app} deleted"
 msgstr "Data aplikace {app} smazána"
 
-#: src/apk_starter/gui.py:259
+#: src/apk_starter/gui.py:268
 #, python-brace-format
 msgid "Cannot delete the data of {app}"
 msgstr "Data aplikace {app} nelze smazat"
 
-#: src/apk_starter/gui.py:263
+#: src/apk_starter/gui.py:272
 msgid "Also delete app data"
 msgstr "Smazat i data aplikace"
 
-#: src/apk_starter/gui.py:266 src/apk_starter/gui.py:268
+#: src/apk_starter/gui.py:275 src/apk_starter/gui.py:277
 #, python-brace-format
 msgid "{app} uninstalled"
 msgstr "Aplikace {app} odinstalována"
 
-#: src/apk_starter/gui.py:269
+#: src/apk_starter/gui.py:278
 #, python-brace-format
 msgid "Uninstall {app}?"
 msgstr "Odinstalovat aplikaci {app}?"
 
-#: src/apk_starter/gui.py:270
+#: src/apk_starter/gui.py:279
 msgid "The app and its menu entry are removed. Close the app first."
 msgstr ""
 "Aplikace a její položka v nabídce budou odstraněny. Nejprve aplikaci zavřete."
 
-#: src/apk_starter/gui.py:270
+#: src/apk_starter/gui.py:279
 msgid "Uninstall"
 msgstr "Odinstalovat"
 
-#: src/apk_starter/gui.py:272
+#: src/apk_starter/gui.py:281
 #, python-brace-format
 msgid "Cannot uninstall {app}"
 msgstr "Aplikaci {app} nelze odinstalovat"
+
+#: src/apk_starter/gui.py:289
+#, python-brace-format
+msgid "Report: {app}"
+msgstr "Zpráva: {app}"
+
+#: src/apk_starter/gui.py:295
+msgid "Save Report…"
+msgstr "Uložit zprávu…"
+
+#: src/apk_starter/gui.py:298
+msgid "Log"
+msgstr "Protokol"
+
+#: src/apk_starter/gui.py:298
+msgid "Debug"
+msgstr "Ladění"
+
+#: src/apk_starter/gui.py:301
+msgid "Recording"
+msgstr "Nahrávka"
+
+#: src/apk_starter/gui.py:310
+msgid "No recordings"
+msgstr "Žádné nahrávky"
+
+#: src/apk_starter/gui.py:311
+msgid "Start the app with log or with debug first."
+msgstr "Nejprve spusťte aplikaci s protokolem nebo s laděním."
+
+#: src/apk_starter/gui.py:339
+msgid "Cannot read the report"
+msgstr "Zprávu nelze přečíst"
+
+#: src/apk_starter/gui.py:363
+msgid "Save Report"
+msgstr "Uložit zprávu"
+
+#: src/apk_starter/gui.py:379
+msgid "Cannot save the report"
+msgstr "Zprávu nelze uložit"
+
+#: src/apk_starter/gui.py:381
+msgid "Report saved"
+msgstr "Zpráva uložena"
 
 #: src/apk_starter/i18n.py:27
 msgid "usage: "
@@ -551,3 +656,16 @@ msgstr "nelze spustit android-translation-layer: {reason}"
 #, python-brace-format
 msgid "android-translation-layer was killed by {signal}"
 msgstr "android-translation-layer byl ukončen signálem {signal}"
+
+#~ msgid ""
+#~ "--install, --list, --remove, --remove-all and --version take no other "
+#~ "arguments"
+#~ msgstr ""
+#~ "--install, --list, --remove, --remove-all a --version nepřijímají žádné "
+#~ "další argumenty"
+
+#~ msgid "See the log folder."
+#~ msgstr "Podívejte se do složky protokolů."
+
+#~ msgid "Try “Start with log” and look at the log."
+#~ msgstr "Zkuste „Spustit s protokolem“ a prohlédněte si protokol."

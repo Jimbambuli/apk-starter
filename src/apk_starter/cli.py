@@ -15,7 +15,7 @@ from pathlib import Path
 from .apkinfo import PACKAGE_RE, ApkInfo, read_apk_info
 from .errors import ApkError, StarterError, UsageError, describe_error
 from .i18n import _
-from . import dexopt, i18n
+from . import dexopt, diag, i18n
 from .launch import (DEFAULT_SIZE, build_command, build_env, cached_apk_info, parse_size, prepare_apk,
                      remember_size, remembered_size, sdk_for)
 from .paths import Paths
@@ -27,33 +27,39 @@ VALUE_OPTIONS = ("--sdk", "--size", "--install", "--remove")
 DISPLAY_VARS = ("WAYLAND_DISPLAY", "DISPLAY")
 
 
-def _scan(argv: list[str]) -> tuple[list[str], Path | bool | None, int]:
-    """Options before the first positional (or `--`): returns (kept options, log, index of the tail)."""
+def _scan(argv: list[str]) -> tuple[list[str], str | None, Path | None, int]:
+    """Options before the first positional (or `--`): returns (kept options, diagnose level "log"/"debug" or None,
+    its file or folder, index of the tail)."""
     kept: list[str] = []
-    log: Path | bool | None = None
+    level: str | None = None
+    target: Path | None = None
     i = 0
     while i < len(argv):
         tok = argv[i]
         if tok == "--" or not tok.startswith("-"):
             break
-        if tok == "--log":
-            log = True
-        elif tok.startswith("--log="):
-            if not tok[6:]:
-                raise UsageError(_("--log= needs a file name"))
-            log = Path(tok[6:])
+        name, eq, value = tok[2:].partition("=")
+        if name in ("log", "debug") and tok.startswith("--"):
+            if level is not None and level != name:
+                raise UsageError(_("--log and --debug exclude each other"))
+            if eq and not value:
+                raise UsageError(_("--log= needs a file name") if name == "log" else _("--debug= needs a folder name"))
+            level, target = name, Path(value) if value else None
         elif tok in VALUE_OPTIONS:
             kept += argv[i:i + 2]
+            i += 1
+        elif tok == "--report" and i + 1 < len(argv) and not argv[i + 1].startswith("-"):
+            kept += argv[i:i + 2]            # optional value: a recording or a package
             i += 1
         else:
             kept.append(tok)
         i += 1
-    return kept, log, i
+    return kept, level, target, i
 
 
-def split_log_option(argv: list[str]) -> tuple[list[str], Path | bool | None]:
-    kept, log, i = _scan(argv)
-    return kept + argv[i:], log
+def split_diag_option(argv: list[str]) -> tuple[list[str], str | None, Path | None]:
+    kept, level, target, i = _scan(argv)
+    return kept + argv[i:], level, target
 
 
 def resolve_target(paths: Paths, target: str) -> Path:
@@ -250,13 +256,17 @@ def lang_from_env(env: Mapping[str, str]) -> str | None:
 def _parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="apk-starter", allow_abbrev=False,
-        usage="%(prog)s [--log[=FILE]] [--sdk N] [--size WxH] [--] [APK|PACKAGE] [ATL-ARGS...]\n"
+        usage="%(prog)s [--log[=FILE] | --debug[=DIR]] [--sdk N] [--size WxH] [--] [APK|PACKAGE] [ATL-ARGS...]\n"
               "       %(prog)s --install APK | --list | --remove PACKAGE [--purge] | --remove-all [--purge]\n"
+              "       %(prog)s --report [RECORDING|PACKAGE]\n"
               "       %(prog)s --version\n"
               "       %(prog)s            " + _("(no arguments: open the management window)"),
         description=_("Start Android apps (APK) with Android Translation Layer."))
     p.add_argument("--log", nargs="?", const=True, metavar="FILE",
                    help=_("write a log for atl-doctor (default: logs/<package>-<time>.log); use --log=FILE"))
+    p.add_argument("--debug", nargs="?", const=True, metavar="DIR",
+                   help=_("record the app for atl-doctor: method trace, view trees, verbose log; much slower "
+                          "(default: logs/<package>-<time>/); use --debug=DIR"))
     p.add_argument("--sdk", type=int, metavar="N", help=_("override the SDK level passed to ATL"))
     p.add_argument("--size", metavar="WxH", help=_("window size (remembered per app)"))
     p.add_argument("--purge", action="store_true", help=_("with --remove/--remove-all: also delete the app data"))
@@ -266,6 +276,9 @@ def _parser() -> argparse.ArgumentParser:
     g.add_argument("--remove", metavar="PACKAGE", help=_("remove an installed app"))
     g.add_argument("--remove-all", action="store_true",
                    help=_("remove all installed apps and their menu entries (before uninstalling the Flatpak)"))
+    g.add_argument("--report", nargs="?", const="", metavar="RECORDING",
+                   help=_("show the report of a log or debug recording (default: the newest; a package name: its "
+                          "newest)"))
     g.add_argument("--version", action="store_true", help=_("show the version and exit"))
     return p
 
@@ -289,7 +302,7 @@ def main(argv: list[str] | None = None, env: Mapping[str, str] | None = None) ->
 
 
 def _main(argv: list[str], env: Mapping[str, str]) -> int:
-    kept, log, i = _scan(argv)
+    kept, level, target, i = _scan(argv)
     tail = argv[i:]
     if tail[:1] == ["--"]:
         tail = tail[1:]
@@ -298,9 +311,9 @@ def _main(argv: list[str], env: Mapping[str, str]) -> int:
         args = parser.parse_args([a for a in kept if a != "--"])
     except SystemExit as e:
         return e.code if isinstance(e.code, int) else 0
-    mode = args.install or args.list or args.remove or args.remove_all or args.version
-    if mode and (tail or log is not None or args.sdk is not None or args.size):
-        parser.error(_("--install, --list, --remove, --remove-all and --version take no other arguments"))
+    mode = args.install or args.list or args.remove or args.remove_all or args.version or args.report is not None
+    if mode and (tail or level is not None or args.sdk is not None or args.size):
+        parser.error(_("--install, --list, --remove, --remove-all, --report and --version take no other arguments"))
     if args.purge and not (args.remove or args.remove_all):
         parser.error(_("--purge only works with --remove or --remove-all"))
     paths = Paths.from_env(env)
@@ -325,17 +338,22 @@ def _main(argv: list[str], env: Mapping[str, str]) -> int:
     if args.install:
         install_apk(paths, Path(args.install), lang_from_env(env), env)
         return 0
-    if not tail and log is None and args.sdk is None and not args.size:
+    if args.report is not None:
+        from . import diag
+        sys.stdout.write(diag.report_text(diag.load_report(diag.find_recording(paths, args.report or None))))
+        return 0
+    if not tail and level is None and args.sdk is None and not args.size:
         if not any(env.get(v) for v in DISPLAY_VARS):
             parser.error(_("no APK given and no display for the window"))
         from . import gui
         return gui.run(paths, env)
     if not tail:
         parser.error(_("no APK given"))
-    return _start(paths, args, log, tail, env)
+    return _start(paths, args, level, target, tail, env)
 
 
-def _start(paths: Paths, args, log, tail: list[str], env: Mapping[str, str]) -> int:
+def _start(paths: Paths, args, level: str | None, into: Path | None, tail: list[str],
+           env: Mapping[str, str]) -> int:
     target, atl_args = tail[0], tail[1:]
     apk = resolve_target(paths, target)
     info = cached_apk_info(paths, apk, lang_from_env(env), read_apk_info)
@@ -344,11 +362,13 @@ def _start(paths: Paths, args, log, tail: list[str], env: Mapping[str, str]) -> 
     else:
         size = remembered_size(paths, info.package) or DEFAULT_SIZE
     started = datetime.now().astimezone()
-    log_path = None
-    if log is True:
-        log_path = default_log_path(paths, info.package, started)
-    elif log:
-        log_path = log
+    log_path = debug_dir = agent_out = None
+    if level == "log":
+        log_path = into or default_log_path(paths, info.package, started)
+        agent_out = Path(os.path.abspath(f"{log_path}.agent"))
+        atl_args = diag.agent_args(paths, agent_out) + atl_args
+    elif level == "debug":
+        debug_dir = into or diag.default_debug_dir(paths, info.package, started)
     apk_path = prepare_apk(paths, info)
     cmd = build_command(paths, apk_path, size=size, sdk=sdk_for(info, args.sdk), atl_args=atl_args,
                         app_id=f"{APP_ID}.{info.package}")
@@ -361,8 +381,12 @@ def _start(paths: Paths, args, log, tail: list[str], env: Mapping[str, str]) -> 
     background = threading.Thread(target=_compile_later, args=(paths, env, later))
     background.start()
     try:
+        if debug_dir is not None:
+            return diag.record(paths, cmd, child_env, debug_dir)
         return run_atl(cmd, child_env, log_path, header)
     finally:
+        if agent_out is not None and log_path.exists():
+            diag.append_agent_output(log_path, agent_out)
         background.join()       # the Flatpak instance (and every process in it) ends with this one
 
 

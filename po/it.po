@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 13:44+0000\n"
+"POT-Creation-Date: 2026-11-01 14:45+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -135,11 +135,19 @@ msgstr "resources.arsc danneggiato"
 msgid "corrupt AndroidManifest.xml"
 msgstr "AndroidManifest.xml danneggiato"
 
-#: src/apk_starter/cli.py:42
+#: src/apk_starter/cli.py:44
+msgid "--log and --debug exclude each other"
+msgstr "--log e --debug si escludono a vicenda"
+
+#: src/apk_starter/cli.py:46
 msgid "--log= needs a file name"
 msgstr "--log= richiede un nome di file"
 
-#: src/apk_starter/cli.py:65
+#: src/apk_starter/cli.py:46
+msgid "--debug= needs a folder name"
+msgstr "--debug= richiede un nome di cartella"
+
+#: src/apk_starter/cli.py:72
 #, python-brace-format
 msgid ""
 "cannot read {file}: no such file (inside the Flatpak sandbox only paths "
@@ -148,22 +156,22 @@ msgstr ""
 "impossibile leggere {file}: file inesistente (nella sandbox di Flatpak sono "
 "visibili solo i percorsi passati con --file-forwarding: {command})"
 
-#: src/apk_starter/cli.py:68 src/apk_starter/cli.py:209
+#: src/apk_starter/cli.py:75 src/apk_starter/cli.py:223
 #, python-brace-format
 msgid "not installed: {package}"
 msgstr "non installato: {package}"
 
-#: src/apk_starter/cli.py:117
+#: src/apk_starter/cli.py:124
 #, python-brace-format
 msgid "Preparing {app} for this computer…"
 msgstr "Preparazione di {app} per questo computer…"
 
-#: src/apk_starter/cli.py:133
+#: src/apk_starter/cli.py:127
 #, python-brace-format
 msgid "{app} could not be prepared in advance: {reason}"
 msgstr "non è stato possibile preparare {app} in anticipo: {reason}"
 
-#: src/apk_starter/cli.py:155
+#: src/apk_starter/cli.py:169
 #, python-brace-format
 msgid ""
 "{app} is installed without a menu entry: the DynamicLauncher portal is not "
@@ -172,37 +180,37 @@ msgstr ""
 "{app} è installata senza voce di menu: il portale DynamicLauncher non è "
 "disponibile; avvia l’app con: {command}"
 
-#: src/apk_starter/cli.py:159
+#: src/apk_starter/cli.py:173
 #, python-brace-format
 msgid "{app} is installed without a menu entry: {reason}"
 msgstr "{app} è installata senza voce di menu: {reason}"
 
-#: src/apk_starter/cli.py:193
+#: src/apk_starter/cli.py:207
 #, python-brace-format
 msgid "cannot remove {folder}: {reason}"
 msgstr "impossibile rimuovere {folder}: {reason}"
 
-#: src/apk_starter/cli.py:213
+#: src/apk_starter/cli.py:227
 msgid ""
 "the DynamicLauncher portal is not available; the menu entry was not removed"
 msgstr ""
 "il portale DynamicLauncher non è disponibile; la voce di menu non è stata "
 "rimossa"
 
-#: src/apk_starter/cli.py:215
+#: src/apk_starter/cli.py:229
 #, python-brace-format
 msgid "the menu entry was not removed: {reason}"
 msgstr "la voce di menu non è stata rimossa: {reason}"
 
-#: src/apk_starter/cli.py:248
+#: src/apk_starter/cli.py:263
 msgid "(no arguments: open the management window)"
 msgstr "(senza argomenti: apre la finestra di gestione)"
 
-#: src/apk_starter/cli.py:249
+#: src/apk_starter/cli.py:264
 msgid "Start Android apps (APK) with Android Translation Layer."
 msgstr "Avvia app Android (APK) con Android Translation Layer."
 
-#: src/apk_starter/cli.py:251
+#: src/apk_starter/cli.py:266
 msgid ""
 "write a log for atl-doctor (default: logs/<package>-<time>.log); use --"
 "log=FILE"
@@ -210,31 +218,37 @@ msgstr ""
 "scrive un registro per atl-doctor (predefinito: logs/<pacchetto>-<ora>.log); "
 "file a scelta con --log=FILE"
 
-#: src/apk_starter/cli.py:252
+#: src/apk_starter/cli.py:268
+msgid ""
+"record the app for atl-doctor: method trace, view trees, verbose log; much "
+"slower (default: logs/<package>-<time>/); use --debug=DIR"
+msgstr "registra l’app per atl-doctor: traccia dei metodi, alberi delle viste, registro dettagliato; molto più lento (predefinito: logs/<package>-<time>/); usa --debug=CARTELLA"
+
+#: src/apk_starter/cli.py:270
 msgid "override the SDK level passed to ATL"
 msgstr "sostituisce il livello SDK passato ad ATL"
 
-#: src/apk_starter/cli.py:253
+#: src/apk_starter/cli.py:271
 msgid "window size (remembered per app)"
 msgstr "dimensione della finestra (ricordata per ogni app)"
 
-#: src/apk_starter/cli.py:254
+#: src/apk_starter/cli.py:272
 msgid "with --remove/--remove-all: also delete the app data"
 msgstr "con --remove/--remove-all: elimina anche i dati dell’app"
 
-#: src/apk_starter/cli.py:256
+#: src/apk_starter/cli.py:274
 msgid "install the APK and add a menu entry"
 msgstr "installa l’APK e aggiunge una voce di menu"
 
-#: src/apk_starter/cli.py:257
+#: src/apk_starter/cli.py:275
 msgid "list installed apps"
 msgstr "elenca le app installate"
 
-#: src/apk_starter/cli.py:258
+#: src/apk_starter/cli.py:276
 msgid "remove an installed app"
 msgstr "disinstalla un’app installata"
 
-#: src/apk_starter/cli.py:260
+#: src/apk_starter/cli.py:278
 msgid ""
 "remove all installed apps and their menu entries (before uninstalling the "
 "Flatpak)"
@@ -242,36 +256,41 @@ msgstr ""
 "rimuove tutte le app installate e le loro voci di menu (prima di "
 "disinstallare il Flatpak)"
 
-#: src/apk_starter/cli.py:261
+#: src/apk_starter/cli.py:280
+msgid ""
+"show the report of a log or debug recording (default: the newest; a package "
+"name: its newest)"
+msgstr "mostra il rapporto di una registrazione con registro o debug (predefinito: la più recente; un nome di pacchetto: la sua più recente)"
+
+#: src/apk_starter/cli.py:282
 msgid "show the version and exit"
 msgstr "mostra la versione ed esce"
 
-#: src/apk_starter/cli.py:295
+#: src/apk_starter/cli.py:316
 msgid ""
-"--install, --list, --remove, --remove-all and --version take no other "
-"arguments"
-msgstr ""
-"--install, --list, --remove, --remove-all e --version non accettano altri "
-"argomenti"
+"--install, --list, --remove, --remove-all, --report and --version take no "
+"other arguments"
+msgstr "--install, --list, --remove, --remove-all, --report e --version non accettano altri argomenti"
 
-#: src/apk_starter/cli.py:297
+#: src/apk_starter/cli.py:318
 msgid "--purge only works with --remove or --remove-all"
 msgstr "--purge funziona solo con --remove o --remove-all"
 
-#: src/apk_starter/cli.py:322
+#: src/apk_starter/cli.py:347
 msgid "no APK given and no display for the window"
 msgstr "nessun APK indicato e nessuno schermo per la finestra"
 
-#: src/apk_starter/cli.py:326
+#: src/apk_starter/cli.py:351
 msgid "no APK given"
 msgstr "nessun APK indicato"
 
-#: src/apk_starter/cli.py:367 src/apk_starter/cli.py:385
+#: src/apk_starter/cli.py:401 src/apk_starter/cli.py:419
 #, python-brace-format
 msgid "the Android runtime could not be prepared in advance: {reason}"
-msgstr "non è stato possibile preparare in anticipo il runtime Android: {reason}"
+msgstr ""
+"non è stato possibile preparare in anticipo il runtime Android: {reason}"
 
-#: src/apk_starter/cli.py:389
+#: src/apk_starter/cli.py:423
 msgid "Preparing apps for this computer…"
 msgstr "Preparazione delle app per questo computer…"
 
@@ -283,6 +302,35 @@ msgstr "impossibile eseguire {program}: {reason}"
 #: src/apk_starter/dexopt.py:193
 msgid "Preparing the Android runtime for this computer…"
 msgstr "Preparazione del runtime Android per questo computer…"
+
+#: src/apk_starter/diag.py:65
+#, python-brace-format
+msgid "debug needs atl-doctor: {reason}"
+msgstr "il debug richiede atl-doctor: {reason}"
+
+#: src/apk_starter/diag.py:119
+#, python-brace-format
+msgid "no such recording: {file}"
+msgstr "registrazione inesistente: {file}"
+
+#: src/apk_starter/diag.py:123
+#, python-brace-format
+msgid "no recording of {package}; start it with --log or --debug"
+msgstr "nessuna registrazione di {package}; avvialo con --log o --debug"
+
+#: src/apk_starter/diag.py:124
+msgid "no recordings yet; start an app with --log or --debug"
+msgstr "ancora nessuna registrazione; avvia un’app con --log o --debug"
+
+#: src/apk_starter/diag.py:134
+#, python-brace-format
+msgid "the report needs atl-doctor: {reason}"
+msgstr "il rapporto richiede atl-doctor: {reason}"
+
+#: src/apk_starter/diag.py:140
+#, python-brace-format
+msgid "cannot read the recording {file}: {reason}"
+msgstr "impossibile leggere la registrazione {file}: {reason}"
 
 #: src/apk_starter/errors.py:23
 #, python-brace-format
@@ -314,107 +362,120 @@ msgstr "Nessuna app installata"
 msgid "Install an APK or drop one here."
 msgstr "Installa un APK o trascinalo qui."
 
-#: src/apk_starter/gui.py:87
+#: src/apk_starter/gui.py:89
 msgid "Close"
 msgstr "Chiudi"
 
-#: src/apk_starter/gui.py:132
+#: src/apk_starter/gui.py:134
 msgid "Cannot read the app list"
 msgstr "Impossibile leggere l’elenco delle app"
 
-#: src/apk_starter/gui.py:143
+#: src/apk_starter/gui.py:145
 #, python-brace-format
 msgid "data {size}"
 msgstr "dati {size}"
 
-#: src/apk_starter/gui.py:143
+#: src/apk_starter/gui.py:145
 msgid "no data"
 msgstr "nessun dato"
 
-#: src/apk_starter/gui.py:155
+#: src/apk_starter/gui.py:157
 msgid "Start"
 msgstr "Avvia"
 
-#: src/apk_starter/gui.py:157
+#: src/apk_starter/gui.py:159
 msgid "Start with log"
 msgstr "Avvia con registro"
 
-#: src/apk_starter/gui.py:157
+#: src/apk_starter/gui.py:159
+msgid "Start with debug"
+msgstr "Avvia con debug"
+
+#: src/apk_starter/gui.py:160
+msgid "Show report"
+msgstr "Mostra rapporto"
+
+#: src/apk_starter/gui.py:160
 msgid "Open log folder"
 msgstr "Apri cartella dei registri"
 
-#: src/apk_starter/gui.py:158
+#: src/apk_starter/gui.py:161
 msgid "Delete data…"
 msgstr "Elimina dati…"
 
-#: src/apk_starter/gui.py:158
+#: src/apk_starter/gui.py:161
 msgid "Uninstall…"
 msgstr "Disinstalla…"
 
-#: src/apk_starter/gui.py:163
+#: src/apk_starter/gui.py:166
 msgid "More"
 msgstr "Altro"
 
-#: src/apk_starter/gui.py:175
+#: src/apk_starter/gui.py:178
 #, python-brace-format
 msgid "Cannot start {app}"
 msgstr "Impossibile avviare {app}"
 
-#: src/apk_starter/gui.py:180
-msgid "See the log folder."
-msgstr "Consulta la cartella dei registri."
+#: src/apk_starter/gui.py:183
+msgid "Look at “Show report”."
+msgstr "Vedi «Mostra rapporto»."
 
-#: src/apk_starter/gui.py:180
-msgid "Try “Start with log” and look at the log."
-msgstr "Prova «Avvia con registro» e consulta il registro."
+#: src/apk_starter/gui.py:183
+msgid "Try “Start with log”, then “Show report”."
+msgstr "Prova «Avvia con registro», poi «Mostra rapporto»."
 
-#: src/apk_starter/gui.py:182
+#: src/apk_starter/gui.py:185
 #, python-brace-format
 msgid "{app} ended with exit code {code}"
 msgstr "{app} è terminata con codice di uscita {code}"
 
-#: src/apk_starter/gui.py:184
+#: src/apk_starter/gui.py:187
 #, python-brace-format
 msgid "{app} was killed by signal {signal}"
 msgstr "{app} è stata terminata dal segnale {signal}"
 
-#: src/apk_starter/gui.py:187
+#: src/apk_starter/gui.py:190
 #, python-brace-format
 msgid "{app} starts with a log"
 msgstr "{app} si avvia con registro"
 
-#: src/apk_starter/gui.py:194 src/apk_starter/gui.py:202
+#: src/apk_starter/gui.py:192
+#, python-brace-format
+msgid "{app} starts with debug; it runs much slower"
+msgstr "{app} si avvia con debug; è molto più lenta"
+
+#: src/apk_starter/gui.py:203 src/apk_starter/gui.py:211
 msgid "Cannot open the log folder"
 msgstr "Impossibile aprire la cartella dei registri"
 
-#: src/apk_starter/gui.py:206
+#: src/apk_starter/gui.py:215
 msgid "Android apps"
 msgstr "App Android"
 
-#: src/apk_starter/gui.py:211
+#: src/apk_starter/gui.py:220
 msgid "Install APK"
 msgstr "Installa APK"
 
-#: src/apk_starter/gui.py:233 src/apk_starter/gui.py:235
+#: src/apk_starter/gui.py:242 src/apk_starter/gui.py:244
 #, python-brace-format
 msgid "{app} installed"
 msgstr "{app} installata"
 
-#: src/apk_starter/gui.py:237
+#: src/apk_starter/gui.py:246
 #, python-brace-format
 msgid "Cannot install {file}"
 msgstr "Impossibile installare {file}"
 
-#: src/apk_starter/gui.py:242
+#: src/apk_starter/gui.py:251
 msgid "Cancel"
 msgstr "Annulla"
 
-#: src/apk_starter/gui.py:254
+#: src/apk_starter/gui.py:263
 #, python-brace-format
 msgid "Delete the data of {app}?"
 msgstr "Eliminare i dati di {app}?"
 
-#: src/apk_starter/gui.py:255
+#: src/apk_starter/gui.py:264
 msgid ""
 "The app stays installed. Its settings, accounts and files are deleted. Close "
 "the app first."
@@ -422,46 +483,91 @@ msgstr ""
 "L’app resta installata. Le sue impostazioni, gli account e i file vengono "
 "eliminati. Chiudi prima l’app."
 
-#: src/apk_starter/gui.py:256
+#: src/apk_starter/gui.py:265
 msgid "Delete Data"
 msgstr "Elimina dati"
 
-#: src/apk_starter/gui.py:258
+#: src/apk_starter/gui.py:267
 #, python-brace-format
 msgid "Data of {app} deleted"
 msgstr "Dati di {app} eliminati"
 
-#: src/apk_starter/gui.py:259
+#: src/apk_starter/gui.py:268
 #, python-brace-format
 msgid "Cannot delete the data of {app}"
 msgstr "Impossibile eliminare i dati di {app}"
 
-#: src/apk_starter/gui.py:263
+#: src/apk_starter/gui.py:272
 msgid "Also delete app data"
 msgstr "Elimina anche i dati dell’app"
 
-#: src/apk_starter/gui.py:266 src/apk_starter/gui.py:268
+#: src/apk_starter/gui.py:275 src/apk_starter/gui.py:277
 #, python-brace-format
 msgid "{app} uninstalled"
 msgstr "{app} disinstallata"
 
-#: src/apk_starter/gui.py:269
+#: src/apk_starter/gui.py:278
 #, python-brace-format
 msgid "Uninstall {app}?"
 msgstr "Disinstallare {app}?"
 
-#: src/apk_starter/gui.py:270
+#: src/apk_starter/gui.py:279
 msgid "The app and its menu entry are removed. Close the app first."
 msgstr "L’app e la sua voce di menu vengono rimosse. Chiudi prima l’app."
 
-#: src/apk_starter/gui.py:270
+#: src/apk_starter/gui.py:279
 msgid "Uninstall"
 msgstr "Disinstalla"
 
-#: src/apk_starter/gui.py:272
+#: src/apk_starter/gui.py:281
 #, python-brace-format
 msgid "Cannot uninstall {app}"
 msgstr "Impossibile disinstallare {app}"
+
+#: src/apk_starter/gui.py:289
+#, python-brace-format
+msgid "Report: {app}"
+msgstr "Rapporto: {app}"
+
+#: src/apk_starter/gui.py:295
+msgid "Save Report…"
+msgstr "Salva rapporto…"
+
+#: src/apk_starter/gui.py:298
+msgid "Log"
+msgstr "Registro"
+
+#: src/apk_starter/gui.py:298
+msgid "Debug"
+msgstr "Debug"
+
+#: src/apk_starter/gui.py:301
+msgid "Recording"
+msgstr "Registrazione"
+
+#: src/apk_starter/gui.py:310
+msgid "No recordings"
+msgstr "Nessuna registrazione"
+
+#: src/apk_starter/gui.py:311
+msgid "Start the app with log or with debug first."
+msgstr "Avvia prima l’app con registro o con debug."
+
+#: src/apk_starter/gui.py:339
+msgid "Cannot read the report"
+msgstr "Impossibile leggere il rapporto"
+
+#: src/apk_starter/gui.py:363
+msgid "Save Report"
+msgstr "Salva rapporto"
+
+#: src/apk_starter/gui.py:379
+msgid "Cannot save the report"
+msgstr "Impossibile salvare il rapporto"
+
+#: src/apk_starter/gui.py:381
+msgid "Report saved"
+msgstr "Rapporto salvato"
 
 #: src/apk_starter/i18n.py:27
 msgid "usage: "
@@ -552,3 +658,16 @@ msgstr "impossibile avviare android-translation-layer: {reason}"
 #, python-brace-format
 msgid "android-translation-layer was killed by {signal}"
 msgstr "android-translation-layer è stato terminato da {signal}"
+
+#~ msgid ""
+#~ "--install, --list, --remove, --remove-all and --version take no other "
+#~ "arguments"
+#~ msgstr ""
+#~ "--install, --list, --remove, --remove-all e --version non accettano altri "
+#~ "argomenti"
+
+#~ msgid "See the log folder."
+#~ msgstr "Consulta la cartella dei registri."
+
+#~ msgid "Try “Start with log” and look at the log."
+#~ msgstr "Prova «Avvia con registro» e consulta il registro."

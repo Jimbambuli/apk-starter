@@ -25,6 +25,7 @@ def load_rows(paths: Paths) -> list[AppRow]:
     return sorted(rows, key=lambda r: (r.label.casefold(), r.package))
 
 
-def start_argv(launcher: list[str], pkg: str, log: bool) -> list[str]:
-    """Apps run as a separate `apk-starter PACKAGE` process, exactly as from their menu entry."""
-    return launcher + (["--log", "--", pkg] if log else [pkg])
+def start_argv(launcher: list[str], pkg: str, level: str | None) -> list[str]:
+    """Apps run as a separate `apk-starter PACKAGE` process, exactly as from their menu entry; level: None,
+    "log" or "debug" (Spec 12)."""
+    return launcher + ([f"--{level}", "--", pkg] if level else [pkg])

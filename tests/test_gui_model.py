@@ -30,6 +30,8 @@ def test_rows_sorted_by_name_with_icon_version_and_size(tmp_path):
 
 
 def test_start_argv():
-    assert start_argv(["/app/bin/apk-starter"], "org.a.app", log=False) == ["/app/bin/apk-starter", "org.a.app"]
-    assert start_argv(["/app/bin/apk-starter"], "org.a.app", log=True) == \
+    assert start_argv(["/app/bin/apk-starter"], "org.a.app", None) == ["/app/bin/apk-starter", "org.a.app"]
+    assert start_argv(["/app/bin/apk-starter"], "org.a.app", "log") == \
         ["/app/bin/apk-starter", "--log", "--", "org.a.app"]
+    assert start_argv(["/app/bin/apk-starter"], "org.a.app", "debug") == \
+        ["/app/bin/apk-starter", "--debug", "--", "org.a.app"]

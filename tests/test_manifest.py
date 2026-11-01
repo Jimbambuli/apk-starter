@@ -41,3 +41,15 @@ def test_all_git_sources_pinned():
     pins = manifest_commits()
     assert {"android_translation_layer", "art_standalone", "bionic_translation", "wolfssl"} <= pins.keys()
     assert all(re.fullmatch(r"[0-9a-f]{40}", c) for c in pins.values())
+
+
+def test_atl_doctor_pinned_with_the_same_atl_source():
+    """Agent, trace counter and report module come from one atl-doctor commit; the stub list is made from the
+    very ATL source the Flatpak runs."""
+    pins = manifest_commits()
+    bi = dict(l.split("=", 1) for l in (ROOT / "data/build-info").read_text().split())
+    text = MANIFEST.read_text(encoding="utf-8")
+    module = text[text.index("- name: atl-doctor"):text.index("- name: apk-starter")]
+    doctor = re.search(r"url: https://github.com/Jimbambuli/atl-doctor.git\n\s+commit: ([0-9a-f]{40})\n", module)
+    assert doctor and bi["atl_doctor_commit"] == doctor.group(1)
+    assert pins["atl-doctor"] == pins["android_translation_layer"] and "libopenjdkjvmti.so" in text

@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 import apk_starter
-from apk_starter.cli import main, split_log_option
+from apk_starter.cli import main, split_diag_option
 from apk_starter import dexopt
 from apk_starter.errors import StarterError
 from apkgen import axml_manifest, make_apk
@@ -15,6 +15,9 @@ from apkgen import axml_manifest, make_apk
 FAKE = Path(__file__).with_name("fake_atl.py")
 FAKE_ART = Path(__file__).with_name("fake_art.py")
 PKG = "org.example.demo"
+# smallest valid DEX header (version 035, no classes): enough for atl-doctor's APK reader
+DEX = b"dex\n035\0" + bytes(24) + (0x70).to_bytes(4, "little") + (0x70).to_bytes(4, "little") + \
+    (0x12345678).to_bytes(4, "little") + bytes(0x70 - 44)
 DEFAULT_ICON = b"<svg/>"
 
 
@@ -56,8 +59,9 @@ def box(tmp_path, monkeypatch):
 
 
 def test_log_flag_does_not_eat_apk():
-    argv, log = split_log_option(["--log", "app.apk", "--log=x"])
-    assert argv == ["app.apk", "--log=x"] and log is True
+    assert split_diag_option(["--log", "app.apk", "--log=x"]) == (["app.apk", "--log=x"], "log", None)
+    assert split_diag_option(["--debug=d", "--", "app.apk"]) == (["--", "app.apk"], "debug", Path("d"))
+    assert split_diag_option(["app.apk"]) == (["app.apk"], None, None)
 
 
 def test_unwritable_log_file_fails_before_launch(box):
@@ -344,3 +348,64 @@ def test_direct_start_unpacks_native_libraries_before_atl(box):
     box.env["FAKE_ATL_CHECK"] = str(box.data / "data" / PKG / f"{PKG}.apk_" / "lib" / "libx.so")
     assert main([str(apk)], env=box.env) == 0
     assert json.loads(box.record.read_text())["check"]
+
+
+def _agent(box):
+    prefix = Path(box.env["APK_STARTER_PREFIX"])
+    for f in ("lib/atl-doctor/libatl_doctor_agent.so", "lib/art/libopenjdkjvmti.so"):
+        (prefix / f).parent.mkdir(parents=True, exist_ok=True)
+        (prefix / f).write_bytes(b"")
+    return prefix
+
+
+def test_log_level_loads_the_agent_and_keeps_its_output_in_the_log(box, capsys):
+    prefix = _agent(box)
+    assert main(["--log", str(box.apk)], env=box.env) == 0
+    a = json.loads(box.record.read_text())["argv"]
+    agent = a[a.index("-X", a.index("--gapplication-app-id")) + 1:]
+    log = next((box.data / "logs").glob(f"{PKG}-*.log"))
+    assert [x for x in a if x.startswith("-agentpath:")] == [
+        f"-agentpath:{prefix}/lib/atl-doctor/libatl_doctor_agent.so={log}.agent,"
+        f"late={prefix}/lib/art/libopenjdkjvmti.so,latesec=3"] and agent
+    assert log.read_text().splitlines()[-1].startswith("# atl-doctor-agent: E\t200\t7\tjava.lang.IllegalState")
+    assert not Path(f"{log}.agent").exists()
+    assert json.loads(box.record.read_text())["log_tags"] is None
+    pytest.importorskip("atl_doctor")
+    capsys.readouterr()
+    assert main(["--report"], env=box.env) == 0
+    out = capsys.readouterr().out
+    assert "java.lang.IllegalStateException: boom" in out and "Exceptions" in out
+
+
+def test_log_without_agent_is_a_plain_log(box):
+    assert main(["--log", str(box.apk)], env=box.env) == 0
+    assert not any(x.startswith("-agentpath") for x in json.loads(box.record.read_text())["argv"])
+
+
+def test_debug_level_records_a_folder_for_atl_doctor(box, capsys):
+    pytest.importorskip("atl_doctor")
+    make_apk(box.apk, manifest=axml_manifest(), files={"classes.dex": DEX})     # atl-doctor reads the code
+    prefix = Path(box.env["APK_STARTER_PREFIX"])
+    (prefix / "bin").mkdir()
+    (prefix / "bin/android-translation-layer").symlink_to(FAKE)
+    assert main(["--debug", str(box.apk)], env={**box.env, "FAKE_ATL_MODE": "exit:3"}) == 3
+    rec = json.loads(box.record.read_text())
+    assert rec["log_tags"] == "*:v" and rec["data_dir"] == str(box.data / "data" / PKG)
+    assert rec["argv"][0] == str(box.tmp / "cache/apk-starter/launch" / f"{PKG}.apk")
+    folder = next((box.data / "logs").glob(f"{PKG}-*"))
+    m = json.loads((folder / "manifest.json").read_text())
+    assert m["exit_status"] == 3 and m["package"] == PKG and "fake atl output" in (folder / "atl.log").read_text()
+    capsys.readouterr()
+    assert main(["--report", PKG], env=box.env) == 0
+    assert "exit status 3" in capsys.readouterr().out
+    assert main(["--debug=" + str(box.tmp / "own"), str(box.apk)], env=box.env) == 0
+    assert (box.tmp / "own/manifest.json").is_file()
+
+
+def test_report_and_diag_usage_errors(box, capsys):
+    assert main(["--log", "--debug", str(box.apk)], env=box.env) == 2
+    assert main(["--debug=", str(box.apk)], env=box.env) == 2
+    assert main(["--report", "org.none.app"], env=box.env) == 2
+    assert main(["--report"], env=box.env) == 1
+    assert main(["--report", "a", "b"], env=box.env) == 2
+    assert main(["--report", "--list"], env=box.env) == 2

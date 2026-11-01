@@ -19,8 +19,8 @@ alias apk-starter='flatpak run --file-forwarding io.github.Jimbambuli.ApkStarter
 ## Use
 
 Open **APK Starter** from the application menu (or run `apk-starter` without arguments) to get a small window that
-lists the installed apps with their icon, version and data size. From there you can start an app (also with a log),
-open the log folder, delete an app's data, uninstall it, and install a new APK with **Install APK…** or by dropping
+lists the installed apps with their icon, version and data size. From there you can start an app (also with a log
+or with debug, see below), show the report of such a start, open the log folder, delete an app's data, uninstall it, and install a new APK with **Install APK…** or by dropping
 the file onto the window. Every installed app also gets its own menu entry.
 
 The same is available on the command line:
@@ -35,6 +35,8 @@ apk-starter --remove-all [--purge]   # remove every installed app and its menu e
 apk-starter --log @@ app.apk @@      # write a log that atl-doctor can read
 apk-starter --log=FILE @@ app.apk @@ # same, to a chosen file (must be writable inside the sandbox,
                                      # e.g. under ~/.var/app/io.github.Jimbambuli.ApkStarter/)
+apk-starter --debug @@ app.apk @@    # record the app for atl-doctor (much slower), --debug=DIR for a folder
+apk-starter --report [FILE|DIR|PACKAGE]  # report of the newest (or the given) log/debug recording
 apk-starter --sdk N @@ app.apk @@    # override the SDK level passed to ATL
 apk-starter --size WxH @@ app.apk @@ # window size (remembered per app)
 apk-starter @@ app.apk @@ -- ARGS    # everything after the APK is passed on to ATL
@@ -48,7 +50,15 @@ Without the alias use `flatpak run --file-forwarding io.github.Jimbambuli.ApkSta
 Double-clicking an APK in the file manager and starting an installed app from the menu work without any command.
 
 Data lives under `~/.var/app/io.github.Jimbambuli.ApkStarter/data/`: `apps/` (installed APKs), `data/<package>/`
-(app data), `logs/` (logs from `--log`).
+(app data), `logs/` (logs from `--log`, folders from `--debug`).
+
+Diagnose levels, for finding out why an app misbehaves under ATL (with
+[atl-doctor](https://github.com/Jimbambuli/atl-doctor)): a normal start loads nothing extra. **Log** (`--log`,
+«Start with log») writes ATL's output plus, through atl-doctor's JVMTI agent, every thrown exception with its stack;
+the app runs at almost full speed. **Debug** (`--debug`, «Start with debug») records a folder with ART's method trace
+(hit ATL stubs), the view trees and a verbose Android log; the app runs much slower. **Show report** in the window or
+`apk-starter --report` turns a recording into a report (crash cause, ATL gaps, exceptions; in English), the same one
+`atl-doctor report --log FILE` or `atl-doctor report DIR` gives.
 
 Like Android, installing compiles an app for your processor (shown as «Preparing …»), so its first start is as
 fast as later ones; the Android runtime itself is prepared once and again after an update of APK Starter. An APK

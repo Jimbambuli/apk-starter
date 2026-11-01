@@ -60,5 +60,14 @@ class Paths:
     def cacerts(self) -> Path:
         return self.prefix / "share/apk-starter/cacerts"
 
+    def jvmti_plugin(self) -> Path:
+        return self.prefix / "lib/art/libopenjdkjvmti.so"
+
+    def agent(self) -> Path:
+        return self.prefix / "lib/atl-doctor/libatl_doctor_agent.so"
+
+    def stub_list(self) -> Path:
+        return self.prefix / "share/apk-starter/stubs.tsv"
+
     def default_icon(self) -> Path:
         return self.prefix / "share/icons/hicolor/scalable/apps/io.github.Jimbambuli.ApkStarter.svg"
