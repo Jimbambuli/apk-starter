@@ -163,3 +163,55 @@ def test_no_arguments_with_display_opens_window(box, monkeypatch):
     monkeypatch.setattr(apk_starter, "gui", fake, raising=False)
     assert main([], env={**box.env, "WAYLAND_DISPLAY": "wayland-0"}) == 0
     assert seen == [box.data]
+
+
+def test_remove_without_portal_removes_files_and_warns(box, capsys):
+    assert main(["--install", str(box.apk)], env=box.env) == 0
+
+    def gone(pkg):
+        raise PortalUnavailable("x")
+    box.fake.uninstall_launcher = gone
+    capsys.readouterr()
+    assert main(["--remove", PKG], env=box.env) == 0
+    assert not (box.data / "apps" / f"{PKG}.apk").exists() and not (box.data / "apps" / f"{PKG}.json").exists()
+    assert "menu entry was not removed" in capsys.readouterr().err
+
+
+def test_portal_error_on_remove_does_not_leave_the_app_half_installed(box):
+    from apk_starter.cli import remove_app
+    from apk_starter.paths import Paths
+    assert main(["--install", str(box.apk)], env=box.env) == 0
+
+    def broken(pkg):
+        raise StarterError("portal call Uninstall failed: boom")
+    box.fake.uninstall_launcher = broken
+    warnings = remove_app(Paths.from_env(box.env), PKG, purge=False)
+    assert not (box.data / "apps" / f"{PKG}.apk").exists() and not (box.data / "apps" / f"{PKG}.json").exists()
+    assert len(warnings) == 1 and "menu entry was not removed" in warnings[0] and "boom" in warnings[0]
+
+
+def test_cancelled_menu_entry_says_the_app_is_installed(box, capsys):
+    def cancel(*a):
+        raise StarterError("menu entry not created (cancelled)")
+    box.fake.install_launcher = cancel
+    assert main(["--install", str(box.apk)], env=box.env) == 1
+    assert (box.data / "apps" / f"{PKG}.apk").exists()
+    err = capsys.readouterr().err
+    assert "Demo is installed without a menu entry" in err and "cancelled" in err
+
+
+def test_remove_all_goes_on_after_a_failure(box, capsys, monkeypatch):
+    from apk_starter import cli
+    assert main(["--install", str(box.apk)], env=box.env) == 0
+    (box.data / "apps" / "a.broken.apk").write_bytes(b"x")
+    real = cli.remove_app
+
+    def remove(paths, pkg, purge):
+        if pkg == "a.broken":
+            raise StarterError("cannot remove a.broken: busy")
+        return real(paths, pkg, purge)
+    monkeypatch.setattr(cli, "remove_app", remove)
+    capsys.readouterr()
+    assert main(["--remove-all"], env=box.env) == 1
+    assert not (box.data / "apps" / f"{PKG}.apk").exists()          # the next app was still removed
+    assert "cannot remove a.broken: busy" in capsys.readouterr().err

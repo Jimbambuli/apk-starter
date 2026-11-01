@@ -7,8 +7,8 @@ import threading
 from collections.abc import Callable, Mapping
 from pathlib import Path
 
-from .cli import APP_ID, _lang, clear_data, install_apk, remove_app
-from .errors import StarterError
+from .cli import APP_ID, clear_data, install_apk, lang_from_env, remove_app
+from .errors import StarterError, describe_error
 from .gui_model import AppRow, load_rows, start_argv
 from .paths import Paths
 
@@ -24,25 +24,21 @@ except (ImportError, ValueError) as e:      # pragma: no cover - depends on the 
 APK_MIME = "application/vnd.android.package-archive"
 
 
-def _message(e: BaseException) -> str:
-    if isinstance(e, StarterError):
-        return str(e)
-    if isinstance(e, OSError):
-        return f"{e.strerror or e}" + (f": {e.filename}" if e.filename else "")
-    return f"unexpected error: {e!r}"
-
-
 class Window(Adw.ApplicationWindow):
     def __init__(self, app: Adw.Application, paths: Paths, lang: str | None, launcher: list[str]):
         super().__init__(application=app, title="APK Starter", default_width=640, default_height=560)
         self.paths, self.lang, self.launcher = paths, lang, launcher
         self.rows: dict[str, AppRow] = {}
+        self.busy = 0                               # running install/remove/clear jobs
+        self.generation = 0                         # newest list load; older results are dropped
 
         install = Gtk.Button(label="Install APK…", tooltip_text="Choose an APK file and add it to the menu")
         install.add_css_class("suggested-action")
         install.connect("clicked", lambda _b: self.choose_apk())
         header = Adw.HeaderBar()
         header.pack_start(install)
+        self.spinner = Adw.Spinner(visible=False, tooltip_text="Working…")
+        header.pack_start(self.spinner)
 
         self.listbox = Gtk.ListBox(selection_mode=Gtk.SelectionMode.NONE, valign=Gtk.Align.START)
         self.listbox.add_css_class("boxed-list")
@@ -72,11 +68,19 @@ class Window(Adw.ApplicationWindow):
 
     # -- helpers -----------------------------------------------------------------------------------------
     def toast(self, text: str) -> None:
-        self.toasts.add_toast(Adw.Toast(title=GLib.markup_escape_text(text), timeout=6))
+        """Short confirmation; replaces the one shown so it appears at once."""
+        self.toasts.dismiss_all()
+        self.toasts.add_toast(Adw.Toast(title=GLib.markup_escape_text(text), timeout=4))
 
-    def background(self, work: Callable[[], object], done: Callable[[object], None] | None = None,
-                   refresh: bool = True) -> None:
-        """Run file and portal work off the main loop; report errors as a toast, then refresh the list."""
+    def alert(self, heading: str, body: str) -> None:
+        """Errors and warnings stay until the user closes them."""
+        dialog = Adw.AlertDialog(heading=heading, body=body)
+        dialog.add_response("close", "Close")
+        dialog.present(self)
+
+    def background(self, work: Callable[[], object], done: Callable[[object], None] | None,
+                   failed: str, job: bool = True) -> None:
+        """Run file and portal work off the main loop; show errors as a dialog headed `failed`, then refresh."""
         def thread() -> None:
             try:
                 result, error = work(), None
@@ -85,19 +89,29 @@ class Window(Adw.ApplicationWindow):
             GLib.idle_add(finish, result, error)
 
         def finish(result, error) -> bool:
+            if job:
+                self.busy -= 1
+                self.spinner.set_visible(self.busy > 0)
             if error is not None:
-                self.toast(_message(error))
+                self.alert(failed, describe_error(error))
             elif done is not None:
                 done(result)
-            if refresh:
+            if job:
                 self.refresh()
             return False
 
+        if job:
+            self.busy += 1
+            self.spinner.set_visible(True)
         threading.Thread(target=thread, daemon=True).start()
 
     # -- list ----------------------------------------------------------------------------------------------
     def refresh(self) -> None:
-        self.background(lambda: load_rows(self.paths), self.show_rows, refresh=False)
+        self.generation += 1
+        generation = self.generation
+        self.background(lambda: load_rows(self.paths),
+                        lambda rows: generation == self.generation and self.show_rows(rows),
+                        "Cannot read the app list", job=False)
 
     def show_rows(self, rows: list[AppRow]) -> None:
         self.rows = {r.package: r for r in rows}
@@ -140,14 +154,16 @@ class Window(Adw.ApplicationWindow):
         try:
             proc = Gio.Subprocess.new(start_argv(self.launcher, pkg, log), Gio.SubprocessFlags.NONE)
         except GLib.Error as e:
-            self.toast(f"cannot start {label}: {e.message}")
+            self.alert(f"Cannot start {label}", e.message)
             return
 
         def ended(p: Gio.Subprocess, res) -> None:
             p.wait_finish(res)
+            hint = "See the log folder." if log else "Try “Start with log” and look at the log."
             if p.get_if_exited() and p.get_exit_status() != 0:
-                hint = " – see the log folder" if log else " – try “Start with log”"
-                self.toast(f"{label} ended with exit code {p.get_exit_status()}{hint}")
+                self.alert(f"{label} ended with exit code {p.get_exit_status()}", hint)
+            elif p.get_if_signaled():
+                self.alert(f"{label} was killed by signal {p.get_term_sig()}", hint)
         proc.wait_async(None, ended)
         if log:
             self.toast(f"{label} starts with a log")
@@ -157,7 +173,7 @@ class Window(Adw.ApplicationWindow):
         try:
             folder.mkdir(parents=True, exist_ok=True)
         except OSError as e:
-            self.toast(_message(e))
+            self.alert("Cannot open the log folder", describe_error(e))
             return
         launcher = Gtk.FileLauncher.new(Gio.File.new_for_path(str(folder)))
 
@@ -165,7 +181,7 @@ class Window(Adw.ApplicationWindow):
             try:
                 lnc.launch_finish(res)
             except GLib.Error as e:
-                self.toast(f"cannot open {folder}: {e.message}")
+                self.alert("Cannot open the log folder", f"{folder}: {e.message}")
         launcher.launch(self, None, opened)
 
     def choose_apk(self) -> None:
@@ -193,9 +209,8 @@ class Window(Adw.ApplicationWindow):
         return any(paths)
 
     def install(self, apk: Path) -> None:
-        self.toast(f"Installing {apk.name}…")
         self.background(lambda: install_apk(self.paths, apk, self.lang),
-                        lambda info: self.toast(f"{info.label} installed"))
+                        lambda info: self.toast(f"{info.label} installed"), f"Cannot install {apk.name}")
 
     def _confirm(self, heading: str, body: str, verb: str, then: Callable[[], None],
                  extra: Gtk.Widget | None = None) -> None:
@@ -213,16 +228,24 @@ class Window(Adw.ApplicationWindow):
     def ask_clear_data(self, pkg: str) -> None:
         label = self.rows[pkg].label if pkg in self.rows else pkg
         self._confirm(f"Delete the data of {label}?",
-                      "The app stays installed. Its settings, accounts and files are deleted.", "Delete Data",
+                      "The app stays installed. Its settings, accounts and files are deleted. "
+                      "Close the app first.", "Delete Data",
                       lambda: self.background(lambda: clear_data(self.paths, pkg),
-                                              lambda _r: self.toast(f"Data of {label} deleted")))
+                                              lambda _r: self.toast(f"Data of {label} deleted"),
+                                              f"Cannot delete the data of {label}"))
 
     def ask_uninstall(self, pkg: str) -> None:
         label = self.rows[pkg].label if pkg in self.rows else pkg
         purge = Gtk.CheckButton(label="Also delete app data")
-        self._confirm(f"Uninstall {label}?", "The app and its menu entry are removed.", "Uninstall",
-                      lambda: self.background(lambda: remove_app(self.paths, pkg, purge.get_active()),
-                                              lambda _r: self.toast(f"{label} uninstalled")),
+        def removed(warnings: list[str]) -> None:
+            if warnings:
+                self.alert(f"{label} uninstalled", "\n".join(warnings))
+            else:
+                self.toast(f"{label} uninstalled")
+        self._confirm(f"Uninstall {label}?", "The app and its menu entry are removed. Close the app first.",
+                      "Uninstall",
+                      lambda: self.background(lambda: remove_app(self.paths, pkg, purge.get_active()), removed,
+                                              f"Cannot uninstall {label}"),
                       extra=purge)
 
 
@@ -233,7 +256,7 @@ def default_launcher() -> list[str]:
 
 def run(paths: Paths, env: Mapping[str, str], launcher: list[str] | None = None) -> int:
     app = Adw.Application(application_id=APP_ID)
-    lang = _lang(env)
+    lang = lang_from_env(env)
 
     def activate(a: Adw.Application) -> None:
         win = a.get_active_window() or Window(a, paths, lang, launcher or default_launcher())

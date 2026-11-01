@@ -11,7 +11,7 @@ from datetime import datetime
 from pathlib import Path
 
 from .apkinfo import PACKAGE_RE, ApkInfo, read_apk_info
-from .errors import ApkError, StarterError, UsageError
+from .errors import ApkError, StarterError, UsageError, describe_error
 from .launch import (DEFAULT_SIZE, build_command, build_env, parse_size, prepare_apk, remember_size,
                      remembered_size, sdk_for)
 from .paths import Paths
@@ -116,8 +116,10 @@ def install_apk(paths: Paths, apk: Path, lang: str | None) -> ApkInfo:
             portal.install_launcher(info.package, info.label, icon)
         except portal.PortalUnavailable:
             raise StarterError(
-                "the DynamicLauncher portal is not available; start the app with: "
-                f"flatpak run {APP_ID} {info.package}") from None
+                f"{info.label} is installed without a menu entry: the DynamicLauncher portal is not available; "
+                f"start the app with: flatpak run {APP_ID} {info.package}") from None
+        except StarterError as e:
+            raise StarterError(f"{info.label} is installed without a menu entry: {e}") from None
     return info
 
 
@@ -159,30 +161,40 @@ def clear_data(paths: Paths, pkg: str) -> None:
         _delete_data(paths, pkg)
 
 
-def remove_app(paths: Paths, pkg: str, purge: bool) -> None:
+def remove_app(paths: Paths, pkg: str, purge: bool) -> list[str]:
+    """Remove the app even when the portal fails (else it could never be removed); returns warnings."""
     from . import portal
+    warnings = []
     with package_lock(paths, pkg):
         if not paths.meta(pkg).exists() and not paths.apk(pkg).exists():
             raise UsageError(f"not installed: {pkg}")
         try:
             portal.uninstall_launcher(pkg)
         except portal.PortalUnavailable:
-            print("apk-starter: the DynamicLauncher portal is not available; the menu entry was not removed",
-                  file=sys.stderr)
+            warnings.append("the DynamicLauncher portal is not available; the menu entry was not removed")
+        except StarterError as e:
+            warnings.append(f"the menu entry was not removed: {e}")
         for f in (paths.apk(pkg), paths.meta(pkg), paths.icon(pkg), paths.launch_dir() / f"{pkg}.apk"):
             f.unlink(missing_ok=True)
         if purge:
             _delete_data(paths, pkg)
+    return warnings
 
 
-def remove_all(paths: Paths, purge: bool) -> None:
+def remove_all(paths: Paths, purge: bool) -> tuple[list[str], list[str]]:
+    """Remove every app, going on after a failure; returns (warnings, errors)."""
     pkgs = {d["package"] for d in list_installed(paths)} | {f.stem for f in paths.apps_dir().glob("*.apk")}
+    warnings, errors = [], []
     for pkg in sorted(pkgs):
         if PACKAGE_RE.fullmatch(pkg):
-            remove_app(paths, pkg, purge)
+            try:
+                warnings += remove_app(paths, pkg, purge)
+            except (StarterError, OSError) as e:
+                errors.append(describe_error(e))
+    return warnings, errors
 
 
-def _lang(env: Mapping[str, str]) -> str | None:
+def lang_from_env(env: Mapping[str, str]) -> str | None:
     raw = env.get("LC_ALL") or env.get("LC_MESSAGES") or env.get("LANG") or ""
     lang = raw.replace("@", ".").split(".")[0].split("_")[0]
     return lang.lower() if lang.isalpha() and lang not in ("C", "POSIX") else None
@@ -217,10 +229,10 @@ def main(argv: list[str] | None = None, env: Mapping[str, str] | None = None) ->
     try:
         return _main(argv, env)
     except StarterError as e:
-        print(f"apk-starter: {e}", file=sys.stderr)
+        print(f"apk-starter: {describe_error(e)}", file=sys.stderr)
         return e.code
     except OSError as e:
-        print(f"apk-starter: {e.strerror or e}" + (f": {e.filename}" if e.filename else ""), file=sys.stderr)
+        print(f"apk-starter: {describe_error(e)}", file=sys.stderr)
         return 1
     except KeyboardInterrupt:
         return 130
@@ -254,13 +266,16 @@ def _main(argv: list[str], env: Mapping[str, str]) -> int:
             print("\t".join(" ".join(str(d.get(k) or "").split()) for k in ("package", "label", "version_name")))
         return 0
     if args.remove:
-        remove_app(paths, args.remove, args.purge)
+        for w in remove_app(paths, args.remove, args.purge):
+            print(f"apk-starter: {w}", file=sys.stderr)
         return 0
     if args.remove_all:
-        remove_all(paths, args.purge)
-        return 0
+        warnings, errors = remove_all(paths, args.purge)
+        for line in warnings + errors:
+            print(f"apk-starter: {line}", file=sys.stderr)
+        return 1 if errors else 0
     if args.install:
-        install_apk(paths, Path(args.install), _lang(env))
+        install_apk(paths, Path(args.install), lang_from_env(env))
         return 0
     if not tail and log is None and args.sdk is None and not args.size:
         if not any(env.get(v) for v in DISPLAY_VARS):
@@ -275,7 +290,7 @@ def _main(argv: list[str], env: Mapping[str, str]) -> int:
 def _start(paths: Paths, args, log, tail: list[str], env: Mapping[str, str]) -> int:
     target, atl_args = tail[0], tail[1:]
     apk = resolve_target(paths, target)
-    info = read_apk_info(apk, _lang(env))
+    info = read_apk_info(apk, lang_from_env(env))
     if args.size:
         size = parse_size(args.size)
     else:

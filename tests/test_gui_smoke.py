@@ -40,6 +40,13 @@ def test_window_lists_installs_starts_and_uninstalls(tmp_path):
         report = json.loads(out.stdout.strip().splitlines()[-1])
     finally:
         daemon.kill()
-    assert report == {"listed": [], "page": "empty", "after_install": ["Demo"], "pkg": "org.example.demo",
-                      "started": ["org.example.demo"], "dialog": "Uninstall Demo?", "after_remove": [],
-                      "page_end": "empty", "data_left": False}, out.stderr
+    heading, body = report.pop("install_error")
+    assert heading == "Cannot install broken.apk" and body.startswith("not an APK"), (body, out.stderr)
+    heading, body = report.pop("install_warning")
+    assert heading == "Cannot install demo.apk" and body.startswith("Demo is installed without a menu entry")
+    heading, body = report.pop("remove_warning")
+    assert heading == "Demo uninstalled" and "menu entry was not removed" in body
+    assert report == {"listed": [], "page": "empty", "drop_accepted": True, "after_install": ["Demo"],
+                      "pkg": "org.example.demo", "started": ["org.example.demo"],
+                      "clear_dialog": "Delete the data of Demo?", "dialog": "Uninstall Demo?", "after_remove": [],
+                      "page_end": "empty", "data_left": False, "busy_end": False}, out.stderr

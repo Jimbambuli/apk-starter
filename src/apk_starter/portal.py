@@ -75,6 +75,9 @@ def _call(conn, Gio, GLib, iface: str, method: str, params):
 
 def _request(conn, Gio, GLib, iface: str, method: str, make_params):
     """Call a portal method that answers through a Request object; returns (response, results)."""
+    # Also called from a worker thread of the window: loop.run() there only waits; the signal is
+    # dispatched by whoever runs the default main context (the GTK main loop) and on_response quits
+    # this loop from there. tests/fake_portal.py covers this case. The package lock stays held meanwhile.
     token = "apkstarter" + uuid.uuid4().hex
     path = request_path(conn.get_unique_name(), token)
     loop = GLib.MainLoop()

@@ -1,7 +1,9 @@
 """Drive the management window headless (GDK_BACKEND=broadway) and print what it shows as JSON.
 
 Usage: gui_probe.py DATA_HOME APK START_RECORD [SCREENSHOT.png]
-Steps: list -> install APK (portal unavailable) -> start -> uninstall with data; optional screenshot of the first list.
+Steps (no portal on the bus): list -> install a broken file (error dialog) -> drop the APK (installed without a
+menu entry) -> start -> delete data through the menu action -> uninstall with data through the menu action
+(warning: menu entry not removed); optional screenshot of the first list.
 """
 import json
 import sys
@@ -87,13 +89,29 @@ def activate(a) -> None:
         else:
             install()
 
+    def dialog():
+        """Text of the dialog on top, then close it."""
+        d = win.get_visible_dialog()
+        text = [d.get_heading(), d.get_body()]
+        d.force_close()
+        return text
+
     def install():
-        win.install(apk)
-        wait(lambda: len(shown) > 1 and win.rows, installed)
+        broken = apk.with_name("broken.apk")
+        broken.write_bytes(b"not a zip")
+        win.install(broken)
+        wait(lambda: win.get_visible_dialog() is not None, failed)
         return False
+
+    def failed():
+        report["install_error"] = dialog()
+        files = Gdk.FileList.new_from_list([Gio.File.new_for_path(str(apk))])
+        report["drop_accepted"] = win.on_drop(None, files, 0, 0)
+        wait(lambda: win.rows and win.get_visible_dialog() is not None, installed)
 
     def installed():
         report["after_install"] = titles(win)
+        report["install_warning"] = dialog()
         report["pkg"] = pkg = "org.example.demo"
         win.activate_action("win.start", GLib.Variant("s", pkg))
         wait(lambda: Path(record).exists() and Path(record).read_text(), lambda: started(pkg))
@@ -101,17 +119,30 @@ def activate(a) -> None:
     def started(pkg):
         report["started"] = Path(record).read_text().split()
         paths.data(pkg).mkdir(parents=True, exist_ok=True)
-        win.ask_uninstall(pkg)
-        dialog = win.get_visible_dialog()
-        report["dialog"] = dialog.get_heading()
-        dialog.get_extra_child().set_active(True)
-        dialog.emit("response", "ok")
-        wait(lambda: pkg not in win.rows, removed)
+        (paths.data(pkg) / "settings").write_text("x")
+        win.activate_action("win.clear-data", GLib.Variant("s", pkg))
+        d = win.get_visible_dialog()
+        report["clear_dialog"] = d.get_heading()
+        d.emit("response", "ok")
+        d.force_close()
+        wait(lambda: not paths.data(pkg).exists() and win.rows[pkg].size == 0, lambda: cleared(pkg))
+
+    def cleared(pkg):
+        paths.data(pkg).mkdir(parents=True, exist_ok=True)
+        win.activate_action("win.uninstall", GLib.Variant("s", pkg))
+        d = win.get_visible_dialog()
+        report["dialog"] = d.get_heading()
+        d.get_extra_child().set_active(True)
+        d.emit("response", "ok")
+        d.force_close()
+        wait(lambda: pkg not in win.rows and win.get_visible_dialog() is not None, removed)
 
     def removed():
         report["after_remove"] = titles(win)
+        report["remove_warning"] = dialog()
         report["page_end"] = win.stack.get_visible_child_name()
         report["data_left"] = paths.data(report["pkg"]).exists()
+        report["busy_end"] = win.spinner.get_visible()
         app.quit()
 
     wait(lambda: shown and win.get_width() > 0, listed)
