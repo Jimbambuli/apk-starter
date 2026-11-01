@@ -1,0 +1,112 @@
+id: io.github.Jimbambuli.ApkStarter
+runtime: org.gnome.Platform
+runtime-version: '51'
+sdk: org.gnome.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.openjdk21
+command: apk-starter
+finish-args:
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --device=dri
+  - --socket=pulseaudio
+  - --share=network
+  - --share=ipc
+build-options:
+  append-path: /usr/lib/sdk/openjdk21/bin
+  env:
+    JAVA_HOME: /usr/lib/sdk/openjdk21/jvm/openjdk-21
+
+modules:
+  # Not in org.gnome.Sdk//51 (tools/sdk-probe.sh): libbsd (+ libmd) for
+  # bionic_translation, OpenXR headers for ATL (the loader is dlopen()ed
+  # only by VR apps).
+  - name: libmd
+    sources:
+      - type: archive
+        url: https://libbsd.freedesktop.org/releases/libmd-1.1.0.tar.xz
+        sha256: 1bd6aa42275313af3141c7cf2e5b964e8b1fd488025caf2f971f43b00776b332
+    cleanup:
+      - /include
+      - /lib/pkgconfig
+      - /share/man
+      - '*.a'
+      - '*.la'
+
+  - name: libbsd
+    sources:
+      - type: archive
+        url: https://libbsd.freedesktop.org/releases/libbsd-0.12.2.tar.xz
+        sha256: b88cc9163d0c652aaf39a99991d974ddba1c3a9711db8f1b5838af2a14731014
+    cleanup:
+      - /include
+      - /lib/pkgconfig
+      - /share/man
+      - '*.a'
+      - '*.la'
+
+  - name: openxr
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DBUILD_TESTS=OFF
+      - -DDYNAMIC_LOADER=ON
+    sources:
+      - type: archive
+        url: https://github.com/KhronosGroup/OpenXR-SDK/archive/refs/tags/release-1.1.49.tar.gz
+        sha256: 74e9260a1876b0540171571a09bad853302ec68a911200321be8b0591ca94111
+    cleanup:
+      - /include
+      - /lib/pkgconfig
+      - /share/doc
+
+  - name: wolfssl
+    config-opts:
+      - --enable-shared
+      - --disable-opensslall
+      - --disable-opensslextra
+      - --enable-aescbc-length-checks
+      - --enable-curve25519
+      - --enable-ed25519
+      - --enable-ed25519-stream
+      - --enable-oldtls
+      - --enable-base64encode
+      - --enable-tlsx
+      - --enable-scrypt
+      - --disable-examples
+      - --enable-crl
+      - --enable-jni
+      - --enable-sessioncerts
+    sources:
+      - type: git
+        url: https://github.com/wolfSSL/wolfssl.git
+        tag: v5.9.4-stable
+        commit: 3c5eead44904df64e6a5a1f4ebdce377d35a849a
+    cleanup:
+      - /bin
+      - /include
+      - /lib/pkgconfig
+      - /share/doc
+      - '*.la'
+
+  - name: bionic_translation
+    buildsystem: meson
+    sources:
+      - type: git
+        url: https://gitlab.com/android_translation_layer/bionic_translation.git
+        commit: 6253dec7f24a57a94039a088cb436d880e92e3be
+
+  - name: art_standalone
+    buildsystem: simple
+    build-options:
+      env:
+        # The AOSP-style makefiles ignore LDFLAGS; -lbsd lives in /app/lib.
+        LIBRARY_PATH: /app/lib
+    build-commands:
+      - make -j$FLATPAK_BUILDER_N_JOBS ____PREFIX=/app ____LIBDIR=lib
+      - make ____PREFIX=/app ____LIBDIR=lib install
+    sources:
+      - type: git
+        url: https://gitlab.com/Jimbambuli/art_standalone.git
+        branch: apk-starter
+        commit: af71ebffe1fe2a1a77592aa976669dfec717eea5
