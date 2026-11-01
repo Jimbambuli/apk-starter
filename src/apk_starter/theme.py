@@ -1,7 +1,20 @@
-"""Colour scheme, accent colour and font of the desktop from the XDG settings portal (Spec 13), without
-libadwaita: plain GTK 4 keeps the compositor's own title bar (Breeze under KWin). No GTK in this module."""
-from collections.abc import Mapping
+"""The look of the desktop (no GTK in this module):
+
+- the GTK theme of the system (Spec 14): in the Flatpak, GTK only sees the runtime's themes and the app's own
+  configuration. With read access to the host's system files (--filesystem=host-os:ro, /run/host) and its GTK
+  configuration (--filesystem=xdg-config/gtk-4.0:ro, gtk-3.0:ro) the window takes the theme, icons, cursor and
+  font from the host's settings.ini, finds the theme in the host's themes folder and loads the host's gtk.css
+  (KDE: the colours of the colour scheme), as GTK does outside the sandbox;
+- colour scheme, accent colour and font from the XDG settings portal (Spec 13); the accent is put on the window's
+  accented parts only without a system theme (the theme brings the desktop's accent itself).
+Plain GTK 4 without libadwaita keeps the compositor's own title bar (Breeze under KWin)."""
+import configparser
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from pathlib import Path
+
+HOST_SHARE = Path("/run/host/usr/share")
+BUILTIN_THEMES = ("Default", "Adwaita", "HighContrast", "HighContrastInverse")
 
 APPEARANCE = "org.freedesktop.appearance"
 KDE_GENERAL = "org.kde.kdeglobals.General"
@@ -63,3 +76,69 @@ checkbutton check:checked {{ background-color: {bg}; border-color: {bg}; color: 
 entry:focus-within, button:focus-visible, .navigation-sidebar > row:focus-visible {{ outline-color: alpha({bg}, 0.6); }}
 .accent {{ color: {bg}; }}
 """
+
+
+def window_css(t: Theme, system_theme: bool) -> str:
+    danger = "#ff7b63" if t.dark else "#c01c28"           # readable red on either background
+    accent = "" if system_theme else accent_css(t.accent)
+    return accent + f".danger-text {{ color: {danger}; }}"
+
+
+@dataclass(frozen=True)
+class SystemTheme:
+    theme_name: str | None = None
+    icon_theme: str | None = None
+    cursor_theme: str | None = None
+    cursor_size: int | None = None
+    font: str | None = None                         # Pango font description, e.g. "Noto Sans,  10"
+    gtk_css: Path | None = None                     # the host's user CSS
+    found: bool = False                             # GTK 4 can load the theme
+
+
+def host_config_dir(env: Mapping[str, str]) -> Path:
+    """Flatpak passes the host's XDG_CONFIG_HOME as HOST_XDG_CONFIG_HOME if it was set; the default is ~/.config."""
+    host = env.get("HOST_XDG_CONFIG_HOME")
+    return Path(host) if host else Path(env.get("HOME", "/")) / ".config"
+
+
+def data_dirs_with_host(current: str | None, host_share: Path = HOST_SHARE) -> str | None:
+    """XDG_DATA_DIRS with the host's share folder at the end (its themes and icons), None if nothing to add."""
+    if not (host_share / "themes").is_dir():
+        return None
+    current = current or "/usr/local/share:/usr/share"
+    if str(host_share) in current.split(":"):
+        return None
+    return f"{current}:{host_share}"
+
+
+def theme_dirs(env: Mapping[str, str]) -> list[Path]:
+    """Where GTK looks for a theme by name (gtkcssprovider.c), the sandbox's own folders first."""
+    home = Path(env.get("HOME", "/"))
+    data_home = Path(env.get("XDG_DATA_HOME") or home / ".local/share")
+    dirs = env.get("XDG_DATA_DIRS") or "/usr/local/share:/usr/share"
+    return [data_home / "themes", home / ".themes"] + [Path(d) / "themes" for d in dirs.split(":") if d]
+
+
+def read_system(config_dir: Path, dirs: Sequence[Path]) -> SystemTheme:
+    """settings.ini of gtk-4.0 (else gtk-3.0) in config_dir; not the dark variant (portal) and not gtk-xft-dpi
+    (for X11, the compositor gives the scale)."""
+    ini = configparser.ConfigParser(interpolation=None, strict=False)
+    for sub in ("gtk-4.0", "gtk-3.0"):
+        try:
+            if ini.read(config_dir / sub / "settings.ini", encoding="utf-8"):
+                break
+        except (configparser.Error, UnicodeDecodeError):
+            return SystemTheme()
+    if not ini.has_section("Settings"):
+        return SystemTheme()
+    sec = ini["Settings"]
+    get = lambda key: (sec.get(key) or "").strip() or None      # noqa: E731
+    name = get("gtk-theme-name")
+    size = get("gtk-cursor-theme-size")
+    found = name is not None and (name in BUILTIN_THEMES or any(
+        (d / name / "gtk-4.0" / "gtk.css").is_file() for d in dirs))
+    css = config_dir / "gtk-4.0" / "gtk.css"
+    return SystemTheme(theme_name=name, icon_theme=get("gtk-icon-theme-name"),
+                       cursor_theme=get("gtk-cursor-theme-name"),
+                       cursor_size=int(size) if size and size.isdigit() else None, font=get("gtk-font-name"),
+                       gtk_css=css if css.is_file() else None, found=found)

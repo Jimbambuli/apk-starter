@@ -22,9 +22,14 @@ Open **APK Starter** from the application menu (or run `apk-starter` without arg
 listed on the left (search with Ctrl+F or by just typing, sort by name, last start, last install or data size), the
 chosen app's details on the right – version, target SDK, dates, data size, whether it is prepared for this computer,
 its log and debug recordings with their reports. Double-click or Enter starts an app, Delete asks to uninstall it.
-Install a new APK with **+** or by dropping it anywhere onto the window. The window follows the desktop's colour
-scheme and accent colour and keeps the desktop's own title bar (plain GTK 4); it remembers its size, the sort order
-and the chosen app. Every installed app also gets its own menu entry.
+Install a new APK with **+** or by dropping it anywhere onto the window. The window takes the desktop's GTK theme,
+colour scheme and accent colour and keeps the desktop's own title bar (plain GTK 4); it remembers its size, the sort
+order and the chosen app. Every installed app also gets its own menu entry.
+
+The apps get a title bar with a back button, drawn in the desktop's GTK theme, so it looks like the title bars of
+the other windows; Escape and the back button of the mouse go back as well. **Title bar from the system** in the
+main menu (☰) gives them the desktop's own title bar instead (where the compositor draws one, e.g. KDE Plasma),
+without the back button.
 
 The same is available on the command line:
 
@@ -76,6 +81,21 @@ gone, but the files stay in `~/.local/share/xdg-desktop-portal/` (and come back 
 
 Bring your own APK – this project ships ATL and its free dependencies only, no apps. Apps that need Google Play
 Services, Jetpack Compose or ARM-only native libraries are not expected to work.
+
+## Permissions
+
+Besides the display, sound, network and GPU, APK Starter reads – never writes – these parts of your system, to take
+over the desktop's GTK theme (`settings.ini` of GTK: theme, icons, cursor, font and the order of the window buttons;
+the theme's files; KDE's colour scheme and window buttons in `colors.css` and `window_decorations.css`), for its
+window and for the apps' title bars, and to follow a change of them at once:
+
+- `--filesystem=host-os:ro`: the system's files under `/run/host` (read only) – the themes and icons in
+  `/usr/share/themes` and `/usr/share/icons`;
+- `--filesystem=xdg-config/gtk-4.0:ro` and `--filesystem=xdg-config/gtk-3.0:ro`: your GTK settings (read only);
+  KDE Plasma keeps the images of the window buttons only in `gtk-3.0`.
+
+Without them (e.g. `flatpak override --user --nofilesystem=host-os io.github.Jimbambuli.ApkStarter`) everything
+works with GTK's default theme in the desktop's light or dark variant.
 
 ## Translations
 

@@ -21,8 +21,8 @@ def manifest_commits() -> dict[str, str]:
 
 def finish_args() -> set[str]:
     text = MANIFEST.read_text(encoding="utf-8")
-    block = re.search(r"^finish-args:\n((?:  - .*\n)+)", text, re.M)
-    return {l.strip()[2:] for l in block.group(1).splitlines()}
+    block = re.search(r"^finish-args:\n((?:  [-#].*\n)+)", text, re.M)       # comment lines in between
+    return {l.strip()[2:] for l in block.group(1).splitlines() if l.strip().startswith("- ")}
 
 
 def test_build_info_matches_manifest():
@@ -34,7 +34,10 @@ def test_build_info_matches_manifest():
 
 def test_finish_args_exact():
     assert finish_args() == {"--socket=wayland", "--socket=fallback-x11", "--device=dri",
-                             "--socket=pulseaudio", "--share=network", "--share=ipc"}
+                             "--socket=pulseaudio", "--share=network", "--share=ipc",
+                             # the system's GTK theme, read only (Spec 14, README «Permissions»)
+                             "--filesystem=host-os:ro", "--filesystem=xdg-config/gtk-4.0:ro",
+                             "--filesystem=xdg-config/gtk-3.0:ro"}
 
 
 def test_all_git_sources_pinned():
@@ -53,3 +56,10 @@ def test_atl_doctor_pinned_with_the_same_atl_source():
     assert bi["atl_doctor_commit"] == pins["atl-doctor"] and pins["android_translation_layer"] in module
     art = text[text.index("- name: art_standalone"):text.index("- name: jni-upcall-deps")]
     assert f"commit: {pins['atl-doctor']}" in art and "libopenjdkjvmti.so" in art   # JVMTI plugin, same atl-doctor
+
+
+def test_atl_from_the_theme_branch():
+    text = (ROOT / "io.github.Jimbambuli.ApkStarter.yml").read_text()
+    module = text[text.index("- name: android_translation_layer"):text.index("- name: atl-doctor")]
+    assert "branch: theme" in module
+    assert text.count(f"commit: {manifest_commits()['android_translation_layer']}") == 2      # also atl-src

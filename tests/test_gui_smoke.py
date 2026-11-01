@@ -136,7 +136,7 @@ def test_search_sort_keys_narrow_layout_and_remembered_state(tmp_path):
         "search": [["Charlie"], "org.c.charlie"], "kept_after_search": "org.c.charlie",
         "by_size": ["Bravo", "Alpha", "Charlie"], "by_started": ["Bravo", "Charlie", "Alpha"],
         "ctrl_f_in_search": True, "enter_to_list": True, "delete_key": "Uninstall Charlie?",
-        "started": ["org.c.charlie"],
+        "started": ["org.c.charlie"], "system_titlebar": [False, True, {"system_titlebar": True}],
         "saved": {"width": 500, "height": 600, "sort": "started", "selected": "org.c.charlie"},
         "narrow_list": [True, False], "narrow_details": [False, True, True, "Bravo"],
         "narrow_back": [True, False]}, out.stderr
@@ -150,7 +150,7 @@ def test_window_follows_the_settings_portal_live():
     try:
         address = bus.stdout.readline().strip()
         with broadway() as env:
-            env = env | {"DBUS_SESSION_BUS_ADDRESS": address}
+            env = env | {"DBUS_SESSION_BUS_ADDRESS": address, "HOST_XDG_CONFIG_HOME": "/nonexistent"}
             portal = subprocess.Popen([sys.executable, str(HERE / "fake_settings_portal.py")], env=env,
                                       stdout=subprocess.PIPE, text=True)
             try:
@@ -163,3 +163,25 @@ def test_window_follows_the_settings_portal_live():
         bus.kill()
     report = json.loads(out.stdout.strip().splitlines()[-1])
     assert report == {"first": [False, True, False], "changed": [True, False, True]}, out.stderr
+
+
+@needs_broadway
+def test_window_takes_the_system_gtk_theme_live(tmp_path):
+    share, cfg = tmp_path / "share", tmp_path / "cfg"
+    (share / "themes" / "Testthema" / "gtk-4.0").mkdir(parents=True)
+    (share / "themes" / "Testthema" / "gtk-4.0" / "gtk.css").write_text("label.theme-probe { color: rgb(1,2,3); }\n")
+    (cfg / "gtk-4.0").mkdir(parents=True)
+    (cfg / "gtk-4.0" / "settings.ini").write_text(
+        "[Settings]\ngtk-theme-name=Testthema\ngtk-icon-theme-name=Testsymbole\ngtk-font-name=Testschrift 13\n")
+    (cfg / "gtk-4.0" / "gtk.css").write_text("@import 'colors.css';\n")
+    (cfg / "gtk-4.0" / "colors.css").write_text("label.user-probe { color: rgb(4,5,6); }\n")
+    with broadway() as env:
+        env = env | {"HOST_XDG_CONFIG_HOME": str(cfg), "XDG_DATA_DIRS": f"/usr/share:{share}"}
+        out = subprocess.run([sys.executable, str(HERE / "gui_system_theme_probe.py"), str(cfg), str(share)],
+                             env=env, capture_output=True, text=True, timeout=60)
+    report = json.loads(out.stdout.strip().splitlines()[-1])
+    assert report == {
+        "first": {"theme": "Testthema", "icons": "Testsymbole", "font": "Testschrift 13", "theme_css": [1, 2, 3],
+                  "user_css": [4, 5, 6], "found": True},
+        "changed": {"theme": "Zweites", "icons": "Testsymbole", "font": "Testschrift 13", "theme_css": [10, 20, 30],
+                    "user_css": [40, 50, 60], "found": True}}, out.stderr

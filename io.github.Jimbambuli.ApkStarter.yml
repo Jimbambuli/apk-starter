@@ -12,6 +12,11 @@ finish-args:
   - --socket=pulseaudio
   - --share=network
   - --share=ipc
+  # the system's GTK theme, read only: themes/icons of the host (/run/host/usr/share) and its GTK settings and
+  # colours (README «Permissions»)
+  - --filesystem=host-os:ro
+  - --filesystem=xdg-config/gtk-4.0:ro
+  - --filesystem=xdg-config/gtk-3.0:ro
 build-options:
   append-path: /usr/lib/sdk/openjdk21/bin
   env:
@@ -154,8 +159,8 @@ modules:
     sources:
       - type: git
         url: https://gitlab.com/Jimbambuli/android_translation_layer.git
-        branch: apk-starter
-        commit: 184cc9a6d4769023f32214741ced4cd749603850
+        branch: theme
+        commit: 36581e742bfbe8167fdc20dd85631a9a93e516b0
 
   # atl-doctor (public, fixed commit): JVMTI agent and trace counter for «Start with log/debug», its Python
   # package for the recorder and «Show report», and the stub list of exactly this ATL (for stub hits).
@@ -179,7 +184,7 @@ modules:
         commit: 0a4a9bd5960201a30ba9f169b4755e467a42e26c
       - type: git
         url: https://gitlab.com/Jimbambuli/android_translation_layer.git
-        commit: 184cc9a6d4769023f32214741ced4cd749603850
+        commit: 36581e742bfbe8167fdc20dd85631a9a93e516b0
         dest: atl-src
 
   - name: apk-starter

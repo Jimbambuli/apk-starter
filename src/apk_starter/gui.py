@@ -15,6 +15,12 @@ from .i18n import _
 from .gui_model import (AppRow, WindowState, filter_rows, is_narrow, key_action, load_rows, load_state,
                         save_state, sort_rows, start_argv)
 from .paths import Paths
+from .settings import Settings, load_settings, save_settings
+
+# The host's themes and icons (Spec 14): XDG_DATA_DIRS has to be complete before GTK reads it for the first time.
+_data_dirs = theme.data_dirs_with_host(os.environ.get("XDG_DATA_DIRS"))
+if _data_dirs:
+    os.environ["XDG_DATA_DIRS"] = _data_dirs
 
 try:
     import gi
@@ -141,9 +147,12 @@ class Window(Gtk.ApplicationWindow):
                               tooltip_text=_("Sort"))
         install = Gtk.Button(icon_name="list-add-symbolic", tooltip_text=_("Install APK…"))
         install.connect("clicked", lambda _b: self.choose_apk())
+        main_menu = Gio.Menu()
+        main_menu.append(_("Title bar from the system (no back button)"), "win.system-titlebar")
+        menu = Gtk.MenuButton(icon_name="open-menu-symbolic", menu_model=main_menu, tooltip_text=_("Main menu"))
         self.spinner = Gtk.Spinner(visible=False, spinning=True, tooltip_text=_("Working…"))
         top = Gtk.Box(spacing=6, margin_top=10, margin_bottom=8, margin_start=10, margin_end=10)
-        for w in (self.search, sort, install, self.spinner):
+        for w in (self.search, sort, install, menu, self.spinner):
             top.append(w)
         self.listbox = Gtk.ListBox(selection_mode=Gtk.SelectionMode.SINGLE, activate_on_single_click=False)
         self.listbox.add_css_class("navigation-sidebar")
@@ -230,6 +239,11 @@ class Window(Gtk.ApplicationWindow):
         sort_action = Gio.SimpleAction.new_stateful("sort", GLib.VariantType.new("s"), GLib.Variant("s", self.sort))
         sort_action.connect("activate", lambda a, v: (a.set_state(v), self.set_sort(v.get_string())))
         self.add_action(sort_action)
+        # the apps' title bar (Spec 13): ATL's with the back button, or the desktop's; read by every start
+        titlebar_action = Gio.SimpleAction.new_stateful(
+            "system-titlebar", None, GLib.Variant("b", load_settings(self.paths.settings()).system_titlebar))
+        titlebar_action.connect("activate", self.toggle_system_titlebar)
+        self.add_action(titlebar_action)
         self.connect("close-request", lambda _w: self.remember() or False)
         self.stack.set_visible_child_name("loading")
         self.refresh()
@@ -418,6 +432,15 @@ class Window(Gtk.ApplicationWindow):
         if row is not None:
             self.listbox.select_row(row)
             row.grab_focus()
+
+    def toggle_system_titlebar(self, action: Gio.SimpleAction, _param) -> None:
+        on = not action.get_state().get_boolean()
+        try:
+            save_settings(self.paths.settings(), Settings(system_titlebar=on))
+        except OSError as e:
+            self.alert(_("Could not save the setting"), describe_error(e))
+            return
+        action.set_state(GLib.Variant("b", on))
 
     def set_sort(self, key: str) -> None:
         self.sort = key
@@ -755,14 +778,30 @@ class ReportWindow(Gtk.Window):
 
 
 class ThemeWatcher:
-    """Colour scheme, accent and font of the desktop from the settings portal, followed live (Spec 13)."""
+    """The look of the desktop, followed live: the system's GTK theme and configuration (Spec 14, files) and colour
+    scheme, accent and font from the settings portal (Spec 13)."""
 
-    def __init__(self, display: Gdk.Display):
+    def __init__(self, display: Gdk.Display, env: Mapping[str, str] | None = None):
         self.display = display
+        self.env = dict(os.environ if env is None else env)
+        self.config_dir = theme.host_config_dir(self.env)
         self.css = Gtk.CssProvider()
         Gtk.StyleContext.add_provider_for_display(display, self.css, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION + 1)
+        self.user_css = Gtk.CssProvider()               # the host's gtk.css, as GTK loads it outside the sandbox
+        Gtk.StyleContext.add_provider_for_display(display, self.user_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+        self.system = theme.SystemTheme()
         self.values: dict[tuple[str, str], object] = {}
         self.proxy = None
+        self.monitors = []
+        self.reload_source = 0
+        for sub in ("gtk-4.0", "gtk-3.0"):
+            try:
+                monitor = Gio.File.new_for_path(str(self.config_dir / sub)).monitor_directory(
+                    Gio.FileMonitorFlags.WATCH_MOVES, None)
+            except GLib.Error:
+                continue
+            monitor.connect("changed", self.on_file_changed)
+            self.monitors.append(monitor)
         try:
             self.proxy = Gio.DBusProxy.new_for_bus_sync(
                 Gio.BusType.SESSION,
@@ -775,6 +814,7 @@ class ThemeWatcher:
             self.proxy.connect("g-signal", self.on_signal)
         except GLib.Error:
             pass                                    # no portal: GTK's own defaults
+        self.load_system()
         self.apply()
 
     def on_signal(self, _proxy, _sender, name: str, params: GLib.Variant) -> None:
@@ -782,6 +822,34 @@ class ThemeWatcher:
             ns, key, value = params.unpack()
             self.values[(ns, key)] = value
             self.apply()
+
+    def on_file_changed(self, _monitor, _file, _other, event: Gio.FileMonitorEvent) -> None:
+        """The desktop writes several files for one change: apply them together."""
+        if event == Gio.FileMonitorEvent.ATTRIBUTE_CHANGED:
+            return
+        if self.reload_source:
+            GLib.source_remove(self.reload_source)
+        self.reload_source = GLib.timeout_add(200, self.reload)
+
+    def reload(self) -> bool:
+        self.reload_source = 0
+        self.load_system()
+        self.apply()
+        return False
+
+    def load_system(self) -> None:
+        # where GTK in this process looks for themes (XDG_DATA_DIRS completed at import)
+        self.system = theme.read_system(self.config_dir, theme.theme_dirs(os.environ))
+        settings = Gtk.Settings.get_for_display(self.display)
+        for prop, value in (("gtk-theme-name", self.system.theme_name), ("gtk-icon-theme-name", self.system.icon_theme),
+                            ("gtk-cursor-theme-name", self.system.cursor_theme),
+                            ("gtk-cursor-theme-size", self.system.cursor_size)):
+            if value is not None and (prop != "gtk-theme-name" or self.system.found):
+                settings.set_property(prop, value)
+        if self.system.gtk_css:
+            self.user_css.load_from_path(str(self.system.gtk_css))
+        else:
+            self.user_css.load_from_string("")
 
     def apply(self, t: theme.Theme | None = None) -> None:
         t = t or theme.from_settings(self.values)
@@ -792,10 +860,10 @@ class ThemeWatcher:
                                   scheme.get(t.dark, Gtk.InterfaceColorScheme.DEFAULT))
         else:
             settings.set_property("gtk-application-prefer-dark-theme", bool(t.dark))
-        if t.font:
-            settings.set_property("gtk-font-name", t.font)
-        danger = "#ff7b63" if t.dark else "#c01c28"           # readable red on either background
-        self.css.load_from_string(theme.accent_css(t.accent) + f".danger-text {{ color: {danger}; }}")
+        font = self.system.font or t.font
+        if font:
+            settings.set_property("gtk-font-name", font)
+        self.css.load_from_string(theme.window_css(t, self.system.found))
 
 
 def install_styles(display: Gdk.Display) -> None:
@@ -816,7 +884,7 @@ def run(paths: Paths, env: Mapping[str, str], launcher: list[str] | None = None)
     def startup(_a: Gtk.Application) -> None:
         display = Gdk.Display.get_default()
         install_styles(display)
-        app.theme = ThemeWatcher(display)
+        app.theme = ThemeWatcher(display, env)
 
     def activate(a: Gtk.Application) -> None:
         win = a.get_active_window() or Window(a, paths, lang, launcher or default_launcher(), env)

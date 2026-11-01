@@ -49,6 +49,9 @@ class Paths:
     def window_state(self) -> Path:
         return self.data_home / "window.json"
 
+    def settings(self) -> Path:
+        return self.data_home / "settings.json"
+
     def lock(self, pkg: str) -> Path:
         return self.cache_home / "apk-starter" / "locks" / f"{_safe(pkg)}.lock"
 

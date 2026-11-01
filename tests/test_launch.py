@@ -4,6 +4,7 @@ import pytest
 
 from apk_starter.apkinfo import ApkInfo
 from apk_starter.errors import UsageError
+from apk_starter.settings import Settings, save_settings
 from apk_starter.launch import (build_command, build_env, parse_size, prepare_apk, remember_size,
                                 remembered_size, sdk_for)
 from apk_starter.paths import Paths
@@ -55,3 +56,12 @@ def test_command_and_env(tmp_path):
     assert env["LD_LIBRARY_PATH"] == f"{p.prefix}/lib/art:/x" and env["LANG"] == "de_CH.UTF-8"
     assert env["ANDROID_APP_DATA_DIR"] == str(p.data("org.example.demo")) and env["ATL_UGLY_ENABLE_WEBVIEW"] == "1"
     assert p.data("org.example.demo").is_dir()
+    assert "ATL_SYSTEM_TITLEBAR" not in env
+
+
+def test_system_titlebar_setting_reaches_atl(tmp_path):
+    p = Paths(tmp_path / "d", tmp_path / "c", Path("/app"))
+    save_settings(p.settings(), Settings(system_titlebar=True))
+    assert build_env(p, "org.example.demo", {})["ATL_SYSTEM_TITLEBAR"] == "1"
+    save_settings(p.settings(), Settings(system_titlebar=False))
+    assert "ATL_SYSTEM_TITLEBAR" not in build_env(p, "org.example.demo", {"ATL_SYSTEM_TITLEBAR": "1"})

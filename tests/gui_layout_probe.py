@@ -89,6 +89,11 @@ def activate(a) -> None:
 
     def started():
         report["started"] = Path(record).read_text().split()
+        menu = win.lookup_action("system-titlebar")
+        before = menu.get_state().get_boolean()
+        win.activate_action("win.system-titlebar", None)          # the check item in the main menu
+        report["system_titlebar"] = [before, menu.get_state().get_boolean(),
+                                     json.loads(paths.settings().read_text())]
         win.set_default_size(500, 600)              # remembered at close, used by the next window
         win.close()
         GLib.timeout_add(100, reopen)
