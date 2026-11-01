@@ -54,8 +54,9 @@ Data lives under `~/.var/app/io.github.Jimbambuli.ApkStarter/data/`: `apps/` (in
 
 Diagnose levels, for finding out why an app misbehaves under ATL (with
 [atl-doctor](https://github.com/Jimbambuli/atl-doctor)): a normal start loads nothing extra. **Log** (`--log`,
-«Start with log») writes ATL's output plus, through atl-doctor's JVMTI agent, every thrown exception with its stack;
-the app runs at almost full speed. **Debug** (`--debug`, «Start with debug») records a folder with ART's method trace
+«Start with log») writes ATL's output plus what atl-doctor's JVMTI agent sees on the fast runtime (lifecycle
+callbacks; ART reports thrown exceptions to the agent only while code runs instrumented, so stacks of exceptions
+come reliably with Debug); the app runs at almost full speed. **Debug** (`--debug`, «Start with debug») records a folder with ART's method trace
 (hit ATL stubs), the view trees and a verbose Android log; the app runs much slower. **Show report** in the window or
 `apk-starter --report` turns a recording into a report (crash cause, ATL gaps, exceptions; in English), the same one
 `atl-doctor report --log FILE` or `atl-doctor report DIR` gives.

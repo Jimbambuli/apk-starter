@@ -165,7 +165,7 @@ modules:
       - meson setup _build agent --prefix=/app -Djdk=$JAVA_HOME
       - ninja -C _build libatl_doctor_agent.so atl-doctor-tracecount
       - install -Dm755 -t /app/lib/atl-doctor _build/libatl_doctor_agent.so _build/atl-doctor-tracecount
-      - cp -r atl_doctor /app/share/apk-starter/atl_doctor
+      - mkdir -p /app/share/apk-starter && cp -r atl_doctor /app/share/apk-starter/atl_doctor
       - install -Dm644 LICENSE /app/share/licenses/io.github.Jimbambuli.ApkStarter/atl-doctor-LICENSE
       - >-
         PYTHONPATH=/app/share/apk-starter python3 -c "import pathlib, sys;
