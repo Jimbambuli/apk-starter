@@ -1,0 +1,117 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install pytest
+      - run: python -m pytest -q
+
+  flatpak:
+    needs: tests
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-51
+      options: --privileged
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: .flatpak-builder
+          key: fb-${{ hashFiles('io.github.Jimbambuli.ApkStarter.yml') }}
+      - name: Add the Flathub remote for this user
+        run: flatpak --user remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+      - name: Build
+        run: |
+          flatpak-builder --user --ccache --force-clean --disable-rofiles-fuse --default-branch=stable --repo=repo \
+            --install-deps-from=flathub build-dir io.github.Jimbambuli.ApkStarter.yml
+      - name: Keep the repo for the smoke test and publishing
+        uses: actions/upload-artifact@v4
+        with:
+          name: repo
+          path: repo
+          retention-days: 7
+
+  smoke:
+    needs: flatpak
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: repo
+          path: repo
+      - name: Install flatpak, X server and portals
+        run: sudo apt-get update && sudo apt-get install -y flatpak xvfb xdotool xdg-desktop-portal fuse3 dbus
+      - name: Download test APK
+        run: |
+          for u in https://f-droid.org/repo/org.billthefarmer.editor_198.apk \
+                   https://f-droid.org/archive/org.billthefarmer.editor_198.apk; do
+            curl -fsSL -o editor.apk "$u" && break
+          done
+          echo "343d17e11d0914e1a7708df2781580a0413e52501c0a41d91f7ef725d9615fe9  editor.apk" | sha256sum -c -
+      - name: Install the app from the built repo
+        run: |
+          flatpak --user remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+          flatpak --user remote-add --no-gpg-verify local repo
+          flatpak --user install -y local io.github.Jimbambuli.ApkStarter
+      - name: Smoke test
+        run: dbus-run-session -- sh tools/smoke.sh io.github.Jimbambuli.ApkStarter editor.apk
+
+  publish:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: smoke
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    env:
+      FLATPAK_GPG_KEY_ID: ${{ vars.FLATPAK_GPG_KEY_ID }}
+      FLATPAK_GPG_PRIVATE_KEY: ${{ secrets.FLATPAK_GPG_PRIVATE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: repo
+          path: repo
+      - name: Install flatpak
+        run: sudo apt-get update && sudo apt-get install -y flatpak gnupg
+      - name: Sign and update the repo
+        run: |
+          export GNUPGHOME="$RUNNER_TEMP/gnupg"
+          mkdir -m 700 "$GNUPGHOME"
+          # upload-artifact drops empty directories that ostree needs
+          mkdir -p repo/refs/remotes repo/tmp
+          printf '%s\n' "$FLATPAK_GPG_PRIVATE_KEY" | gpg --batch --import
+          flatpak build-sign repo --gpg-sign="$FLATPAK_GPG_KEY_ID" --gpg-homedir="$GNUPGHOME" \
+            io.github.Jimbambuli.ApkStarter stable
+          flatpak build-update-repo --gpg-sign="$FLATPAK_GPG_KEY_ID" --gpg-homedir="$GNUPGHOME" \
+            --generate-static-deltas --prune --default-branch=stable --title='APK Starter' repo
+          gpg --batch --yes --delete-secret-keys "$FLATPAK_GPG_KEY_ID"
+      - name: Assemble the site
+        run: |
+          mkdir site
+          cp pages/* site/
+          cp data/icons/io.github.Jimbambuli.ApkStarter.svg site/icon.svg
+          cp -r repo site/repo
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deploy
+        uses: actions/deploy-pages@v4
