@@ -1,1 +1,7 @@
 docs/superpowers/
+.venv/
+__pycache__/
+.flatpak-builder/
+build-dir/
+repo/
+.pytest_cache/
