@@ -1,0 +1,91 @@
+"""Build the android-translation-layer command line, environment and per-app data."""
+import json
+import os
+import re
+from collections.abc import Mapping
+from pathlib import Path
+
+from .apkinfo import ApkInfo
+from .errors import UsageError
+from .paths import Paths
+
+ATL_BIN = "android-translation-layer"
+ATL_MAX_SDK = 34
+DEFAULT_SIZE = (1200, 850)
+SIZE_MIN, SIZE_MAX = 200, 10000
+_SIZE_RE = re.compile(r"([0-9]+)x([0-9]+)")
+
+
+def parse_size(s: str) -> tuple[int, int]:
+    m = _SIZE_RE.fullmatch(s)
+    if m:
+        w, h = int(m.group(1)), int(m.group(2))
+        if SIZE_MIN <= w <= SIZE_MAX and SIZE_MIN <= h <= SIZE_MAX:
+            return w, h
+    raise UsageError(f"invalid --size, expected WxH: {s}")
+
+
+def sdk_for(info: ApkInfo, override: int | None) -> int | None:
+    if override is not None:
+        return override
+    if info.target_sdk is None:
+        return None
+    return min(info.target_sdk, ATL_MAX_SDK)
+
+
+def _size_file(paths: Paths, pkg: str) -> Path:
+    return paths.data(pkg) / "apk-starter.json"
+
+
+def remembered_size(paths: Paths, pkg: str) -> tuple[int, int] | None:
+    try:
+        size = json.loads(_size_file(paths, pkg).read_text(encoding="utf-8"))["size"]
+        w, h = size
+        if type(w) is int and type(h) is int and SIZE_MIN <= w <= SIZE_MAX and SIZE_MIN <= h <= SIZE_MAX:
+            return w, h
+    except (OSError, ValueError, KeyError, TypeError):
+        pass
+    return None
+
+
+def remember_size(paths: Paths, pkg: str, size: tuple[int, int]) -> None:
+    f = _size_file(paths, pkg)
+    f.parent.mkdir(parents=True, exist_ok=True)
+    tmp = f.with_name(f.name + ".tmp")
+    tmp.write_text(json.dumps({"size": list(size)}), encoding="utf-8")
+    os.replace(tmp, f)
+
+
+def prepare_apk(paths: Paths, info: ApkInfo) -> Path:
+    """ATL names the data folder after the APK file name, so always start through <pkg>.apk."""
+    own = paths.apk(info.package)
+    if info.path.resolve() == own.resolve():
+        return own
+    link = paths.launch_dir() / own.name
+    link.parent.mkdir(parents=True, exist_ok=True)
+    tmp = link.with_name(f"{link.name}.{os.getpid()}.tmp")
+    tmp.unlink(missing_ok=True)
+    os.symlink(info.path.resolve(), tmp)
+    os.replace(tmp, link)
+    return link
+
+
+def build_command(paths: Paths, apk_path: Path, *, size: tuple[int, int], sdk: int | None,
+                  atl_args: list[str]) -> list[str]:
+    cmd = [ATL_BIN, str(apk_path), "-w", str(size[0]), "-h", str(size[1])]
+    if sdk is not None:
+        cmd += ["--sdk-int", str(sdk)]
+    cmd += ["-X", f"-Djavax.net.ssl.trustStore={paths.cacerts()}"]
+    return cmd + atl_args
+
+
+def build_env(paths: Paths, pkg: str, base: Mapping[str, str]) -> dict[str, str]:
+    env = dict(base)
+    data = paths.data(pkg)
+    data.mkdir(parents=True, exist_ok=True)
+    env["ANDROID_APP_DATA_DIR"] = str(data)
+    env["ATL_UGLY_ENABLE_WEBVIEW"] = "1"
+    art = f"{paths.prefix}/lib/art"
+    old = base.get("LD_LIBRARY_PATH", "")
+    env["LD_LIBRARY_PATH"] = f"{art}:{old}" if old else art
+    return env
