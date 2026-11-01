@@ -1,0 +1,489 @@
+# Dutch translation of APK Starter.
+# This file is distributed under the same license as the apk-starter package.
+# Machine-assisted translation; corrections welcome.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: apk-starter\n"
+"Report-Msgid-Bugs-To: https://github.com/Jimbambuli/apk-starter/issues\n"
+"PO-Revision-Date: 2026-11-01 13:45+0100\n"
+"Last-Translator: Jimbambuli (machine-assisted)\n"
+"Language-Team: none\n"
+"Language: nl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: data/io.github.Jimbambuli.ApkStarter.desktop.in:2
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:4
+msgid "APK Starter"
+msgstr "APK Starter"
+
+#: data/io.github.Jimbambuli.ApkStarter.desktop.in:3
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:5
+msgid "Run Android apps on the Linux desktop"
+msgstr "Android-apps uitvoeren op de Linux-desktop"
+
+#: data/io.github.Jimbambuli.ApkStarter.desktop.in:4
+msgid "Android;APK;App;"
+msgstr "Android;APK;App;Toepassing;"
+
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:12
+msgid ""
+"APK Starter runs a single Android app from its APK file on the Linux "
+"desktop. It is built on Android Translation Layer (ATL) and translates the "
+"app's calls to GTK, Wayland and the usual Linux libraries instead of running "
+"a full Android system."
+msgstr "APK Starter voert een losse Android-app uit vanuit het APK-bestand op de Linux-desktop. Het is gebouwd op Android Translation Layer (ATL) en vertaalt de aanroepen van de app naar GTK, Wayland en de gebruikelijke Linux-bibliotheken, in plaats van een volledig Android-systeem te draaien."
+
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:18
+msgid ""
+"Bring your own APK: open it, double-click it, or add it to the application "
+"menu."
+msgstr "Neem je eigen APK mee: open het, dubbelklik erop of voeg het toe aan het toepassingsmenu."
+
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:19
+msgid ""
+"A small window lists your apps with icon, version and data size; start, "
+"uninstall or delete their data from there."
+msgstr "Een klein venster toont je apps met pictogram, versie en gegevensgrootte; van daaruit kun je ze starten, verwijderen of hun gegevens wissen."
+
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:21
+msgid "Each app keeps its own data folder."
+msgstr "Elke app heeft een eigen gegevensmap."
+
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:22
+msgid "An optional log helps to find out why an app does not work."
+msgstr "Een optioneel logboek helpt uit te zoeken waarom een app niet werkt."
+
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:24
+msgid ""
+"No apps are included and no Google services are provided. Apps that need "
+"Google Play services, Jetpack Compose, ARM-only native code, the camera, "
+"Bluetooth or telephony may not work."
+msgstr "Er worden geen apps meegeleverd en geen Google-diensten aangeboden. Apps die Google Play-services, Jetpack Compose, native code alleen voor ARM, de camera, Bluetooth of telefonie nodig hebben, werken mogelijk niet."
+
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:28
+msgid "Android is a trademark of Google LLC."
+msgstr "Android is een handelsmerk van Google LLC."
+
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:36
+msgid "The app list with three free apps from F-Droid"
+msgstr "De applijst met drie vrije apps van F-Droid"
+
+#: src/apk_starter/apkinfo.py:45
+#, python-brace-format
+msgid "{file} is too large ({size} bytes)"
+msgstr "{file} is te groot ({size} bytes)"
+
+#: src/apk_starter/apkinfo.py:88
+#, python-brace-format
+msgid "split APK bundles (.apks/.xapk) are not supported yet: {file}"
+msgstr "gesplitste APK-bundels (.apks/.xapk) worden nog niet ondersteund: {file}"
+
+#: src/apk_starter/apkinfo.py:94 src/apk_starter/apkinfo.py:115
+#, python-brace-format
+msgid "not an APK (no AndroidManifest.xml): {file}"
+msgstr "geen APK (AndroidManifest.xml ontbreekt): {file}"
+
+#: src/apk_starter/apkinfo.py:98
+#, python-brace-format
+msgid "invalid package name in manifest: {package}"
+msgstr "ongeldige pakketnaam in manifest: {package}"
+
+#: src/apk_starter/apkinfo.py:117 src/apk_starter/apkinfo.py:119
+#, python-brace-format
+msgid "cannot read {file}: {reason}"
+msgstr "kan {file} niet lezen: {reason}"
+
+#: src/apk_starter/arsc.py:32 src/apk_starter/arsc.py:37
+msgid "resource reference loop"
+msgstr "lus in bronverwijzingen"
+
+#: src/apk_starter/arsc.py:61 src/apk_starter/arsc.py:67
+#: src/apk_starter/arsc.py:89 src/apk_starter/arsc.py:102
+#: src/apk_starter/arsc.py:105 src/apk_starter/arsc.py:116
+#: src/apk_starter/arsc.py:120 src/apk_starter/arsc.py:128
+msgid "corrupt resources.arsc"
+msgstr "beschadigd resources.arsc"
+
+#: src/apk_starter/axml.py:47 src/apk_starter/axml.py:53
+msgid "corrupt AndroidManifest.xml"
+msgstr "beschadigd AndroidManifest.xml"
+
+#: src/apk_starter/cli.py:41
+msgid "--log= needs a file name"
+msgstr "--log= heeft een bestandsnaam nodig"
+
+#: src/apk_starter/cli.py:64
+#, python-brace-format
+msgid ""
+"cannot read {file}: no such file (inside the Flatpak sandbox only paths "
+"passed with --file-forwarding are visible: {command})"
+msgstr "kan {file} niet lezen: bestand bestaat niet (in de Flatpak-sandbox zijn alleen paden zichtbaar die met --file-forwarding zijn doorgegeven: {command})"
+
+#: src/apk_starter/cli.py:67 src/apk_starter/cli.py:176
+#, python-brace-format
+msgid "not installed: {package}"
+msgstr "niet geïnstalleerd: {package}"
+
+#: src/apk_starter/cli.py:122
+#, python-brace-format
+msgid ""
+"{app} is installed without a menu entry: the DynamicLauncher portal is not "
+"available; start the app with: {command}"
+msgstr "{app} is geïnstalleerd zonder menu-item: het DynamicLauncher-portaal is niet beschikbaar; start de app met: {command}"
+
+#: src/apk_starter/cli.py:126
+#, python-brace-format
+msgid "{app} is installed without a menu entry: {reason}"
+msgstr "{app} is geïnstalleerd zonder menu-item: {reason}"
+
+#: src/apk_starter/cli.py:160
+#, python-brace-format
+msgid "cannot remove {folder}: {reason}"
+msgstr "kan {folder} niet verwijderen: {reason}"
+
+#: src/apk_starter/cli.py:180
+msgid ""
+"the DynamicLauncher portal is not available; the menu entry was not removed"
+msgstr "het DynamicLauncher-portaal is niet beschikbaar; het menu-item is niet verwijderd"
+
+#: src/apk_starter/cli.py:182
+#, python-brace-format
+msgid "the menu entry was not removed: {reason}"
+msgstr "het menu-item is niet verwijderd: {reason}"
+
+#: src/apk_starter/cli.py:215
+msgid "(no arguments: open the management window)"
+msgstr "(zonder argumenten: beheervenster openen)"
+
+#: src/apk_starter/cli.py:216
+msgid "Start Android apps (APK) with Android Translation Layer."
+msgstr "Android-apps (APK) starten met Android Translation Layer."
+
+#: src/apk_starter/cli.py:218
+msgid ""
+"write a log for atl-doctor (default: logs/<package>-<time>.log); use --"
+"log=FILE"
+msgstr "logboek voor atl-doctor schrijven (standaard: logs/<pakket>-<tijd>.log); ander bestand met --log=FILE"
+
+#: src/apk_starter/cli.py:219
+msgid "override the SDK level passed to ATL"
+msgstr "het SDK-niveau voor ATL overschrijven"
+
+#: src/apk_starter/cli.py:220
+msgid "window size (remembered per app)"
+msgstr "venstergrootte (per app onthouden)"
+
+#: src/apk_starter/cli.py:221
+msgid "with --remove/--remove-all: also delete the app data"
+msgstr "met --remove/--remove-all: ook de appgegevens wissen"
+
+#: src/apk_starter/cli.py:223
+msgid "install the APK and add a menu entry"
+msgstr "de APK installeren en een menu-item toevoegen"
+
+#: src/apk_starter/cli.py:224
+msgid "list installed apps"
+msgstr "geïnstalleerde apps tonen"
+
+#: src/apk_starter/cli.py:225
+msgid "remove an installed app"
+msgstr "een geïnstalleerde app verwijderen"
+
+#: src/apk_starter/cli.py:227
+msgid ""
+"remove all installed apps and their menu entries (before uninstalling the "
+"Flatpak)"
+msgstr "alle geïnstalleerde apps en hun menu-items verwijderen (vóór het verwijderen van de Flatpak)"
+
+#: src/apk_starter/cli.py:228
+msgid "show the version and exit"
+msgstr "versie tonen en afsluiten"
+
+#: src/apk_starter/cli.py:262
+msgid ""
+"--install, --list, --remove, --remove-all and --version take no other "
+"arguments"
+msgstr "--install, --list, --remove, --remove-all en --version accepteren geen andere argumenten"
+
+#: src/apk_starter/cli.py:264
+msgid "--purge only works with --remove or --remove-all"
+msgstr "--purge werkt alleen met --remove of --remove-all"
+
+#: src/apk_starter/cli.py:289
+msgid "no APK given and no display for the window"
+msgstr "geen APK opgegeven en geen beeldscherm voor het venster"
+
+#: src/apk_starter/cli.py:293
+msgid "no APK given"
+msgstr "geen APK opgegeven"
+
+#: src/apk_starter/errors.py:23
+#, python-brace-format
+msgid "unexpected error: {error}"
+msgstr "onverwachte fout: {error}"
+
+#: src/apk_starter/gui.py:23
+#, python-brace-format
+msgid "the window needs GTK 4 and libadwaita: {reason}"
+msgstr "het venster heeft GTK 4 en libadwaita nodig: {reason}"
+
+#: src/apk_starter/gui.py:36
+msgid "Install APK…"
+msgstr "APK installeren…"
+
+#: src/apk_starter/gui.py:36
+msgid "Choose an APK file and add it to the menu"
+msgstr "Een APK-bestand kiezen en aan het menu toevoegen"
+
+#: src/apk_starter/gui.py:41
+msgid "Working…"
+msgstr "Bezig…"
+
+#: src/apk_starter/gui.py:48
+msgid "No apps installed"
+msgstr "Geen apps geïnstalleerd"
+
+#: src/apk_starter/gui.py:49
+msgid "Install an APK or drop one here."
+msgstr "Installeer een APK of sleep er een hierheen."
+
+#: src/apk_starter/gui.py:79
+msgid "Close"
+msgstr "Sluiten"
+
+#: src/apk_starter/gui.py:115
+msgid "Cannot read the app list"
+msgstr "Kan de applijst niet lezen"
+
+#: src/apk_starter/gui.py:126
+#, python-brace-format
+msgid "data {size}"
+msgstr "gegevens {size}"
+
+#: src/apk_starter/gui.py:126
+msgid "no data"
+msgstr "geen gegevens"
+
+#: src/apk_starter/gui.py:138
+msgid "Start"
+msgstr "Starten"
+
+#: src/apk_starter/gui.py:140
+msgid "Start with log"
+msgstr "Starten met logboek"
+
+#: src/apk_starter/gui.py:140
+msgid "Open log folder"
+msgstr "Logboekmap openen"
+
+#: src/apk_starter/gui.py:141
+msgid "Delete data…"
+msgstr "Gegevens wissen…"
+
+#: src/apk_starter/gui.py:141
+msgid "Uninstall…"
+msgstr "Verwijderen…"
+
+#: src/apk_starter/gui.py:146
+msgid "More"
+msgstr "Meer"
+
+#: src/apk_starter/gui.py:158
+#, python-brace-format
+msgid "Cannot start {app}"
+msgstr "Kan {app} niet starten"
+
+#: src/apk_starter/gui.py:163
+msgid "See the log folder."
+msgstr "Zie de logboekmap."
+
+#: src/apk_starter/gui.py:163
+msgid "Try “Start with log” and look at the log."
+msgstr "Probeer ‘Starten met logboek’ en bekijk het logboek."
+
+#: src/apk_starter/gui.py:165
+#, python-brace-format
+msgid "{app} ended with exit code {code}"
+msgstr "{app} is gestopt met afsluitcode {code}"
+
+#: src/apk_starter/gui.py:167
+#, python-brace-format
+msgid "{app} was killed by signal {signal}"
+msgstr "{app} is beëindigd door signaal {signal}"
+
+#: src/apk_starter/gui.py:170
+#, python-brace-format
+msgid "{app} starts with a log"
+msgstr "{app} start met logboek"
+
+#: src/apk_starter/gui.py:177 src/apk_starter/gui.py:185
+msgid "Cannot open the log folder"
+msgstr "Kan de logboekmap niet openen"
+
+#: src/apk_starter/gui.py:189
+msgid "Android apps"
+msgstr "Android-apps"
+
+#: src/apk_starter/gui.py:194
+msgid "Install APK"
+msgstr "APK installeren"
+
+#: src/apk_starter/gui.py:214
+#, python-brace-format
+msgid "{app} installed"
+msgstr "{app} geïnstalleerd"
+
+#: src/apk_starter/gui.py:215
+#, python-brace-format
+msgid "Cannot install {file}"
+msgstr "Kan {file} niet installeren"
+
+#: src/apk_starter/gui.py:220
+msgid "Cancel"
+msgstr "Annuleren"
+
+#: src/apk_starter/gui.py:232
+#, python-brace-format
+msgid "Delete the data of {app}?"
+msgstr "Gegevens van {app} wissen?"
+
+#: src/apk_starter/gui.py:233
+msgid ""
+"The app stays installed. Its settings, accounts and files are deleted. Close "
+"the app first."
+msgstr "De app blijft geïnstalleerd. De instellingen, accounts en bestanden worden gewist. Sluit eerst de app."
+
+#: src/apk_starter/gui.py:234
+msgid "Delete Data"
+msgstr "Gegevens wissen"
+
+#: src/apk_starter/gui.py:236
+#, python-brace-format
+msgid "Data of {app} deleted"
+msgstr "Gegevens van {app} gewist"
+
+#: src/apk_starter/gui.py:237
+#, python-brace-format
+msgid "Cannot delete the data of {app}"
+msgstr "Kan de gegevens van {app} niet wissen"
+
+#: src/apk_starter/gui.py:241
+msgid "Also delete app data"
+msgstr "Ook appgegevens wissen"
+
+#: src/apk_starter/gui.py:244 src/apk_starter/gui.py:246
+#, python-brace-format
+msgid "{app} uninstalled"
+msgstr "{app} verwijderd"
+
+#: src/apk_starter/gui.py:247
+#, python-brace-format
+msgid "Uninstall {app}?"
+msgstr "{app} verwijderen?"
+
+#: src/apk_starter/gui.py:248
+msgid "The app and its menu entry are removed. Close the app first."
+msgstr "De app en het menu-item worden verwijderd. Sluit eerst de app."
+
+#: src/apk_starter/gui.py:248
+msgid "Uninstall"
+msgstr "Verwijderen"
+
+#: src/apk_starter/gui.py:250
+#, python-brace-format
+msgid "Cannot uninstall {app}"
+msgstr "Kan {app} niet verwijderen"
+
+#: src/apk_starter/i18n.py:27
+msgid "usage: "
+msgstr "gebruik: "
+
+#: src/apk_starter/i18n.py:27
+msgid "options"
+msgstr "opties"
+
+#: src/apk_starter/i18n.py:27
+msgid "show this help message and exit"
+msgstr "deze hulptekst tonen en afsluiten"
+
+#: src/apk_starter/i18n.py:27
+#, python-format
+msgid "%(prog)s: error: %(message)s\n"
+msgstr "%(prog)s: fout: %(message)s\n"
+
+#: src/apk_starter/i18n.py:28
+#, python-format
+msgid "unrecognized arguments: %s"
+msgstr "onbekende argumenten: %s"
+
+#: src/apk_starter/i18n.py:28
+msgid "expected one argument"
+msgstr "één argument verwacht"
+
+#: src/apk_starter/i18n.py:28
+#, python-format
+msgid "argument %(argument_name)s: %(message)s"
+msgstr "argument %(argument_name)s: %(message)s"
+
+#: src/apk_starter/i18n.py:29
+#, python-format
+msgid "not allowed with argument %s"
+msgstr "niet toegestaan samen met argument %s"
+
+#: src/apk_starter/i18n.py:29
+#, python-format
+msgid "invalid %(type)s value: %(value)r"
+msgstr "ongeldige %(type)s-waarde: %(value)r"
+
+#: src/apk_starter/launch.py:26
+#, python-brace-format
+msgid "invalid --size, expected WxH: {value}"
+msgstr "ongeldige --size, verwacht WxH: {value}"
+
+#: src/apk_starter/paths.py:14 src/apk_starter/portal.py:26
+#, python-brace-format
+msgid "invalid package name: {package}"
+msgstr "ongeldige pakketnaam: {package}"
+
+#: src/apk_starter/portal.py:74
+#, python-brace-format
+msgid "portal call {method} failed: {reason}"
+msgstr "portaalaanroep {method} mislukt: {reason}"
+
+#: src/apk_starter/portal.py:99
+msgid "portal did not answer"
+msgstr "het portaal antwoordde niet"
+
+#: src/apk_starter/portal.py:119
+msgid "menu entry not created (cancelled)"
+msgstr "menu-item niet aangemaakt (geannuleerd)"
+
+#: src/apk_starter/resbin.py:13 src/apk_starter/resbin.py:16
+#: src/apk_starter/resbin.py:24 src/apk_starter/resbin.py:34
+#: src/apk_starter/resbin.py:54 src/apk_starter/resbin.py:58
+#, python-brace-format
+msgid "corrupt resource chunk at {offset}"
+msgstr "beschadigd bronblok op positie {offset}"
+
+#: src/apk_starter/run.py:93
+#, python-brace-format
+msgid "cannot write log {file}: {reason}"
+msgstr "kan logboek {file} niet schrijven: {reason}"
+
+#: src/apk_starter/run.py:102
+msgid "android-translation-layer not found"
+msgstr "android-translation-layer niet gevonden"
+
+#: src/apk_starter/run.py:107
+#, python-brace-format
+msgid "cannot start android-translation-layer: {reason}"
+msgstr "kan android-translation-layer niet starten: {reason}"
+
+#: src/apk_starter/run.py:141
+#, python-brace-format
+msgid "android-translation-layer was killed by {signal}"
+msgstr "android-translation-layer is beëindigd door {signal}"

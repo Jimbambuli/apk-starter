@@ -1,4 +1,5 @@
 """Error classes; the exit code of the command line is the class attribute `code`."""
+from .i18n import _
 
 
 class StarterError(Exception):
@@ -19,4 +20,4 @@ def describe_error(e: BaseException) -> str:
         return str(e)
     if isinstance(e, OSError):
         return f"{e.strerror or e}" + (f": {e.filename}" if e.filename else "")
-    return f"unexpected error: {e!r}"
+    return _("unexpected error: {error}").format(error=repr(e))

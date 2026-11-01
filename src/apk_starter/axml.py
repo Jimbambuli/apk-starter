@@ -3,6 +3,7 @@ import struct
 from dataclasses import dataclass
 
 from .errors import ApkError
+from .i18n import _
 from .resbin import chunk_header, read_string_pool
 
 NONE = 0xFFFFFFFF
@@ -43,13 +44,13 @@ def parse_manifest(data: bytes) -> ManifestInfo:
     try:
         return _parse(data)
     except (struct.error, IndexError, UnicodeError) as e:
-        raise ApkError("corrupt AndroidManifest.xml") from e
+        raise ApkError(_("corrupt AndroidManifest.xml")) from e
 
 
 def _parse(data: bytes) -> ManifestInfo:
     ctype, hsize, size = chunk_header(data, 0)
     if ctype != 0x0003:
-        raise ApkError("corrupt AndroidManifest.xml")
+        raise ApkError(_("corrupt AndroidManifest.xml"))
     strings: list[str] = []
     resmap: list[int] = []
     package = None

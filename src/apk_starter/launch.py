@@ -7,6 +7,7 @@ from pathlib import Path
 
 from .apkinfo import ApkInfo
 from .errors import UsageError
+from .i18n import _
 from .paths import Paths
 
 ATL_BIN = "android-translation-layer"
@@ -22,7 +23,7 @@ def parse_size(s: str) -> tuple[int, int]:
         w, h = int(m.group(1)), int(m.group(2))
         if SIZE_MIN <= w <= SIZE_MAX and SIZE_MIN <= h <= SIZE_MAX:
             return w, h
-    raise UsageError(f"invalid --size, expected WxH: {s}")
+    raise UsageError(_("invalid --size, expected WxH: {value}").format(value=s))
 
 
 def sdk_for(info: ApkInfo, override: int | None) -> int | None:

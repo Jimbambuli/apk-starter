@@ -3,6 +3,7 @@ import struct
 from dataclasses import dataclass
 
 from .errors import ApkError
+from .i18n import _
 from .resbin import chunk_header, read_string_pool
 
 MAX_DEPTH = 8
@@ -28,12 +29,12 @@ class ResourceTable:
 
     def _resolve(self, res_id: int, depth: int, steps: list[int]) -> list[tuple[Config, str]]:
         if depth > MAX_DEPTH:
-            raise ApkError("resource reference loop")
+            raise ApkError(_("resource reference loop"))
         out: list[tuple[Config, str]] = []
         for cfg, dtype, data in self._entries.get(res_id, []):
             steps[0] += 1
             if steps[0] > MAX_STEPS:
-                raise ApkError("resource reference loop")
+                raise ApkError(_("resource reference loop"))
             if dtype == 0x03 and data < len(self._strings):
                 out.append((cfg, self._strings[data]))
             elif dtype == 0x01:
@@ -57,13 +58,13 @@ def parse_table(data: bytes) -> ResourceTable:
     try:
         return _parse(data)
     except (struct.error, IndexError) as e:
-        raise ApkError("corrupt resources.arsc") from e
+        raise ApkError(_("corrupt resources.arsc")) from e
 
 
 def _parse(data: bytes) -> ResourceTable:
     ctype, hsize, size = chunk_header(data, 0)
     if ctype != 0x0002:
-        raise ApkError("corrupt resources.arsc")
+        raise ApkError(_("corrupt resources.arsc"))
     strings: list[str] = []
     entries: dict[int, list[tuple[Config, int, int]]] = {}
     count = [0]
@@ -85,7 +86,7 @@ def _package(data: bytes, pos: int, hs: int, sz: int, entries, count) -> None:
     while p + 8 <= end:
         t, ths, tsz = chunk_header(data, p)
         if p + tsz > end:
-            raise ApkError("corrupt resources.arsc")
+            raise ApkError(_("corrupt resources.arsc"))
         if t == 0x0201:
             _type(data, p, ths, tsz, pkg_id, entries, count)
         p += tsz
@@ -98,10 +99,10 @@ def _type(data: bytes, pos: int, hs: int, sz: int, pkg_id: int, entries, count) 
     cfg = _config(data, pos + 20)
     base = pos + hs
     if estart > sz or estart < hs:
-        raise ApkError("corrupt resources.arsc")
+        raise ApkError(_("corrupt resources.arsc"))
     width = 2 if flags & 0x02 and not flags & 0x01 else 4
     if base + n * width > end:
-        raise ApkError("corrupt resources.arsc")
+        raise ApkError(_("corrupt resources.arsc"))
     if flags & 0x01:       # sparse: (idx u16, off/4 u16)
         offs = [(i, o * 4) for i, o in (struct.unpack_from("<HH", data, base + 4 * k) for k in range(n))]
     elif flags & 0x02:     # offset16
@@ -112,11 +113,11 @@ def _type(data: bytes, pos: int, hs: int, sz: int, pkg_id: int, entries, count) 
         offs = [(i, o) for i, o in enumerate(vals) if o != 0xFFFFFFFF]
     count[0] += len(offs)
     if count[0] > MAX_ENTRIES:
-        raise ApkError("corrupt resources.arsc")
+        raise ApkError(_("corrupt resources.arsc"))
     for idx, off in offs:
         e = pos + estart + off
         if e + 8 > end:
-            raise ApkError("corrupt resources.arsc")
+            raise ApkError(_("corrupt resources.arsc"))
         esize, eflags = struct.unpack_from("<HH", data, e)
         if eflags & 0x08:              # compact
             dtype, val = eflags >> 8, struct.unpack_from("<I", data, e + 4)[0]
@@ -124,7 +125,7 @@ def _type(data: bytes, pos: int, hs: int, sz: int, pkg_id: int, entries, count) 
             continue
         else:
             if e + esize + 8 > end:
-                raise ApkError("corrupt resources.arsc")
+                raise ApkError(_("corrupt resources.arsc"))
             dtype = data[e + esize + 3]
             val = struct.unpack_from("<I", data, e + esize + 4)[0]
         rid = (pkg_id << 24) | (type_id << 16) | idx

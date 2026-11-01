@@ -12,6 +12,8 @@ from pathlib import Path
 
 from .apkinfo import PACKAGE_RE, ApkInfo, read_apk_info
 from .errors import ApkError, StarterError, UsageError, describe_error
+from .i18n import _
+from . import i18n
 from .launch import (DEFAULT_SIZE, build_command, build_env, parse_size, prepare_apk, remember_size,
                      remembered_size, sdk_for)
 from .paths import Paths
@@ -36,7 +38,7 @@ def _scan(argv: list[str]) -> tuple[list[str], Path | bool | None, int]:
             log = True
         elif tok.startswith("--log="):
             if not tok[6:]:
-                raise UsageError("--log= needs a file name")
+                raise UsageError(_("--log= needs a file name"))
             log = Path(tok[6:])
         elif tok in VALUE_OPTIONS:
             kept += argv[i:i + 2]
@@ -59,9 +61,10 @@ def resolve_target(paths: Paths, target: str) -> Path:
         return paths.apk(target)
     if "/" in target or target.lower().endswith((".apk", ".apks", ".xapk")):
         raise ApkError(
-            f"cannot read {target}: no such file (inside the Flatpak sandbox only paths passed with "
-            f"--file-forwarding are visible: flatpak run --file-forwarding {APP_ID} @@ FILE @@)")
-    raise UsageError(f"not installed: {target}")
+            _("cannot read {file}: no such file (inside the Flatpak sandbox only paths passed with "
+              "--file-forwarding are visible: {command})").format(
+                file=target, command=f"flatpak run --file-forwarding {APP_ID} @@ FILE @@"))
+    raise UsageError(_("not installed: {package}").format(package=target))
 
 
 def _desktop_id(pkg: str) -> str:
@@ -116,10 +119,12 @@ def install_apk(paths: Paths, apk: Path, lang: str | None) -> ApkInfo:
             portal.install_launcher(info.package, info.label, icon)
         except portal.PortalUnavailable:
             raise StarterError(
-                f"{info.label} is installed without a menu entry: the DynamicLauncher portal is not available; "
-                f"start the app with: flatpak run {APP_ID} {info.package}") from None
+                _("{app} is installed without a menu entry: the DynamicLauncher portal is not available; "
+                  "start the app with: {command}").format(app=info.label,
+                                                         command=f"flatpak run {APP_ID} {info.package}")) from None
         except StarterError as e:
-            raise StarterError(f"{info.label} is installed without a menu entry: {e}") from None
+            raise StarterError(_("{app} is installed without a menu entry: {reason}").format(
+                app=info.label, reason=e)) from None
     return info
 
 
@@ -152,7 +157,8 @@ def _delete_data(paths: Paths, pkg: str) -> None:
     except FileNotFoundError:
         pass
     except OSError as e:
-        raise StarterError(f"cannot remove {paths.data(pkg)}: {e.strerror}") from None
+        raise StarterError(_("cannot remove {folder}: {reason}").format(folder=paths.data(pkg),
+                                                                         reason=e.strerror)) from None
 
 
 def clear_data(paths: Paths, pkg: str) -> None:
@@ -167,13 +173,13 @@ def remove_app(paths: Paths, pkg: str, purge: bool) -> list[str]:
     warnings = []
     with package_lock(paths, pkg):
         if not paths.meta(pkg).exists() and not paths.apk(pkg).exists():
-            raise UsageError(f"not installed: {pkg}")
+            raise UsageError(_("not installed: {package}").format(package=pkg))
         try:
             portal.uninstall_launcher(pkg)
         except portal.PortalUnavailable:
-            warnings.append("the DynamicLauncher portal is not available; the menu entry was not removed")
+            warnings.append(_("the DynamicLauncher portal is not available; the menu entry was not removed"))
         except StarterError as e:
-            warnings.append(f"the menu entry was not removed: {e}")
+            warnings.append(_("the menu entry was not removed: {reason}").format(reason=e))
         for f in (paths.apk(pkg), paths.meta(pkg), paths.icon(pkg), paths.launch_dir() / f"{pkg}.apk"):
             f.unlink(missing_ok=True)
         if purge:
@@ -206,26 +212,27 @@ def _parser() -> argparse.ArgumentParser:
         usage="%(prog)s [--log[=FILE]] [--sdk N] [--size WxH] [--] [APK|PACKAGE] [ATL-ARGS...]\n"
               "       %(prog)s --install APK | --list | --remove PACKAGE [--purge] | --remove-all [--purge]\n"
               "       %(prog)s --version\n"
-              "       %(prog)s            (no arguments: open the management window)",
-        description="Start Android apps (APK) with Android Translation Layer.")
+              "       %(prog)s            " + _("(no arguments: open the management window)"),
+        description=_("Start Android apps (APK) with Android Translation Layer."))
     p.add_argument("--log", nargs="?", const=True, metavar="FILE",
-                   help="write a log for atl-doctor (default: logs/<package>-<time>.log); use --log=FILE")
-    p.add_argument("--sdk", type=int, metavar="N", help="override the SDK level passed to ATL")
-    p.add_argument("--size", metavar="WxH", help="window size (remembered per app)")
-    p.add_argument("--purge", action="store_true", help="with --remove/--remove-all: also delete the app data")
+                   help=_("write a log for atl-doctor (default: logs/<package>-<time>.log); use --log=FILE"))
+    p.add_argument("--sdk", type=int, metavar="N", help=_("override the SDK level passed to ATL"))
+    p.add_argument("--size", metavar="WxH", help=_("window size (remembered per app)"))
+    p.add_argument("--purge", action="store_true", help=_("with --remove/--remove-all: also delete the app data"))
     g = p.add_mutually_exclusive_group()
-    g.add_argument("--install", metavar="APK", help="install the APK and add a menu entry")
-    g.add_argument("--list", action="store_true", help="list installed apps")
-    g.add_argument("--remove", metavar="PACKAGE", help="remove an installed app")
+    g.add_argument("--install", metavar="APK", help=_("install the APK and add a menu entry"))
+    g.add_argument("--list", action="store_true", help=_("list installed apps"))
+    g.add_argument("--remove", metavar="PACKAGE", help=_("remove an installed app"))
     g.add_argument("--remove-all", action="store_true",
-                   help="remove all installed apps and their menu entries (before uninstalling the Flatpak)")
-    g.add_argument("--version", action="store_true")
+                   help=_("remove all installed apps and their menu entries (before uninstalling the Flatpak)"))
+    g.add_argument("--version", action="store_true", help=_("show the version and exit"))
     return p
 
 
 def main(argv: list[str] | None = None, env: Mapping[str, str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     env = os.environ if env is None else env
+    i18n.setup(Paths.from_env(env).prefix)
     try:
         return _main(argv, env)
     except StarterError as e:
@@ -252,9 +259,9 @@ def _main(argv: list[str], env: Mapping[str, str]) -> int:
         return e.code if isinstance(e.code, int) else 0
     mode = args.install or args.list or args.remove or args.remove_all or args.version
     if mode and (tail or log is not None or args.sdk is not None or args.size):
-        parser.error("--install, --list, --remove, --remove-all and --version take no other arguments")
+        parser.error(_("--install, --list, --remove, --remove-all and --version take no other arguments"))
     if args.purge and not (args.remove or args.remove_all):
-        parser.error("--purge only works with --remove or --remove-all")
+        parser.error(_("--purge only works with --remove or --remove-all"))
     paths = Paths.from_env(env)
 
     if args.version:
@@ -279,11 +286,11 @@ def _main(argv: list[str], env: Mapping[str, str]) -> int:
         return 0
     if not tail and log is None and args.sdk is None and not args.size:
         if not any(env.get(v) for v in DISPLAY_VARS):
-            parser.error("no APK given and no display for the window")
+            parser.error(_("no APK given and no display for the window"))
         from . import gui
         return gui.run(paths, env)
     if not tail:
-        parser.error("no APK given")
+        parser.error(_("no APK given"))
     return _start(paths, args, log, tail, env)
 
 

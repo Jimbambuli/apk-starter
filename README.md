@@ -57,6 +57,21 @@ gone, but the files stay in `~/.local/share/xdg-desktop-portal/` (and come back 
 Bring your own APK – this project ships ATL and its free dependencies only, no apps. Apps that need Google Play
 Services, Jetpack Compose or ARM-only native libraries are not expected to work.
 
+## Translations
+
+The window, `--help`, the messages and the menu/AppStream texts follow the system language. Included: German,
+French, Italian, Spanish, Brazilian Portuguese, Dutch, Polish, Czech, Ukrainian, Russian, Japanese and simplified
+Chinese; English is the source language. The translations are machine-assisted – corrections are welcome as issues or
+pull requests against `po/<language>.po`.
+
+After changing texts, update the template and the catalogs:
+
+```
+xgettext --from-code=UTF-8 --keyword=_ --keyword=N_ --add-comments=Translators --package-name=apk-starter \
+  -f <(grep -v '^#' po/POTFILES) -o po/apk-starter.pot
+for l in $(cat po/LINGUAS); do msgmerge --update --backup=none po/$l.po po/apk-starter.pot; done
+```
+
 **Status:** pre-release, not yet published.
 
 License: GPL-3.0-or-later (same as ATL), see [LICENSE](LICENSE). Not affiliated with Google; Android is a trademark

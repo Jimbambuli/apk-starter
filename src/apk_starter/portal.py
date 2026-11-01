@@ -5,6 +5,7 @@ import uuid
 from .apkinfo import PACKAGE_RE
 from .cli import APP_ID
 from .errors import StarterError, UsageError
+from .i18n import _
 
 RESPONSE_TIMEOUT = 300
 PORTAL_NAME = "org.freedesktop.portal.Desktop"
@@ -22,7 +23,7 @@ def desktop_file_id(pkg: str) -> str:
 
 def _check_pkg(pkg: str) -> str:
     if len(pkg) > 255 or not PACKAGE_RE.fullmatch(pkg):
-        raise StarterError(f"invalid package name: {pkg!r}")
+        raise StarterError(_("invalid package name: {package}").format(package=repr(pkg)))
     return pkg
 
 
@@ -70,7 +71,7 @@ def _call(conn, Gio, GLib, iface: str, method: str, params):
     except GLib.Error as e:
         if any(name in e.message for name in UNAVAILABLE_ERRORS):
             raise PortalUnavailable(f"{iface} is not available") from None
-        raise StarterError(f"portal call {method} failed: {e.message}") from None
+        raise StarterError(_("portal call {method} failed: {reason}").format(method=method, reason=e.message)) from None
 
 
 def _request(conn, Gio, GLib, iface: str, method: str, make_params):
@@ -95,7 +96,7 @@ def _request(conn, Gio, GLib, iface: str, method: str, make_params):
             GLib.timeout_add_seconds(RESPONSE_TIMEOUT, loop.quit)
             loop.run()
         if not answer:
-            raise StarterError("portal did not answer")
+            raise StarterError(_("portal did not answer"))
         return answer[0]
     finally:
         conn.signal_unsubscribe(sub)
@@ -115,7 +116,7 @@ def install_launcher(pkg: str, label: str, icon: bytes) -> None:
 
     response, results = _request(conn, Gio, GLib, iface, "PrepareInstall", prepare)
     if response != 0 or "token" not in results:
-        raise StarterError("menu entry not created (cancelled)")
+        raise StarterError(_("menu entry not created (cancelled)"))
     _call(conn, Gio, GLib, iface, "Install",
           GLib.Variant("(sssa{sv})", (results["token"], desktop_file_id(pkg), desktop_entry(pkg, label), {})))
 

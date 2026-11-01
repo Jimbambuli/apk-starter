@@ -1,0 +1,489 @@
+# Chinese (simplified) translation of APK Starter.
+# This file is distributed under the same license as the apk-starter package.
+# Machine-assisted translation; corrections welcome.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: apk-starter\n"
+"Report-Msgid-Bugs-To: https://github.com/Jimbambuli/apk-starter/issues\n"
+"PO-Revision-Date: 2026-11-01 13:45+0100\n"
+"Last-Translator: Jimbambuli (machine-assisted)\n"
+"Language-Team: none\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: data/io.github.Jimbambuli.ApkStarter.desktop.in:2
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:4
+msgid "APK Starter"
+msgstr "APK Starter"
+
+#: data/io.github.Jimbambuli.ApkStarter.desktop.in:3
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:5
+msgid "Run Android apps on the Linux desktop"
+msgstr "在 Linux 桌面上运行 Android 应用"
+
+#: data/io.github.Jimbambuli.ApkStarter.desktop.in:4
+msgid "Android;APK;App;"
+msgstr "Android;APK;App;应用;安卓;"
+
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:12
+msgid ""
+"APK Starter runs a single Android app from its APK file on the Linux "
+"desktop. It is built on Android Translation Layer (ATL) and translates the "
+"app's calls to GTK, Wayland and the usual Linux libraries instead of running "
+"a full Android system."
+msgstr "APK Starter 可在 Linux 桌面上从 APK 文件运行单个 Android 应用。它基于 Android Translation Layer (ATL)，将应用的调用转换为对 GTK、Wayland 和常见 Linux 库的调用，而无需运行完整的 Android 系统。"
+
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:18
+msgid ""
+"Bring your own APK: open it, double-click it, or add it to the application "
+"menu."
+msgstr "自备 APK：打开它、双击它，或将其添加到应用程序菜单。"
+
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:19
+msgid ""
+"A small window lists your apps with icon, version and data size; start, "
+"uninstall or delete their data from there."
+msgstr "一个小窗口列出您的应用及其图标、版本和数据大小；可在其中启动、卸载应用或删除其数据。"
+
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:21
+msgid "Each app keeps its own data folder."
+msgstr "每个应用都有自己的数据文件夹。"
+
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:22
+msgid "An optional log helps to find out why an app does not work."
+msgstr "可选的日志有助于找出应用无法运行的原因。"
+
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:24
+msgid ""
+"No apps are included and no Google services are provided. Apps that need "
+"Google Play services, Jetpack Compose, ARM-only native code, the camera, "
+"Bluetooth or telephony may not work."
+msgstr "不包含任何应用，也不提供 Google 服务。需要 Google Play 服务、Jetpack Compose、仅限 ARM 的原生代码、摄像头、蓝牙或电话功能的应用可能无法运行。"
+
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:28
+msgid "Android is a trademark of Google LLC."
+msgstr "Android 是 Google LLC 的商标。"
+
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:36
+msgid "The app list with three free apps from F-Droid"
+msgstr "应用列表，其中有三个来自 F-Droid 的自由应用"
+
+#: src/apk_starter/apkinfo.py:45
+#, python-brace-format
+msgid "{file} is too large ({size} bytes)"
+msgstr "{file} 过大（{size} 字节）"
+
+#: src/apk_starter/apkinfo.py:88
+#, python-brace-format
+msgid "split APK bundles (.apks/.xapk) are not supported yet: {file}"
+msgstr "尚不支持拆分 APK 包（.apks/.xapk）：{file}"
+
+#: src/apk_starter/apkinfo.py:94 src/apk_starter/apkinfo.py:115
+#, python-brace-format
+msgid "not an APK (no AndroidManifest.xml): {file}"
+msgstr "不是 APK（缺少 AndroidManifest.xml）：{file}"
+
+#: src/apk_starter/apkinfo.py:98
+#, python-brace-format
+msgid "invalid package name in manifest: {package}"
+msgstr "清单中的包名无效：{package}"
+
+#: src/apk_starter/apkinfo.py:117 src/apk_starter/apkinfo.py:119
+#, python-brace-format
+msgid "cannot read {file}: {reason}"
+msgstr "无法读取 {file}：{reason}"
+
+#: src/apk_starter/arsc.py:32 src/apk_starter/arsc.py:37
+msgid "resource reference loop"
+msgstr "资源引用存在循环"
+
+#: src/apk_starter/arsc.py:61 src/apk_starter/arsc.py:67
+#: src/apk_starter/arsc.py:89 src/apk_starter/arsc.py:102
+#: src/apk_starter/arsc.py:105 src/apk_starter/arsc.py:116
+#: src/apk_starter/arsc.py:120 src/apk_starter/arsc.py:128
+msgid "corrupt resources.arsc"
+msgstr "resources.arsc 已损坏"
+
+#: src/apk_starter/axml.py:47 src/apk_starter/axml.py:53
+msgid "corrupt AndroidManifest.xml"
+msgstr "AndroidManifest.xml 已损坏"
+
+#: src/apk_starter/cli.py:41
+msgid "--log= needs a file name"
+msgstr "--log= 需要文件名"
+
+#: src/apk_starter/cli.py:64
+#, python-brace-format
+msgid ""
+"cannot read {file}: no such file (inside the Flatpak sandbox only paths "
+"passed with --file-forwarding are visible: {command})"
+msgstr "无法读取 {file}：文件不存在（在 Flatpak 沙盒中只能看到通过 --file-forwarding 传入的路径：{command}）"
+
+#: src/apk_starter/cli.py:67 src/apk_starter/cli.py:176
+#, python-brace-format
+msgid "not installed: {package}"
+msgstr "未安装：{package}"
+
+#: src/apk_starter/cli.py:122
+#, python-brace-format
+msgid ""
+"{app} is installed without a menu entry: the DynamicLauncher portal is not "
+"available; start the app with: {command}"
+msgstr "{app} 已安装，但没有菜单项：DynamicLauncher 门户不可用；请使用以下命令启动应用：{command}"
+
+#: src/apk_starter/cli.py:126
+#, python-brace-format
+msgid "{app} is installed without a menu entry: {reason}"
+msgstr "{app} 已安装，但没有菜单项：{reason}"
+
+#: src/apk_starter/cli.py:160
+#, python-brace-format
+msgid "cannot remove {folder}: {reason}"
+msgstr "无法删除 {folder}：{reason}"
+
+#: src/apk_starter/cli.py:180
+msgid ""
+"the DynamicLauncher portal is not available; the menu entry was not removed"
+msgstr "DynamicLauncher 门户不可用；菜单项未删除"
+
+#: src/apk_starter/cli.py:182
+#, python-brace-format
+msgid "the menu entry was not removed: {reason}"
+msgstr "菜单项未删除：{reason}"
+
+#: src/apk_starter/cli.py:215
+msgid "(no arguments: open the management window)"
+msgstr "（不带参数：打开管理窗口）"
+
+#: src/apk_starter/cli.py:216
+msgid "Start Android apps (APK) with Android Translation Layer."
+msgstr "使用 Android Translation Layer 启动 Android 应用（APK）。"
+
+#: src/apk_starter/cli.py:218
+msgid ""
+"write a log for atl-doctor (default: logs/<package>-<time>.log); use --"
+"log=FILE"
+msgstr "为 atl-doctor 写入日志（默认：logs/<包名>-<时间>.log）；可用 --log=FILE 指定其他文件"
+
+#: src/apk_starter/cli.py:219
+msgid "override the SDK level passed to ATL"
+msgstr "覆盖传给 ATL 的 SDK 级别"
+
+#: src/apk_starter/cli.py:220
+msgid "window size (remembered per app)"
+msgstr "窗口大小（按应用记住）"
+
+#: src/apk_starter/cli.py:221
+msgid "with --remove/--remove-all: also delete the app data"
+msgstr "与 --remove/--remove-all 一起使用：同时删除应用数据"
+
+#: src/apk_starter/cli.py:223
+msgid "install the APK and add a menu entry"
+msgstr "安装 APK 并添加菜单项"
+
+#: src/apk_starter/cli.py:224
+msgid "list installed apps"
+msgstr "列出已安装的应用"
+
+#: src/apk_starter/cli.py:225
+msgid "remove an installed app"
+msgstr "卸载已安装的应用"
+
+#: src/apk_starter/cli.py:227
+msgid ""
+"remove all installed apps and their menu entries (before uninstalling the "
+"Flatpak)"
+msgstr "删除所有已安装的应用及其菜单项（在卸载 Flatpak 之前）"
+
+#: src/apk_starter/cli.py:228
+msgid "show the version and exit"
+msgstr "显示版本并退出"
+
+#: src/apk_starter/cli.py:262
+msgid ""
+"--install, --list, --remove, --remove-all and --version take no other "
+"arguments"
+msgstr "--install、--list、--remove、--remove-all 和 --version 不接受其他参数"
+
+#: src/apk_starter/cli.py:264
+msgid "--purge only works with --remove or --remove-all"
+msgstr "--purge 只能与 --remove 或 --remove-all 一起使用"
+
+#: src/apk_starter/cli.py:289
+msgid "no APK given and no display for the window"
+msgstr "未指定 APK，且没有可用于显示窗口的显示器"
+
+#: src/apk_starter/cli.py:293
+msgid "no APK given"
+msgstr "未指定 APK"
+
+#: src/apk_starter/errors.py:23
+#, python-brace-format
+msgid "unexpected error: {error}"
+msgstr "意外错误：{error}"
+
+#: src/apk_starter/gui.py:23
+#, python-brace-format
+msgid "the window needs GTK 4 and libadwaita: {reason}"
+msgstr "窗口需要 GTK 4 和 libadwaita：{reason}"
+
+#: src/apk_starter/gui.py:36
+msgid "Install APK…"
+msgstr "安装 APK…"
+
+#: src/apk_starter/gui.py:36
+msgid "Choose an APK file and add it to the menu"
+msgstr "选择 APK 文件并添加到菜单"
+
+#: src/apk_starter/gui.py:41
+msgid "Working…"
+msgstr "正在处理…"
+
+#: src/apk_starter/gui.py:48
+msgid "No apps installed"
+msgstr "尚未安装应用"
+
+#: src/apk_starter/gui.py:49
+msgid "Install an APK or drop one here."
+msgstr "安装 APK，或将其拖放到此处。"
+
+#: src/apk_starter/gui.py:79
+msgid "Close"
+msgstr "关闭"
+
+#: src/apk_starter/gui.py:115
+msgid "Cannot read the app list"
+msgstr "无法读取应用列表"
+
+#: src/apk_starter/gui.py:126
+#, python-brace-format
+msgid "data {size}"
+msgstr "数据 {size}"
+
+#: src/apk_starter/gui.py:126
+msgid "no data"
+msgstr "无数据"
+
+#: src/apk_starter/gui.py:138
+msgid "Start"
+msgstr "启动"
+
+#: src/apk_starter/gui.py:140
+msgid "Start with log"
+msgstr "带日志启动"
+
+#: src/apk_starter/gui.py:140
+msgid "Open log folder"
+msgstr "打开日志文件夹"
+
+#: src/apk_starter/gui.py:141
+msgid "Delete data…"
+msgstr "删除数据…"
+
+#: src/apk_starter/gui.py:141
+msgid "Uninstall…"
+msgstr "卸载…"
+
+#: src/apk_starter/gui.py:146
+msgid "More"
+msgstr "更多"
+
+#: src/apk_starter/gui.py:158
+#, python-brace-format
+msgid "Cannot start {app}"
+msgstr "无法启动 {app}"
+
+#: src/apk_starter/gui.py:163
+msgid "See the log folder."
+msgstr "请查看日志文件夹。"
+
+#: src/apk_starter/gui.py:163
+msgid "Try “Start with log” and look at the log."
+msgstr "请尝试“带日志启动”，然后查看日志。"
+
+#: src/apk_starter/gui.py:165
+#, python-brace-format
+msgid "{app} ended with exit code {code}"
+msgstr "{app} 已退出，退出代码为 {code}"
+
+#: src/apk_starter/gui.py:167
+#, python-brace-format
+msgid "{app} was killed by signal {signal}"
+msgstr "{app} 被信号 {signal} 终止"
+
+#: src/apk_starter/gui.py:170
+#, python-brace-format
+msgid "{app} starts with a log"
+msgstr "{app} 正在带日志启动"
+
+#: src/apk_starter/gui.py:177 src/apk_starter/gui.py:185
+msgid "Cannot open the log folder"
+msgstr "无法打开日志文件夹"
+
+#: src/apk_starter/gui.py:189
+msgid "Android apps"
+msgstr "Android 应用"
+
+#: src/apk_starter/gui.py:194
+msgid "Install APK"
+msgstr "安装 APK"
+
+#: src/apk_starter/gui.py:214
+#, python-brace-format
+msgid "{app} installed"
+msgstr "已安装 {app}"
+
+#: src/apk_starter/gui.py:215
+#, python-brace-format
+msgid "Cannot install {file}"
+msgstr "无法安装 {file}"
+
+#: src/apk_starter/gui.py:220
+msgid "Cancel"
+msgstr "取消"
+
+#: src/apk_starter/gui.py:232
+#, python-brace-format
+msgid "Delete the data of {app}?"
+msgstr "删除 {app} 的数据？"
+
+#: src/apk_starter/gui.py:233
+msgid ""
+"The app stays installed. Its settings, accounts and files are deleted. Close "
+"the app first."
+msgstr "应用将保持安装。其设置、账户和文件将被删除。请先关闭应用。"
+
+#: src/apk_starter/gui.py:234
+msgid "Delete Data"
+msgstr "删除数据"
+
+#: src/apk_starter/gui.py:236
+#, python-brace-format
+msgid "Data of {app} deleted"
+msgstr "已删除 {app} 的数据"
+
+#: src/apk_starter/gui.py:237
+#, python-brace-format
+msgid "Cannot delete the data of {app}"
+msgstr "无法删除 {app} 的数据"
+
+#: src/apk_starter/gui.py:241
+msgid "Also delete app data"
+msgstr "同时删除应用数据"
+
+#: src/apk_starter/gui.py:244 src/apk_starter/gui.py:246
+#, python-brace-format
+msgid "{app} uninstalled"
+msgstr "已卸载 {app}"
+
+#: src/apk_starter/gui.py:247
+#, python-brace-format
+msgid "Uninstall {app}?"
+msgstr "卸载 {app}？"
+
+#: src/apk_starter/gui.py:248
+msgid "The app and its menu entry are removed. Close the app first."
+msgstr "应用及其菜单项将被删除。请先关闭应用。"
+
+#: src/apk_starter/gui.py:248
+msgid "Uninstall"
+msgstr "卸载"
+
+#: src/apk_starter/gui.py:250
+#, python-brace-format
+msgid "Cannot uninstall {app}"
+msgstr "无法卸载 {app}"
+
+#: src/apk_starter/i18n.py:27
+msgid "usage: "
+msgstr "用法："
+
+#: src/apk_starter/i18n.py:27
+msgid "options"
+msgstr "选项"
+
+#: src/apk_starter/i18n.py:27
+msgid "show this help message and exit"
+msgstr "显示此帮助信息并退出"
+
+#: src/apk_starter/i18n.py:27
+#, python-format
+msgid "%(prog)s: error: %(message)s\n"
+msgstr "%(prog)s：错误：%(message)s\n"
+
+#: src/apk_starter/i18n.py:28
+#, python-format
+msgid "unrecognized arguments: %s"
+msgstr "无法识别的参数：%s"
+
+#: src/apk_starter/i18n.py:28
+msgid "expected one argument"
+msgstr "需要一个参数"
+
+#: src/apk_starter/i18n.py:28
+#, python-format
+msgid "argument %(argument_name)s: %(message)s"
+msgstr "参数 %(argument_name)s：%(message)s"
+
+#: src/apk_starter/i18n.py:29
+#, python-format
+msgid "not allowed with argument %s"
+msgstr "不能与参数 %s 同时使用"
+
+#: src/apk_starter/i18n.py:29
+#, python-format
+msgid "invalid %(type)s value: %(value)r"
+msgstr "无效的 %(type)s 值：%(value)r"
+
+#: src/apk_starter/launch.py:26
+#, python-brace-format
+msgid "invalid --size, expected WxH: {value}"
+msgstr "--size 无效，应为 WxH：{value}"
+
+#: src/apk_starter/paths.py:14 src/apk_starter/portal.py:26
+#, python-brace-format
+msgid "invalid package name: {package}"
+msgstr "无效的包名：{package}"
+
+#: src/apk_starter/portal.py:74
+#, python-brace-format
+msgid "portal call {method} failed: {reason}"
+msgstr "门户调用 {method} 失败：{reason}"
+
+#: src/apk_starter/portal.py:99
+msgid "portal did not answer"
+msgstr "门户没有响应"
+
+#: src/apk_starter/portal.py:119
+msgid "menu entry not created (cancelled)"
+msgstr "未创建菜单项（已取消）"
+
+#: src/apk_starter/resbin.py:13 src/apk_starter/resbin.py:16
+#: src/apk_starter/resbin.py:24 src/apk_starter/resbin.py:34
+#: src/apk_starter/resbin.py:54 src/apk_starter/resbin.py:58
+#, python-brace-format
+msgid "corrupt resource chunk at {offset}"
+msgstr "偏移 {offset} 处的资源块已损坏"
+
+#: src/apk_starter/run.py:93
+#, python-brace-format
+msgid "cannot write log {file}: {reason}"
+msgstr "无法写入日志 {file}：{reason}"
+
+#: src/apk_starter/run.py:102
+msgid "android-translation-layer not found"
+msgstr "找不到 android-translation-layer"
+
+#: src/apk_starter/run.py:107
+#, python-brace-format
+msgid "cannot start android-translation-layer: {reason}"
+msgstr "无法启动 android-translation-layer：{reason}"
+
+#: src/apk_starter/run.py:141
+#, python-brace-format
+msgid "android-translation-layer was killed by {signal}"
+msgstr "android-translation-layer 被 {signal} 终止"

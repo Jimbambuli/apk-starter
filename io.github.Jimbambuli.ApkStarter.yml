@@ -155,8 +155,12 @@ modules:
       - cp -r src/apk_starter /app/share/apk-starter/apk_starter
       - install -Dm644 data/build-info /app/share/apk-starter/build-info
       - install -Dm644 $JAVA_HOME/lib/security/cacerts /app/share/apk-starter/cacerts
-      - install -Dm644 data/io.github.Jimbambuli.ApkStarter.desktop /app/share/applications/io.github.Jimbambuli.ApkStarter.desktop
-      - install -Dm644 data/io.github.Jimbambuli.ApkStarter.metainfo.xml /app/share/metainfo/io.github.Jimbambuli.ApkStarter.metainfo.xml
+      # Translations (po/LINGUAS): catalogs for the program, merged texts for the menu entry and AppStream.
+      - for l in $(cat po/LINGUAS); do install -d /app/share/locale/$l/LC_MESSAGES && msgfmt --check -o /app/share/locale/$l/LC_MESSAGES/apk-starter.mo po/$l.po || exit 1; done
+      - msgfmt --desktop --template=data/io.github.Jimbambuli.ApkStarter.desktop.in -d po -o io.github.Jimbambuli.ApkStarter.desktop
+      - msgfmt --xml --template=data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in -d po -o io.github.Jimbambuli.ApkStarter.metainfo.xml
+      - install -Dm644 io.github.Jimbambuli.ApkStarter.desktop /app/share/applications/io.github.Jimbambuli.ApkStarter.desktop
+      - install -Dm644 io.github.Jimbambuli.ApkStarter.metainfo.xml /app/share/metainfo/io.github.Jimbambuli.ApkStarter.metainfo.xml
       - install -Dm644 data/icons/io.github.Jimbambuli.ApkStarter.svg /app/share/icons/hicolor/scalable/apps/io.github.Jimbambuli.ApkStarter.svg
     sources:
       - type: dir

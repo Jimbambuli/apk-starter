@@ -1,6 +1,7 @@
 [Desktop Entry]
 Name=APK Starter
 Comment=Run Android apps on the Linux desktop
+Keywords=Android;APK;App;
 Exec=apk-starter %f
 Icon=io.github.Jimbambuli.ApkStarter
 Terminal=false

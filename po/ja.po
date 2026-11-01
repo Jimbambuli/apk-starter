@@ -1,0 +1,489 @@
+# Japanese translation of APK Starter.
+# This file is distributed under the same license as the apk-starter package.
+# Machine-assisted translation; corrections welcome.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: apk-starter\n"
+"Report-Msgid-Bugs-To: https://github.com/Jimbambuli/apk-starter/issues\n"
+"PO-Revision-Date: 2026-11-01 13:45+0100\n"
+"Last-Translator: Jimbambuli (machine-assisted)\n"
+"Language-Team: none\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: data/io.github.Jimbambuli.ApkStarter.desktop.in:2
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:4
+msgid "APK Starter"
+msgstr "APK Starter"
+
+#: data/io.github.Jimbambuli.ApkStarter.desktop.in:3
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:5
+msgid "Run Android apps on the Linux desktop"
+msgstr "Linux デスクトップで Android アプリを実行します"
+
+#: data/io.github.Jimbambuli.ApkStarter.desktop.in:4
+msgid "Android;APK;App;"
+msgstr "Android;APK;App;アプリ;アプリケーション;"
+
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:12
+msgid ""
+"APK Starter runs a single Android app from its APK file on the Linux "
+"desktop. It is built on Android Translation Layer (ATL) and translates the "
+"app's calls to GTK, Wayland and the usual Linux libraries instead of running "
+"a full Android system."
+msgstr "APK Starter は、Android アプリを 1 つ、その APK ファイルから Linux デスクトップ上で実行します。Android Translation Layer (ATL) を基盤とし、完全な Android システムを動かす代わりに、アプリの呼び出しを GTK、Wayland、一般的な Linux ライブラリに変換します。"
+
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:18
+msgid ""
+"Bring your own APK: open it, double-click it, or add it to the application "
+"menu."
+msgstr "APK はご自身で用意してください。開く、ダブルクリックする、またはアプリケーションメニューに追加することができます。"
+
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:19
+msgid ""
+"A small window lists your apps with icon, version and data size; start, "
+"uninstall or delete their data from there."
+msgstr "小さなウィンドウにアプリがアイコン、バージョン、データサイズとともに一覧表示され、そこから起動、アンインストール、データの削除ができます。"
+
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:21
+msgid "Each app keeps its own data folder."
+msgstr "アプリごとに専用のデータフォルダーがあります。"
+
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:22
+msgid "An optional log helps to find out why an app does not work."
+msgstr "オプションのログで、アプリが動作しない原因を調べることができます。"
+
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:24
+msgid ""
+"No apps are included and no Google services are provided. Apps that need "
+"Google Play services, Jetpack Compose, ARM-only native code, the camera, "
+"Bluetooth or telephony may not work."
+msgstr "アプリは同梱されておらず、Google のサービスも提供されません。Google Play 開発者サービス、Jetpack Compose、ARM 専用のネイティブコード、カメラ、Bluetooth、電話機能を必要とするアプリは動作しない場合があります。"
+
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:28
+msgid "Android is a trademark of Google LLC."
+msgstr "Android は Google LLC の商標です。"
+
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:36
+msgid "The app list with three free apps from F-Droid"
+msgstr "F-Droid の 3 つの自由なアプリが並んだアプリ一覧"
+
+#: src/apk_starter/apkinfo.py:45
+#, python-brace-format
+msgid "{file} is too large ({size} bytes)"
+msgstr "{file} が大きすぎます ({size} バイト)"
+
+#: src/apk_starter/apkinfo.py:88
+#, python-brace-format
+msgid "split APK bundles (.apks/.xapk) are not supported yet: {file}"
+msgstr "分割 APK バンドル (.apks/.xapk) にはまだ対応していません: {file}"
+
+#: src/apk_starter/apkinfo.py:94 src/apk_starter/apkinfo.py:115
+#, python-brace-format
+msgid "not an APK (no AndroidManifest.xml): {file}"
+msgstr "APK ではありません (AndroidManifest.xml がありません): {file}"
+
+#: src/apk_starter/apkinfo.py:98
+#, python-brace-format
+msgid "invalid package name in manifest: {package}"
+msgstr "マニフェストのパッケージ名が無効です: {package}"
+
+#: src/apk_starter/apkinfo.py:117 src/apk_starter/apkinfo.py:119
+#, python-brace-format
+msgid "cannot read {file}: {reason}"
+msgstr "{file} を読み込めません: {reason}"
+
+#: src/apk_starter/arsc.py:32 src/apk_starter/arsc.py:37
+msgid "resource reference loop"
+msgstr "リソース参照がループしています"
+
+#: src/apk_starter/arsc.py:61 src/apk_starter/arsc.py:67
+#: src/apk_starter/arsc.py:89 src/apk_starter/arsc.py:102
+#: src/apk_starter/arsc.py:105 src/apk_starter/arsc.py:116
+#: src/apk_starter/arsc.py:120 src/apk_starter/arsc.py:128
+msgid "corrupt resources.arsc"
+msgstr "resources.arsc が破損しています"
+
+#: src/apk_starter/axml.py:47 src/apk_starter/axml.py:53
+msgid "corrupt AndroidManifest.xml"
+msgstr "AndroidManifest.xml が破損しています"
+
+#: src/apk_starter/cli.py:41
+msgid "--log= needs a file name"
+msgstr "--log= にはファイル名が必要です"
+
+#: src/apk_starter/cli.py:64
+#, python-brace-format
+msgid ""
+"cannot read {file}: no such file (inside the Flatpak sandbox only paths "
+"passed with --file-forwarding are visible: {command})"
+msgstr "{file} を読み込めません: ファイルがありません (Flatpak サンドボックス内では --file-forwarding で渡したパスしか見えません: {command})"
+
+#: src/apk_starter/cli.py:67 src/apk_starter/cli.py:176
+#, python-brace-format
+msgid "not installed: {package}"
+msgstr "インストールされていません: {package}"
+
+#: src/apk_starter/cli.py:122
+#, python-brace-format
+msgid ""
+"{app} is installed without a menu entry: the DynamicLauncher portal is not "
+"available; start the app with: {command}"
+msgstr "{app} はメニュー項目なしでインストールされました: DynamicLauncher ポータルが利用できません。次のコマンドでアプリを起動してください: {command}"
+
+#: src/apk_starter/cli.py:126
+#, python-brace-format
+msgid "{app} is installed without a menu entry: {reason}"
+msgstr "{app} はメニュー項目なしでインストールされました: {reason}"
+
+#: src/apk_starter/cli.py:160
+#, python-brace-format
+msgid "cannot remove {folder}: {reason}"
+msgstr "{folder} を削除できません: {reason}"
+
+#: src/apk_starter/cli.py:180
+msgid ""
+"the DynamicLauncher portal is not available; the menu entry was not removed"
+msgstr "DynamicLauncher ポータルが利用できないため、メニュー項目は削除されませんでした"
+
+#: src/apk_starter/cli.py:182
+#, python-brace-format
+msgid "the menu entry was not removed: {reason}"
+msgstr "メニュー項目は削除されませんでした: {reason}"
+
+#: src/apk_starter/cli.py:215
+msgid "(no arguments: open the management window)"
+msgstr "(引数なし: 管理ウィンドウを開く)"
+
+#: src/apk_starter/cli.py:216
+msgid "Start Android apps (APK) with Android Translation Layer."
+msgstr "Android Translation Layer で Android アプリ (APK) を起動します。"
+
+#: src/apk_starter/cli.py:218
+msgid ""
+"write a log for atl-doctor (default: logs/<package>-<time>.log); use --"
+"log=FILE"
+msgstr "atl-doctor 用のログを書き出す (既定: logs/<パッケージ>-<時刻>.log)。別のファイルは --log=FILE で指定"
+
+#: src/apk_starter/cli.py:219
+msgid "override the SDK level passed to ATL"
+msgstr "ATL に渡す SDK レベルを上書きする"
+
+#: src/apk_starter/cli.py:220
+msgid "window size (remembered per app)"
+msgstr "ウィンドウサイズ (アプリごとに記憶)"
+
+#: src/apk_starter/cli.py:221
+msgid "with --remove/--remove-all: also delete the app data"
+msgstr "--remove/--remove-all と併用: アプリのデータも削除する"
+
+#: src/apk_starter/cli.py:223
+msgid "install the APK and add a menu entry"
+msgstr "APK をインストールしてメニュー項目を追加する"
+
+#: src/apk_starter/cli.py:224
+msgid "list installed apps"
+msgstr "インストール済みのアプリを一覧表示する"
+
+#: src/apk_starter/cli.py:225
+msgid "remove an installed app"
+msgstr "インストール済みのアプリをアンインストールする"
+
+#: src/apk_starter/cli.py:227
+msgid ""
+"remove all installed apps and their menu entries (before uninstalling the "
+"Flatpak)"
+msgstr "インストール済みのすべてのアプリとそのメニュー項目を削除する (Flatpak をアンインストールする前に)"
+
+#: src/apk_starter/cli.py:228
+msgid "show the version and exit"
+msgstr "バージョンを表示して終了する"
+
+#: src/apk_starter/cli.py:262
+msgid ""
+"--install, --list, --remove, --remove-all and --version take no other "
+"arguments"
+msgstr "--install、--list、--remove、--remove-all、--version は他の引数を取りません"
+
+#: src/apk_starter/cli.py:264
+msgid "--purge only works with --remove or --remove-all"
+msgstr "--purge は --remove または --remove-all と一緒にしか使えません"
+
+#: src/apk_starter/cli.py:289
+msgid "no APK given and no display for the window"
+msgstr "APK が指定されておらず、ウィンドウを表示するディスプレイもありません"
+
+#: src/apk_starter/cli.py:293
+msgid "no APK given"
+msgstr "APK が指定されていません"
+
+#: src/apk_starter/errors.py:23
+#, python-brace-format
+msgid "unexpected error: {error}"
+msgstr "予期しないエラー: {error}"
+
+#: src/apk_starter/gui.py:23
+#, python-brace-format
+msgid "the window needs GTK 4 and libadwaita: {reason}"
+msgstr "ウィンドウには GTK 4 と libadwaita が必要です: {reason}"
+
+#: src/apk_starter/gui.py:36
+msgid "Install APK…"
+msgstr "APK をインストール…"
+
+#: src/apk_starter/gui.py:36
+msgid "Choose an APK file and add it to the menu"
+msgstr "APK ファイルを選んでメニューに追加します"
+
+#: src/apk_starter/gui.py:41
+msgid "Working…"
+msgstr "処理中…"
+
+#: src/apk_starter/gui.py:48
+msgid "No apps installed"
+msgstr "インストール済みのアプリはありません"
+
+#: src/apk_starter/gui.py:49
+msgid "Install an APK or drop one here."
+msgstr "APK をインストールするか、ここにドロップしてください。"
+
+#: src/apk_starter/gui.py:79
+msgid "Close"
+msgstr "閉じる"
+
+#: src/apk_starter/gui.py:115
+msgid "Cannot read the app list"
+msgstr "アプリ一覧を読み込めません"
+
+#: src/apk_starter/gui.py:126
+#, python-brace-format
+msgid "data {size}"
+msgstr "データ {size}"
+
+#: src/apk_starter/gui.py:126
+msgid "no data"
+msgstr "データなし"
+
+#: src/apk_starter/gui.py:138
+msgid "Start"
+msgstr "起動"
+
+#: src/apk_starter/gui.py:140
+msgid "Start with log"
+msgstr "ログ付きで起動"
+
+#: src/apk_starter/gui.py:140
+msgid "Open log folder"
+msgstr "ログフォルダーを開く"
+
+#: src/apk_starter/gui.py:141
+msgid "Delete data…"
+msgstr "データを削除…"
+
+#: src/apk_starter/gui.py:141
+msgid "Uninstall…"
+msgstr "アンインストール…"
+
+#: src/apk_starter/gui.py:146
+msgid "More"
+msgstr "その他"
+
+#: src/apk_starter/gui.py:158
+#, python-brace-format
+msgid "Cannot start {app}"
+msgstr "{app} を起動できません"
+
+#: src/apk_starter/gui.py:163
+msgid "See the log folder."
+msgstr "ログフォルダーを確認してください。"
+
+#: src/apk_starter/gui.py:163
+msgid "Try “Start with log” and look at the log."
+msgstr "「ログ付きで起動」を試して、ログを確認してください。"
+
+#: src/apk_starter/gui.py:165
+#, python-brace-format
+msgid "{app} ended with exit code {code}"
+msgstr "{app} は終了コード {code} で終了しました"
+
+#: src/apk_starter/gui.py:167
+#, python-brace-format
+msgid "{app} was killed by signal {signal}"
+msgstr "{app} はシグナル {signal} で強制終了されました"
+
+#: src/apk_starter/gui.py:170
+#, python-brace-format
+msgid "{app} starts with a log"
+msgstr "{app} をログ付きで起動します"
+
+#: src/apk_starter/gui.py:177 src/apk_starter/gui.py:185
+msgid "Cannot open the log folder"
+msgstr "ログフォルダーを開けません"
+
+#: src/apk_starter/gui.py:189
+msgid "Android apps"
+msgstr "Android アプリ"
+
+#: src/apk_starter/gui.py:194
+msgid "Install APK"
+msgstr "APK をインストール"
+
+#: src/apk_starter/gui.py:214
+#, python-brace-format
+msgid "{app} installed"
+msgstr "{app} をインストールしました"
+
+#: src/apk_starter/gui.py:215
+#, python-brace-format
+msgid "Cannot install {file}"
+msgstr "{file} をインストールできません"
+
+#: src/apk_starter/gui.py:220
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: src/apk_starter/gui.py:232
+#, python-brace-format
+msgid "Delete the data of {app}?"
+msgstr "{app} のデータを削除しますか？"
+
+#: src/apk_starter/gui.py:233
+msgid ""
+"The app stays installed. Its settings, accounts and files are deleted. Close "
+"the app first."
+msgstr "アプリはインストールされたままです。設定、アカウント、ファイルは削除されます。先にアプリを閉じてください。"
+
+#: src/apk_starter/gui.py:234
+msgid "Delete Data"
+msgstr "データを削除"
+
+#: src/apk_starter/gui.py:236
+#, python-brace-format
+msgid "Data of {app} deleted"
+msgstr "{app} のデータを削除しました"
+
+#: src/apk_starter/gui.py:237
+#, python-brace-format
+msgid "Cannot delete the data of {app}"
+msgstr "{app} のデータを削除できません"
+
+#: src/apk_starter/gui.py:241
+msgid "Also delete app data"
+msgstr "アプリのデータも削除する"
+
+#: src/apk_starter/gui.py:244 src/apk_starter/gui.py:246
+#, python-brace-format
+msgid "{app} uninstalled"
+msgstr "{app} をアンインストールしました"
+
+#: src/apk_starter/gui.py:247
+#, python-brace-format
+msgid "Uninstall {app}?"
+msgstr "{app} をアンインストールしますか？"
+
+#: src/apk_starter/gui.py:248
+msgid "The app and its menu entry are removed. Close the app first."
+msgstr "アプリとそのメニュー項目が削除されます。先にアプリを閉じてください。"
+
+#: src/apk_starter/gui.py:248
+msgid "Uninstall"
+msgstr "アンインストール"
+
+#: src/apk_starter/gui.py:250
+#, python-brace-format
+msgid "Cannot uninstall {app}"
+msgstr "{app} をアンインストールできません"
+
+#: src/apk_starter/i18n.py:27
+msgid "usage: "
+msgstr "使い方: "
+
+#: src/apk_starter/i18n.py:27
+msgid "options"
+msgstr "オプション"
+
+#: src/apk_starter/i18n.py:27
+msgid "show this help message and exit"
+msgstr "このヘルプを表示して終了する"
+
+#: src/apk_starter/i18n.py:27
+#, python-format
+msgid "%(prog)s: error: %(message)s\n"
+msgstr "%(prog)s: エラー: %(message)s\n"
+
+#: src/apk_starter/i18n.py:28
+#, python-format
+msgid "unrecognized arguments: %s"
+msgstr "認識できない引数: %s"
+
+#: src/apk_starter/i18n.py:28
+msgid "expected one argument"
+msgstr "引数が 1 つ必要です"
+
+#: src/apk_starter/i18n.py:28
+#, python-format
+msgid "argument %(argument_name)s: %(message)s"
+msgstr "引数 %(argument_name)s: %(message)s"
+
+#: src/apk_starter/i18n.py:29
+#, python-format
+msgid "not allowed with argument %s"
+msgstr "引数 %s と一緒には使えません"
+
+#: src/apk_starter/i18n.py:29
+#, python-format
+msgid "invalid %(type)s value: %(value)r"
+msgstr "無効な %(type)s 値: %(value)r"
+
+#: src/apk_starter/launch.py:26
+#, python-brace-format
+msgid "invalid --size, expected WxH: {value}"
+msgstr "--size が無効です (WxH 形式で指定してください): {value}"
+
+#: src/apk_starter/paths.py:14 src/apk_starter/portal.py:26
+#, python-brace-format
+msgid "invalid package name: {package}"
+msgstr "無効なパッケージ名: {package}"
+
+#: src/apk_starter/portal.py:74
+#, python-brace-format
+msgid "portal call {method} failed: {reason}"
+msgstr "ポータル呼び出し {method} に失敗しました: {reason}"
+
+#: src/apk_starter/portal.py:99
+msgid "portal did not answer"
+msgstr "ポータルが応答しませんでした"
+
+#: src/apk_starter/portal.py:119
+msgid "menu entry not created (cancelled)"
+msgstr "メニュー項目は作成されませんでした (キャンセル)"
+
+#: src/apk_starter/resbin.py:13 src/apk_starter/resbin.py:16
+#: src/apk_starter/resbin.py:24 src/apk_starter/resbin.py:34
+#: src/apk_starter/resbin.py:54 src/apk_starter/resbin.py:58
+#, python-brace-format
+msgid "corrupt resource chunk at {offset}"
+msgstr "オフセット {offset} のリソースチャンクが破損しています"
+
+#: src/apk_starter/run.py:93
+#, python-brace-format
+msgid "cannot write log {file}: {reason}"
+msgstr "ログ {file} を書き込めません: {reason}"
+
+#: src/apk_starter/run.py:102
+msgid "android-translation-layer not found"
+msgstr "android-translation-layer が見つかりません"
+
+#: src/apk_starter/run.py:107
+#, python-brace-format
+msgid "cannot start android-translation-layer: {reason}"
+msgstr "android-translation-layer を起動できません: {reason}"
+
+#: src/apk_starter/run.py:141
+#, python-brace-format
+msgid "android-translation-layer was killed by {signal}"
+msgstr "android-translation-layer はシグナル {signal} で強制終了されました"

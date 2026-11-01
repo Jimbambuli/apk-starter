@@ -10,6 +10,7 @@ from pathlib import Path
 from .arsc import Config, ResourceTable, parse_table
 from .axml import ResRef, Value, parse_manifest
 from .errors import ApkError
+from .i18n import _
 
 PACKAGE_RE = re.compile(r"[A-Za-z][A-Za-z0-9_]*(\.[A-Za-z][A-Za-z0-9_]*)+")
 MAX_PACKAGE = 255
@@ -41,7 +42,7 @@ def png_size(data: bytes) -> tuple[int, int] | None:
 def _read(z: zipfile.ZipFile, name: str, limit: int) -> bytes:
     info = z.getinfo(name)
     if info.file_size > limit:
-        raise ApkError(f"{name} is too large ({info.file_size} bytes)")
+        raise ApkError(_("{file} is too large ({size} bytes)").format(file=name, size=info.file_size))
     return z.read(info)
 
 
@@ -84,17 +85,17 @@ def _icon(z: zipfile.ZipFile, table: ResourceTable | None, icon_id: int | None) 
 def read_apk_info(path: Path, lang: str | None = None) -> ApkInfo:
     path = Path(path)
     if path.suffix.lower() in (".apks", ".xapk"):
-        raise ApkError(f"split APK bundles (.apks/.xapk) are not supported yet: {path}")
+        raise ApkError(_("split APK bundles (.apks/.xapk) are not supported yet: {file}").format(file=path))
     try:
         with zipfile.ZipFile(path) as z:
             try:
                 raw = _read(z, "AndroidManifest.xml", MAX_MANIFEST)
             except KeyError:
-                raise ApkError(f"not an APK (no AndroidManifest.xml): {path}") from None
+                raise ApkError(_("not an APK (no AndroidManifest.xml): {file}").format(file=path)) from None
             m = parse_manifest(raw)
             pkg = m.package
             if pkg is None or len(pkg) > MAX_PACKAGE or not PACKAGE_RE.fullmatch(pkg):
-                raise ApkError(f"invalid package name in manifest: {pkg!r}")
+                raise ApkError(_("invalid package name in manifest: {package}").format(package=repr(pkg)))
             table = None
             try:
                 table = parse_table(_read(z, "resources.arsc", MAX_ARSC))
@@ -111,11 +112,11 @@ def read_apk_info(path: Path, lang: str | None = None) -> ApkInfo:
                 icon=_icon(z, table, m.icon),
             )
     except zipfile.BadZipFile:
-        raise ApkError(f"not an APK (no AndroidManifest.xml): {path}") from None
+        raise ApkError(_("not an APK (no AndroidManifest.xml): {file}").format(file=path)) from None
     except (zipfile.LargeZipFile, RuntimeError, EOFError, zlib.error, ValueError, struct.error) as e:
-        raise ApkError(f"cannot read {path}: {e}") from None
+        raise ApkError(_("cannot read {file}: {reason}").format(file=path, reason=e)) from None
     except OSError as e:
-        raise ApkError(f"cannot read {path}: {e.strerror}") from None
+        raise ApkError(_("cannot read {file}: {reason}").format(file=path, reason=e.strerror)) from None
 
 
 def main(argv: list[str]) -> int:

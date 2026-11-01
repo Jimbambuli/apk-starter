@@ -11,6 +11,7 @@ from pathlib import Path
 
 from .apkinfo import ApkInfo
 from .errors import StarterError
+from .i18n import _
 from .paths import Paths
 
 LOG_FORMAT = 1
@@ -89,7 +90,7 @@ def run_atl(cmd: list[str], env: dict[str, str], log: Path | None, header: dict[
                 logf.write(f"{HEADER_PREFIX}{k}={v}\n".encode("utf-8"))
             logf.flush()
         except OSError as e:
-            raise StarterError(f"cannot write log {log}: {e.strerror}") from None
+            raise StarterError(_("cannot write log {file}: {reason}").format(file=log, reason=e.strerror)) from None
     t0 = time.monotonic()
     try:
         proc = subprocess.Popen(cmd, env=env, **({"stdout": subprocess.PIPE, "stderr": subprocess.STDOUT}
@@ -98,12 +99,12 @@ def run_atl(cmd: list[str], env: dict[str, str], log: Path | None, header: dict[
         if logf:
             logf.close()
             log.unlink(missing_ok=True)
-        raise StarterError("android-translation-layer not found") from None
+        raise StarterError(_("android-translation-layer not found")) from None
     except OSError as e:
         if logf:
             logf.close()
             log.unlink(missing_ok=True)
-        raise StarterError(f"cannot start android-translation-layer: {e.strerror}") from None
+        raise StarterError(_("cannot start android-translation-layer: {reason}").format(reason=e.strerror)) from None
 
     previous = {}
     try:
@@ -137,7 +138,8 @@ def run_atl(cmd: list[str], env: dict[str, str], log: Path | None, header: dict[
         except ValueError:
             sig_name = f"SIG{-rc}"
         rc = 128 - rc
-        sys.stderr.write(f"apk-starter: android-translation-layer was killed by {sig_name}\n")
+        msg = _("android-translation-layer was killed by {signal}").format(signal=sig_name)
+        sys.stderr.write(f"apk-starter: {msg}\n")
         sys.stderr.flush()
     if logf:
         tail = b"" if last == b"\n" else b"\n"

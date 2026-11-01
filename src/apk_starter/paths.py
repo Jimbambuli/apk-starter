@@ -5,12 +5,13 @@ from pathlib import Path
 
 from .apkinfo import MAX_PACKAGE, PACKAGE_RE
 from .errors import UsageError
+from .i18n import _
 
 
 def _safe(pkg: str) -> str:
     """Every path below is built from a package name, so refuse anything that is not one."""
     if len(pkg) > MAX_PACKAGE or not PACKAGE_RE.fullmatch(pkg):
-        raise UsageError(f"invalid package name: {pkg!r}")
+        raise UsageError(_("invalid package name: {package}").format(package=repr(pkg)))
     return pkg
 
 

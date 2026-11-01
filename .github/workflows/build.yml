@@ -20,6 +20,8 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install pytest==9.2.0
+      - name: Install gettext (the translation tests compile po/*.po with msgfmt --check)
+        run: sudo apt-get update && sudo apt-get install -y gettext
       - run: python -m pytest -q
 
   flatpak:
