@@ -1,0 +1,28 @@
+#!/bin/sh
+# Offline stand-in for xmvn5-resolve, used only while building ATL in the Flatpak
+# (no network there). Maps the three Maven coordinates ATL's jni_upcall_gen needs
+# to jars shipped by the jni-upcall-deps module.
+#   xmvn5-resolve COORD          -> path, rc 0 (unknown: rc 1)
+#   xmvn5-resolve -rc COORD...   -> paths joined with ':'
+J=${J:-/app/share/apk-starter-build/java}
+
+jar() {
+    case $1 in
+        org.ow2.asm:asm) echo "$J/asm.jar" ;;
+        org.ow2.asm:asm-tree) echo "$J/asm-tree.jar" ;;
+        gnu.getopt:java-getopt) echo "$J/java-getopt.jar" ;;
+        *) echo "xmvn5-resolve: unknown artifact $1" >&2; return 1 ;;
+    esac
+}
+
+if [ "${1:-}" = "-rc" ]; then
+    shift
+    cp=
+    for c in "$@"; do
+        p=$(jar "$c") || exit 1
+        cp=${cp:+$cp:}$p
+    done
+    echo "$cp"
+else
+    jar "${1:?usage: xmvn5-resolve [-rc] COORD...}"
+fi

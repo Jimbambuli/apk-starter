@@ -110,3 +110,39 @@ modules:
         url: https://gitlab.com/Jimbambuli/art_standalone.git
         branch: apk-starter
         commit: af71ebffe1fe2a1a77592aa976669dfec717eea5
+
+  # ATL's jni_upcall_gen resolves asm/asm-tree/java-getopt via xmvn5-resolve or
+  # a Maven download; the build has no network, so ship the jars and a stand-in.
+  - name: jni-upcall-deps
+    buildsystem: simple
+    build-commands:
+      - install -Dm644 -t /app/share/apk-starter-build/java asm.jar asm-tree.jar java-getopt.jar
+      - install -Dm755 xmvn5-resolve /app/bin/xmvn5-resolve
+    sources:
+      - type: file
+        url: https://repo1.maven.org/maven2/org/ow2/asm/asm/9.8/asm-9.8.jar
+        sha256: 876eab6a83daecad5ca67eb9fcabb063c97b5aeb8cf1fca7a989ecde17522051
+        dest-filename: asm.jar
+      - type: file
+        url: https://repo1.maven.org/maven2/org/ow2/asm/asm-tree/9.8/asm-tree-9.8.jar
+        sha256: 14b7880cb7c85eed101e2710432fc3ffb83275532a6a894dc4c4095d49ad59f1
+        dest-filename: asm-tree.jar
+      - type: file
+        url: https://repo1.maven.org/maven2/gnu/getopt/java-getopt/1.0.13/java-getopt-1.0.13.jar
+        sha256: f09dc6369ffc4fe4362cbd49b6ac6c4a7471375ac5d884c71b0a625a889c38c4
+        dest-filename: java-getopt.jar
+      - type: file
+        path: build-aux/xmvn5-resolve
+    cleanup:
+      - /share/apk-starter-build
+      - /bin/xmvn5-resolve
+
+  - name: android_translation_layer
+    buildsystem: meson
+    config-opts:
+      - -Ddownload_tool_deps=false
+    sources:
+      - type: git
+        url: https://gitlab.com/Jimbambuli/android_translation_layer.git
+        branch: apk-starter
+        commit: 9fb941275b1011c6ab47877beedc91210fa21f7e
