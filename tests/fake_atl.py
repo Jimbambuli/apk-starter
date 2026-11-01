@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Stand-in for android-translation-layer in tests. Mode from FAKE_ATL_MODE: exit:N | signal:N | noeol.
+"""Stand-in for android-translation-layer in tests. Mode from FAKE_ATL_MODE: exit:N | signal:N | noeol | sleep:S.
 FAKE_ATL_CHECK=PATH: records whether PATH existed when ATL started. With -agentpath:LIB=OUT,... it writes one
 exception line of atl-doctor's agent to OUT."""
 import json
@@ -28,6 +28,10 @@ if kind == "noeol":
     sys.exit(0)
 sys.stdout.write("fake atl output\n")
 sys.stdout.flush()
+if kind == "sleep":
+    import time
+    time.sleep(float(arg))
+    sys.exit(0)
 if kind == "signal":
     os.kill(os.getpid(), int(arg))
 sys.exit(int(arg or 0))

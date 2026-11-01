@@ -17,6 +17,7 @@ from .paths import Paths
 AGENT_PREFIX = "# atl-doctor-agent: "   # atl-doctor's log mode reads agent lines after this prefix
 AGENT_PATH_MAX = 480                    # the agent keeps paths in 512-byte buffers
 VERBOSE_LOG = {"ANDROID_LOG_TAGS": "*:v"}   # liblog: every Android log level for every tag
+TREE_AFTER_S = 10.0                     # Debug: one phase mark "running" then (view tree, memory) if the app still runs
 _NAME = re.compile(r"(?P<pkg>.+)-(?P<time>\d{8}-\d{6})(?P<log>\.log)?")
 
 
@@ -64,12 +65,27 @@ def record(paths: Paths, cmd: list[str], env: Mapping[str, str], out: Path) -> i
     except ImportError as e:
         raise StarterError(_("debug needs atl-doctor: {reason}").format(reason=e)) from None
     import signal
+    import threading
+    from atl_doctor.record_atl import send_mark
 
+    done = threading.Event()
+
+    def mark() -> None:
+        """atl-doctor asks for the view tree at a mark; without one a recording has none."""
+        if not done.wait(TREE_AFTER_S):
+            try:
+                send_mark(out, "running", timeout_s=2.0)
+            except (DoctorError, OSError):
+                pass                        # the app has ended meanwhile
+    marker = threading.Thread(target=mark, daemon=True)
+    marker.start()
     try:
         record_atl(record_options(paths, cmd, env, out))
         m = Capture.open(out).read_manifest()
     except DoctorError as e:
         raise StarterError(str(e)) from None
+    finally:
+        done.set()
     if m.signal:
         try:
             return 128 + signal.Signals[m.signal].value

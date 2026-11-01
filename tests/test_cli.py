@@ -409,3 +409,17 @@ def test_report_and_diag_usage_errors(box, capsys):
     assert main(["--report"], env=box.env) == 1
     assert main(["--report", "a", "b"], env=box.env) == 2
     assert main(["--report", "--list"], env=box.env) == 2
+
+
+def test_debug_asks_for_a_view_tree_while_the_app_runs(box, monkeypatch):
+    pytest.importorskip("atl_doctor")
+    make_apk(box.apk, manifest=axml_manifest(), files={"classes.dex": DEX})
+    prefix = Path(box.env["APK_STARTER_PREFIX"])
+    (prefix / "bin").mkdir()
+    (prefix / "bin/android-translation-layer").symlink_to(FAKE)
+    monkeypatch.setattr(dexopt, "FLATPAK_INFO", box.info)
+    from apk_starter import diag
+    monkeypatch.setattr(diag, "TREE_AFTER_S", 0.3)
+    assert main(["--debug", str(box.apk)], env={**box.env, "FAKE_ATL_MODE": "sleep:2"}) == 0
+    folder = next((box.data / "logs").glob(f"{PKG}-*"))
+    assert [l.split("\t")[3] for l in (folder / "marks.tsv").read_text().splitlines()] == ["start", "running"]
