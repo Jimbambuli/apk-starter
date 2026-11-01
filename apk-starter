@@ -1,0 +1,14 @@
+#!/usr/bin/python3
+"""Start Android apps (APK) with Android Translation Layer."""
+import os
+import sys
+
+HERE = os.path.dirname(os.path.realpath(__file__))
+for d in ("/app/share/apk-starter", os.path.join(HERE, "src")):
+    if os.path.isdir(os.path.join(d, "apk_starter")):
+        sys.path.insert(0, d)
+        break
+
+from apk_starter.cli import main  # noqa: E402
+
+sys.exit(main())
