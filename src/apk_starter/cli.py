@@ -19,6 +19,7 @@ from . import dexopt, diag, i18n
 from .launch import (DEFAULT_SIZE, build_command, build_env, cached_apk_info, parse_size, prepare_apk,
                      remember_size, remembered_size, sdk_for)
 from .paths import Paths
+from .settings import load_settings
 from .run import (default_log_path, header_fields, read_build_info, run_atl, runtime_name)
 
 VERSION = "0.1.0"
@@ -362,6 +363,8 @@ def _start(paths: Paths, args, level: str | None, into: Path | None, tail: list[
     else:
         size = remembered_size(paths, info.package) or DEFAULT_SIZE
     started = datetime.now().astimezone()
+    if level is None and load_settings(paths.settings()).app(info.package).log:
+        level = "log"                               # «Log» ticked for this app in the window: every start
     log_path = debug_dir = agent_out = None
     if level == "log":
         log_path = into or default_log_path(paths, info.package, started)

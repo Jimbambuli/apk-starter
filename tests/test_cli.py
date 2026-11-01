@@ -377,6 +377,16 @@ def test_log_level_loads_the_agent_and_keeps_its_output_in_the_log(box, capsys):
     assert "java.lang.IllegalStateException: boom" in out and "Exceptions" in out
 
 
+def test_remembered_log_applies_to_every_start_of_the_app(box):
+    """«Log» ticked in the window: also a start from the menu entry (`apk-starter PACKAGE`) writes a log."""
+    from apk_starter.paths import Paths
+    from apk_starter.settings import Settings, save_settings
+    assert main(["--install", str(box.apk)], env=box.env) == 0
+    save_settings(Paths.from_env(box.env).settings(), Settings().with_app(PKG, log=True))
+    assert main([PKG], env=box.env) == 0
+    assert len(list((box.data / "logs").glob(f"{PKG}-*.log"))) == 1
+
+
 def test_log_without_agent_is_a_plain_log(box):
     assert main(["--log", str(box.apk)], env=box.env) == 0
     assert not any(x.startswith("-agentpath") for x in json.loads(box.record.read_text())["argv"])

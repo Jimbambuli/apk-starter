@@ -92,8 +92,7 @@ def build_env(paths: Paths, pkg: str, base: Mapping[str, str]) -> dict[str, str]
     env["ANDROID_APP_DATA_DIR"] = str(data)
     env["ATL_UGLY_ENABLE_WEBVIEW"] = "1"
     env.pop("ATL_SYSTEM_TITLEBAR", None)
-    if load_settings(paths.settings()).system_titlebar:
-        env["ATL_SYSTEM_TITLEBAR"] = "1"        # the desktop's title bar, without ATL's back button
+    env["ATL_TITLEBAR"] = load_settings(paths.settings()).app(pkg).titlebar     # chosen in the window, per app
     art = f"{paths.prefix}/lib/art"
     old = base.get("LD_LIBRARY_PATH", "")
     env["LD_LIBRARY_PATH"] = f"{art}:{old}" if old else art

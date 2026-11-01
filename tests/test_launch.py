@@ -56,12 +56,13 @@ def test_command_and_env(tmp_path):
     assert env["LD_LIBRARY_PATH"] == f"{p.prefix}/lib/art:/x" and env["LANG"] == "de_CH.UTF-8"
     assert env["ANDROID_APP_DATA_DIR"] == str(p.data("org.example.demo")) and env["ATL_UGLY_ENABLE_WEBVIEW"] == "1"
     assert p.data("org.example.demo").is_dir()
-    assert "ATL_SYSTEM_TITLEBAR" not in env
+    assert "ATL_SYSTEM_TITLEBAR" not in env and env["ATL_TITLEBAR"] == "atl"
 
 
-def test_system_titlebar_setting_reaches_atl(tmp_path):
+def test_titlebar_of_the_app_reaches_atl(tmp_path):
     p = Paths(tmp_path / "d", tmp_path / "c", Path("/app"))
-    save_settings(p.settings(), Settings(system_titlebar=True))
-    assert build_env(p, "org.example.demo", {})["ATL_SYSTEM_TITLEBAR"] == "1"
-    save_settings(p.settings(), Settings(system_titlebar=False))
-    assert "ATL_SYSTEM_TITLEBAR" not in build_env(p, "org.example.demo", {"ATL_SYSTEM_TITLEBAR": "1"})
+    save_settings(p.settings(), Settings().with_app("org.a", titlebar="system").with_app("org.b", titlebar="system-navigation"))
+    assert build_env(p, "org.a", {})["ATL_TITLEBAR"] == "system"
+    assert build_env(p, "org.b", {})["ATL_TITLEBAR"] == "system-navigation"
+    env = build_env(p, "org.c", {"ATL_SYSTEM_TITLEBAR": "1", "ATL_TITLEBAR": "system"})
+    assert env["ATL_TITLEBAR"] == "atl" and "ATL_SYSTEM_TITLEBAR" not in env
