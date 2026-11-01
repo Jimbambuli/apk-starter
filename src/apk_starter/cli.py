@@ -1,6 +1,7 @@
 """Command line: start an APK, install/list/remove menu entries."""
 import argparse
 import contextlib
+import dataclasses
 import fcntl
 import json
 import os
@@ -115,23 +116,28 @@ def prepare_installed(paths: Paths, env: Mapping[str, str], info: ApkInfo, repor
     try:
         dexopt.ensure_runtime(paths, env, report)
         report(_("Preparing {app} for this computer…").format(app=info.label))
-        failed: list[Exception] = []
-        def natives() -> None:
-            try:
-                dexopt.extract_natives(paths, info.package, paths.apk(info.package))
-            except (StarterError, OSError) as e:
-                failed.append(e)
-        t = threading.Thread(target=natives)
-        t.start()
-        try:
-            dexopt.compile_app(paths, env, str(paths.apk(info.package)), dexopt.FULL)
-        finally:
-            t.join()
-        if failed:
-            raise failed[0]
+        _compile_and_unpack(paths, env, info.package, paths.apk(info.package), dexopt.FULL)
     except (StarterError, OSError) as e:
         warn(_("{app} could not be prepared in advance: {reason}").format(app=info.label,
                                                                             reason=describe_error(e)))
+
+
+def _compile_and_unpack(paths: Paths, env: Mapping[str, str], pkg: str, apk: Path, flt: str) -> None:
+    """dex2oat and unpacking the native libraries side by side (F181); raises the first failure."""
+    failed: list[Exception] = []
+    def natives() -> None:
+        try:
+            dexopt.extract_natives(paths, pkg, apk)
+        except (StarterError, OSError) as e:
+            failed.append(e)
+    t = threading.Thread(target=natives)
+    t.start()
+    try:
+        dexopt.compile_app(paths, env, str(apk), flt)
+    finally:
+        t.join()
+    if failed:
+        raise failed[0]
 
 
 def install_apk(paths: Paths, apk: Path, lang: str | None, env: Mapping[str, str] | None = None,
@@ -141,6 +147,8 @@ def install_apk(paths: Paths, apk: Path, lang: str | None, env: Mapping[str, str
     info = read_apk_info(apk, lang)
     with package_lock(paths, info.package):
         install_app(paths, info)
+        with contextlib.suppress(OSError):          # the first start then needs not parse the APK (F182)
+            cached_apk_info(paths, paths.apk(info.package), lang, lambda p, _l: dataclasses.replace(info, path=p))
         prepare_installed(paths, os.environ if env is None else env, info, report, warn)
         icon = info.icon
         if icon is None:
@@ -349,7 +357,7 @@ def _start(paths: Paths, args, log, tail: list[str], env: Mapping[str, str]) -> 
         remember_size(paths, info.package, size)
     header = header_fields(info, read_build_info(paths.build_info()), runtime_name(), cmd, started, VERSION) \
         if log_path else {}
-    later = _prepare_start(paths, env, str(apk_path))
+    later = _prepare_start(paths, env, info.package, apk_path)
     background = threading.Thread(target=_compile_later, args=(paths, env, later))
     background.start()
     try:
@@ -358,9 +366,11 @@ def _start(paths: Paths, args, log, tail: list[str], env: Mapping[str, str]) -> 
         background.join()       # the Flatpak instance (and every process in it) ends with this one
 
 
-def _prepare_start(paths: Paths, env: Mapping[str, str], location: str) -> list[str]:
+def _prepare_start(paths: Paths, env: Mapping[str, str], pkg: str, apk: Path) -> list[str]:
     """Before ATL: runtime if needed (e.g. after a Flatpak update), the app with QUICK if it has no current
-    code (direct start, F180). Returns the APKs to compile with FULL in the background while the app runs."""
+    code (direct start, F180), its native libraries meanwhile. Returns the APKs to compile with FULL in the
+    background while the app runs."""
+    location = str(apk)
     try:
         dexopt.ensure_runtime(paths, env, _stderr)
     except (StarterError, OSError) as e:
@@ -369,9 +379,9 @@ def _prepare_start(paths: Paths, env: Mapping[str, str], location: str) -> list[
     flt = dexopt.app_filter(paths, location)
     if flt is None:
         try:
-            dexopt.compile_app(paths, env, location, dexopt.QUICK)
+            _compile_and_unpack(paths, env, pkg, apk, dexopt.QUICK)
         except (StarterError, OSError):
-            pass                # ART compiles it at the start, as before
+            pass                # ART compiles it at the start and ATL unpacks, as before
     later = [] if flt == dexopt.FULL else [location]
     return later + [loc for loc in dexopt.stale_installed(paths) if loc != location]
 

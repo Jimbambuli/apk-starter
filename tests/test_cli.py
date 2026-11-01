@@ -328,3 +328,19 @@ def test_window_rebuild_prepares_runtime_and_every_stale_app(box):
     n = len(box.art())
     prepare_all(paths, box.env, msgs.append)
     assert len(box.art()) == n and len(msgs) == 2
+
+
+def test_install_fills_the_apk_details_cache(box, monkeypatch):
+    import apk_starter.cli as cli
+    assert main(["--install", str(box.apk)], env=box.env) == 0
+    seen = []
+    monkeypatch.setattr(cli, "read_apk_info", lambda p, lang=None: seen.append(p))
+    assert main([PKG], env=box.env) == 0
+    assert seen == []
+
+
+def test_direct_start_unpacks_native_libraries_before_atl(box):
+    apk = make_apk(box.tmp / "libs.apk", manifest=axml_manifest(), files={"lib/x86_64/libx.so": b"x"})
+    box.env["FAKE_ATL_CHECK"] = str(box.data / "data" / PKG / f"{PKG}.apk_" / "lib" / "libx.so")
+    assert main([str(apk)], env=box.env) == 0
+    assert json.loads(box.record.read_text())["check"]
