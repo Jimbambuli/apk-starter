@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.Jimbambuli.ApkStarter</id>
+  <name>APK Starter</name>
+  <summary>Run Android apps on the Linux desktop</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <developer id="io.github.jimbambuli">
+    <name>Jimbambuli</name>
+  </developer>
+  <description>
+    <p>
+      APK Starter runs a single Android app from its APK file on the Linux desktop. It is built on
+      Android Translation Layer (ATL) and translates the app's calls to GTK, Wayland and the usual
+      Linux libraries instead of running a full Android system.
+    </p>
+    <ul>
+      <li>Bring your own APK: open it, double-click it, or add it to the application menu.</li>
+      <li>Each app keeps its own data folder.</li>
+      <li>An optional log helps to find out why an app does not work.</li>
+    </ul>
+    <p>
+      No apps are included and no Google services are provided. Apps that need Google Play
+      services, Jetpack Compose, ARM-only native code, the camera, Bluetooth or telephony may not work.
+    </p>
+    <p>Android is a trademark of Google LLC.</p>
+  </description>
+  <launchable type="desktop-id">io.github.Jimbambuli.ApkStarter.desktop</launchable>
+  <url type="homepage">https://github.com/Jimbambuli/apk-starter</url>
+  <url type="bugtracker">https://github.com/Jimbambuli/apk-starter/issues</url>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://jimbambuli.github.io/apk-starter/screenshot.png</image>
+      <caption>A free text editor app started from its APK</caption>
+    </screenshot>
+  </screenshots>
+  <content_rating type="oars-1.1"/>
+  <releases>
+    <release version="0.1.0" date="2026-11-01"/>
+  </releases>
+</component>

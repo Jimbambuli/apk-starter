@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=APK Starter
+Comment=Run Android apps on the Linux desktop
+Exec=apk-starter %f
+Icon=io.github.Jimbambuli.ApkStarter
+Terminal=false
+Type=Application
+Categories=Utility;
+MimeType=application/vnd.android.package-archive;
+NoDisplay=false

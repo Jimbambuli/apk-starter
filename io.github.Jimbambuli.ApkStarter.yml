@@ -146,3 +146,26 @@ modules:
         url: https://gitlab.com/Jimbambuli/android_translation_layer.git
         branch: apk-starter
         commit: 9fb941275b1011c6ab47877beedc91210fa21f7e
+
+  - name: apk-starter
+    buildsystem: simple
+    build-commands:
+      - install -Dm755 apk-starter /app/bin/apk-starter
+      - mkdir -p /app/share/apk-starter
+      - cp -r src/apk_starter /app/share/apk-starter/apk_starter
+      - install -Dm644 data/build-info /app/share/apk-starter/build-info
+      - install -Dm644 $JAVA_HOME/lib/security/cacerts /app/share/apk-starter/cacerts
+      - install -Dm644 data/io.github.Jimbambuli.ApkStarter.desktop /app/share/applications/io.github.Jimbambuli.ApkStarter.desktop
+      - install -Dm644 data/io.github.Jimbambuli.ApkStarter.metainfo.xml /app/share/metainfo/io.github.Jimbambuli.ApkStarter.metainfo.xml
+      - install -Dm644 data/icons/io.github.Jimbambuli.ApkStarter.svg /app/share/icons/hicolor/scalable/apps/io.github.Jimbambuli.ApkStarter.svg
+    sources:
+      - type: dir
+        path: .
+        skip:
+          - .git
+          - .venv
+          - docs
+          - tests
+          - .github
+          - pages
+          - tools
