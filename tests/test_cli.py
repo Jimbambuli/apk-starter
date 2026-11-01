@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+import apk_starter
 from apk_starter.cli import main, split_log_option
 from apk_starter.errors import StarterError
 from apkgen import axml_manifest, make_apk
@@ -33,6 +34,7 @@ def box(tmp_path, monkeypatch):
     fake.uninstall_launcher = lambda pkg: calls.append(("uninstall", pkg))
     fake.choose_apk = lambda: pytest.fail("file chooser not expected")
     monkeypatch.setitem(sys.modules, "apk_starter.portal", fake)
+    monkeypatch.setattr(apk_starter, "portal", fake, raising=False)
     prefix = tmp_path / "prefix"
     (prefix / "share/icons/hicolor/scalable/apps").mkdir(parents=True)
     (prefix / "share/icons/hicolor/scalable/apps/io.github.Jimbambuli.ApkStarter.svg").write_bytes(DEFAULT_ICON)
