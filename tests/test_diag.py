@@ -134,7 +134,7 @@ def test_debug_options_for_the_recorder(tmp_path):
     cmd = ["android-translation-layer", "/c/launch/org.a.apk", "-w", "800", "--gapplication-app-id", "x"]
     opts = diag.record_options(p, cmd, {"ANDROID_APP_DATA_DIR": "/d"}, tmp_path / "rec")
     assert opts.apk == Path("/c/launch/org.a.apk") and opts.atl_args == cmd[2:] and opts.prefix == p.prefix
-    assert opts.env == {"ANDROID_APP_DATA_DIR": "/d", "ANDROID_LOG_TAGS": "*:v"} and opts.trace
+    assert opts.env == {"ANDROID_APP_DATA_DIR": "/d", "ANDROID_LOG_TAGS": "*:v [bionic_linker]:i"} and opts.trace
     assert opts.light  # attached agent, stub hits from ATL, sampling: the app keeps its speed
     assert opts.stub_list is None
     p.stub_list().parent.mkdir(parents=True)
@@ -145,3 +145,14 @@ def test_debug_options_for_the_recorder(tmp_path):
 def test_debug_dir_name(tmp_path):
     p = _paths(tmp_path)
     assert diag.default_debug_dir(p, "org.a", datetime(2026, 11, 1, 9, 5, 7)) == p.logs_dir() / "org.a-20261101-090507"
+
+
+def test_report_view_shows_the_time_line(tmp_path):
+    pytest.importorskip("atl_doctor")
+    r = diag.load_report(_log_with_agent(tmp_path))
+    r.extras["timeline"] = [{"phase": "start", "top": [{"thread": "main", "method": "org.ex.App.load", "ms": 250.0},
+                                                       {"thread": "pool-3-thread-1", "method": "a.B.c", "ms": 12.5}]}]
+    view = diag.report_view(r)
+    assert view[-1].title == "Time line"
+    assert view[-1].items[0].title == "start"
+    assert view[-1].items[0].details.splitlines() == ["250.0 ms  main  org.ex.App.load", "12.5 ms  pool-3-thread-1  a.B.c"]

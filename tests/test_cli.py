@@ -390,7 +390,7 @@ def test_debug_level_records_a_folder_for_atl_doctor(box, capsys):
     (prefix / "bin/android-translation-layer").symlink_to(FAKE)
     assert main(["--debug", str(box.apk)], env={**box.env, "FAKE_ATL_MODE": "exit:3"}) == 3
     rec = json.loads(box.record.read_text())
-    assert rec["log_tags"] == "*:v" and rec["data_dir"] == str(box.data / "data" / PKG)
+    assert rec["log_tags"] == "*:v [bionic_linker]:i" and rec["data_dir"] == str(box.data / "data" / PKG)
     assert rec["argv"][0] == str(box.tmp / "cache/apk-starter/launch" / f"{PKG}.apk")
     folder = next((box.data / "logs").glob(f"{PKG}-*"))
     m = json.loads((folder / "manifest.json").read_text())

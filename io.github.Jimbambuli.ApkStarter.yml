@@ -120,10 +120,10 @@ modules:
       - type: git
         url: https://gitlab.com/Jimbambuli/art_standalone.git
         branch: debug-leicht
-        commit: 7594b632a065a79ac92ee08ded28188f006be780
+        commit: 5da2b5987fafba445d244ae4c7d96b976a75d6f8
       - type: git
         url: https://github.com/Jimbambuli/atl-doctor.git
-        commit: cd637de705dd874936456b064b7fa22e1e44f7c5
+        commit: 2b4bf5052ad547f7e95777de9f24f8bd53bb4316
         dest: atl-doctor
 
   # ATL's jni_upcall_gen resolves asm/asm-tree/java-getopt via xmvn5-resolve or
@@ -181,7 +181,7 @@ modules:
     sources:
       - type: git
         url: https://github.com/Jimbambuli/atl-doctor.git
-        commit: cd637de705dd874936456b064b7fa22e1e44f7c5
+        commit: 2b4bf5052ad547f7e95777de9f24f8bd53bb4316
       - type: git
         url: https://gitlab.com/Jimbambuli/android_translation_layer.git
         commit: 5691360e394ef62942682e4d0ec9ef0003b74dca

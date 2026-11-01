@@ -17,7 +17,9 @@ from .paths import Paths
 
 AGENT_PREFIX = "# atl-doctor-agent: "   # atl-doctor's log mode reads agent lines after this prefix
 AGENT_PATH_MAX = 480                    # the agent keeps paths in 512-byte buffers
-VERBOSE_LOG = {"ANDROID_LOG_TAGS": "*:v"}   # liblog: every Android log level for every tag
+# liblog: every Android log level for every tag, but the bionic linker only from info on: its verbose/debug lines
+# (one per symbol it binds, ~550 000 for JW Library) made the start several times slower
+VERBOSE_LOG = {"ANDROID_LOG_TAGS": "*:v [bionic_linker]:i"}
 TREE_AFTER_S = 10.0                     # Debug: one phase mark "running" then (view tree, memory) if the app still runs
 _NAME = re.compile(r"(?P<pkg>.+)-(?P<time>\d{8}-\d{6})(?P<log>\.log)?")
 
@@ -227,4 +229,9 @@ def report_view(report) -> list[ReportSection]:
             view.append(ReportSection(title, items))
     if len(view) == 1:
         view.append(ReportSection("Findings", [ReportItem("No crash, ATL gap or exception was found.")]))
+    timeline = report.extras.get("timeline") or []     # Debug: busiest methods per phase (ART's sampling profiler)
+    if timeline:
+        view.append(ReportSection("Time line", [
+            ReportItem(p["phase"], "\n".join(f"{e['ms']:.1f} ms  {e['thread']}  {e['method']}" for e in p["top"]))
+            for p in timeline]))
     return view
