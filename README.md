@@ -86,13 +86,13 @@ Services, Jetpack Compose or ARM-only native libraries are not expected to work.
 
 Besides the display, sound, network and GPU, APK Starter reads – never writes – these parts of your system, to take
 over the desktop's GTK theme (`settings.ini` of GTK: theme, icons, cursor, font and the order of the window buttons;
-the theme's files; KDE's colour scheme and window buttons in `colors.css` and `window_decorations.css`), for its
-window and for the apps' title bars, and to follow a change of them at once:
+the theme's files; KDE's colour scheme in `colors.css`), for its window and for the apps' title bars, and to follow a
+change of them at once:
 
 - `--filesystem=host-os:ro`: the system's files under `/run/host` (read only) – the themes and icons in
   `/usr/share/themes` and `/usr/share/icons`;
 - `--filesystem=xdg-config/gtk-4.0:ro` and `--filesystem=xdg-config/gtk-3.0:ro`: your GTK settings (read only);
-  KDE Plasma keeps the images of the window buttons only in `gtk-3.0`.
+  those of GTK 3 count where there are none for GTK 4.
 
 Without them (e.g. `flatpak override --user --nofilesystem=host-os io.github.Jimbambuli.ApkStarter`) everything
 works with GTK's default theme in the desktop's light or dark variant.
