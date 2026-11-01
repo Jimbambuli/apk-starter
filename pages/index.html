@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>APK Starter</title>
+<link rel="icon" href="icon.svg">
+<style>
+:root{color-scheme:light dark;--bg:#fff;--fg:#1d1d1f;--mut:#5a5a62;--ac:#2a6fd6;--code:#f1f1f4}
+@media (prefers-color-scheme:dark){:root{--bg:#18181b;--fg:#e8e8ec;--mut:#a0a0aa;--ac:#7fb0ff;--code:#26262b}}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 system-ui,sans-serif}
+main{max-width:42rem;margin:0 auto;padding:2rem 16px 4rem}
+h1{display:flex;align-items:center;gap:.6rem}h1 img{width:48px;height:48px}
+a{color:var(--ac)}pre{background:var(--code);padding:.8rem 1rem;overflow-x:auto;border-radius:6px}
+img.shot{max-width:100%;height:auto;border-radius:6px}.mut{color:var(--mut)}
+</style>
+</head>
+<body>
+<main>
+<h1><img src="icon.svg" alt="">APK Starter</h1>
+<p>Run Android apps on the Linux desktop. APK Starter wraps
+<a href="https://gitlab.com/android_translation_layer/android_translation_layer">Android Translation Layer</a>
+in a Flatpak, reads name and icon from the APK and can put the app into your application menu.</p>
+<img class="shot" src="screenshot.png" alt="A free Android text editor running in an APK Starter window" width="1200" height="850">
+<p class="mut">Screenshot: Editor by billthefarmer (GPL-3.0).</p>
+<h2>Install</h2>
+<pre>flatpak install --user https://jimbambuli.github.io/apk-starter/io.github.Jimbambuli.ApkStarter.flatpakref</pre>
+<p>Or add the repository first:
+<a href="apk-starter.flatpakrepo">apk-starter.flatpakrepo</a>,
+then <code>flatpak install apk-starter io.github.Jimbambuli.ApkStarter</code>.
+The repository is signed; the public key is <a href="apk-starter.gpg">apk-starter.gpg</a>.</p>
+<h2>Use</h2>
+<pre>flatpak run --file-forwarding io.github.Jimbambuli.ApkStarter @@ app.apk @@</pre>
+<p>Details, options and the shell alias are in the
+<a href="https://github.com/Jimbambuli/apk-starter#readme">README</a>.</p>
+<p class="mut">Source: <a href="https://github.com/Jimbambuli/apk-starter">github.com/Jimbambuli/apk-starter</a>, GPL-3.0-or-later.</p>
+</main>
+</body>
+</html>

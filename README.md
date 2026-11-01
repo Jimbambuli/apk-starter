@@ -3,16 +3,39 @@
 Run Android apps (APK files) on the Linux desktop – a Flatpak built on
 [Android Translation Layer (ATL)](https://gitlab.com/android_translation_layer/android_translation_layer).
 
+## Install
+
 ```
-apk-starter app.apk            # start an app
-apk-starter --install app.apk  # add it to the application menu
-apk-starter --log app.apk      # optional log (readable by atl-doctor)
+flatpak install --user https://jimbambuli.github.io/apk-starter/io.github.Jimbambuli.ApkStarter.flatpakref
 ```
+
+The repository is signed (key: [pages/apk-starter.gpg](pages/apk-starter.gpg)). Flatpak exports only the app ID as a
+command, so for a short command on the host add an alias:
+
+```
+alias apk-starter='flatpak run --file-forwarding io.github.Jimbambuli.ApkStarter'
+```
+
+## Use
+
+```
+apk-starter @@ app.apk @@            # start an app (@@ lets Flatpak pass the file into the sandbox)
+apk-starter --install @@ app.apk @@  # add it to the application menu (asks via the desktop portal)
+apk-starter --list                   # installed apps
+apk-starter --remove PACKAGE [--purge]
+apk-starter --log @@ app.apk @@      # write a log that atl-doctor can read
+```
+
+Without the alias use `flatpak run --file-forwarding io.github.Jimbambuli.ApkStarter …` instead of `apk-starter`.
+Double-clicking an APK in the file manager and starting an installed app from the menu work without any command.
+
+Data lives under `~/.var/app/io.github.Jimbambuli.ApkStarter/data/`: `apps/` (installed APKs), `data/<package>/`
+(app data), `logs/` (logs from `--log`).
 
 Bring your own APK – this project ships ATL and its free dependencies only, no apps. Apps that need Google Play
 Services, Jetpack Compose or ARM-only native libraries are not expected to work.
 
-**Status:** design phase, no code yet.
+**Status:** pre-release, not yet published.
 
 License: GPL-3.0-or-later (same as ATL), see [LICENSE](LICENSE). Not affiliated with Google; Android is a trademark
 of Google LLC.
