@@ -6,7 +6,7 @@ MANIFEST = ROOT / "io.github.Jimbambuli.ApkStarter.yml"
 
 
 def manifest_commits() -> dict[str, str]:
-    """Module name -> pinned commit of its git source (regex, no YAML library)."""
+    """Module name -> pinned commit of its (first) git source (regex, no YAML library)."""
     pins: dict[str, str] = {}
     module = None
     for line in MANIFEST.read_text(encoding="utf-8").splitlines():
@@ -15,7 +15,7 @@ def manifest_commits() -> dict[str, str]:
             module = m.group(1)
         m = re.match(r"\s*commit: (\S+)", line)
         if m and module is not None:
-            pins[module] = m.group(1)
+            pins.setdefault(module, m.group(1))
     return pins
 
 
@@ -50,6 +50,6 @@ def test_atl_doctor_pinned_with_the_same_atl_source():
     bi = dict(l.split("=", 1) for l in (ROOT / "data/build-info").read_text().split())
     text = MANIFEST.read_text(encoding="utf-8")
     module = text[text.index("- name: atl-doctor"):text.index("- name: apk-starter")]
-    doctor = re.search(r"url: https://github.com/Jimbambuli/atl-doctor.git\n\s+commit: ([0-9a-f]{40})\n", module)
-    assert doctor and bi["atl_doctor_commit"] == doctor.group(1)
-    assert pins["atl-doctor"] == pins["android_translation_layer"] and "libopenjdkjvmti.so" in text
+    assert bi["atl_doctor_commit"] == pins["atl-doctor"] and pins["android_translation_layer"] in module
+    art = text[text.index("- name: art_standalone"):text.index("- name: jni-upcall-deps")]
+    assert f"commit: {pins['atl-doctor']}" in art and "libopenjdkjvmti.so" in art   # JVMTI plugin, same atl-doctor

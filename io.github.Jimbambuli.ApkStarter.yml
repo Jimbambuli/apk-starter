@@ -106,14 +106,20 @@ modules:
     build-commands:
       - make -j$FLATPAK_BUILDER_N_JOBS ____PREFIX=/app ____LIBDIR=lib
       - make ____PREFIX=/app ____LIBDIR=lib install
-      # ART's JVMTI plugin (not in ____art_all): loaded only for «Start with log/debug» (atl-doctor's agent).
-      - make -j$FLATPAK_BUILDER_N_JOBS ____PREFIX=/app ____LIBDIR=lib libopenjdkjvmti
-      - install -Dm755 out/host/linux-x86/lib64/libopenjdkjvmti.so /app/lib/art/libopenjdkjvmti.so
+      # ART's JVMTI plugin (not in ____art_all, its make target lacks include paths): built with atl-doctor's
+      # script and template fix (needed with GCC 14 and 16); loaded only for «Start with log/debug».
+      - patch -p0 < atl-doctor/tools/openjdkjvmti-gcc14.diff
+      - J=$FLATPAK_BUILDER_N_JOBS bash atl-doctor/tools/build-jvmti-plugin.sh . /app
+      - install -Dm755 jvmti-out/libopenjdkjvmti.so /app/lib/art/libopenjdkjvmti.so
     sources:
       - type: git
         url: https://gitlab.com/Jimbambuli/art_standalone.git
         branch: apk-starter
         commit: af71ebffe1fe2a1a77592aa976669dfec717eea5
+      - type: git
+        url: https://github.com/Jimbambuli/atl-doctor.git
+        commit: 0a4a9bd5960201a30ba9f169b4755e467a42e26c
+        dest: atl-doctor
 
   # ATL's jni_upcall_gen resolves asm/asm-tree/java-getopt via xmvn5-resolve or
   # a Maven download; the build has no network, so ship the jars and a stand-in.
@@ -170,7 +176,7 @@ modules:
     sources:
       - type: git
         url: https://github.com/Jimbambuli/atl-doctor.git
-        commit: 73d5e292b69da61fde83dafbe2400bfe471686a2
+        commit: 0a4a9bd5960201a30ba9f169b4755e467a42e26c
       - type: git
         url: https://gitlab.com/Jimbambuli/android_translation_layer.git
         commit: 184cc9a6d4769023f32214741ced4cd749603850
