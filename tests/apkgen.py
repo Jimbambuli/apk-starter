@@ -186,3 +186,27 @@ def arsc_table(package: str, res: list[Res], *, utf8=True, mode: str = "dense") 
     gpool = string_pool(values, utf8)
     table = struct.pack("<HHII", 0x0002, 12, 12 + len(gpool) + len(pkg), 1) + gpool + pkg
     return table, ids
+
+
+# ---------------------------------------------------------------- PNG / APK
+import zlib  # noqa: E402
+import zipfile  # noqa: E402
+from pathlib import Path  # noqa: E402
+
+
+def png_bytes(w: int, h: int) -> bytes:
+    def chunk(tag: bytes, body: bytes) -> bytes:
+        return struct.pack(">I", len(body)) + tag + body + struct.pack(">I", zlib.crc32(tag + body))
+    raw = b"".join(b"\0" + b"\x20\x40\x80\xff" * w for _ in range(h))
+    return (b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", w, h, 8, 6, 0, 0, 0))
+            + chunk(b"IDAT", zlib.compress(raw)) + chunk(b"IEND", b""))
+
+
+def make_apk(path: Path, *, manifest: bytes, arsc: bytes | None = None, files: dict | None = None) -> Path:
+    with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
+        z.writestr("AndroidManifest.xml", manifest)
+        if arsc is not None:
+            z.writestr("resources.arsc", arsc)
+        for name, data in (files or {}).items():
+            z.writestr(name, data)
+    return path
