@@ -79,6 +79,7 @@ def test_start_passes_args_and_remembers_size(box):
     a = rec["argv"]
     assert a[a.index("-w") + 1] == "800" and a[a.index("-h") + 1] == "600"
     assert a[a.index("--sdk-int") + 1] == "34" and a[-2:] == ["-X", "-v"]
+    assert a[a.index("--gapplication-app-id") + 1] == f"io.github.Jimbambuli.ApkStarter.{PKG}"
     assert rec["data_dir"] == str(box.data / "data" / PKG)
     assert main([str(box.apk)], env=box.env) == 0
     a = json.loads(box.record.read_text())["argv"]

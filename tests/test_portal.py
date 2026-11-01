@@ -9,7 +9,7 @@ Name=Demo
 Exec=apk-starter org.x.y
 Terminal=false
 Categories=Utility;
-StartupWMClass=org.x.y
+StartupWMClass=io.github.Jimbambuli.ApkStarter.org.x.y
 X-ApkStarter-Package=org.x.y
 """
 

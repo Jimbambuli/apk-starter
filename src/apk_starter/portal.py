@@ -38,7 +38,7 @@ def desktop_entry(pkg: str, label: str) -> str:
         f"Exec=apk-starter {pkg}\n"
         "Terminal=false\n"
         "Categories=Utility;\n"
-        f"StartupWMClass={pkg}\n"
+        f"StartupWMClass={APP_ID}.{pkg}\n"
         f"X-ApkStarter-Package={pkg}\n"
     )
 

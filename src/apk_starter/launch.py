@@ -71,10 +71,12 @@ def prepare_apk(paths: Paths, info: ApkInfo) -> Path:
 
 
 def build_command(paths: Paths, apk_path: Path, *, size: tuple[int, int], sdk: int | None,
-                  atl_args: list[str]) -> list[str]:
+                  atl_args: list[str], app_id: str) -> list[str]:
     cmd = [ATL_BIN, str(apk_path), "-w", str(size[0]), "-h", str(size[1])]
     if sdk is not None:
         cmd += ["--sdk-int", str(sdk)]
+    # Window app ID = menu entry ID: KWin only accepts IDs prefixed with the Flatpak ID.
+    cmd += ["--gapplication-app-id", app_id]
     cmd += ["-X", f"-Djavax.net.ssl.trustStore={paths.cacerts()}"]
     return cmd + atl_args
 

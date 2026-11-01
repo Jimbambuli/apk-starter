@@ -227,7 +227,8 @@ def _start(paths: Paths, args, log, tail: list[str], env: Mapping[str, str]) -> 
     elif log:
         log_path = log
     apk_path = prepare_apk(paths, info)
-    cmd = build_command(paths, apk_path, size=size, sdk=sdk_for(info, args.sdk), atl_args=atl_args)
+    cmd = build_command(paths, apk_path, size=size, sdk=sdk_for(info, args.sdk), atl_args=atl_args,
+                        app_id=f"{APP_ID}.{info.package}")
     child_env = build_env(paths, info.package, env)
     if args.size:
         remember_size(paths, info.package, size)

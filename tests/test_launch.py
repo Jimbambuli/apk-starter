@@ -46,8 +46,10 @@ def test_same_package_same_data_dir_regardless_of_filename(tmp_path):
 
 def test_command_and_env(tmp_path):
     p = Paths(tmp_path / "d", tmp_path / "c", Path("/app"))
-    cmd = build_command(p, Path("/a/org.example.demo.apk"), size=(1200, 850), sdk=34, atl_args=["-X", "-verbose:jni"])
+    cmd = build_command(p, Path("/a/org.example.demo.apk"), size=(1200, 850), sdk=34, atl_args=["-X", "-verbose:jni"],
+                        app_id="io.github.Jimbambuli.ApkStarter.org.example.demo")
     assert cmd == ["android-translation-layer", "/a/org.example.demo.apk", "-w", "1200", "-h", "850", "--sdk-int", "34",
+                   "--gapplication-app-id", "io.github.Jimbambuli.ApkStarter.org.example.demo",
                    "-X", f"-Djavax.net.ssl.trustStore={p.prefix}/share/apk-starter/cacerts", "-X", "-verbose:jni"]
     env = build_env(p, "org.example.demo", {"LD_LIBRARY_PATH": "/x", "LANG": "de_CH.UTF-8"})
     assert env["LD_LIBRARY_PATH"] == f"{p.prefix}/lib/art:/x" and env["LANG"] == "de_CH.UTF-8"
