@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 14:45+0000\n"
+"POT-Creation-Date: 2026-11-01 15:45+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -214,7 +214,9 @@ msgstr ""
 msgid ""
 "record the app for atl-doctor: method trace, view trees, verbose log; much "
 "slower (default: logs/<package>-<time>/); use --debug=DIR"
-msgstr "为 atl-doctor 录制应用：方法跟踪、视图树、详细日志；会明显变慢（默认：logs/<package>-<time>/）；使用 --debug=文件夹"
+msgstr ""
+"为 atl-doctor 录制应用：方法跟踪、视图树、详细日志；会明显变慢（默认：logs/"
+"<package>-<time>/）；使用 --debug=文件夹"
 
 #: src/apk_starter/cli.py:270
 msgid "override the SDK level passed to ATL"
@@ -260,7 +262,9 @@ msgstr "显示版本并退出"
 msgid ""
 "--install, --list, --remove, --remove-all, --report and --version take no "
 "other arguments"
-msgstr "--install、--list、--remove、--remove-all、--report 和 --version 不接受其他参数"
+msgstr ""
+"--install、--list、--remove、--remove-all、--report 和 --version 不接受其他参"
+"数"
 
 #: src/apk_starter/cli.py:318
 msgid "--purge only works with --remove or --remove-all"
@@ -274,12 +278,12 @@ msgstr "未指定 APK，且没有可用于显示窗口的显示器"
 msgid "no APK given"
 msgstr "未指定 APK"
 
-#: src/apk_starter/cli.py:401 src/apk_starter/cli.py:419
+#: src/apk_starter/cli.py:404 src/apk_starter/cli.py:422
 #, python-brace-format
 msgid "the Android runtime could not be prepared in advance: {reason}"
 msgstr "无法提前准备 Android 运行时：{reason}"
 
-#: src/apk_starter/cli.py:423
+#: src/apk_starter/cli.py:426
 msgid "Preparing apps for this computer…"
 msgstr "正在为此计算机准备应用…"
 
@@ -292,31 +296,31 @@ msgstr "无法运行 {program}：{reason}"
 msgid "Preparing the Android runtime for this computer…"
 msgstr "正在为此计算机准备 Android 运行时…"
 
-#: src/apk_starter/diag.py:65
+#: src/apk_starter/diag.py:66
 #, python-brace-format
 msgid "debug needs atl-doctor: {reason}"
 msgstr "调试需要 atl-doctor：{reason}"
 
-#: src/apk_starter/diag.py:119
+#: src/apk_starter/diag.py:135
 #, python-brace-format
 msgid "no such recording: {file}"
 msgstr "没有这个录制：{file}"
 
-#: src/apk_starter/diag.py:123
+#: src/apk_starter/diag.py:139
 #, python-brace-format
 msgid "no recording of {package}; start it with --log or --debug"
 msgstr "没有 {package} 的录制；请用 --log 或 --debug 启动"
 
-#: src/apk_starter/diag.py:124
+#: src/apk_starter/diag.py:140
 msgid "no recordings yet; start an app with --log or --debug"
 msgstr "还没有录制；请用 --log 或 --debug 启动应用"
 
-#: src/apk_starter/diag.py:134
+#: src/apk_starter/diag.py:150
 #, python-brace-format
 msgid "the report needs atl-doctor: {reason}"
 msgstr "报告需要 atl-doctor：{reason}"
 
-#: src/apk_starter/diag.py:140
+#: src/apk_starter/diag.py:156
 #, python-brace-format
 msgid "cannot read the recording {file}: {reason}"
 msgstr "无法读取录制 {file}：{reason}"
@@ -326,233 +330,314 @@ msgstr "无法读取录制 {file}：{reason}"
 msgid "unexpected error: {error}"
 msgstr "意外错误：{error}"
 
-#: src/apk_starter/gui.py:24
+#: src/apk_starter/gui.py:25
 #, python-brace-format
-msgid "the window needs GTK 4 and libadwaita: {reason}"
-msgstr "窗口需要 GTK 4 和 libadwaita：{reason}"
+msgid "the window needs GTK 4: {reason}"
+msgstr "窗口需要 GTK 4：{reason}"
 
-#: src/apk_starter/gui.py:39
+#: src/apk_starter/gui.py:52
+msgid "never"
+msgstr "从未"
+
+#: src/apk_starter/gui.py:130
+msgid "Search apps"
+msgstr "搜索应用"
+
+#: src/apk_starter/gui.py:135
+msgid "Name"
+msgstr "名称"
+
+#: src/apk_starter/gui.py:135 src/apk_starter/gui.py:480
+msgid "Last started"
+msgstr "最近启动"
+
+#: src/apk_starter/gui.py:135
+msgid "Last installed"
+msgstr "最近安装"
+
+#: src/apk_starter/gui.py:136
+msgid "Data size"
+msgstr "数据大小"
+
+#: src/apk_starter/gui.py:139
+msgid "Sort"
+msgstr "排序"
+
+#: src/apk_starter/gui.py:140
 msgid "Install APK…"
 msgstr "安装 APK…"
 
-#: src/apk_starter/gui.py:39
-msgid "Choose an APK file and add it to the menu"
-msgstr "选择 APK 文件并添加到菜单"
-
-#: src/apk_starter/gui.py:44
+#: src/apk_starter/gui.py:142
 msgid "Working…"
 msgstr "正在处理…"
 
-#: src/apk_starter/gui.py:51
+#: src/apk_starter/gui.py:150
+msgid "No app matches."
+msgstr "没有匹配的应用。"
+
+#: src/apk_starter/gui.py:158
+msgid "Back"
+msgstr "返回"
+
+#: src/apk_starter/gui.py:197
+msgid "Drop the APK to install it"
+msgstr "松开以安装 APK"
+
+#: src/apk_starter/gui.py:242
 msgid "No apps installed"
 msgstr "尚未安装应用"
 
-#: src/apk_starter/gui.py:52
-msgid "Install an APK or drop one here."
-msgstr "安装 APK，或将其拖放到此处。"
+#: src/apk_starter/gui.py:243
+msgid "Drag an APK here or choose one."
+msgstr "将 APK 拖到这里或选择一个。"
 
-#: src/apk_starter/gui.py:89
+#: src/apk_starter/gui.py:245
+msgid "Choose APK…"
+msgstr "选择 APK…"
+
+#: src/apk_starter/gui.py:269
 msgid "Close"
 msgstr "关闭"
 
-#: src/apk_starter/gui.py:134
+#: src/apk_starter/gui.py:355
 msgid "Cannot read the app list"
 msgstr "无法读取应用列表"
 
-#: src/apk_starter/gui.py:145
-#, python-brace-format
-msgid "data {size}"
-msgstr "数据 {size}"
-
-#: src/apk_starter/gui.py:145
-msgid "no data"
-msgstr "无数据"
-
-#: src/apk_starter/gui.py:157
+#: src/apk_starter/gui.py:461
 msgid "Start"
 msgstr "启动"
 
-#: src/apk_starter/gui.py:159
+#: src/apk_starter/gui.py:466
 msgid "Start with log"
 msgstr "带日志启动"
 
-#: src/apk_starter/gui.py:159
+#: src/apk_starter/gui.py:466
 msgid "Start with debug"
 msgstr "带调试启动"
 
-#: src/apk_starter/gui.py:160
-msgid "Show report"
-msgstr "显示报告"
+#: src/apk_starter/gui.py:471
+msgid "Debug runs much slower; use it for error reports."
+msgstr "调试模式会慢很多；用于错误报告。"
 
-#: src/apk_starter/gui.py:160
+#: src/apk_starter/gui.py:477
+msgid "Version"
+msgstr "版本"
+
+#: src/apk_starter/gui.py:478
+msgid "Target SDK"
+msgstr "目标 SDK"
+
+#: src/apk_starter/gui.py:479
+msgid "Installed"
+msgstr "安装时间"
+
+#: src/apk_starter/gui.py:481
+msgid "Data"
+msgstr "数据"
+
+#: src/apk_starter/gui.py:481
+msgid "no data"
+msgstr "无数据"
+
+#: src/apk_starter/gui.py:482
+msgid "Status"
+msgstr "状态"
+
+#: src/apk_starter/gui.py:482
+msgid "Prepared for this computer"
+msgstr "已为本机准备"
+
+#: src/apk_starter/gui.py:483
+msgid "Not prepared yet (done at the next start)"
+msgstr "尚未准备（下次启动时完成）"
+
+#: src/apk_starter/gui.py:490
+msgid "Recordings"
+msgstr "记录"
+
+#: src/apk_starter/gui.py:491
 msgid "Open log folder"
 msgstr "打开日志文件夹"
 
-#: src/apk_starter/gui.py:161
+#: src/apk_starter/gui.py:497 src/apk_starter/gui.py:650
+msgid "Log"
+msgstr "日志"
+
+#: src/apk_starter/gui.py:497 src/apk_starter/gui.py:650
+msgid "Debug"
+msgstr "调试"
+
+#: src/apk_starter/gui.py:501
+msgid "Show report"
+msgstr "显示报告"
+
+#: src/apk_starter/gui.py:503 src/apk_starter/gui.py:655
+msgid "Save Report…"
+msgstr "保存报告…"
+
+#: src/apk_starter/gui.py:509
+msgid "None yet. Start the app with log or with debug to record one."
+msgstr "还没有。使用日志或调试模式启动应用即可记录。"
+
+#: src/apk_starter/gui.py:514
 msgid "Delete data…"
 msgstr "删除数据…"
 
-#: src/apk_starter/gui.py:161
+#: src/apk_starter/gui.py:515
 msgid "Uninstall…"
 msgstr "卸载…"
 
-#: src/apk_starter/gui.py:166
-msgid "More"
-msgstr "更多"
-
-#: src/apk_starter/gui.py:178
+#: src/apk_starter/gui.py:526
 #, python-brace-format
 msgid "Cannot start {app}"
 msgstr "无法启动 {app}"
 
-#: src/apk_starter/gui.py:183
+#: src/apk_starter/gui.py:531
 msgid "Look at “Show report”."
 msgstr "请查看“显示报告”。"
 
-#: src/apk_starter/gui.py:183
+#: src/apk_starter/gui.py:531
 msgid "Try “Start with log”, then “Show report”."
 msgstr "请尝试“带日志启动”，然后“显示报告”。"
 
-#: src/apk_starter/gui.py:185
+#: src/apk_starter/gui.py:533
 #, python-brace-format
 msgid "{app} ended with exit code {code}"
 msgstr "{app} 已退出，退出代码为 {code}"
 
-#: src/apk_starter/gui.py:187
+#: src/apk_starter/gui.py:535
 #, python-brace-format
 msgid "{app} was killed by signal {signal}"
 msgstr "{app} 被信号 {signal} 终止"
 
-#: src/apk_starter/gui.py:190
+#: src/apk_starter/gui.py:540
 #, python-brace-format
 msgid "{app} starts with a log"
 msgstr "{app} 正在带日志启动"
 
-#: src/apk_starter/gui.py:192
+#: src/apk_starter/gui.py:542
 #, python-brace-format
 msgid "{app} starts with debug; it runs much slower"
 msgstr "{app} 以调试模式启动；运行会明显变慢"
 
-#: src/apk_starter/gui.py:203 src/apk_starter/gui.py:211
+#: src/apk_starter/gui.py:544
+#, python-brace-format
+msgid "{app} starts"
+msgstr "正在启动 {app}"
+
+#: src/apk_starter/gui.py:556 src/apk_starter/gui.py:564
 msgid "Cannot open the log folder"
 msgstr "无法打开日志文件夹"
 
-#: src/apk_starter/gui.py:215
+#: src/apk_starter/gui.py:568
 msgid "Android apps"
 msgstr "Android 应用"
 
-#: src/apk_starter/gui.py:220
+#: src/apk_starter/gui.py:573
 msgid "Install APK"
 msgstr "安装 APK"
 
-#: src/apk_starter/gui.py:242 src/apk_starter/gui.py:244
+#: src/apk_starter/gui.py:599 src/apk_starter/gui.py:601
 #, python-brace-format
 msgid "{app} installed"
 msgstr "已安装 {app}"
 
-#: src/apk_starter/gui.py:246
+#: src/apk_starter/gui.py:602
+#, python-brace-format
+msgid "Installing {file}…"
+msgstr "正在安装 {file}…"
+
+#: src/apk_starter/gui.py:604
 #, python-brace-format
 msgid "Cannot install {file}"
 msgstr "无法安装 {file}"
 
-#: src/apk_starter/gui.py:251
+#: src/apk_starter/gui.py:608
 msgid "Cancel"
 msgstr "取消"
 
-#: src/apk_starter/gui.py:263
+#: src/apk_starter/gui.py:613
 #, python-brace-format
 msgid "Delete the data of {app}?"
 msgstr "删除 {app} 的数据？"
 
-#: src/apk_starter/gui.py:264
+#: src/apk_starter/gui.py:614
 msgid ""
 "The app stays installed. Its settings, accounts and files are deleted. Close "
 "the app first."
 msgstr "应用将保持安装。其设置、账户和文件将被删除。请先关闭应用。"
 
-#: src/apk_starter/gui.py:265
+#: src/apk_starter/gui.py:615
 msgid "Delete Data"
 msgstr "删除数据"
 
-#: src/apk_starter/gui.py:267
+#: src/apk_starter/gui.py:617
 #, python-brace-format
 msgid "Data of {app} deleted"
 msgstr "已删除 {app} 的数据"
 
-#: src/apk_starter/gui.py:268
+#: src/apk_starter/gui.py:618
 #, python-brace-format
 msgid "Cannot delete the data of {app}"
 msgstr "无法删除 {app} 的数据"
 
-#: src/apk_starter/gui.py:272
+#: src/apk_starter/gui.py:622
 msgid "Also delete app data"
 msgstr "同时删除应用数据"
 
-#: src/apk_starter/gui.py:275 src/apk_starter/gui.py:277
+#: src/apk_starter/gui.py:629 src/apk_starter/gui.py:631
 #, python-brace-format
 msgid "{app} uninstalled"
 msgstr "已卸载 {app}"
 
-#: src/apk_starter/gui.py:278
+#: src/apk_starter/gui.py:632
 #, python-brace-format
 msgid "Uninstall {app}?"
 msgstr "卸载 {app}？"
 
-#: src/apk_starter/gui.py:279
+#: src/apk_starter/gui.py:633
 msgid "The app and its menu entry are removed. Close the app first."
 msgstr "应用及其菜单项将被删除。请先关闭应用。"
 
-#: src/apk_starter/gui.py:279
+#: src/apk_starter/gui.py:633
 msgid "Uninstall"
 msgstr "卸载"
 
-#: src/apk_starter/gui.py:281
+#: src/apk_starter/gui.py:635
 #, python-brace-format
 msgid "Cannot uninstall {app}"
 msgstr "无法卸载 {app}"
 
-#: src/apk_starter/gui.py:289
+#: src/apk_starter/gui.py:643
 #, python-brace-format
 msgid "Report: {app}"
 msgstr "报告：{app}"
 
-#: src/apk_starter/gui.py:295
-msgid "Save Report…"
-msgstr "保存报告…"
-
-#: src/apk_starter/gui.py:298
-msgid "Log"
-msgstr "日志"
-
-#: src/apk_starter/gui.py:298
-msgid "Debug"
-msgstr "调试"
-
-#: src/apk_starter/gui.py:301
+#: src/apk_starter/gui.py:653
 msgid "Recording"
 msgstr "录制"
 
-#: src/apk_starter/gui.py:310
+#: src/apk_starter/gui.py:666
 msgid "No recordings"
 msgstr "没有录制"
 
-#: src/apk_starter/gui.py:311
+#: src/apk_starter/gui.py:667
 msgid "Start the app with log or with debug first."
 msgstr "请先带日志或带调试启动应用。"
 
-#: src/apk_starter/gui.py:339
+#: src/apk_starter/gui.py:705
 msgid "Cannot read the report"
 msgstr "无法读取报告"
 
-#: src/apk_starter/gui.py:363
+#: src/apk_starter/gui.py:734
 msgid "Save Report"
 msgstr "保存报告"
 
-#: src/apk_starter/gui.py:379
+#: src/apk_starter/gui.py:750
 msgid "Cannot save the report"
 msgstr "无法保存报告"
 
-#: src/apk_starter/gui.py:381
+#: src/apk_starter/gui.py:752
 msgid "Report saved"
 msgstr "报告已保存"
 
@@ -645,15 +730,3 @@ msgstr "无法启动 android-translation-layer：{reason}"
 #, python-brace-format
 msgid "android-translation-layer was killed by {signal}"
 msgstr "android-translation-layer 被 {signal} 终止"
-
-#~ msgid ""
-#~ "--install, --list, --remove, --remove-all and --version take no other "
-#~ "arguments"
-#~ msgstr ""
-#~ "--install、--list、--remove、--remove-all 和 --version 不接受其他参数"
-
-#~ msgid "See the log folder."
-#~ msgstr "请查看日志文件夹。"
-
-#~ msgid "Try “Start with log” and look at the log."
-#~ msgstr "请尝试“带日志启动”，然后查看日志。"

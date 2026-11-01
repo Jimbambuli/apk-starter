@@ -10,8 +10,7 @@ from pathlib import Path
 import gi
 
 gi.require_version("Gtk", "4.0")
-gi.require_version("Adw", "1")
-from gi.repository import Adw, Gio, GLib, Gtk  # noqa: E402
+from gi.repository import Gio, GLib, Gtk  # noqa: E402
 
 from apk_starter import gui  # noqa: E402
 from apk_starter.paths import Paths  # noqa: E402
@@ -42,23 +41,16 @@ def wait(cond, then, tries=200) -> None:
 
 
 def shown(d) -> list:
-    """Section titles and their row titles."""
+    """Section titles and their item titles."""
     out = []
     group = d.sections.get_first_child()
     while group is not None:
-        rows = []
-        row = group.get_first_child()
-
-        def walk(w):
-            if isinstance(w, Adw.PreferencesRow):
-                rows.append(w.get_title())
-                return
-            c = w.get_first_child()
-            while c is not None:
-                walk(c)
-                c = c.get_next_sibling()
-        walk(row)
-        out.append([group.get_title(), rows])
+        items = group.get_last_child()
+        rows, row = [], items.get_first_child()
+        while row is not None:
+            rows.append(row.title)
+            row = row.get_next_sibling()
+        out.append([group.title, rows])
         group = group.get_next_sibling()
     return out
 
@@ -69,7 +61,7 @@ def activate(a) -> None:
 
     def listed():
         win.activate_action("win.show-report", GLib.Variant("s", "org.example.demo"))
-        d = win.get_visible_dialog()
+        d = win.report_window
         report["title"] = d.get_title()
         report["choices"] = [d.choice.get_model().get_string(i) for i in range(d.choice.get_model().get_n_items())]
         wait(lambda: d.report is not None and d.stack.get_visible_child_name() == "report", lambda: first(d))
@@ -83,18 +75,18 @@ def activate(a) -> None:
     def second(d):
         report["older"] = shown(d)
         d.save_to(save_to)
-        d.force_close()
+        d.destroy()
         win.activate_action("win.show-report", GLib.Variant("s", "org.example.none"))
-        e = win.get_visible_dialog()
+        e = win.report_window
         report["empty_page"] = e.stack.get_visible_child_name()
         report["empty_choice_visible"] = e.choice.get_visible()
-        e.force_close()
+        e.destroy()
         app.quit()
 
     wait(lambda: win.rows, listed)
 
 
-app = Adw.Application(application_id="io.github.Jimbambuli.ApkStarter.ReportProbe",
+app = Gtk.Application(application_id="io.github.Jimbambuli.ApkStarter.ReportProbe",
                       flags=Gio.ApplicationFlags.NON_UNIQUE)
 app.connect("activate", activate)
 app.run([sys.argv[0]])

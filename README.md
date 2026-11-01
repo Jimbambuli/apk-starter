@@ -18,10 +18,13 @@ alias apk-starter='flatpak run --file-forwarding io.github.Jimbambuli.ApkStarter
 
 ## Use
 
-Open **APK Starter** from the application menu (or run `apk-starter` without arguments) to get a small window that
-lists the installed apps with their icon, version and data size. From there you can start an app (also with a log
-or with debug, see below), show the report of such a start, open the log folder, delete an app's data, uninstall it, and install a new APK with **Install APK…** or by dropping
-the file onto the window. Every installed app also gets its own menu entry.
+Open **APK Starter** from the application menu (or run `apk-starter` without arguments): the installed apps are
+listed on the left (search with Ctrl+F or by just typing, sort by name, last start, last install or data size), the
+chosen app's details on the right – version, target SDK, dates, data size, whether it is prepared for this computer,
+its log and debug recordings with their reports. Double-click or Enter starts an app, Delete asks to uninstall it.
+Install a new APK with **+** or by dropping it anywhere onto the window. The window follows the desktop's colour
+scheme and accent colour and keeps the desktop's own title bar (plain GTK 4); it remembers its size, the sort order
+and the chosen app. Every installed app also gets its own menu entry.
 
 The same is available on the command line:
 

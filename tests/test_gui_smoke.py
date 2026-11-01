@@ -1,4 +1,4 @@
-"""Smoke test of the real window on a headless GTK display (skipped without gtk4-broadwayd/libadwaita)."""
+"""Smoke test of the real window on a headless GTK display (skipped without gtk4-broadwayd/GTK 4)."""
 import contextlib
 import json
 import os
@@ -15,19 +15,18 @@ from apkgen import axml_manifest, make_apk
 HERE = Path(__file__).parent
 
 
-def _has_adw() -> bool:
+def _has_gtk() -> bool:
     try:
         import gi
         gi.require_version("Gtk", "4.0")
-        gi.require_version("Adw", "1")
-        from gi.repository import Adw  # noqa: F401
+        from gi.repository import Gtk  # noqa: F401
         return True
     except (ImportError, ValueError):
         return False
 
 
-needs_broadway = pytest.mark.skipif(not shutil.which("gtk4-broadwayd") or not _has_adw(),
-                                    reason="no gtk4-broadwayd/libadwaita")
+needs_broadway = pytest.mark.skipif(not shutil.which("gtk4-broadwayd") or not _has_gtk(),
+                                    reason="no gtk4-broadwayd/GTK 4")
 
 
 @contextlib.contextmanager
@@ -112,3 +111,32 @@ def test_show_report_lists_recordings_shows_and_saves(tmp_path):
                   ["Findings", ["No crash, ATL gap or exception was found."]]],
         "empty_page": "none", "empty_choice_visible": False}, out.stderr
     assert "Environment" in (tmp_path / "r.txt").read_text()
+
+
+@needs_broadway
+def test_search_sort_keys_narrow_layout_and_remembered_state(tmp_path):
+    d = tmp_path / "d"
+    (d / "apps").mkdir(parents=True)
+    for pkg, label, size, started in (("org.a.alpha", "Alpha", 5, None), ("org.b.bravo", "Bravo", 50, 200),
+                                      ("org.c.charlie", "Charlie", 0, 100)):
+        (d / "apps" / f"{pkg}.json").write_text(json.dumps({"package": pkg, "label": label}))
+        if size:
+            (d / "data" / pkg).mkdir(parents=True)
+            (d / "data" / pkg / "f").write_bytes(b"x" * size)
+        if started:
+            (d / "apps" / f"{pkg}.started").touch()
+            os.utime(d / "apps" / f"{pkg}.started", (started, started))
+    (d / "window.json").write_text(json.dumps({"width": 900, "height": 600, "selected": "org.b.bravo"}))
+    with broadway() as env:
+        out = subprocess.run([sys.executable, str(HERE / "gui_layout_probe.py"), str(d), str(tmp_path / "started")],
+                             env=env, capture_output=True, text=True, timeout=60)
+    report = json.loads(out.stdout.strip().splitlines()[-1])
+    assert report == {
+        "restored": ["org.b.bravo", "Bravo", ["Alpha", "Bravo", "Charlie"]],
+        "search": [["Charlie"], "org.c.charlie"], "kept_after_search": "org.c.charlie",
+        "by_size": ["Bravo", "Alpha", "Charlie"], "by_started": ["Bravo", "Charlie", "Alpha"],
+        "ctrl_f_in_search": True, "enter_to_list": True, "delete_key": "Uninstall Charlie?",
+        "started": ["org.c.charlie"],
+        "saved": {"width": 500, "height": 600, "sort": "started", "selected": "org.c.charlie"},
+        "narrow_list": [True, False], "narrow_details": [False, True, True, "Bravo"],
+        "narrow_back": [True, False]}, out.stderr

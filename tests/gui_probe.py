@@ -13,9 +13,8 @@ import gi
 
 gi.require_version("Gtk", "4.0")
 gi.require_version("Gsk", "4.0")
-gi.require_version("Adw", "1")
 gi.require_version("Graphene", "1.0")
-from gi.repository import Adw, Gdk, Gio, GLib, Graphene, Gsk, Gtk  # noqa: E402
+from gi.repository import Gdk, Gio, GLib, Graphene, Gsk, Gtk  # noqa: E402
 
 from apk_starter import gui  # noqa: E402
 from apk_starter.paths import Paths  # noqa: E402
@@ -29,7 +28,7 @@ report: dict = {}
 def titles(win) -> list[str]:
     out, child = [], win.listbox.get_first_child()
     while child is not None:
-        out.append(child.get_title())
+        out.append(child.title)
         child = child.get_next_sibling()
     return out
 
@@ -60,7 +59,7 @@ def screenshot(win, path: str) -> None:
     w, h = content.get_width(), content.get_height()
     rect = Graphene.Rect().init(0, 0, w, h)
     bg = Gdk.RGBA()
-    bg.parse("#fafafb")                             # libadwaita window background (light)
+    bg.parse("#fafafb")
     snap = Gtk.Snapshot()
     snap.append_color(bg, rect)
     Gtk.WidgetPaintable.new(content).snapshot(snap, w, h)
@@ -73,6 +72,7 @@ def screenshot(win, path: str) -> None:
 
 
 def activate(a) -> None:
+    gui.install_styles(Gdk.Display.get_default())
     Gtk.IconTheme.get_for_display(Gdk.Display.get_default()).add_search_path(
         str(Path(__file__).resolve().parent.parent / "data/icons"))
     shown = []
@@ -91,23 +91,23 @@ def activate(a) -> None:
 
     def dialog():
         """Text of the dialog on top, then close it."""
-        d = win.get_visible_dialog()
-        text = [d.get_heading(), d.get_body()]
-        d.force_close()
+        d = win.dialog
+        text = [d.heading, d.body]
+        d.respond("close")
         return text
 
     def install():
         broken = apk.with_name("broken.apk")
         broken.write_bytes(b"not a zip")
         win.install(broken)
-        wait(lambda: win.get_visible_dialog() is not None, failed)
+        wait(lambda: win.dialog is not None, failed)
         return False
 
     def failed():
         report["install_error"] = dialog()
         files = Gdk.FileList.new_from_list([Gio.File.new_for_path(str(apk))])
         report["drop_accepted"] = win.on_drop(None, files, 0, 0)
-        wait(lambda: win.rows and win.get_visible_dialog() is not None, installed)
+        wait(lambda: win.rows and win.dialog is not None, installed)
 
     def installed():
         report["after_install"] = titles(win)
@@ -121,21 +121,19 @@ def activate(a) -> None:
         paths.data(pkg).mkdir(parents=True, exist_ok=True)
         (paths.data(pkg) / "settings").write_text("x")
         win.activate_action("win.clear-data", GLib.Variant("s", pkg))
-        d = win.get_visible_dialog()
-        report["clear_dialog"] = d.get_heading()
-        d.emit("response", "ok")
-        d.force_close()
+        d = win.dialog
+        report["clear_dialog"] = d.heading
+        d.respond("ok")
         wait(lambda: not paths.data(pkg).exists() and win.rows[pkg].size == 0, lambda: cleared(pkg))
 
     def cleared(pkg):
         paths.data(pkg).mkdir(parents=True, exist_ok=True)
         win.activate_action("win.uninstall", GLib.Variant("s", pkg))
-        d = win.get_visible_dialog()
-        report["dialog"] = d.get_heading()
-        d.get_extra_child().set_active(True)
-        d.emit("response", "ok")
-        d.force_close()
-        wait(lambda: pkg not in win.rows and win.get_visible_dialog() is not None, removed)
+        d = win.dialog
+        report["dialog"] = d.heading
+        d.extra.set_active(True)
+        d.respond("ok")
+        wait(lambda: pkg not in win.rows and win.dialog is not None, removed)
 
     def removed():
         report["after_remove"] = titles(win)
@@ -148,7 +146,7 @@ def activate(a) -> None:
     wait(lambda: shown and win.get_width() > 0, listed)
 
 
-app = Adw.Application(application_id="io.github.Jimbambuli.ApkStarter.Probe", flags=Gio.ApplicationFlags.NON_UNIQUE)
+app = Gtk.Application(application_id="io.github.Jimbambuli.ApkStarter.Probe", flags=Gio.ApplicationFlags.NON_UNIQUE)
 app.connect("activate", activate)
 app.run([sys.argv[0]])
 print(json.dumps(report))

@@ -423,3 +423,20 @@ def test_debug_asks_for_a_view_tree_while_the_app_runs(box, monkeypatch):
     assert main(["--debug", str(box.apk)], env={**box.env, "FAKE_ATL_MODE": "sleep:2"}) == 0
     folder = next((box.data / "logs").glob(f"{PKG}-*"))
     assert [l.split("\t")[3] for l in (folder / "marks.tsv").read_text().splitlines()] == ["start", "running"]
+
+
+def test_install_keeps_target_sdk_and_start_notes_the_time(box):
+    paths = apk_starter.paths.Paths.from_env(box.env)
+    assert main(["--install", str(box.apk)], env=box.env) == 0
+    assert json.loads(paths.meta(PKG).read_text())["target_sdk"] == 34
+    assert not paths.started(PKG).exists()
+    assert main([PKG], env=box.env) == 0
+    assert paths.started(PKG).is_file()
+    assert main(["--remove", PKG], env=box.env) == 0
+    assert not paths.started(PKG).exists()
+
+
+def test_direct_start_of_an_app_that_is_not_installed_notes_nothing(box):
+    paths = apk_starter.paths.Paths.from_env(box.env)
+    assert main([str(box.apk)], env=box.env) == 0
+    assert not paths.started(PKG).exists()

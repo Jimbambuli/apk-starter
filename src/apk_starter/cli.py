@@ -107,7 +107,7 @@ def install_app(paths: Paths, info: ApkInfo) -> None:
     else:
         paths.icon(info.package).unlink(missing_ok=True)
     meta = {"package": info.package, "label": info.label, "version_name": info.version_name,
-            "version_code": info.version_code, "desktop_id": _desktop_id(info.package)}
+            "version_code": info.version_code, "target_sdk": info.target_sdk, "desktop_id": _desktop_id(info.package)}
     _write_atomic(paths.meta(info.package), json.dumps(meta).encode("utf-8"))
 
 
@@ -227,7 +227,7 @@ def remove_app(paths: Paths, pkg: str, purge: bool) -> list[str]:
             warnings.append(_("the DynamicLauncher portal is not available; the menu entry was not removed"))
         except StarterError as e:
             warnings.append(_("the menu entry was not removed: {reason}").format(reason=e))
-        for f in (paths.apk(pkg), paths.meta(pkg), paths.icon(pkg), paths.launch_dir() / f"{pkg}.apk"):
+        for f in (paths.apk(pkg), paths.meta(pkg), paths.icon(pkg), paths.started(pkg), paths.launch_dir() / f"{pkg}.apk"):
             f.unlink(missing_ok=True)
         if purge:
             _delete_data(paths, pkg)
@@ -378,6 +378,9 @@ def _start(paths: Paths, args, level: str | None, into: Path | None, tail: list[
     header = header_fields(info, read_build_info(paths.build_info()), runtime_name(), cmd, started, VERSION) \
         if log_path else {}
     later = _prepare_start(paths, env, info.package, apk_path)
+    if paths.meta(info.package).is_file():         # «last started» in the window
+        with contextlib.suppress(OSError):
+            paths.started(info.package).touch()
     background = threading.Thread(target=_compile_later, args=(paths, env, later))
     background.start()
     try:

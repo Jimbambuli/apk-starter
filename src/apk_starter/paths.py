@@ -42,6 +42,13 @@ class Paths:
     def icon(self, pkg: str) -> Path:
         return self.apps_dir() / f"{_safe(pkg)}.png"
 
+    def started(self, pkg: str) -> Path:
+        """Its modification time is the last start of an installed app."""
+        return self.apps_dir() / f"{_safe(pkg)}.started"
+
+    def window_state(self) -> Path:
+        return self.data_home / "window.json"
+
     def lock(self, pkg: str) -> Path:
         return self.cache_home / "apk-starter" / "locks" / f"{_safe(pkg)}.lock"
 
