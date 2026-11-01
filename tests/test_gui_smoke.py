@@ -140,3 +140,26 @@ def test_search_sort_keys_narrow_layout_and_remembered_state(tmp_path):
         "saved": {"width": 500, "height": 600, "sort": "started", "selected": "org.c.charlie"},
         "narrow_list": [True, False], "narrow_details": [False, True, True, "Bravo"],
         "narrow_back": [True, False]}, out.stderr
+
+
+@needs_broadway
+@pytest.mark.skipif(not shutil.which("dbus-daemon"), reason="no dbus-daemon")
+def test_window_follows_the_settings_portal_live():
+    bus = subprocess.Popen(["dbus-daemon", "--session", "--nofork", "--print-address"], stdout=subprocess.PIPE,
+                           text=True)
+    try:
+        address = bus.stdout.readline().strip()
+        with broadway() as env:
+            env = env | {"DBUS_SESSION_BUS_ADDRESS": address}
+            portal = subprocess.Popen([sys.executable, str(HERE / "fake_settings_portal.py")], env=env,
+                                      stdout=subprocess.PIPE, text=True)
+            try:
+                assert portal.stdout.readline().strip() == "ready"
+                out = subprocess.run([sys.executable, str(HERE / "gui_theme_probe.py")], env=env,
+                                     capture_output=True, text=True, timeout=60)
+            finally:
+                portal.kill()
+    finally:
+        bus.kill()
+    report = json.loads(out.stdout.strip().splitlines()[-1])
+    assert report == {"first": [False, True, False], "changed": [True, False, True]}, out.stderr

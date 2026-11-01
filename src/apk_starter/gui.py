@@ -33,7 +33,7 @@ DETAILS_MARGIN = 28
 CSS = """
 .app-name { font-size: 1.7em; font-weight: 700; }
 .welcome-title { font-size: 2em; font-weight: 700; }
-.section-title { font-weight: 700; margin-top: 6px; }
+.section-title { font-weight: 700; }
 .row-name { font-weight: 600; }
 .caption { font-size: 0.85em; }
 .start-button { font-size: 1.15em; font-weight: 700; padding: 8px 28px; border-radius: 999px; }
@@ -41,7 +41,7 @@ CSS = """
          background-color: alpha(currentColor, 0.03); }
 .toast { border-radius: 999px; padding: 8px 20px; margin: 18px; }
 .drop-zone { border: 3px dashed alpha(currentColor, 0.45); border-radius: 18px; margin: 12px;
-             background-color: alpha(@theme_bg_color, 0.92); }
+             background-color: @theme_bg_color; }
 .progress-bar { padding: 6px 12px; border-bottom: 1px solid alpha(currentColor, 0.12);
                 background-color: alpha(currentColor, 0.05); }
 """
@@ -76,7 +76,8 @@ class Dialog(Gtk.Window):
     def __init__(self, parent: Gtk.Window, heading: str, body: str, buttons: list[tuple[str, str]],
                  then: Callable[[str], None] | None = None, extra: Gtk.Widget | None = None,
                  destructive: str | None = None):
-        super().__init__(transient_for=parent, modal=True, resizable=False, title=heading, default_width=420)
+        super().__init__(transient_for=parent, modal=True, resizable=False, title="APK Starter",
+                         default_width=420)
         self.heading, self.body, self.extra, self.then = heading, body, extra, then
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12, margin_top=24, margin_bottom=20,
                       margin_start=24, margin_end=24)
@@ -95,6 +96,7 @@ class Dialog(Gtk.Window):
         box.append(row)
         self.set_child(box)
         self.set_default_widget(row.get_first_child())          # Enter = the first, harmless button
+        self.set_focus(row.get_first_child())                   # not the text (it would show as selected)
         self.connect("close-request", lambda _w: self.respond(buttons[0][0]) or True)
         parent.dialog = self
 
@@ -486,8 +488,8 @@ class Window(Gtk.ApplicationWindow):
             facts.attach(label(value, wrap=True, selectable=True, hexpand=True), 1, i, 1, 1)
         self.details.append(facts)
 
-        heading = Gtk.Box(spacing=8)
-        heading.append(label(_("Recordings"), "section-title", hexpand=True))
+        heading = Gtk.Box(spacing=8, margin_top=6)
+        heading.append(label(_("Recordings"), "section-title", hexpand=True, valign=Gtk.Align.CENTER))
         logs = Gtk.Button(label=_("Open log folder"), action_name="win.open-logs", action_target=target)
         logs.add_css_class("flat")
         heading.append(logs)
@@ -763,7 +765,8 @@ class ThemeWatcher:
         self.proxy = None
         try:
             self.proxy = Gio.DBusProxy.new_for_bus_sync(
-                Gio.BusType.SESSION, Gio.DBusProxyFlags.DO_NOT_AUTO_START_AT_CONSTRUCTION, None,
+                Gio.BusType.SESSION,
+                Gio.DBusProxyFlags.DO_NOT_AUTO_START_AT_CONSTRUCTION | Gio.DBusProxyFlags.DO_NOT_LOAD_PROPERTIES, None,
                 "org.freedesktop.portal.Desktop", "/org/freedesktop/portal/desktop",
                 "org.freedesktop.portal.Settings", None)
             all_ = self.proxy.call_sync("ReadAll", GLib.Variant("(as)", (list(theme.NAMESPACES),)),
