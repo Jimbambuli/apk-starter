@@ -169,3 +169,6 @@ modules:
           - .github
           - pages
           - tools
+          - build-dir
+          - repo
+          - .flatpak-builder

@@ -66,7 +66,7 @@ def _desktop_id(pkg: str) -> str:
 
 
 def _write_atomic(dest: Path, data: bytes) -> None:
-    tmp = dest.with_name(dest.name + ".tmp")
+    tmp = dest.with_name(f"{dest.name}.{os.getpid()}.tmp")
     tmp.write_bytes(data)
     os.replace(tmp, dest)
 
@@ -75,7 +75,7 @@ def install_app(paths: Paths, info: ApkInfo) -> None:
     dest = paths.apk(info.package)
     paths.apps_dir().mkdir(parents=True, exist_ok=True)
     if not (dest.exists() and os.path.samefile(info.path, dest)):
-        tmp = dest.with_name(dest.name + ".tmp")
+        tmp = dest.with_name(f"{dest.name}.{os.getpid()}.tmp")
         shutil.copyfile(info.path, tmp)
         os.replace(tmp, dest)
     meta = {"package": info.package, "label": info.label, "version_name": info.version_name,
@@ -148,6 +148,9 @@ def main(argv: list[str] | None = None, env: Mapping[str, str] | None = None) ->
     except StarterError as e:
         print(f"apk-starter: {e}", file=sys.stderr)
         return e.code
+    except OSError as e:
+        print(f"apk-starter: {e.strerror or e}" + (f": {e.filename}" if e.filename else ""), file=sys.stderr)
+        return 1
     except KeyboardInterrupt:
         return 130
 

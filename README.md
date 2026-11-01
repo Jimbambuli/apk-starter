@@ -24,7 +24,16 @@ apk-starter --install @@ app.apk @@  # add it to the application menu (asks via 
 apk-starter --list                   # installed apps
 apk-starter --remove PACKAGE [--purge]
 apk-starter --log @@ app.apk @@      # write a log that atl-doctor can read
+apk-starter --log=FILE @@ app.apk @@ # same, to a chosen file (must be writable inside the sandbox,
+                                     # e.g. under ~/.var/app/io.github.Jimbambuli.ApkStarter/)
+apk-starter --sdk N @@ app.apk @@    # override the SDK level passed to ATL
+apk-starter --size WxH @@ app.apk @@ # window size (remembered per app)
+apk-starter @@ app.apk @@ -- ARGS    # everything after the APK is passed on to ATL
+apk-starter --version
 ```
+
+Exit codes: 0 ok, 1 error (e.g. cannot write), 2 wrong usage, 3 APK not readable; if the app is ended by a signal,
+128+N.
 
 Without the alias use `flatpak run --file-forwarding io.github.Jimbambuli.ApkStarter …` instead of `apk-starter`.
 Double-clicking an APK in the file manager and starting an installed app from the menu work without any command.

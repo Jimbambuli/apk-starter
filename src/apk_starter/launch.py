@@ -51,7 +51,7 @@ def remembered_size(paths: Paths, pkg: str) -> tuple[int, int] | None:
 def remember_size(paths: Paths, pkg: str, size: tuple[int, int]) -> None:
     f = _size_file(paths, pkg)
     f.parent.mkdir(parents=True, exist_ok=True)
-    tmp = f.with_name(f.name + ".tmp")
+    tmp = f.with_name(f"{f.name}.{os.getpid()}.tmp")
     tmp.write_text(json.dumps({"size": list(size)}), encoding="utf-8")
     os.replace(tmp, f)
 

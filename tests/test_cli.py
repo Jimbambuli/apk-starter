@@ -120,3 +120,10 @@ def test_log_default_location(box):
     assert len(logs) == 1
     lines = logs[0].read_text().splitlines()
     assert lines[0] == "# apk-starter: format=1" and lines[-2].startswith("# apk-starter: exit=0")
+
+
+def test_file_errors_end_as_one_line_exit_1(box, capsys):
+    box.data.write_text("not a directory")          # apps/ cannot be created below a file
+    assert main(["--install", str(box.apk)], env=box.env) == 1
+    err = capsys.readouterr().err
+    assert err.startswith("apk-starter: ") and "Traceback" not in err
