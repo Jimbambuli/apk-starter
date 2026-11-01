@@ -74,5 +74,12 @@ for l in $(cat po/LINGUAS); do msgmerge --update --backup=none po/$l.po po/apk-s
 
 **Status:** pre-release, not yet published.
 
+## Credits and license
+
 License: GPL-3.0-or-later (same as ATL), see [LICENSE](LICENSE). Not affiliated with Google; Android is a trademark
 of Google LLC.
+
+The app icon (`data/icons/io.github.Jimbambuli.ApkStarter.svg`) is licensed under
+[CC BY 3.0](https://creativecommons.org/licenses/by/3.0/). The Android robot is reproduced or modified from work
+created and shared by Google and used according to terms described in the Creative Commons 3.0 Attribution License.
+The letters "APK" in the icon are outlines of DejaVu Sans Bold (Bitstream Vera/DejaVu font license).

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 12:33+0000\n"
+"POT-Creation-Date: 2026-11-01 12:35+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -70,7 +70,14 @@ msgstr ""
 msgid "Android is a trademark of Google LLC."
 msgstr ""
 
-#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:36
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:29
+msgid ""
+"The Android robot in the icon is reproduced or modified from work created "
+"and shared by Google and used according to terms described in the Creative "
+"Commons 3.0 Attribution License."
+msgstr ""
+
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:40
 msgid "The app list with three free apps from F-Droid"
 msgstr ""
 

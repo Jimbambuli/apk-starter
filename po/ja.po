@@ -68,7 +68,14 @@ msgstr "アプリは同梱されておらず、Google のサービスも提供�
 msgid "Android is a trademark of Google LLC."
 msgstr "Android は Google LLC の商標です。"
 
-#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:36
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:29
+msgid ""
+"The Android robot in the icon is reproduced or modified from work created "
+"and shared by Google and used according to terms described in the Creative "
+"Commons 3.0 Attribution License."
+msgstr "アイコンの Android ロボットは、Google が作成および共有している著作物を複製または改変したもので、クリエイティブ・コモンズ表示 3.0 ライセンスに記載された条件に従って使用しています。"
+
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:40
 msgid "The app list with three free apps from F-Droid"
 msgstr "F-Droid の 3 つの自由なアプリが並んだアプリ一覧"
 

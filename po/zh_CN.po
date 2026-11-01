@@ -68,7 +68,14 @@ msgstr "不包含任何应用，也不提供 Google 服务。需要 Google Play 
 msgid "Android is a trademark of Google LLC."
 msgstr "Android 是 Google LLC 的商标。"
 
-#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:36
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:29
+msgid ""
+"The Android robot in the icon is reproduced or modified from work created "
+"and shared by Google and used according to terms described in the Creative "
+"Commons 3.0 Attribution License."
+msgstr "图标中的 Android 机器人是根据 Google 创作和分享的作品复制或修改而成，并依照知识共享署名 3.0 许可协议中所述的条款使用。"
+
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:40
 msgid "The app list with three free apps from F-Droid"
 msgstr "应用列表，其中有三个来自 F-Droid 的自由应用"
 

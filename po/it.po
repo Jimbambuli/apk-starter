@@ -68,7 +68,14 @@ msgstr "Non sono incluse app né servizi Google. Le app che richiedono i servizi
 msgid "Android is a trademark of Google LLC."
 msgstr "Android è un marchio di Google LLC."
 
-#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:36
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:29
+msgid ""
+"The Android robot in the icon is reproduced or modified from work created "
+"and shared by Google and used according to terms described in the Creative "
+"Commons 3.0 Attribution License."
+msgstr "Il robot Android nell’icona è riprodotto o modificato a partire da un’opera creata e condivisa da Google e viene usato secondo i termini della licenza Creative Commons Attribuzione 3.0."
+
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:40
 msgid "The app list with three free apps from F-Droid"
 msgstr "L’elenco delle app con tre app libere da F-Droid"
 

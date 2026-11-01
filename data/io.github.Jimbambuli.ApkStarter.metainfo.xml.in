@@ -26,6 +26,10 @@
       services, Jetpack Compose, ARM-only native code, the camera, Bluetooth or telephony may not work.
     </p>
     <p>Android is a trademark of Google LLC.</p>
+    <p>
+      The Android robot in the icon is reproduced or modified from work created and shared by Google and used
+      according to terms described in the Creative Commons 3.0 Attribution License.
+    </p>
   </description>
   <launchable type="desktop-id">io.github.Jimbambuli.ApkStarter.desktop</launchable>
   <url type="homepage">https://github.com/Jimbambuli/apk-starter</url>
