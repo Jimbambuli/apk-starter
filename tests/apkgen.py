@@ -87,3 +87,102 @@ def axml_manifest(*, package="org.example.demo", version_code=7, version_name="1
     rm = _chunk(0x0180, 8, b"".join(struct.pack("<I", r) for r in resmap))
     payload = pool + rm + body
     return struct.pack("<HHI", 0x0003, 8, 8 + len(payload)) + payload
+
+
+# ---------------------------------------------------------------- resources.arsc
+from dataclasses import dataclass  # noqa: E402
+
+DENSITY = {"ldpi": 120, "mdpi": 160, "hdpi": 240, "xhdpi": 320, "xxhdpi": 480, "xxxhdpi": 640, "anydpi": 0xFFFE}
+
+
+@dataclass
+class Res:
+    type_name: str
+    key: str
+    configs: dict  # qualifier ("", "de", "xxhdpi", "anydpi-v26") -> str | int (int = reference)
+
+
+def _config_bytes(qualifier: str) -> bytes:
+    lang, density, sdk = b"\0\0", 0, 0
+    for part in [p for p in qualifier.split("-") if p]:
+        if part in DENSITY:
+            density = DENSITY[part]
+        elif part.startswith("v") and part[1:].isdigit():
+            sdk = int(part[1:])
+        elif len(part) == 2 and part.isalpha():
+            lang = part.encode("ascii")
+    cfg = bytearray(28)
+    struct.pack_into("<I", cfg, 0, 28)
+    cfg[8:10] = lang
+    struct.pack_into("<H", cfg, 14, density)
+    struct.pack_into("<H", cfg, 24, sdk)
+    return bytes(cfg)
+
+
+def arsc_table(package: str, res: list[Res], *, utf8=True, mode: str = "dense") -> tuple[bytes, dict[str, int]]:
+    types: dict[str, list[Res]] = {}
+    for r in res:
+        types.setdefault(r.type_name, []).append(r)
+    ids = {}
+    for tno, (tname, items) in enumerate(types.items(), start=1):
+        for eno, r in enumerate(items):
+            ids[f"{tname}/{r.key}"] = (0x7F << 24) | (tno << 16) | eno
+    values: list[str] = []
+
+    def value(v):
+        if isinstance(v, int):
+            return 0x01, v
+        if v.startswith("@"):
+            return 0x01, ids[v[1:]]
+        if v not in values:
+            values.append(v)
+        return 0x03, values.index(v)
+
+    keys = [r.key for r in res]
+    body = b""
+    for tno, (tname, items) in enumerate(types.items(), start=1):
+        n = len(items)
+        body += _chunk(0x0202, 16, struct.pack("<BBHI", tno, 0, 0, n) + b"\0\0\0\0" * n)
+        quals = []
+        for r in items:
+            for q in r.configs:
+                if q not in quals:
+                    quals.append(q)
+        for q in quals:
+            entry_blobs, offs = b"", {}
+            for i, r in enumerate(items):
+                if q not in r.configs:
+                    continue
+                dt, data = value(r.configs[q])
+                offs[i] = len(entry_blobs)
+                if mode == "compact":
+                    entry_blobs += struct.pack("<HHI", i, 0x08 | (dt << 8), data)
+                else:
+                    entry_blobs += struct.pack("<HHIHBBI", 8, 0, keys.index(r.key), 8, 0, dt, data)
+            if mode == "sparse":
+                flags = 0x01
+                arr = b"".join(struct.pack("<HH", i, o // 4) for i, o in offs.items())
+                count = len(offs)
+            elif mode == "offset16":
+                flags = 0x02
+                arr = b"".join(struct.pack("<H", offs[i] // 4 if i in offs else 0xFFFF) for i in range(n))
+                arr += b"\0" * (-len(arr) % 4)
+                count = n
+            else:
+                flags = 0
+                arr = b"".join(struct.pack("<I", offs.get(i, 0xFFFFFFFF)) for i in range(n))
+                count = n
+            cfg = _config_bytes(q)
+            hs = 20 + len(cfg)
+            payload = struct.pack("<BBHII", tno, flags, 0, count, hs + len(arr)) + cfg + arr + entry_blobs
+            body += struct.pack("<HHI", 0x0201, hs, 8 + len(payload)) + payload
+    type_pool = string_pool(list(types), utf8)
+    key_pool = string_pool(keys, utf8)
+    name = package.encode("utf-16le")[:254].ljust(256, b"\0")
+    hs = 288
+    pkg_payload = struct.pack("<I", 0x7F) + name + struct.pack("<IIIII", hs, 0, hs + len(type_pool), 0, 0)
+    pkg = struct.pack("<HHI", 0x0200, hs, hs + len(type_pool) + len(key_pool) + len(body)) + pkg_payload \
+        + type_pool + key_pool + body
+    gpool = string_pool(values, utf8)
+    table = struct.pack("<HHII", 0x0002, 12, 12 + len(gpool) + len(pkg), 1) + gpool + pkg
+    return table, ids
