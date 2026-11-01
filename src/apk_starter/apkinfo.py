@@ -3,6 +3,7 @@ import re
 import struct
 import sys
 import zipfile
+import zlib
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -69,7 +70,7 @@ def _icon(z: zipfile.ZipFile, table: ResourceTable | None, icon_id: int | None) 
             continue
         try:
             data = _read(z, path, MAX_ICON)
-        except (KeyError, ApkError):
+        except (KeyError, ApkError, zipfile.BadZipFile, zlib.error, EOFError, OSError, RuntimeError):
             continue
         size = png_size(data)
         if size is None or size[0] != size[1] or not 0 < size[0] <= MAX_ICON_EDGE:
@@ -111,7 +112,7 @@ def read_apk_info(path: Path, lang: str | None = None) -> ApkInfo:
             )
     except zipfile.BadZipFile:
         raise ApkError(f"not an APK (no AndroidManifest.xml): {path}") from None
-    except (zipfile.LargeZipFile, RuntimeError, EOFError) as e:
+    except (zipfile.LargeZipFile, RuntimeError, EOFError, zlib.error, ValueError, struct.error) as e:
         raise ApkError(f"cannot read {path}: {e}") from None
     except OSError as e:
         raise ApkError(f"cannot read {path}: {e.strerror}") from None

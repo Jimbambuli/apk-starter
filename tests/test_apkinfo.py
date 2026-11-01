@@ -61,3 +61,50 @@ def test_oversized_manifest_rejected(tmp_path, monkeypatch):
     monkeypatch.setattr(apkinfo, "MAX_MANIFEST", 100)
     with pytest.raises(ApkError):
         read_apk_info(make_apk(tmp_path / "a.apk", manifest=axml_manifest()))
+
+
+def _corrupt_member(apk, member):
+    """Flip bytes inside the stored data of one ZIP member (the central directory stays valid)."""
+    import zipfile
+    with zipfile.ZipFile(apk) as z:
+        zi = z.getinfo(member)
+    raw = bytearray(apk.read_bytes())
+    start = zi.header_offset + 30 + len(zi.filename.encode()) + int.from_bytes(raw[zi.header_offset + 28:zi.header_offset + 30], "little")
+    for k in range(start, start + min(zi.compress_size, 16)):
+        raw[k] ^= 0xFF
+    apk.write_bytes(bytes(raw))
+
+
+def test_corrupt_deflate_manifest_is_apkerror(tmp_path):
+    apk = _app(tmp_path, {}, {})
+    _corrupt_member(apk, "AndroidManifest.xml")
+    with pytest.raises(ApkError):
+        read_apk_info(apk)
+
+
+def test_corrupt_icon_is_skipped_not_fatal(tmp_path):
+    apk = _app(tmp_path, {"xxhdpi": "res/a.png", "xhdpi": "res/b.png"},
+               {"res/a.png": png_bytes(144, 144), "res/b.png": png_bytes(96, 96)})
+    _corrupt_member(apk, "res/a.png")
+    i = read_apk_info(apk)
+    assert i.package == "org.example.demo"
+    assert png_size(i.icon) == (96, 96)
+
+
+def test_fuzz_damaged_zip_bytes_never_traceback(tmp_path):
+    import random
+    apk = _app(tmp_path, {"xxhdpi": "res/a.png"}, {"res/a.png": png_bytes(144, 144)})
+    good = apk.read_bytes()
+    rnd = random.Random(1234)
+    for n in range(400):
+        raw = bytearray(good)
+        for _ in range(rnd.randint(1, 6)):
+            raw[rnd.randrange(len(raw))] = rnd.randrange(256)
+        if n % 7 == 0:
+            del raw[rnd.randrange(len(raw)):]
+        bad = tmp_path / "bad.apk"
+        bad.write_bytes(bytes(raw))
+        try:
+            read_apk_info(bad)
+        except ApkError:
+            pass
