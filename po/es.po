@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 17:03+0000\n"
+"POT-Creation-Date: 2026-11-01 20:34+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -222,12 +222,13 @@ msgstr ""
 
 #: src/apk_starter/cli.py:268
 msgid ""
-"record the app for atl-doctor: method trace, view trees, verbose log; much "
-"slower (default: logs/<package>-<time>/); use --debug=DIR"
+"record the app for atl-doctor: exceptions, ATL stub calls, time line, view "
+"trees, verbose log; a little slower (default: logs/<package>-<time>/); use --"
+"debug=DIR"
 msgstr ""
-"grabar la app para atl-doctor: traza de métodos, árboles de vistas, registro "
-"detallado; mucho más lento (predeterminado: logs/<package>-<time>/); use --"
-"debug=CARPETA"
+"grabar la app para atl-doctor: excepciones, llamadas a stubs de ATL, línea "
+"de tiempo, árboles de vistas, registro detallado; algo más lento "
+"(predeterminado: logs/<package>-<time>/); use --debug=CARPETA"
 
 #: src/apk_starter/cli.py:270
 msgid "override the SDK level passed to ATL"
@@ -312,31 +313,31 @@ msgstr "no se puede ejecutar {program}: {reason}"
 msgid "Preparing the Android runtime for this computer…"
 msgstr "Preparando el entorno de ejecución de Android para este equipo…"
 
-#: src/apk_starter/diag.py:66
+#: src/apk_starter/diag.py:68
 #, python-brace-format
 msgid "debug needs atl-doctor: {reason}"
 msgstr "la depuración necesita atl-doctor: {reason}"
 
-#: src/apk_starter/diag.py:135
+#: src/apk_starter/diag.py:137
 #, python-brace-format
 msgid "no such recording: {file}"
 msgstr "no existe la grabación: {file}"
 
-#: src/apk_starter/diag.py:139
+#: src/apk_starter/diag.py:141
 #, python-brace-format
 msgid "no recording of {package}; start it with --log or --debug"
 msgstr "no hay grabaciones de {package}; inícielo con --log o --debug"
 
-#: src/apk_starter/diag.py:140
+#: src/apk_starter/diag.py:142
 msgid "no recordings yet; start an app with --log or --debug"
 msgstr "aún no hay grabaciones; inicie una app con --log o --debug"
 
-#: src/apk_starter/diag.py:150
+#: src/apk_starter/diag.py:152
 #, python-brace-format
 msgid "the report needs atl-doctor: {reason}"
 msgstr "el informe necesita atl-doctor: {reason}"
 
-#: src/apk_starter/diag.py:156
+#: src/apk_starter/diag.py:158
 #, python-brace-format
 msgid "cannot read the recording {file}: {reason}"
 msgstr "no se puede leer la grabación {file}: {reason}"
@@ -444,8 +445,8 @@ msgid "Start with debug"
 msgstr "Iniciar con depuración"
 
 #: src/apk_starter/gui.py:496
-msgid "Debug runs much slower; use it for error reports."
-msgstr "La depuración es mucho más lenta; úsela para informes de errores."
+msgid "Debug runs a little slower; use it for error reports."
+msgstr "La depuración es algo más lenta; úsela para informes de errores."
 
 #: src/apk_starter/gui.py:502
 msgid "Version"
@@ -547,8 +548,8 @@ msgstr "{app} se inicia con registro"
 
 #: src/apk_starter/gui.py:567
 #, python-brace-format
-msgid "{app} starts with debug; it runs much slower"
-msgstr "{app} se inicia con depuración; funciona mucho más lento"
+msgid "{app} starts with debug; it runs a little slower"
+msgstr "{app} se inicia con depuración; funciona algo más lento"
 
 #: src/apk_starter/gui.py:569
 #, python-brace-format

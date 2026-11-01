@@ -1,8 +1,9 @@
 """Diagnose levels and reports (Spec 12).
 
 Log: the log of run.py plus atl-doctor's JVMTI agent (exceptions with stack, lifecycle), its output appended to the
-log so that `atl-doctor report --log` reads both. Debug: atl-doctor's recorder (method trace, agent, view trees,
-verbose Android log) writes a recording folder. Reports come from atl-doctor's report code (English on purpose)."""
+log so that `atl-doctor report --log` reads both. Debug: atl-doctor's light recorder (agent attached when the runtime
+runs, stub calls counted by ATL, time line from ART's sampling profiler, view trees, verbose Android log) writes a
+recording folder; the app keeps nearly its normal speed (no full method trace). Reports come from atl-doctor's report code (English on purpose)."""
 import re
 from collections.abc import Mapping
 from dataclasses import dataclass
@@ -53,7 +54,8 @@ def record_options(paths: Paths, cmd: list[str], env: Mapping[str, str], out: Pa
 
     stubs = paths.stub_list()
     return RecordOptions(apk=Path(cmd[1]), out=out, prefix=paths.prefix, atl_src=None, agent=None,
-                         atl_args=cmd[2:], env={**env, **VERBOSE_LOG}, stub_list=stubs if stubs.is_file() else None)
+                         atl_args=cmd[2:], env={**env, **VERBOSE_LOG}, stub_list=stubs if stubs.is_file() else None,
+                         light=True)
 
 
 def record(paths: Paths, cmd: list[str], env: Mapping[str, str], out: Path) -> int:

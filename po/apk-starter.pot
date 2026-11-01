@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 17:03+0000\n"
+"POT-Creation-Date: 2026-11-01 20:34+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -198,8 +198,9 @@ msgstr ""
 
 #: src/apk_starter/cli.py:268
 msgid ""
-"record the app for atl-doctor: method trace, view trees, verbose log; much "
-"slower (default: logs/<package>-<time>/); use --debug=DIR"
+"record the app for atl-doctor: exceptions, ATL stub calls, time line, view "
+"trees, verbose log; a little slower (default: logs/<package>-<time>/); use --"
+"debug=DIR"
 msgstr ""
 
 #: src/apk_starter/cli.py:270
@@ -278,31 +279,31 @@ msgstr ""
 msgid "Preparing the Android runtime for this computer…"
 msgstr ""
 
-#: src/apk_starter/diag.py:66
+#: src/apk_starter/diag.py:68
 #, python-brace-format
 msgid "debug needs atl-doctor: {reason}"
 msgstr ""
 
-#: src/apk_starter/diag.py:135
+#: src/apk_starter/diag.py:137
 #, python-brace-format
 msgid "no such recording: {file}"
 msgstr ""
 
-#: src/apk_starter/diag.py:139
+#: src/apk_starter/diag.py:141
 #, python-brace-format
 msgid "no recording of {package}; start it with --log or --debug"
 msgstr ""
 
-#: src/apk_starter/diag.py:140
+#: src/apk_starter/diag.py:142
 msgid "no recordings yet; start an app with --log or --debug"
 msgstr ""
 
-#: src/apk_starter/diag.py:150
+#: src/apk_starter/diag.py:152
 #, python-brace-format
 msgid "the report needs atl-doctor: {reason}"
 msgstr ""
 
-#: src/apk_starter/diag.py:156
+#: src/apk_starter/diag.py:158
 #, python-brace-format
 msgid "cannot read the recording {file}: {reason}"
 msgstr ""
@@ -410,7 +411,7 @@ msgid "Start with debug"
 msgstr ""
 
 #: src/apk_starter/gui.py:496
-msgid "Debug runs much slower; use it for error reports."
+msgid "Debug runs a little slower; use it for error reports."
 msgstr ""
 
 #: src/apk_starter/gui.py:502
@@ -511,7 +512,7 @@ msgstr ""
 
 #: src/apk_starter/gui.py:567
 #, python-brace-format
-msgid "{app} starts with debug; it runs much slower"
+msgid "{app} starts with debug; it runs a little slower"
 msgstr ""
 
 #: src/apk_starter/gui.py:569

@@ -43,7 +43,7 @@ apk-starter --remove-all [--purge]   # remove every installed app and its menu e
 apk-starter --log @@ app.apk @@      # write a log that atl-doctor can read
 apk-starter --log=FILE @@ app.apk @@ # same, to a chosen file (must be writable inside the sandbox,
                                      # e.g. under ~/.var/app/io.github.Jimbambuli.ApkStarter/)
-apk-starter --debug @@ app.apk @@    # record the app for atl-doctor (much slower), --debug=DIR for a folder
+apk-starter --debug @@ app.apk @@    # record the app for atl-doctor (a little slower), --debug=DIR for a folder
 apk-starter --report [FILE|DIR|PACKAGE]  # report of the newest (or the given) log/debug recording
 apk-starter --sdk N @@ app.apk @@    # override the SDK level passed to ATL
 apk-starter --size WxH @@ app.apk @@ # window size (remembered per app)
@@ -63,9 +63,11 @@ Data lives under `~/.var/app/io.github.Jimbambuli.ApkStarter/data/`: `apps/` (in
 Diagnose levels, for finding out why an app misbehaves under ATL (with
 [atl-doctor](https://github.com/Jimbambuli/atl-doctor)): a normal start loads nothing extra. **Log** (`--log`,
 «Start with log») writes ATL's output plus what atl-doctor's JVMTI agent sees on the fast runtime (lifecycle
-callbacks; ART reports thrown exceptions to the agent only while code runs instrumented, so stacks of exceptions
-come reliably with Debug); the app runs at almost full speed. **Debug** (`--debug`, «Start with debug») records a folder with ART's method trace
-(hit ATL stubs), the view trees and a verbose Android log; the app runs much slower. **Show report** in the window or
+callbacks; the agent comes 3 s after the start, so exceptions of the start itself come with Debug); the app runs at
+almost full speed. **Debug** (`--debug`, «Start with debug») records a folder: the agent attached as soon as the
+runtime runs (exceptions with stack, also caught ones, lifecycle), the calls of ATL's stub methods (counted by ATL
+itself), a time line from ART's sampling profiler, the view trees and a verbose Android log; the app runs only a
+little slower (no full method trace, which made apps lose their own start-up races). **Show report** in the window or
 `apk-starter --report` turns a recording into a report (crash cause, ATL gaps, exceptions; in English), the same one
 `atl-doctor report --log FILE` or `atl-doctor report DIR` gives.
 

@@ -493,7 +493,7 @@ class Window(Gtk.ApplicationWindow):
         starts = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
         starts.append(start)
         starts.append(more)
-        starts.append(label(_("Debug runs much slower; use it for error reports."), "dim-label", "caption",
+        starts.append(label(_("Debug runs a little slower; use it for error reports."), "dim-label", "caption",
                             wrap=True))
         self.details.append(starts)
 
@@ -564,7 +564,7 @@ class Window(Gtk.ApplicationWindow):
         if level == "log":
             self.toast(_("{app} starts with a log").format(app=label_))
         elif level == "debug":
-            self.toast(_("{app} starts with debug; it runs much slower").format(app=label_))
+            self.toast(_("{app} starts with debug; it runs a little slower").format(app=label_))
         else:
             self.toast(_("{app} starts").format(app=label_))
 

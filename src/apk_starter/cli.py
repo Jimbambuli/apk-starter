@@ -265,8 +265,8 @@ def _parser() -> argparse.ArgumentParser:
     p.add_argument("--log", nargs="?", const=True, metavar="FILE",
                    help=_("write a log for atl-doctor (default: logs/<package>-<time>.log); use --log=FILE"))
     p.add_argument("--debug", nargs="?", const=True, metavar="DIR",
-                   help=_("record the app for atl-doctor: method trace, view trees, verbose log; much slower "
-                          "(default: logs/<package>-<time>/); use --debug=DIR"))
+                   help=_("record the app for atl-doctor: exceptions, ATL stub calls, time line, view trees, verbose "
+                          "log; a little slower (default: logs/<package>-<time>/); use --debug=DIR"))
     p.add_argument("--sdk", type=int, metavar="N", help=_("override the SDK level passed to ATL"))
     p.add_argument("--size", metavar="WxH", help=_("window size (remembered per app)"))
     p.add_argument("--purge", action="store_true", help=_("with --remove/--remove-all: also delete the app data"))

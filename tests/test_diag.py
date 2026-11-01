@@ -135,6 +135,7 @@ def test_debug_options_for_the_recorder(tmp_path):
     opts = diag.record_options(p, cmd, {"ANDROID_APP_DATA_DIR": "/d"}, tmp_path / "rec")
     assert opts.apk == Path("/c/launch/org.a.apk") and opts.atl_args == cmd[2:] and opts.prefix == p.prefix
     assert opts.env == {"ANDROID_APP_DATA_DIR": "/d", "ANDROID_LOG_TAGS": "*:v"} and opts.trace
+    assert opts.light  # attached agent, stub hits from ATL, sampling: the app keeps its speed
     assert opts.stub_list is None
     p.stub_list().parent.mkdir(parents=True)
     p.stub_list().write_text("x")
