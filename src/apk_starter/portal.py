@@ -3,7 +3,7 @@ import re
 import uuid
 
 from .apkinfo import PACKAGE_RE
-from .cli import APP_ID
+from .cli import ENTRY_PREFIX
 from .errors import StarterError, UsageError
 from .i18n import _
 
@@ -18,7 +18,7 @@ class PortalUnavailable(StarterError):
 
 
 def desktop_file_id(pkg: str) -> str:
-    return f"{APP_ID}.{pkg}.desktop"
+    return f"{ENTRY_PREFIX}.{pkg}.desktop"
 
 
 def _check_pkg(pkg: str) -> str:
@@ -38,7 +38,7 @@ def desktop_entry(pkg: str, label: str) -> str:
         f"Exec=apk-starter {pkg}\n"
         "Terminal=false\n"
         "Categories=Utility;\n"
-        f"StartupWMClass={APP_ID}.{pkg}\n"
+        f"StartupWMClass={ENTRY_PREFIX}.{pkg}\n"
         f"X-ApkStarter-Package={pkg}\n"
     )
 

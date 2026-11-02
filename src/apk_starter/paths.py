@@ -1,11 +1,27 @@
 """Folder layout: everything the starter writes lives under XDG_DATA_HOME / XDG_CACHE_HOME."""
-from collections.abc import Mapping
+import re
+from collections.abc import Mapping, MutableMapping
 from dataclasses import dataclass
 from pathlib import Path
 
 from .apkinfo import MAX_PACKAGE, PACKAGE_RE
 from .errors import UsageError
 from .i18n import _
+
+
+PROFILE_RE = re.compile(r"[a-z0-9]{1,16}")
+
+
+def apply_profile(env: MutableMapping[str, str]) -> None:
+    """A test build (its own Flatpak branch, APK_STARTER_PROFILE in its metadata) keeps data and caches beside
+    those of stable: <XDG_DATA_HOME>/../<profile>/data and .../cache, also for ATL and ART started from here."""
+    profile = env.get("APK_STARTER_PROFILE", "")
+    if not PROFILE_RE.fullmatch(profile) or env.get("APK_STARTER_PROFILE_APPLIED") == profile:
+        return
+    home = Path(env.get("HOME", "/"))
+    base = Path(env.get("XDG_DATA_HOME") or home / ".local/share").parent / profile
+    env["XDG_DATA_HOME"], env["XDG_CACHE_HOME"] = str(base / "data"), str(base / "cache")
+    env["APK_STARTER_PROFILE_APPLIED"] = profile
 
 
 def _safe(pkg: str) -> str:

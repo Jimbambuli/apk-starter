@@ -8,8 +8,9 @@ import threading
 from collections.abc import Callable, Mapping
 from pathlib import Path
 
-from . import dexopt, diag, theme
-from .cli import APP_ID, clear_data, install_apk, lang_from_env, prepare_all, remove_app
+from . import dexopt, diag, microg, theme
+from .cli import (APP_ID, ENTRY_PREFIX, clear_data, install_apk, lang_from_env, microg_hint, prepare_all, remove_app,
+                  setup_microg)
 from .errors import StarterError, describe_error
 from .i18n import _
 from .gui_model import (AppRow, WindowState, crash_meaning, details_layout, filter_rows, is_narrow, key_action,
@@ -147,9 +148,13 @@ class Window(Gtk.ApplicationWindow):
             ["view-sort-descending-symbolic", "view-sort-descending"])))
         install = Gtk.Button(icon_name="list-add-symbolic", tooltip_text=_("Install APK…"))
         install.connect("clicked", lambda _b: self.choose_apk())
+        # test build with microG: once, until «microG settings» is installed
+        self.microg_button = Gtk.Button(label="microG", tooltip_text=_("Set up microG"),
+                                        visible=bool(microg.bundled(paths)) and not paths.apk(microg.GMS).is_file())
+        self.microg_button.connect("clicked", lambda _b: self.setup_microg())
         self.spinner = Gtk.Spinner(visible=False, spinning=True, tooltip_text=_("Working…"))
         top = Gtk.Box(spacing=6, margin_top=10, margin_bottom=8, margin_start=10, margin_end=10)
-        for w in (self.search, sort, install, self.spinner):
+        for w in (self.search, sort, install, self.microg_button, self.spinner):
             top.append(w)
         self.listbox = Gtk.ListBox(selection_mode=Gtk.SelectionMode.SINGLE, activate_on_single_click=False)
         self.listbox.add_css_class("navigation-sidebar")
@@ -641,6 +646,17 @@ class Window(Gtk.ApplicationWindow):
         self.background(lambda: install_apk(self.paths, apk, self.lang, self.env, self.progress, warnings.append),
                         done, _("Cannot install {file}").format(file=apk.name))
 
+    def setup_microg(self) -> None:
+        warnings: list[str] = []
+
+        def done(info) -> None:
+            self.microg_button.set_visible(False)
+            self.selected = info.package
+            self.alert(_("microG is set up"), "\n".join(warnings + [microg_hint()]))
+        self.progress(_("Setting up microG…"))
+        self.background(lambda: setup_microg(self.paths, self.lang, self.env, self.progress, warnings.append),
+                        done, _("Cannot set up microG"))
+
     def _confirm(self, heading: str, body: str, verb: str, then: Callable[[], None],
                  extra: Gtk.Widget | None = None) -> None:
         Dialog(self, heading, body, [("cancel", _("Cancel")), ("ok", verb)],
@@ -772,7 +788,7 @@ def default_launcher() -> list[str]:
 
 
 def run(paths: Paths, env: Mapping[str, str], launcher: list[str] | None = None) -> int:
-    app = Gtk.Application(application_id=APP_ID)
+    app = Gtk.Application(application_id=ENTRY_PREFIX)     # a test build's window beside the one of stable
     lang = lang_from_env(env)
 
     def startup(_a: Gtk.Application) -> None:
