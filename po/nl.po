@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-02 20:57+0000\n"
+"POT-Creation-Date: 2026-11-02 20:59+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -167,7 +167,7 @@ msgstr ""
 msgid "the downloaded file is not Aurora Store {code}"
 msgstr "het gedownloade bestand is niet Aurora Store {code}"
 
-#: src/apk_starter/aurora.py:75 src/apk_starter/gui.py:670
+#: src/apk_starter/aurora.py:75 src/apk_starter/gui.py:673
 msgid "Downloading Aurora Store from F-Droid…"
 msgstr "Aurora Store wordt van F-Droid gedownload…"
 
@@ -331,8 +331,8 @@ msgid "show the version and exit"
 msgstr "versie tonen en afsluiten"
 
 #: src/apk_starter/cli.py:363
-msgid "test build with microG: add «microG settings»"
-msgstr "testbuild met microG: «microG-instellingen» toevoegen"
+msgid "add «microG settings» (Google services for the apps)"
+msgstr "«microG-instellingen» toevoegen (Google-diensten voor de apps)"
 
 #: src/apk_starter/cli.py:401
 msgid ""
@@ -459,7 +459,7 @@ msgstr "Sleep een APK hierheen of kies er een."
 msgid "Choose APK…"
 msgstr "APK kiezen…"
 
-#: src/apk_starter/gui.py:265 src/apk_starter/gui.py:598
+#: src/apk_starter/gui.py:265 src/apk_starter/gui.py:601
 msgid "Close"
 msgstr "Sluiten"
 
@@ -523,97 +523,97 @@ msgstr "Voorbereid voor deze computer"
 msgid "Not prepared yet (done at the next start)"
 msgstr "Nog niet voorbereid (gebeurt bij de volgende start)"
 
-#: src/apk_starter/gui.py:522
-msgid "Window bar:"
-msgstr "Vensterbalk:"
+#: src/apk_starter/gui.py:524
+msgid "Window bar"
+msgstr "Vensterbalk"
 
-#: src/apk_starter/gui.py:523
-msgid "From the system"
-msgstr "Van het systeem"
-
-#: src/apk_starter/gui.py:523
+#: src/apk_starter/gui.py:525
 msgid "With back button"
 msgstr "Met terugknop"
 
-#: src/apk_starter/gui.py:524
+#: src/apk_starter/gui.py:525
+msgid "From the system"
+msgstr "Van het systeem"
+
+#: src/apk_starter/gui.py:526
 msgid "From the system + navigation bar"
 msgstr "Van het systeem + navigatiebalk"
 
-#: src/apk_starter/gui.py:532 src/apk_starter/gui.py:560
+#: src/apk_starter/gui.py:535 src/apk_starter/gui.py:563
 msgid "Log"
 msgstr "Logboek"
 
-#: src/apk_starter/gui.py:533
+#: src/apk_starter/gui.py:536
 msgid "Debug (next start only)"
 msgstr "Debug (alleen volgende start)"
 
-#: src/apk_starter/gui.py:534
+#: src/apk_starter/gui.py:537
 msgid "Debug runs a little slower."
 msgstr "Debug is iets trager."
 
-#: src/apk_starter/gui.py:559
+#: src/apk_starter/gui.py:562
 msgid "Recordings"
 msgstr "Opnames"
 
-#: src/apk_starter/gui.py:560
+#: src/apk_starter/gui.py:563
 msgid "Debug"
 msgstr "Debug"
 
-#: src/apk_starter/gui.py:563 src/apk_starter/gui.py:598
+#: src/apk_starter/gui.py:566 src/apk_starter/gui.py:601
 msgid "Open log folder"
 msgstr "Logboekmap openen"
 
-#: src/apk_starter/gui.py:574
+#: src/apk_starter/gui.py:577
 #, python-brace-format
 msgid "Cannot start {app}"
 msgstr "Kan {app} niet starten"
 
-#: src/apk_starter/gui.py:596
+#: src/apk_starter/gui.py:599
 msgid "Tick “Log” under ⚙ and start the app again to record the error."
 msgstr ""
 "Vink ‘Logboek’ aan onder ⚙ en start de app opnieuw om de fout vast te leggen."
 
-#: src/apk_starter/gui.py:597
+#: src/apk_starter/gui.py:600
 #, python-brace-format
 msgid "{app} ended unexpectedly."
 msgstr "{app} is onverwacht gestopt."
 
-#: src/apk_starter/gui.py:607 src/apk_starter/gui.py:615
+#: src/apk_starter/gui.py:610 src/apk_starter/gui.py:618
 msgid "Cannot open the log folder"
 msgstr "Kan de logboekmap niet openen"
 
-#: src/apk_starter/gui.py:619
+#: src/apk_starter/gui.py:622
 msgid "Android apps"
 msgstr "Android-apps"
 
-#: src/apk_starter/gui.py:625
+#: src/apk_starter/gui.py:628
 msgid "Install APK"
 msgstr "APK installeren"
 
-#: src/apk_starter/gui.py:655 src/apk_starter/gui.py:669
+#: src/apk_starter/gui.py:658 src/apk_starter/gui.py:672
 #, python-brace-format
 msgid "{app} installed"
 msgstr "{app} geïnstalleerd"
 
-#: src/apk_starter/gui.py:656
+#: src/apk_starter/gui.py:659
 #, python-brace-format
 msgid "Installing {file}…"
 msgstr "{file} wordt geïnstalleerd…"
 
-#: src/apk_starter/gui.py:659
+#: src/apk_starter/gui.py:662
 #, python-brace-format
 msgid "Cannot install {file}"
 msgstr "Kan {file} niet installeren"
 
-#: src/apk_starter/gui.py:672
+#: src/apk_starter/gui.py:675
 msgid "Cannot set up Aurora Store"
 msgstr "Aurora Store kan niet worden ingesteld"
 
-#: src/apk_starter/gui.py:673
+#: src/apk_starter/gui.py:676
 msgid "Set up Aurora Store?"
 msgstr "Aurora Store instellen?"
 
-#: src/apk_starter/gui.py:674
+#: src/apk_starter/gui.py:677
 msgid ""
 "Aurora Store installs free apps from Google Play; the apps it installs "
 "appear here. APK Starter downloads the official Aurora Store from F-Droid "
@@ -630,33 +630,33 @@ msgstr ""
 "kan in strijd zijn met de servicevoorwaarden van Google, en Google kan het "
 "account blokkeren."
 
-#: src/apk_starter/gui.py:678 src/apk_starter/gui.py:695
+#: src/apk_starter/gui.py:681 src/apk_starter/gui.py:698
 #: src/apk_starter/install_request.py:44
 msgid "Cancel"
 msgstr "Annuleren"
 
-#: src/apk_starter/gui.py:678
+#: src/apk_starter/gui.py:681
 msgid "Set up"
 msgstr "Instellen"
 
-#: src/apk_starter/gui.py:688
+#: src/apk_starter/gui.py:691
 msgid "microG is set up"
 msgstr "microG is ingesteld"
 
-#: src/apk_starter/gui.py:689
+#: src/apk_starter/gui.py:692
 msgid "Setting up microG…"
 msgstr "microG wordt ingesteld…"
 
-#: src/apk_starter/gui.py:691
+#: src/apk_starter/gui.py:694
 msgid "Cannot set up microG"
 msgstr "Kan microG niet instellen"
 
-#: src/apk_starter/gui.py:700
+#: src/apk_starter/gui.py:703
 #, python-brace-format
 msgid "Delete the data of {app}?"
 msgstr "Gegevens van {app} wissen?"
 
-#: src/apk_starter/gui.py:701
+#: src/apk_starter/gui.py:704
 msgid ""
 "The app stays installed. Its settings, accounts and files are deleted. Close "
 "the app first."
@@ -664,38 +664,38 @@ msgstr ""
 "De app blijft geïnstalleerd. De instellingen, accounts en bestanden worden "
 "gewist. Sluit eerst de app."
 
-#: src/apk_starter/gui.py:702
+#: src/apk_starter/gui.py:705
 msgid "Delete Data"
 msgstr "Gegevens wissen"
 
-#: src/apk_starter/gui.py:704
+#: src/apk_starter/gui.py:707
 #, python-brace-format
 msgid "Cannot delete the data of {app}"
 msgstr "Kan de gegevens van {app} niet wissen"
 
-#: src/apk_starter/gui.py:708
+#: src/apk_starter/gui.py:711
 msgid "Also delete app data"
 msgstr "Ook appgegevens wissen"
 
-#: src/apk_starter/gui.py:715
+#: src/apk_starter/gui.py:718
 #, python-brace-format
 msgid "{app} uninstalled"
 msgstr "{app} verwijderd"
 
-#: src/apk_starter/gui.py:716
+#: src/apk_starter/gui.py:719
 #, python-brace-format
 msgid "Uninstall {app}?"
 msgstr "{app} verwijderen?"
 
-#: src/apk_starter/gui.py:717
+#: src/apk_starter/gui.py:720
 msgid "The app and its menu entry are removed. Close the app first."
 msgstr "De app en het menu-item worden verwijderd. Sluit eerst de app."
 
-#: src/apk_starter/gui.py:717
+#: src/apk_starter/gui.py:720
 msgid "Uninstall"
 msgstr "Verwijderen"
 
-#: src/apk_starter/gui.py:719
+#: src/apk_starter/gui.py:722
 #, python-brace-format
 msgid "Cannot uninstall {app}"
 msgstr "Kan {app} niet verwijderen"

@@ -515,20 +515,23 @@ class Window(Gtk.ApplicationWindow):
             start.grab_focus()                      # not the name (a focused label shows all of it selected)
 
     def make_options(self, r: AppRow, app) -> Gtk.Popover:
-        """The ⚙ menu: window bar and Log (remembered per app), Debug (next start only), the recordings."""
+        """The ⚙ menu: window bar and Log (remembered per app), Debug (next start only), the recordings.
+
+        The window bar is a group of option buttons, not a drop-down: the menu keeps one size and nothing in it
+        opens over the rest (Marcel 2.11.2026)."""
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8, margin_top=8, margin_bottom=8, margin_start=8,
                       margin_end=8)
-        bar = Gtk.Box(spacing=8)
-        bar.append(label(_("Window bar:"), valign=Gtk.Align.CENTER))
-        names_ = {"system": _("From the system"), "atl": _("With back button"),
+        box.append(label(_("Window bar"), "section-title"))
+        names_ = {"atl": _("With back button"), "system": _("From the system"),
                   "system-navigation": _("From the system + navigation bar")}
-        order = ("system", "atl", "system-navigation")
-        assert set(order) == set(TITLEBARS)
-        choice = Gtk.DropDown.new_from_strings([names_[k] for k in order])
-        choice.set_selected(order.index(app.titlebar))
-        choice.connect("notify::selected",
-                       lambda d, _p, p=r.package: self.save_app_setting(p, titlebar=order[d.get_selected()]))
-        bar.append(choice)
+        choice: dict[str, Gtk.CheckButton] = {}
+        for key in TITLEBARS:                       # with back button (the default), from the system, + navigation
+            b = Gtk.CheckButton(label=names_[key], active=key == app.titlebar,
+                                group=next(iter(choice.values()), None))
+            b.connect("toggled", lambda b, p=r.package, k=key: b.get_active() and self.save_app_setting(p, titlebar=k))
+            choice[key] = b
+            box.append(b)
+        box.append(Gtk.Separator(margin_top=4))
         log = Gtk.CheckButton(label=_("Log"), active=app.log or self.debug, sensitive=not self.debug)
         debug = Gtk.CheckButton(label=_("Debug (next start only)"), active=self.debug)
         hint = label(_("Debug runs a little slower."), "dim-label", "caption", wrap=True, max_width_chars=40,
@@ -549,7 +552,7 @@ class Window(Gtk.ApplicationWindow):
         log.connect("toggled", log_toggled)
         debug.connect("toggled", debug_toggled)
         self.debug_check, self.log_check, self.titlebar_choice = debug, log, choice
-        for w in (bar, log, debug, hint):
+        for w in (log, debug, hint):
             box.append(w)
 
         recs = diag.recordings(self.paths, r.package)

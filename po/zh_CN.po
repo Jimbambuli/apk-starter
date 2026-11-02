@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-02 20:57+0000\n"
+"POT-Creation-Date: 2026-11-02 20:59+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -159,7 +159,7 @@ msgstr "下载的 Aurora Store 并非由 Aurora OSS 签名（证书 {found}）�
 msgid "the downloaded file is not Aurora Store {code}"
 msgstr "下载的文件不是 Aurora Store {code}"
 
-#: src/apk_starter/aurora.py:75 src/apk_starter/gui.py:670
+#: src/apk_starter/aurora.py:75 src/apk_starter/gui.py:673
 msgid "Downloading Aurora Store from F-Droid…"
 msgstr "正在从 F-Droid 下载 Aurora Store…"
 
@@ -315,8 +315,8 @@ msgid "show the version and exit"
 msgstr "显示版本并退出"
 
 #: src/apk_starter/cli.py:363
-msgid "test build with microG: add «microG settings»"
-msgstr "含 microG 的测试版：添加“microG 设置”"
+msgid "add «microG settings» (Google services for the apps)"
+msgstr "添加“microG 设置”（为应用提供 Google 服务）"
 
 #: src/apk_starter/cli.py:401
 msgid ""
@@ -441,7 +441,7 @@ msgstr "将 APK 拖到这里或选择一个。"
 msgid "Choose APK…"
 msgstr "选择 APK…"
 
-#: src/apk_starter/gui.py:265 src/apk_starter/gui.py:598
+#: src/apk_starter/gui.py:265 src/apk_starter/gui.py:601
 msgid "Close"
 msgstr "关闭"
 
@@ -505,96 +505,96 @@ msgstr "已为本机准备"
 msgid "Not prepared yet (done at the next start)"
 msgstr "尚未准备（下次启动时完成）"
 
-#: src/apk_starter/gui.py:522
-msgid "Window bar:"
-msgstr "窗口栏："
+#: src/apk_starter/gui.py:524
+msgid "Window bar"
+msgstr "窗口栏"
 
-#: src/apk_starter/gui.py:523
-msgid "From the system"
-msgstr "系统提供"
-
-#: src/apk_starter/gui.py:523
+#: src/apk_starter/gui.py:525
 msgid "With back button"
 msgstr "带返回按钮"
 
-#: src/apk_starter/gui.py:524
+#: src/apk_starter/gui.py:525
+msgid "From the system"
+msgstr "系统提供"
+
+#: src/apk_starter/gui.py:526
 msgid "From the system + navigation bar"
 msgstr "系统提供 + 导航栏"
 
-#: src/apk_starter/gui.py:532 src/apk_starter/gui.py:560
+#: src/apk_starter/gui.py:535 src/apk_starter/gui.py:563
 msgid "Log"
 msgstr "日志"
 
-#: src/apk_starter/gui.py:533
+#: src/apk_starter/gui.py:536
 msgid "Debug (next start only)"
 msgstr "调试（仅下次启动）"
 
-#: src/apk_starter/gui.py:534
+#: src/apk_starter/gui.py:537
 msgid "Debug runs a little slower."
 msgstr "调试模式会稍慢一些。"
 
-#: src/apk_starter/gui.py:559
+#: src/apk_starter/gui.py:562
 msgid "Recordings"
 msgstr "记录"
 
-#: src/apk_starter/gui.py:560
+#: src/apk_starter/gui.py:563
 msgid "Debug"
 msgstr "调试"
 
-#: src/apk_starter/gui.py:563 src/apk_starter/gui.py:598
+#: src/apk_starter/gui.py:566 src/apk_starter/gui.py:601
 msgid "Open log folder"
 msgstr "打开日志文件夹"
 
-#: src/apk_starter/gui.py:574
+#: src/apk_starter/gui.py:577
 #, python-brace-format
 msgid "Cannot start {app}"
 msgstr "无法启动 {app}"
 
-#: src/apk_starter/gui.py:596
+#: src/apk_starter/gui.py:599
 msgid "Tick “Log” under ⚙ and start the app again to record the error."
 msgstr "在 ⚙ 中勾选“日志”并重新启动应用以记录错误。"
 
-#: src/apk_starter/gui.py:597
+#: src/apk_starter/gui.py:600
 #, python-brace-format
 msgid "{app} ended unexpectedly."
 msgstr "{app} 意外退出。"
 
-#: src/apk_starter/gui.py:607 src/apk_starter/gui.py:615
+#: src/apk_starter/gui.py:610 src/apk_starter/gui.py:618
 msgid "Cannot open the log folder"
 msgstr "无法打开日志文件夹"
 
-#: src/apk_starter/gui.py:619
+#: src/apk_starter/gui.py:622
 msgid "Android apps"
 msgstr "Android 应用"
 
-#: src/apk_starter/gui.py:625
+#: src/apk_starter/gui.py:628
 msgid "Install APK"
 msgstr "安装 APK"
 
-#: src/apk_starter/gui.py:655 src/apk_starter/gui.py:669
+#: src/apk_starter/gui.py:658 src/apk_starter/gui.py:672
 #, python-brace-format
 msgid "{app} installed"
 msgstr "已安装 {app}"
 
-#: src/apk_starter/gui.py:656
+#: src/apk_starter/gui.py:659
 #, python-brace-format
 msgid "Installing {file}…"
 msgstr "正在安装 {file}…"
 
-#: src/apk_starter/gui.py:659
+#: src/apk_starter/gui.py:662
 #, python-brace-format
 msgid "Cannot install {file}"
 msgstr "无法安装 {file}"
 
-#: src/apk_starter/gui.py:672
+#: src/apk_starter/gui.py:675
 msgid "Cannot set up Aurora Store"
 msgstr "无法设置 Aurora Store"
 
-#: src/apk_starter/gui.py:673
+#: src/apk_starter/gui.py:676
 msgid "Set up Aurora Store?"
 msgstr "设置 Aurora Store？"
 
-#: src/apk_starter/gui.py:674
+#: src/apk_starter/gui.py:677
 msgid ""
 "Aurora Store installs free apps from Google Play; the apps it installs "
 "appear here. APK Starter downloads the official Aurora Store from F-Droid "
@@ -609,70 +609,70 @@ msgstr ""
 "请在 Aurora Store 中匿名登录。使用自己的 Google 帐号登录可能违反 Google 的服"
 "务条款，Google 可能会封禁该帐号。"
 
-#: src/apk_starter/gui.py:678 src/apk_starter/gui.py:695
+#: src/apk_starter/gui.py:681 src/apk_starter/gui.py:698
 #: src/apk_starter/install_request.py:44
 msgid "Cancel"
 msgstr "取消"
 
-#: src/apk_starter/gui.py:678
+#: src/apk_starter/gui.py:681
 msgid "Set up"
 msgstr "设置"
 
-#: src/apk_starter/gui.py:688
+#: src/apk_starter/gui.py:691
 msgid "microG is set up"
 msgstr "microG 已设置完成"
 
-#: src/apk_starter/gui.py:689
+#: src/apk_starter/gui.py:692
 msgid "Setting up microG…"
 msgstr "正在设置 microG…"
 
-#: src/apk_starter/gui.py:691
+#: src/apk_starter/gui.py:694
 msgid "Cannot set up microG"
 msgstr "无法设置 microG"
 
-#: src/apk_starter/gui.py:700
+#: src/apk_starter/gui.py:703
 #, python-brace-format
 msgid "Delete the data of {app}?"
 msgstr "删除 {app} 的数据？"
 
-#: src/apk_starter/gui.py:701
+#: src/apk_starter/gui.py:704
 msgid ""
 "The app stays installed. Its settings, accounts and files are deleted. Close "
 "the app first."
 msgstr "应用将保持安装。其设置、账户和文件将被删除。请先关闭应用。"
 
-#: src/apk_starter/gui.py:702
+#: src/apk_starter/gui.py:705
 msgid "Delete Data"
 msgstr "删除数据"
 
-#: src/apk_starter/gui.py:704
+#: src/apk_starter/gui.py:707
 #, python-brace-format
 msgid "Cannot delete the data of {app}"
 msgstr "无法删除 {app} 的数据"
 
-#: src/apk_starter/gui.py:708
+#: src/apk_starter/gui.py:711
 msgid "Also delete app data"
 msgstr "同时删除应用数据"
 
-#: src/apk_starter/gui.py:715
+#: src/apk_starter/gui.py:718
 #, python-brace-format
 msgid "{app} uninstalled"
 msgstr "已卸载 {app}"
 
-#: src/apk_starter/gui.py:716
+#: src/apk_starter/gui.py:719
 #, python-brace-format
 msgid "Uninstall {app}?"
 msgstr "卸载 {app}？"
 
-#: src/apk_starter/gui.py:717
+#: src/apk_starter/gui.py:720
 msgid "The app and its menu entry are removed. Close the app first."
 msgstr "应用及其菜单项将被删除。请先关闭应用。"
 
-#: src/apk_starter/gui.py:717
+#: src/apk_starter/gui.py:720
 msgid "Uninstall"
 msgstr "卸载"
 
-#: src/apk_starter/gui.py:719
+#: src/apk_starter/gui.py:722
 #, python-brace-format
 msgid "Cannot uninstall {app}"
 msgstr "无法卸载 {app}"

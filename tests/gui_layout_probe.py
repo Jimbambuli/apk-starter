@@ -95,7 +95,7 @@ def activate(a) -> None:
         report["started"] = Path(record).read_text().split()
         report["focus_on_start"] = win.get_focus() is win.start_button
         report["charlie_menu"] = [win.recordings_shown, win.gear_dot.get_visible()]
-        win.titlebar_choice.set_selected(2)                       # From the system + navigation bar
+        win.titlebar_choice["system-navigation"].set_active(True)  # From the system + navigation bar
         win.log_check.set_active(True)
         report["dot_with_log"] = win.gear_dot.get_visible()
         report["settings"] = json.loads(paths.settings().read_text())
