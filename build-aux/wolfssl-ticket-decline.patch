@@ -1,0 +1,20 @@
+diff --git a/src/internal.c b/src/internal.c
+index 65c0c44..79a8879 100644
+--- a/src/internal.c
++++ b/src/internal.c
+@@ -20799,7 +20799,14 @@ int DoHandShakeMsgType(WOLFSSL* ssl, byte* input, word32* inOutIdx,
+                  *   messages.
+                  */
+ #ifndef WOLFSSL_WPAS
+-                if (ssl->arrays->sessionIDSz != 0) {
++                /* With a session ticket SendClientHello() sends an empty
++                 * Session ID: the ServerHello's Session ID says nothing then
++                 * and the server may decline the ticket (RFC 5077 3.4). */
++                if (ssl->arrays->sessionIDSz != 0
++    #ifdef HAVE_SESSION_TICKET
++                        && ssl->session->ticketLen == 0
++    #endif
++                        ) {
+                     /* Fatal error. Only try to send an alert. RFC 5246 does not
+                      * allow for reverting back to a full handshake after the
+                      * server has indicated the intention to do a resumption. */
