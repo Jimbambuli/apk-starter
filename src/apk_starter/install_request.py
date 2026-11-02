@@ -61,7 +61,12 @@ def run(paths: Paths, env: Mapping[str, str], files: list[Path]) -> int:
             if not ask(info, installer, update, env):
                 _say(_("Installation of {app} cancelled").format(app=info.label))
                 return STATUS_ABORTED
-            install_parts(paths, info, parts.splits, lang, env)
+            try:
+                install_parts(paths, info, parts.splits, lang, env)
+            except StarterError as e:
+                if not paths.meta(info.package).is_file():
+                    raise
+                _say(describe_error(e))         # installed, only the menu entry is missing: the store may open it
         return STATUS_SUCCESS
     except splits.IncompatibleError as e:
         _say(describe_error(e))

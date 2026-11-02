@@ -86,3 +86,14 @@ def test_install_request_failure_is_status_failure(box, monkeypatch, capsys):
     bad.write_bytes(b"no zip")
     assert main(["--install-request", str(bad)], env=box.env) == 4
     assert "not an APK" in capsys.readouterr().err
+
+
+def test_install_request_without_menu_entry_is_still_installed(box, monkeypatch, capsys):
+    from test_cli import PortalUnavailable
+
+    def boom(*a):
+        raise PortalUnavailable("x")
+    box.fake.install_launcher = boom
+    monkeypatch.setattr(install_request, "ask", lambda *a: True)
+    assert main(["--install-request", *map(str, parts(box.tmp))], env=box.env) == 0
+    assert "without a menu entry" in capsys.readouterr().err
