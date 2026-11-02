@@ -44,3 +44,12 @@ def test_microg_settings_and_every_app_shares_microg(box, capsys):  # noqa: F811
     assert not (data / GMS / f"{GMS}.apk_").is_symlink()      # microG's own folder is the shared one
     assert main(["--remove", PKG, "--purge"], env=box.env) == 0
     assert (data / GMS / f"{GMS}.apk_").is_dir()               # the app's links go, microG's data stays
+
+
+def test_test_build_makes_no_menu_entries(box, monkeypatch):  # noqa: F811
+    """The portal's entries would start stable (no --branch): a test build's apps start from its window."""
+    from apk_starter import cli
+    monkeypatch.setattr(cli, "MENU_ENTRIES", False)
+    assert main(["--install", str(box.apk)], env=box.env) == 0
+    assert main(["--remove", PKG], env=box.env) == 0
+    assert box.calls == []

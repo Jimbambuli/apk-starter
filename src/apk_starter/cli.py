@@ -28,6 +28,9 @@ APP_ID = "io.github.Jimbambuli.ApkStarter"
 _PROFILE = os.environ.get("APK_STARTER_PROFILE", "")
 ENTRY_PREFIX = f"{APP_ID}.{_PROFILE}" if PROFILE_RE.fullmatch(_PROFILE) else APP_ID
 RUN_REF = f"{APP_ID}//{_PROFILE}" if PROFILE_RE.fullmatch(_PROFILE) else APP_ID     # its Flatpak branch
+# The portal's menu entries run the current branch (no --branch), so a test build makes none: its apps start from
+# its own window.
+MENU_ENTRIES = RUN_REF == APP_ID
 VALUE_OPTIONS = ("--sdk", "--size", "--install", "--remove")
 DISPLAY_VARS = ("WAYLAND_DISPLAY", "DISPLAY")
 
@@ -161,6 +164,8 @@ def install_apk(paths: Paths, apk: Path, lang: str | None, env: Mapping[str, str
         with contextlib.suppress(OSError):          # the first start then needs not parse the APK (F182)
             cached_apk_info(paths, paths.apk(info.package), lang, lambda p, _l: dataclasses.replace(info, path=p))
         prepare_installed(paths, os.environ if env is None else env, info, report, warn)
+        if not MENU_ENTRIES:
+            return info
         icon = info.icon
         if icon is None:
             try:
@@ -187,7 +192,7 @@ def microg_hint() -> str:
 
 def setup_microg(paths: Paths, lang: str | None, env: Mapping[str, str] | None = None,
                  report: Callable[[str], None] = _stderr, warn: Callable[[str], None] = _stderr) -> ApkInfo:
-    """Test build with microG: install the shipped GmsCore as «microG settings» (app list and menu entry)."""
+    """Test build with microG: install the shipped GmsCore as «microG settings» (in the app list)."""
     from . import microg
     apk = microg.bundle_dir(paths) / f"{microg.GMS}.apk"
     if not apk.is_file():
@@ -242,7 +247,8 @@ def remove_app(paths: Paths, pkg: str, purge: bool) -> list[str]:
         if not paths.meta(pkg).exists() and not paths.apk(pkg).exists():
             raise UsageError(_("not installed: {package}").format(package=pkg))
         try:
-            portal.uninstall_launcher(pkg)
+            if MENU_ENTRIES:
+                portal.uninstall_launcher(pkg)
         except portal.PortalUnavailable:
             warnings.append(_("the DynamicLauncher portal is not available; the menu entry was not removed"))
         except StarterError as e:
