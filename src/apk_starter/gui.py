@@ -724,6 +724,15 @@ class ThemeWatcher:
             pass                                    # no portal: GTK's own defaults
         self.load_system()
         self.apply()
+        # GTK also takes the icon theme from the settings portal (org.gnome.desktop.interface), maybe one that is
+        # not in the sandbox (KDE: breeze): keep an installed one
+        Gtk.Settings.get_for_display(display).connect("notify::gtk-icon-theme-name", self.on_icon_theme)
+        self.on_icon_theme()
+
+    def on_icon_theme(self, *_args) -> None:
+        settings = Gtk.Settings.get_for_display(self.display)
+        if not theme.icon_theme_available(settings.props.gtk_icon_theme_name, theme.icon_theme_dirs(os.environ)):
+            settings.props.gtk_icon_theme_name = "Adwaita"
 
     def on_signal(self, _proxy, _sender, name: str, params: GLib.Variant) -> None:
         if name == "SettingChanged":
