@@ -66,8 +66,9 @@ def test_atl_doctor_pinned_with_the_same_atl_source():
     assert f"commit: {pins['atl-doctor']}" in art and "libopenjdkjvmti.so" in art   # JVMTI plugin, same atl-doctor
 
 
-def test_atl_from_the_microg_1_branch():
+def test_atl_from_the_apk_starter_tv6_branch():
     text = (ROOT / "io.github.Jimbambuli.ApkStarter.yml").read_text()
     module = text[text.index("- name: android_translation_layer"):text.index("- name: atl-doctor")]
-    assert "branch: microg-1" in module   # apk-starter-tv4 + compose-1 + microG (open ATL MRs, M1-M17)
+    # apk-starter-tv5 + compose-1 + microG (microg-1) + app stores (aurora-1)
+    assert "branch: apk-starter-tv6" in module
     assert text.count(f"commit: {manifest_commits()['android_translation_layer']}") == 2      # also atl-src

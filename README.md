@@ -42,6 +42,9 @@ The same is available on the command line:
 apk-starter                          # open the window
 apk-starter @@ app.apk @@            # start an app (@@ lets Flatpak pass the file into the sandbox)
 apk-starter --install @@ app.apk @@  # add it to the application menu (asks via the desktop portal)
+apk-starter --install @@ base.apk @@ @@ split_config.x86_64.apk @@ ...  # a split APK: the base and its parts
+apk-starter --install @@ app.apks @@ # a bundle (.apks/.xapk); parts for ARM only are left out
+apk-starter --setup-aurora           # download Aurora Store from F-Droid, check its signature, install it
 apk-starter --list                   # installed apps
 apk-starter --remove PACKAGE [--purge]
 apk-starter --remove-all [--purge]   # remove every installed app and its menu entry
@@ -55,8 +58,18 @@ apk-starter @@ app.apk @@ -- ARGS    # everything after the APK is passed on to 
 apk-starter --version
 ```
 
-Exit codes: 0 ok, 1 error (e.g. cannot write), 2 wrong usage, 3 APK not readable; if the app is ended by a signal,
-128+N.
+Exit codes: 0 ok, 1 error (e.g. cannot write), 2 wrong usage, 3 APK not readable, 7 the app has native code only
+for other processors (e.g. ARM); if the app is ended by a signal, 128+N.
+
+### App stores (Aurora Store)
+
+**+ → Set up Aurora Store…** (or `--setup-aurora`) downloads the official Aurora Store from F-Droid, checks its APK
+signature against Aurora OSS's certificate and installs it like any app; Aurora Store is not part of the Flatpak.
+When Aurora Store (or another store using Android's PackageInstaller) installs an app, ATL hands its APKs to APK
+Starter, which asks **Install …?** and installs it with a menu entry; the store then sees it as installed. Split APKs
+from Google Play (base and configuration parts) are kept together; apps with native code only for ARM are refused
+with a message. Sign in anonymously in Aurora Store: signing in with your own Google account may break Google's terms
+of service.
 
 Without the alias use `flatpak run --file-forwarding io.github.Jimbambuli.ApkStarter …` instead of `apk-starter`.
 Double-clicking an APK in the file manager and starting an installed app from the menu work without any command.

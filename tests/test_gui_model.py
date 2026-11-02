@@ -109,3 +109,16 @@ def test_crash_meaning_only_for_real_crashes():
     assert "3" in crash_meaning(True, 3)
     assert crash_meaning(True, 128 + 11).startswith("SIGSEGV") and crash_meaning(False, 6).startswith("SIGABRT")
     assert "memory" in crash_meaning(True, 128 + 9)
+
+
+def test_group_parts_puts_the_parts_of_an_app_together(tmp_path):
+    from apk_starter.gui_model import group_parts
+    from apkgen import axml_manifest, make_apk
+    a = make_apk(tmp_path / "a.apk", manifest=axml_manifest(package="org.example.a"))
+    a2 = make_apk(tmp_path / "a2.apk", manifest=axml_manifest(package="org.example.a", split="config.de"))
+    b = make_apk(tmp_path / "b.apk", manifest=axml_manifest(package="org.example.b"))
+    junk = tmp_path / "junk.apk"
+    junk.write_bytes(b"x")
+    bundle = tmp_path / "c.xapk"
+    bundle.write_bytes(b"x")
+    assert group_parts([a, b, a2, junk, bundle]) == [[a, a2], [b], [junk], [bundle]]

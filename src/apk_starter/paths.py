@@ -52,6 +52,16 @@ class Paths:
     def apk(self, pkg: str) -> Path:
         return self.apps_dir() / f"{_safe(pkg)}.apk"
 
+    def splits_dir(self, pkg: str) -> Path:
+        """The configuration parts of a split APK (ABI, density, language), next to the base <pkg>.apk."""
+        return self.apps_dir() / f"{_safe(pkg)}.splits"
+
+    def installed_splits(self, pkg: str) -> list[Path]:
+        try:
+            return sorted(p for p in self.splits_dir(pkg).iterdir() if p.suffix == ".apk")
+        except OSError:
+            return []
+
     def meta(self, pkg: str) -> Path:
         return self.apps_dir() / f"{_safe(pkg)}.json"
 
@@ -94,6 +104,9 @@ class Paths:
 
     def stub_list(self) -> Path:
         return self.prefix / "share/apk-starter/stubs.tsv"
+
+    def program(self) -> Path:
+        return self.prefix / "bin/apk-starter"
 
     def default_icon(self) -> Path:
         return self.prefix / "share/icons/hicolor/scalable/apps/io.github.Jimbambuli.ApkStarter.svg"

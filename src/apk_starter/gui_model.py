@@ -152,3 +152,22 @@ def crash_meaning(exited: bool, status: int) -> str | None:
     if signal == 9:
         return _("SIGKILL: ended by the system (too little memory?)")
     return _("Signal {signal}").format(signal=SIGNALS.get(signal, signal))
+
+
+def group_parts(files: list[Path]) -> list[list[Path]]:
+    """Dropped or chosen files, one group per app: the base and parts of a split APK together (in the given order),
+    every other file (other app, bundle, unreadable) alone; the install then tells what is wrong with it."""
+    from . import splits
+    from .errors import ApkError
+    groups: dict[str, list[Path]] = {}
+    alone: list[list[Path]] = []
+    for f in files:
+        try:
+            pkg = splits.read_part(f)[0] if f.suffix.lower() not in splits.BUNDLES else None
+        except ApkError:
+            pkg = None
+        if pkg is None:
+            alone.append([f])
+        else:
+            groups.setdefault(pkg, []).append(f)
+    return list(groups.values()) + alone
