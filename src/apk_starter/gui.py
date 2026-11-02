@@ -8,12 +8,12 @@ import threading
 from collections.abc import Callable, Mapping
 from pathlib import Path
 
-from . import dexopt, diag, theme
-from .cli import APP_ID, clear_data, install_apk, lang_from_env, prepare_all, remove_app
+from . import aurora, dexopt, diag, theme
+from .cli import APP_ID, clear_data, install_files, lang_from_env, prepare_all, remove_app
 from .errors import StarterError, describe_error
 from .i18n import _
-from .gui_model import (AppRow, WindowState, crash_meaning, details_layout, filter_rows, is_narrow, key_action,
-                        load_rows, load_state, save_state, sort_rows, start_argv)
+from .gui_model import (AppRow, WindowState, crash_meaning, details_layout, filter_rows, group_parts, is_narrow,
+                        key_action, load_rows, load_state, save_state, sort_rows, start_argv)
 from .paths import Paths
 from .settings import TITLEBARS, load_settings, save_settings
 
@@ -145,8 +145,10 @@ class Window(Gtk.ApplicationWindow):
         # Breeze has no symbolic variant of this icon
         sort.set_child(Gtk.Image.new_from_gicon(Gio.ThemedIcon.new_from_names(
             ["view-sort-descending-symbolic", "view-sort-descending"])))
-        install = Gtk.Button(icon_name="list-add-symbolic", tooltip_text=_("Install APK…"))
-        install.connect("clicked", lambda _b: self.choose_apk())
+        add_menu = Gio.Menu()
+        add_menu.append(_("Install APK…"), "win.choose-apk")
+        add_menu.append(_("Set up Aurora Store…"), "win.setup-aurora")
+        install = Gtk.MenuButton(menu_model=add_menu, icon_name="list-add-symbolic", tooltip_text=_("Add apps"))
         self.spinner = Gtk.Spinner(visible=False, spinning=True, tooltip_text=_("Working…"))
         top = Gtk.Box(spacing=6, margin_top=10, margin_bottom=8, margin_start=10, margin_end=10)
         for w in (self.search, sort, install, self.spinner):
@@ -224,6 +226,10 @@ class Window(Gtk.ApplicationWindow):
             action = Gio.SimpleAction.new(name, GLib.VariantType.new("s"))
             action.connect("activate", lambda _a, v, h=handler: h(v.get_string()))
             self.add_action(action)
+        for name, handler in (("choose-apk", self.choose_apk), ("setup-aurora", self.ask_setup_aurora)):
+            action = Gio.SimpleAction.new(name, None)
+            action.connect("activate", lambda _a, _v, h=handler: h())
+            self.add_action(action)
         sort_action = Gio.SimpleAction.new_stateful("sort", GLib.VariantType.new("s"), GLib.Variant("s", self.sort))
         sort_action.connect("activate", lambda a, v: (a.set_state(v), self.set_sort(v.get_string())))
         self.add_action(sort_action)
@@ -245,7 +251,9 @@ class Window(Gtk.ApplicationWindow):
         choose.add_css_class("suggested-action")
         choose.add_css_class("start-button")
         choose.connect("clicked", lambda _b: self.choose_apk())
-        for w in (self.welcome_title, self.welcome_text, choose):
+        aurora_ = Gtk.Button(label=_("Set up Aurora Store…"), halign=Gtk.Align.CENTER)
+        aurora_.connect("clicked", lambda _b: self.ask_setup_aurora())
+        for w in (self.welcome_title, self.welcome_text, choose, aurora_):
             box.append(w)
         return box
 
@@ -606,7 +614,8 @@ class Window(Gtk.ApplicationWindow):
 
     def choose_apk(self) -> None:
         apks = Gtk.FileFilter(name=_("Android apps"))
-        apks.add_suffix("apk")
+        for suffix in ("apk", "apks", "xapk"):
+            apks.add_suffix(suffix)
         apks.add_mime_type(APK_MIME)
         filters = Gio.ListStore.new(Gtk.FileFilter)
         filters.append(apks)
@@ -614,32 +623,57 @@ class Window(Gtk.ApplicationWindow):
 
         def chosen(d: Gtk.FileDialog, res) -> None:
             try:
-                f = d.open_finish(res)
+                files = d.open_multiple_finish(res)
             except GLib.Error:                      # cancelled
                 return
-            if f is not None and f.get_path():
-                self.install(Path(f.get_path()))
-        dialog.open(self, None, chosen)
+            self.install_dropped([f.get_path() for f in files if f.get_path()])
+        dialog.open_multiple(self, None, chosen)    # several files: a split APK (base and its parts)
 
     def on_drop(self, _target, files, _x, _y) -> bool:
         self.drop_zone.set_reveal_child(False)
-        paths = [f.get_path() for f in files.get_files()]
-        for p in paths:
-            if p:
-                self.install(Path(p))
-        return any(paths)
+        paths = [f.get_path() for f in files.get_files() if f.get_path()]
+        self.install_dropped(paths)
+        return bool(paths)
 
-    def install(self, apk: Path) -> None:
+    def install_dropped(self, names: list[str]) -> None:
+        """One install per app: the parts of a split APK together, other APKs each on their own."""
+        for group in group_parts([Path(n) for n in names]):
+            self.install(group)
+
+    def install(self, files: Path | list[Path]) -> None:
+        files = [files] if isinstance(files, Path) else files
         warnings: list[str] = []
+        name = files[0].name
 
         def done(info) -> None:
             self.selected = info.package
             self.search.set_text("")
             if warnings:
                 self.alert(_("{app} installed").format(app=info.label), "\n".join(warnings))
-        self.progress(_("Installing {file}…").format(file=apk.name))
-        self.background(lambda: install_apk(self.paths, apk, self.lang, self.env, self.progress, warnings.append),
-                        done, _("Cannot install {file}").format(file=apk.name))
+        self.progress(_("Installing {file}…").format(file=name))
+        self.background(lambda: install_files(self.paths, files, self.lang, self.env, self.progress,
+                                              warnings.append),
+                        done, _("Cannot install {file}").format(file=name))
+
+    def ask_setup_aurora(self) -> None:
+        def setup() -> None:
+            warnings: list[str] = []
+
+            def done(info) -> None:
+                self.selected = info.package
+                self.search.set_text("")
+                if warnings:
+                    self.alert(_("{app} installed").format(app=info.label), "\n".join(warnings))
+            self.progress(_("Downloading Aurora Store from F-Droid…"))
+            self.background(lambda: aurora.setup(self.paths, self.env, self.progress, warnings.append), done,
+                            _("Cannot set up Aurora Store"))
+        Dialog(self, _("Set up Aurora Store?"),
+               _("Aurora Store installs free apps from Google Play; the apps it installs appear here. APK Starter "
+                 "downloads the official Aurora Store from F-Droid and checks its signature.\n\n"
+                 "Sign in anonymously in Aurora Store. Signing in with your own Google account may break Google's "
+                 "terms of service, and Google can block the account."),
+               [("cancel", _("Cancel")), ("ok", _("Set up"))],
+               lambda resp: setup() if resp == "ok" else None).present()
 
     def _confirm(self, heading: str, body: str, verb: str, then: Callable[[], None],
                  extra: Gtk.Widget | None = None) -> None:

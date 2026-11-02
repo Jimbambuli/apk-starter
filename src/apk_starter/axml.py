@@ -38,6 +38,7 @@ class ManifestInfo:
     target_sdk: int | None
     label: Value | None
     icon: int | None
+    split: str | None = None        # <manifest split="config.x86_64">: a configuration part of a split APK
 
 
 def parse_manifest(data: bytes) -> ManifestInfo:
@@ -54,6 +55,7 @@ def _parse(data: bytes) -> ManifestInfo:
     strings: list[str] = []
     resmap: list[int] = []
     package = None
+    split = None
     found: dict[tuple[str, str], object] = {}
     pos = hsize
     end = size
@@ -74,8 +76,11 @@ def _parse(data: bytes) -> ManifestInfo:
                 if aid not in ATTR_IDS:
                     aid = NAME_TO_ID.get(strings[name], 0) if name < len(strings) else 0
                 if tag == "manifest" and ns == NONE and name < len(strings) \
-                        and strings[name] == "package" and dt == 0x03 and raw != NONE:
-                    package = strings[raw]
+                        and strings[name] in ("package", "split") and dt == 0x03 and raw != NONE:
+                    if strings[name] == "package":
+                        package = strings[raw]
+                    else:
+                        split = strings[raw]
                     continue
                 field = ATTR_IDS.get(aid)
                 if field is None:
@@ -110,4 +115,5 @@ def _parse(data: bytes) -> ManifestInfo:
         target_sdk=num("uses-sdk", "target_sdk"),
         label=val_("application", "label"),
         icon=icon.id if isinstance(icon, ResRef) else None,
+        split=split,
     )

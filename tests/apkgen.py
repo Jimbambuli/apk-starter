@@ -48,7 +48,7 @@ def _end(name: int) -> bytes:
 
 def axml_manifest(*, package="org.example.demo", version_code=7, version_name="1.2", min_sdk=21,
                   target_sdk=34, label: str | int = "Demo", icon: int | None = None,
-                  utf8=True, strip_names=False) -> bytes:
+                  utf8=True, strip_names=False, split: str | None = None) -> bytes:
     ids = {"label": 0x01010001, "icon": 0x01010002, "versionCode": 0x0101021B,
            "versionName": 0x0101021C, "minSdkVersion": 0x0101020C, "targetSdkVersion": 0x01010270}
     attr_names = ["versionCode", "versionName", "minSdkVersion", "targetSdkVersion", "label"]
@@ -65,6 +65,7 @@ def axml_manifest(*, package="org.example.demo", version_code=7, version_name="1
     ns = add(NS_URI)
     n_pkg, n_manifest, n_sdk, n_app = add("package"), add("manifest"), add("uses-sdk"), add("application")
     v_pkg, v_vn = add(package), add(version_name)
+    n_split, v_split = (add("split"), add(split)) if split else (None, None)
     v_label = add(label) if isinstance(label, str) else None
     A = ns
     manifest_attrs = [
@@ -72,6 +73,8 @@ def axml_manifest(*, package="org.example.demo", version_code=7, version_name="1
         (A, idx["versionCode"], 0xFFFFFFFF, 0x10, version_code),
         (A, idx["versionName"], v_vn, 0x03, v_vn),
     ]
+    if split:
+        manifest_attrs.append((0xFFFFFFFF, n_split, v_split, 0x03, v_split))
     sdk_attrs = [(A, idx["minSdkVersion"], 0xFFFFFFFF, 0x10, min_sdk),
                  (A, idx["targetSdkVersion"], 0xFFFFFFFF, 0x10, target_sdk)]
     app_attrs = [(A, idx["label"], v_label, 0x03, v_label) if v_label is not None

@@ -14,7 +14,9 @@ if rec:
         check = os.environ.get("FAKE_ATL_CHECK")
         json.dump({"argv": sys.argv[1:], "data_dir": os.environ.get("ANDROID_APP_DATA_DIR"),
                    "check": bool(check) and os.path.exists(check),
-                   "log_tags": os.environ.get("ANDROID_LOG_TAGS")}, f)
+                   "log_tags": os.environ.get("ANDROID_LOG_TAGS"),
+                   "installed_apks": os.environ.get("ATL_INSTALLED_APKS_DIR"),
+                   "install_command": os.environ.get("ATL_INSTALL_COMMAND")}, f)
 for a in sys.argv[1:]:
     if a.startswith("-agentpath:"):
         with open(a.split("=", 1)[1].split(",")[0], "a") as f:

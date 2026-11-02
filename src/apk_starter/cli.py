@@ -7,6 +7,7 @@ import json
 import os
 import shutil
 import sys
+import tempfile
 import threading
 from collections.abc import Callable, Iterator, Mapping
 from datetime import datetime
@@ -15,7 +16,7 @@ from pathlib import Path
 from .apkinfo import PACKAGE_RE, ApkInfo, read_apk_info
 from .errors import ApkError, StarterError, UsageError, describe_error
 from .i18n import _
-from . import dexopt, diag, i18n
+from . import dexopt, diag, i18n, splits
 from .launch import (DEFAULT_SIZE, build_command, build_env, cached_apk_info, parse_size, prepare_apk,
                      remember_size, remembered_size, sdk_for)
 from .paths import Paths
@@ -24,7 +25,7 @@ from .run import (default_log_path, header_fields, read_build_info, run_atl, run
 
 VERSION = "0.1.0"
 APP_ID = "io.github.Jimbambuli.ApkStarter"
-VALUE_OPTIONS = ("--sdk", "--size", "--install", "--remove")
+VALUE_OPTIONS = ("--sdk", "--size", "--install", "--install-request", "--remove")
 DISPLAY_VARS = ("WAYLAND_DISPLAY", "DISPLAY")
 
 
@@ -93,13 +94,32 @@ def package_lock(paths: Paths, pkg: str) -> Iterator[None]:
         yield
 
 
-def install_app(paths: Paths, info: ApkInfo) -> None:
+def _install_splits(paths: Paths, pkg: str, parts: tuple[tuple[str, Path], ...]) -> None:
+    """The configuration parts as <pkg>.splits/<name>.apk; replaces the parts of an earlier install."""
+    dest = paths.splits_dir(pkg)
+    old = dest.with_name(f"{dest.name}.{os.getpid()}.old")
+    if parts:
+        tmp = dest.with_name(f"{dest.name}.{os.getpid()}.tmp")
+        shutil.rmtree(tmp, ignore_errors=True)
+        tmp.mkdir()
+        for name, src in parts:
+            shutil.copyfile(src, tmp / f"{name}.apk")
+        if dest.exists():
+            os.replace(dest, old)
+        os.replace(tmp, dest)
+    elif dest.exists():
+        os.replace(dest, old)
+    shutil.rmtree(old, ignore_errors=True)
+
+
+def install_app(paths: Paths, info: ApkInfo, parts: tuple[tuple[str, Path], ...] = ()) -> None:
     dest = paths.apk(info.package)
     paths.apps_dir().mkdir(parents=True, exist_ok=True)
     if not (dest.exists() and os.path.samefile(info.path, dest)):
         tmp = dest.with_name(f"{dest.name}.{os.getpid()}.tmp")
         shutil.copyfile(info.path, tmp)
         os.replace(tmp, dest)
+    _install_splits(paths, info.package, parts)
     if info.icon:
         _write_atomic(paths.icon(info.package), info.icon)
     else:
@@ -131,7 +151,8 @@ def _compile_and_unpack(paths: Paths, env: Mapping[str, str], pkg: str, apk: Pat
     failed: list[Exception] = []
     def natives() -> None:
         try:
-            dexopt.extract_natives(paths, pkg, apk)
+            for f in [apk] + (paths.installed_splits(pkg) if apk == paths.apk(pkg) else []):
+                dexopt.extract_natives(paths, pkg, f)        # the base, then the ABI part of a split APK
         except (StarterError, OSError) as e:
             failed.append(e)
     t = threading.Thread(target=natives)
@@ -147,10 +168,41 @@ def _compile_and_unpack(paths: Paths, env: Mapping[str, str], pkg: str, apk: Pat
 def install_apk(paths: Paths, apk: Path, lang: str | None, env: Mapping[str, str] | None = None,
                 report: Callable[[str], None] = _stderr, warn: Callable[[str], None] = _stderr) -> ApkInfo:
     """Copy the APK into apps/, compile it for this computer and add a menu entry (DynamicLauncher portal)."""
+    return install_files(paths, [apk], lang, env, report, warn)
+
+
+def read_parts(paths: Paths, files: list[Path], lang: str | None, tmp: Path) -> tuple[ApkInfo, splits.SplitSet]:
+    """The app of one APK, of a base with its configuration parts, or of a bundle (.apks/.xapk); only the parts
+    for this computer (refused with IncompatibleError if there is no x86_64 code)."""
+    parts = splits.expand(files, tmp)
+    if len(parts) == 1:
+        info = read_apk_info(parts[0], lang)
+        return info, splits.select(splits.SplitSet(info.package, parts[0], ()), info.label)
+    s = splits.collect(parts)
+    info = read_apk_info(s.base, lang)
+    return info, splits.select(s, info.label)
+
+
+def parts_dir(paths: Paths) -> tempfile.TemporaryDirectory:
+    """Where bundles are unpacked while installing (next to the cache, not in a small /tmp)."""
+    paths.cache_home.mkdir(parents=True, exist_ok=True)
+    return tempfile.TemporaryDirectory(prefix="apk-starter-", dir=paths.cache_home)
+
+
+def install_files(paths: Paths, files: list[Path], lang: str | None, env: Mapping[str, str] | None = None,
+                  report: Callable[[str], None] = _stderr, warn: Callable[[str], None] = _stderr) -> ApkInfo:
+    """Install an APK, a split APK (base and parts) or a bundle."""
+    with parts_dir(paths) as tmp:
+        info, parts = read_parts(paths, files, lang, Path(tmp))
+        return install_parts(paths, info, parts.splits, lang, env, report, warn)
+
+
+def install_parts(paths: Paths, info: ApkInfo, parts: tuple[tuple[str, Path], ...], lang: str | None,
+                  env: Mapping[str, str] | None, report: Callable[[str], None] = _stderr,
+                  warn: Callable[[str], None] = _stderr) -> ApkInfo:
     from . import portal
-    info = read_apk_info(apk, lang)
     with package_lock(paths, info.package):
-        install_app(paths, info)
+        install_app(paths, info, parts)
         with contextlib.suppress(OSError):          # the first start then needs not parse the APK (F182)
             cached_apk_info(paths, paths.apk(info.package), lang, lambda p, _l: dataclasses.replace(info, path=p))
         prepare_installed(paths, os.environ if env is None else env, info, report, warn)
@@ -227,6 +279,7 @@ def remove_app(paths: Paths, pkg: str, purge: bool) -> list[str]:
             warnings.append(_("the menu entry was not removed: {reason}").format(reason=e))
         for f in (paths.apk(pkg), paths.meta(pkg), paths.icon(pkg), paths.started(pkg), paths.launch_dir() / f"{pkg}.apk"):
             f.unlink(missing_ok=True)
+        shutil.rmtree(paths.splits_dir(pkg), ignore_errors=True)
         if purge:
             _delete_data(paths, pkg)
     return warnings
@@ -268,7 +321,11 @@ def _parser() -> argparse.ArgumentParser:
     p.add_argument("--size", metavar="WxH", help=_("window size (remembered per app)"))
     p.add_argument("--purge", action="store_true", help=_("with --remove/--remove-all: also delete the app data"))
     g = p.add_mutually_exclusive_group()
-    g.add_argument("--install", metavar="APK", help=_("install the APK and add a menu entry"))
+    g.add_argument("--install", metavar="APK", help=_("install the APK and add a menu entry; a split APK: the base "
+                                                      "and its parts, or one .apks/.xapk file"))
+    g.add_argument("--install-request", metavar="APK", help=argparse.SUPPRESS)  # from an app store, via ATL
+    g.add_argument("--setup-aurora", action="store_true",
+                   help=_("download Aurora Store from F-Droid, check its signature and install it"))
     g.add_argument("--list", action="store_true", help=_("list installed apps"))
     g.add_argument("--remove", metavar="PACKAGE", help=_("remove an installed app"))
     g.add_argument("--remove-all", action="store_true",
@@ -305,8 +362,9 @@ def _main(argv: list[str], env: Mapping[str, str]) -> int:
         args = parser.parse_args([a for a in kept if a != "--"])
     except SystemExit as e:
         return e.code if isinstance(e.code, int) else 0
-    mode = args.install or args.list or args.remove or args.remove_all or args.version
-    if mode and (tail or level is not None or args.sdk is not None or args.size):
+    mode = args.install or args.install_request or args.setup_aurora or args.list or args.remove or args.remove_all or args.version
+    more = tail if (args.install or args.install_request) else []       # the further parts of a split APK
+    if mode and ((tail and not more) or level is not None or args.sdk is not None or args.size):
         parser.error(_("--install, --list, --remove, --remove-all and --version take no other arguments"))
     if args.purge and not (args.remove or args.remove_all):
         parser.error(_("--purge only works with --remove or --remove-all"))
@@ -330,8 +388,15 @@ def _main(argv: list[str], env: Mapping[str, str]) -> int:
             print(f"apk-starter: {line}", file=sys.stderr)
         return 1 if errors else 0
     if args.install:
-        install_apk(paths, Path(args.install), lang_from_env(env), env)
+        install_files(paths, [Path(args.install), *map(Path, more)], lang_from_env(env), env)
         return 0
+    if args.setup_aurora:
+        from . import aurora
+        aurora.setup(paths, env, _stderr, _stderr)
+        return 0
+    if args.install_request:
+        from . import install_request
+        return install_request.run(paths, env, [Path(args.install_request), *map(Path, more)])
     if not tail and level is None and args.sdk is None and not args.size:
         if not any(env.get(v) for v in DISPLAY_VARS):
             parser.error(_("no APK given and no display for the window"))
@@ -362,8 +427,9 @@ def _start(paths: Paths, args, level: str | None, into: Path | None, tail: list[
     elif level == "debug":
         debug_dir = into or diag.default_debug_dir(paths, info.package, started)
     apk_path = prepare_apk(paths, info)
+    parts = paths.installed_splits(info.package) if apk_path == paths.apk(info.package) else []
     cmd = build_command(paths, apk_path, size=size, sdk=sdk_for(info, args.sdk), atl_args=atl_args,
-                        app_id=f"{APP_ID}.{info.package}")
+                        app_id=f"{APP_ID}.{info.package}", splits=parts)
     child_env = build_env(paths, info.package, env)
     if args.size:
         remember_size(paths, info.package, size)

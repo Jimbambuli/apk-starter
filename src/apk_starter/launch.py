@@ -75,8 +75,9 @@ def prepare_apk(paths: Paths, info: ApkInfo) -> Path:
 
 
 def build_command(paths: Paths, apk_path: Path, *, size: tuple[int, int], sdk: int | None,
-                  atl_args: list[str], app_id: str) -> list[str]:
-    cmd = [ATL_BIN, str(apk_path), "-w", str(size[0]), "-h", str(size[1])]
+                  atl_args: list[str], app_id: str, splits: list[Path] = ()) -> list[str]:
+    # the configuration parts of a split APK after the base: ATL loads them like Android's splitSourceDirs
+    cmd = [ATL_BIN, str(apk_path), *map(str, splits), "-w", str(size[0]), "-h", str(size[1])]
     if sdk is not None:
         cmd += ["--sdk-int", str(sdk)]
     # Window app ID = menu entry ID: KWin only accepts IDs prefixed with the Flatpak ID.
@@ -95,6 +96,9 @@ def build_env(paths: Paths, pkg: str, base: Mapping[str, str]) -> dict[str, str]
     env["ATL_TITLEBAR"] = load_settings(paths.settings()).app(pkg).titlebar     # chosen in the window, per app
     # the tooltips of ATL's navigation bar ◁ ○ □ in the desktop's language (ATL has no translations)
     env["ATL_NAVIGATION_TOOLTIPS"] = "\n".join((_("Back"), _("Start page of the app"), _("Open pages of the app")))
+    # app stores (Aurora Store): ATL finds the installed apps here and hands installs back to the starter
+    env["ATL_INSTALLED_APKS_DIR"] = str(paths.apps_dir())
+    env["ATL_INSTALL_COMMAND"] = f"{paths.program()} --install-request"
     env.pop("ATL_APP_ICON", None)
     if paths.icon(pkg).is_file():
         env["ATL_APP_ICON"] = str(paths.icon(pkg))     # for ATL's title bar; ATL cannot draw adaptive icons
