@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-02 17:07+0000\n"
+"POT-Creation-Date: 2026-11-02 17:16+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -357,7 +357,7 @@ msgstr "Виконується…"
 msgid "No app matches."
 msgstr "Немає відповідних застосунків."
 
-#: src/apk_starter/gui.py:166
+#: src/apk_starter/gui.py:166 src/apk_starter/launch.py:97
 msgid "Back"
 msgstr "Назад"
 
@@ -652,6 +652,14 @@ msgstr "некоректне значення %(type)s: %(value)r"
 #, python-brace-format
 msgid "invalid --size, expected WxH: {value}"
 msgstr "некоректне значення --size, очікується WxH: {value}"
+
+#: src/apk_starter/launch.py:97
+msgid "Start page of the app"
+msgstr "Початкова сторінка застосунку"
+
+#: src/apk_starter/launch.py:97
+msgid "Open pages of the app"
+msgstr "Відкриті сторінки застосунку"
 
 #: src/apk_starter/paths.py:14 src/apk_starter/portal.py:26
 #, python-brace-format

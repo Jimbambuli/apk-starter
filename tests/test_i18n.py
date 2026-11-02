@@ -95,6 +95,15 @@ def test_help_and_errors_in_german(tmp_path, prefix, monkeypatch, capsys):
     assert "apk-starter: Fehler: --purge geht nur mit --remove oder --remove-all" in capsys.readouterr().err
 
 
+def test_navigation_bar_tooltips_in_german(tmp_path, prefix, monkeypatch):
+    from apk_starter.launch import build_env
+    from apk_starter.paths import Paths
+    monkeypatch.setenv("LANGUAGE", "de")
+    i18n.setup(prefix)
+    env = build_env(Paths(tmp_path / "d", tmp_path / "c", prefix), "org.example.demo", {})
+    assert env["ATL_NAVIGATION_TOOLTIPS"] == "Zurück\nStartseite der App\nOffene Seiten der App"
+
+
 def test_help_in_japanese_and_english_fallback(tmp_path, prefix, monkeypatch, capsys):
     monkeypatch.setenv("LANGUAGE", "ja")
     assert main(["--help"], env=_env(tmp_path, prefix)) == 0

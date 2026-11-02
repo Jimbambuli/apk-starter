@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-02 17:07+0000\n"
+"POT-Creation-Date: 2026-11-02 17:16+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -360,7 +360,7 @@ msgstr "Trwa praca…"
 msgid "No app matches."
 msgstr "Brak pasujących aplikacji."
 
-#: src/apk_starter/gui.py:166
+#: src/apk_starter/gui.py:166 src/apk_starter/launch.py:97
 msgid "Back"
 msgstr "Wstecz"
 
@@ -654,6 +654,14 @@ msgstr "nieprawidłowa wartość %(type)s: %(value)r"
 #, python-brace-format
 msgid "invalid --size, expected WxH: {value}"
 msgstr "nieprawidłowa wartość --size, oczekiwano WxH: {value}"
+
+#: src/apk_starter/launch.py:97
+msgid "Start page of the app"
+msgstr "Strona startowa aplikacji"
+
+#: src/apk_starter/launch.py:97
+msgid "Open pages of the app"
+msgstr "Otwarte strony aplikacji"
 
 #: src/apk_starter/paths.py:14 src/apk_starter/portal.py:26
 #, python-brace-format

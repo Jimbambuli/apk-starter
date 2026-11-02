@@ -93,6 +93,8 @@ def build_env(paths: Paths, pkg: str, base: Mapping[str, str]) -> dict[str, str]
     env["ATL_UGLY_ENABLE_WEBVIEW"] = "1"
     env.pop("ATL_SYSTEM_TITLEBAR", None)
     env["ATL_TITLEBAR"] = load_settings(paths.settings()).app(pkg).titlebar     # chosen in the window, per app
+    # the tooltips of ATL's navigation bar ◁ ○ □ in the desktop's language (ATL has no translations)
+    env["ATL_NAVIGATION_TOOLTIPS"] = "\n".join((_("Back"), _("Start page of the app"), _("Open pages of the app")))
     env.pop("ATL_APP_ICON", None)
     if paths.icon(pkg).is_file():
         env["ATL_APP_ICON"] = str(paths.icon(pkg))     # for ATL's title bar; ATL cannot draw adaptive icons

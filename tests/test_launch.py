@@ -57,6 +57,7 @@ def test_command_and_env(tmp_path):
     assert env["ANDROID_APP_DATA_DIR"] == str(p.data("org.example.demo")) and env["ATL_UGLY_ENABLE_WEBVIEW"] == "1"
     assert p.data("org.example.demo").is_dir()
     assert "ATL_SYSTEM_TITLEBAR" not in env and env["ATL_TITLEBAR"] == "atl"
+    assert env["ATL_NAVIGATION_TOOLTIPS"] == "Back\nStart page of the app\nOpen pages of the app"
 
 
 def test_titlebar_of_the_app_reaches_atl(tmp_path):
