@@ -126,7 +126,7 @@ modules:
       - type: git
         url: https://gitlab.com/Jimbambuli/art_standalone.git
         branch: apk-starter-tv4
-        commit: 53f7a8d07be39214e54902fb4f060779eeb1eecc
+        commit: 20da12b7ed8913e9056b733206e058a866b3fb5b
       - type: git
         url: https://github.com/Jimbambuli/atl-doctor.git
         commit: d7d830af2f72d8865c508c2c0d99fde30071f865
@@ -173,7 +173,7 @@ modules:
   - name: git
     buildsystem: simple
     build-commands:
-      - make -j$FLATPAK_BUILDER_N_JOBS prefix=/app NO_PERL=1 NO_PYTHON=1 NO_TCLTK=1 NO_GETTEXT=1 NO_EXPAT=1 INSTALL_SYMLINKS=1 install
+      - make -j$FLATPAK_BUILDER_N_JOBS prefix=/app NO_RUST=1 NO_PERL=1 NO_PYTHON=1 NO_TCLTK=1 NO_GETTEXT=1 NO_EXPAT=1 INSTALL_SYMLINKS=1 install
     sources:
       - type: archive
         url: https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.56.0.tar.xz
@@ -186,6 +186,13 @@ modules:
       - /bin/scalar
       - /bin/git-shell
       - /bin/git-cvsserver
+      # servers and helpers the report never uses (it only runs ls-remote, clone, sparse-checkout, checkout)
+      - /libexec/git-core/git-daemon
+      - /libexec/git-core/git-http-backend
+      - /libexec/git-core/git-http-fetch
+      - /libexec/git-core/git-imap-send
+      - /libexec/git-core/git-sh-i18n--envsubst
+      - /libexec/git-core/git-shell
 
   # atl-doctor (public, fixed commit): JVMTI agent and trace counter for «Start with log/debug», its Python
   # package for the recorder and «Show report», and the stub list of exactly this ATL (for stub hits).
