@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-02 17:16+0000\n"
+"POT-Creation-Date: 2026-11-02 19:36+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -94,7 +94,7 @@ msgstr ""
 msgid "The app list with three free apps from F-Droid"
 msgstr "F-Droid の 3 つの自由なアプリが並んだアプリ一覧"
 
-#: src/apk_starter/apkinfo.py:45
+#: src/apk_starter/apkinfo.py:45 src/apk_starter/splits.py:77
 #, python-brace-format
 msgid "{file} is too large ({size} bytes)"
 msgstr "{file} が大きすぎます ({size} バイト)"
@@ -105,19 +105,27 @@ msgid "split APK bundles (.apks/.xapk) are not supported yet: {file}"
 msgstr "分割 APK バンドル (.apks/.xapk) にはまだ対応していません: {file}"
 
 #: src/apk_starter/apkinfo.py:94 src/apk_starter/apkinfo.py:115
+#: src/apk_starter/splits.py:75 src/apk_starter/splits.py:82
 #, python-brace-format
 msgid "not an APK (no AndroidManifest.xml): {file}"
 msgstr "APK ではありません (AndroidManifest.xml がありません): {file}"
 
-#: src/apk_starter/apkinfo.py:98
+#: src/apk_starter/apkinfo.py:98 src/apk_starter/splits.py:89
 #, python-brace-format
 msgid "invalid package name in manifest: {package}"
 msgstr "マニフェストのパッケージ名が無効です: {package}"
 
 #: src/apk_starter/apkinfo.py:117 src/apk_starter/apkinfo.py:119
+#: src/apk_starter/splits.py:62 src/apk_starter/splits.py:64
+#: src/apk_starter/splits.py:84 src/apk_starter/splits.py:86
 #, python-brace-format
 msgid "cannot read {file}: {reason}"
 msgstr "{file} を読み込めません: {reason}"
+
+#: src/apk_starter/apksig.py:30
+#, python-brace-format
+msgid "the signature of the APK is not valid: {reason}"
+msgstr "APK の署名が無効です: {reason}"
 
 #: src/apk_starter/arsc.py:32 src/apk_starter/arsc.py:37
 msgid "resource reference loop"
@@ -130,23 +138,53 @@ msgstr "リソース参照がループしています"
 msgid "corrupt resources.arsc"
 msgstr "resources.arsc が破損しています"
 
-#: src/apk_starter/axml.py:47 src/apk_starter/axml.py:53
+#: src/apk_starter/aurora.py:32
+#, python-brace-format
+msgid "the download is larger than expected: {url}"
+msgstr "ダウンロードが想定より大きいです: {url}"
+
+#: src/apk_starter/aurora.py:44 src/apk_starter/aurora.py:46
+msgid "F-Droid gave no version of Aurora Store"
+msgstr "F-Droid から Aurora Store のバージョンが得られませんでした"
+
+#: src/apk_starter/aurora.py:60
+#, python-brace-format
+msgid "cannot download Aurora Store from F-Droid: {reason}"
+msgstr "F-Droid から Aurora Store をダウンロードできません: {reason}"
+
+#: src/apk_starter/aurora.py:64
+#, python-brace-format
+msgid ""
+"the downloaded Aurora Store is not signed by Aurora OSS (certificate "
+"{found}); it was not installed"
+msgstr "ダウンロードした Aurora Store は Aurora OSS の署名ではありません (証明書 {found})。インストールしませんでした"
+
+#: src/apk_starter/aurora.py:68
+#, python-brace-format
+msgid "the downloaded file is not Aurora Store {code}"
+msgstr "ダウンロードしたファイルは Aurora Store {code} ではありません"
+
+#: src/apk_starter/aurora.py:75 src/apk_starter/gui.py:667
+msgid "Downloading Aurora Store from F-Droid…"
+msgstr "F-Droid から Aurora Store をダウンロードしています…"
+
+#: src/apk_starter/axml.py:48 src/apk_starter/axml.py:54
 msgid "corrupt AndroidManifest.xml"
 msgstr "AndroidManifest.xml が破損しています"
 
-#: src/apk_starter/cli.py:45
+#: src/apk_starter/cli.py:46
 msgid "--log and --debug exclude each other"
 msgstr "--log と --debug は同時に指定できません"
 
-#: src/apk_starter/cli.py:47
+#: src/apk_starter/cli.py:48
 msgid "--log= needs a file name"
 msgstr "--log= にはファイル名が必要です"
 
-#: src/apk_starter/cli.py:47
+#: src/apk_starter/cli.py:48
 msgid "--debug= needs a folder name"
 msgstr "--debug= にはフォルダー名が必要です"
 
-#: src/apk_starter/cli.py:70
+#: src/apk_starter/cli.py:71
 #, python-brace-format
 msgid ""
 "cannot read {file}: no such file (inside the Flatpak sandbox only paths "
@@ -155,22 +193,22 @@ msgstr ""
 "{file} を読み込めません: ファイルがありません (Flatpak サンドボックス内では "
 "--file-forwarding で渡したパスしか見えません: {command})"
 
-#: src/apk_starter/cli.py:73 src/apk_starter/cli.py:221
+#: src/apk_starter/cli.py:74 src/apk_starter/cli.py:273
 #, python-brace-format
 msgid "not installed: {package}"
 msgstr "インストールされていません: {package}"
 
-#: src/apk_starter/cli.py:122
+#: src/apk_starter/cli.py:142
 #, python-brace-format
 msgid "Preparing {app} for this computer…"
 msgstr "このコンピューター用に {app} を準備しています…"
 
-#: src/apk_starter/cli.py:125
+#: src/apk_starter/cli.py:145
 #, python-brace-format
 msgid "{app} could not be prepared in advance: {reason}"
 msgstr "{app} を事前に準備できませんでした: {reason}"
 
-#: src/apk_starter/cli.py:167
+#: src/apk_starter/cli.py:219
 #, python-brace-format
 msgid ""
 "{app} is installed without a menu entry: the DynamicLauncher portal is not "
@@ -179,37 +217,37 @@ msgstr ""
 "{app} はメニュー項目なしでインストールされました: DynamicLauncher ポータルが"
 "利用できません。次のコマンドでアプリを起動してください: {command}"
 
-#: src/apk_starter/cli.py:171
+#: src/apk_starter/cli.py:223
 #, python-brace-format
 msgid "{app} is installed without a menu entry: {reason}"
 msgstr "{app} はメニュー項目なしでインストールされました: {reason}"
 
-#: src/apk_starter/cli.py:205
+#: src/apk_starter/cli.py:257
 #, python-brace-format
 msgid "cannot remove {folder}: {reason}"
 msgstr "{folder} を削除できません: {reason}"
 
-#: src/apk_starter/cli.py:225
+#: src/apk_starter/cli.py:277
 msgid ""
 "the DynamicLauncher portal is not available; the menu entry was not removed"
 msgstr ""
 "DynamicLauncher ポータルが利用できないため、メニュー項目は削除されませんでし"
 "た"
 
-#: src/apk_starter/cli.py:227
+#: src/apk_starter/cli.py:279
 #, python-brace-format
 msgid "the menu entry was not removed: {reason}"
 msgstr "メニュー項目は削除されませんでした: {reason}"
 
-#: src/apk_starter/cli.py:260
+#: src/apk_starter/cli.py:313
 msgid "(no arguments: open the management window)"
 msgstr "(引数なし: 管理ウィンドウを開く)"
 
-#: src/apk_starter/cli.py:261
+#: src/apk_starter/cli.py:314
 msgid "Start Android apps (APK) with Android Translation Layer."
 msgstr "Android Translation Layer で Android アプリ (APK) を起動します。"
 
-#: src/apk_starter/cli.py:263
+#: src/apk_starter/cli.py:316
 msgid ""
 "write a log for atl-doctor (default: logs/<package>-<time>.log); use --"
 "log=FILE"
@@ -217,7 +255,7 @@ msgstr ""
 "atl-doctor 用のログを書き出す (既定: logs/<パッケージ>-<時刻>.log)。別のファ"
 "イルは --log=FILE で指定"
 
-#: src/apk_starter/cli.py:265
+#: src/apk_starter/cli.py:318
 msgid ""
 "record the app for atl-doctor: exceptions, ATL stub calls, time line, view "
 "trees, verbose log; a little slower (default: logs/<package>-<time>/); use --"
@@ -227,31 +265,37 @@ msgstr ""
 "ビューツリー、詳細ログ。少し遅くなります (既定: logs/<package>-<time>/)。--"
 "debug=DIR を使用"
 
-#: src/apk_starter/cli.py:267
+#: src/apk_starter/cli.py:320
 msgid "override the SDK level passed to ATL"
 msgstr "ATL に渡す SDK レベルを上書きする"
 
-#: src/apk_starter/cli.py:268
+#: src/apk_starter/cli.py:321
 msgid "window size (remembered per app)"
 msgstr "ウィンドウサイズ (アプリごとに記憶)"
 
-#: src/apk_starter/cli.py:269
+#: src/apk_starter/cli.py:322
 msgid "with --remove/--remove-all: also delete the app data"
 msgstr "--remove/--remove-all と併用: アプリのデータも削除する"
 
-#: src/apk_starter/cli.py:271
-msgid "install the APK and add a menu entry"
-msgstr "APK をインストールしてメニュー項目を追加する"
+#: src/apk_starter/cli.py:324
+msgid ""
+"install the APK and add a menu entry; a split APK: the base and its parts, "
+"or one .apks/.xapk file"
+msgstr "APK をインストールしてメニュー項目を追加 (分割 APK: ベースとその部分、または 1 つの .apks/.xapk ファイル)"
 
-#: src/apk_starter/cli.py:272
+#: src/apk_starter/cli.py:328
+msgid "download Aurora Store from F-Droid, check its signature and install it"
+msgstr "F-Droid から Aurora Store をダウンロードし、署名を確認してインストール"
+
+#: src/apk_starter/cli.py:329
 msgid "list installed apps"
 msgstr "インストール済みのアプリを一覧表示する"
 
-#: src/apk_starter/cli.py:273
+#: src/apk_starter/cli.py:330
 msgid "remove an installed app"
 msgstr "インストール済みのアプリをアンインストールする"
 
-#: src/apk_starter/cli.py:275
+#: src/apk_starter/cli.py:332
 msgid ""
 "remove all installed apps and their menu entries (before uninstalling the "
 "Flatpak)"
@@ -259,35 +303,35 @@ msgstr ""
 "インストール済みのすべてのアプリとそのメニュー項目を削除する (Flatpak をアン"
 "インストールする前に)"
 
-#: src/apk_starter/cli.py:276
+#: src/apk_starter/cli.py:333
 msgid "show the version and exit"
 msgstr "バージョンを表示して終了する"
 
-#: src/apk_starter/cli.py:310
+#: src/apk_starter/cli.py:368
 msgid ""
 "--install, --list, --remove, --remove-all and --version take no other "
 "arguments"
 msgstr ""
 "--install、--list、--remove、--remove-all、--version は他の引数を取りません"
 
-#: src/apk_starter/cli.py:312
+#: src/apk_starter/cli.py:370
 msgid "--purge only works with --remove or --remove-all"
 msgstr "--purge は --remove または --remove-all と一緒にしか使えません"
 
-#: src/apk_starter/cli.py:337
+#: src/apk_starter/cli.py:402
 msgid "no APK given and no display for the window"
 msgstr "APK が指定されておらず、ウィンドウを表示するディスプレイもありません"
 
-#: src/apk_starter/cli.py:341
+#: src/apk_starter/cli.py:406
 msgid "no APK given"
 msgstr "APK が指定されていません"
 
-#: src/apk_starter/cli.py:396 src/apk_starter/cli.py:414
+#: src/apk_starter/cli.py:462 src/apk_starter/cli.py:480
 #, python-brace-format
 msgid "the Android runtime could not be prepared in advance: {reason}"
 msgstr "Android ランタイムを事前に準備できませんでした: {reason}"
 
-#: src/apk_starter/cli.py:418
+#: src/apk_starter/cli.py:484
 msgid "Preparing apps for this computer…"
 msgstr "このコンピューター用にアプリを準備しています…"
 
@@ -327,7 +371,7 @@ msgstr "アプリを検索"
 msgid "Name"
 msgstr "名前"
 
-#: src/apk_starter/gui.py:141 src/apk_starter/gui.py:495
+#: src/apk_starter/gui.py:141 src/apk_starter/gui.py:503
 msgid "Last started"
 msgstr "最終起動"
 
@@ -343,194 +387,225 @@ msgstr "データサイズ"
 msgid "Sort"
 msgstr "並べ替え"
 
-#: src/apk_starter/gui.py:148
+#: src/apk_starter/gui.py:149
 msgid "Install APK…"
 msgstr "APK をインストール…"
 
-#: src/apk_starter/gui.py:150
+#: src/apk_starter/gui.py:150 src/apk_starter/gui.py:254
+msgid "Set up Aurora Store…"
+msgstr "Aurora Store をセットアップ…"
+
+#: src/apk_starter/gui.py:151
+msgid "Add apps"
+msgstr "アプリを追加"
+
+#: src/apk_starter/gui.py:152
 msgid "Working…"
 msgstr "処理中…"
 
-#: src/apk_starter/gui.py:158
+#: src/apk_starter/gui.py:160
 msgid "No app matches."
 msgstr "一致するアプリはありません。"
 
-#: src/apk_starter/gui.py:166 src/apk_starter/launch.py:97
+#: src/apk_starter/gui.py:168 src/apk_starter/launch.py:98
 msgid "Back"
 msgstr "戻る"
 
-#: src/apk_starter/gui.py:200
+#: src/apk_starter/gui.py:202
 msgid "Drop the APK to install it"
 msgstr "ドロップしてAPKをインストール"
 
-#: src/apk_starter/gui.py:241
+#: src/apk_starter/gui.py:247
 msgid "No apps installed"
 msgstr "インストール済みのアプリはありません"
 
-#: src/apk_starter/gui.py:242
+#: src/apk_starter/gui.py:248
 msgid "Drag an APK here or choose one."
 msgstr "APK をここにドラッグするか選択してください。"
 
-#: src/apk_starter/gui.py:244
+#: src/apk_starter/gui.py:250
 msgid "Choose APK…"
 msgstr "APK を選択…"
 
-#: src/apk_starter/gui.py:255 src/apk_starter/gui.py:587
+#: src/apk_starter/gui.py:263 src/apk_starter/gui.py:595
 msgid "Close"
 msgstr "閉じる"
 
-#: src/apk_starter/gui.py:342
+#: src/apk_starter/gui.py:350
 msgid "Cannot read the app list"
 msgstr "アプリ一覧を読み込めません"
 
-#: src/apk_starter/gui.py:412
+#: src/apk_starter/gui.py:420
 msgid "Could not save the setting"
 msgstr "設定を保存できませんでした"
 
-#: src/apk_starter/gui.py:468
+#: src/apk_starter/gui.py:476
 msgid "Start"
 msgstr "起動"
 
-#: src/apk_starter/gui.py:472
+#: src/apk_starter/gui.py:480
 msgid "Uninstall…"
 msgstr "アンインストール…"
 
-#: src/apk_starter/gui.py:474
+#: src/apk_starter/gui.py:482
 msgid "Options"
 msgstr "オプション"
 
-#: src/apk_starter/gui.py:479
+#: src/apk_starter/gui.py:487
 msgid "Log or Debug is on"
 msgstr "ログまたはデバッグが有効"
 
-#: src/apk_starter/gui.py:484
+#: src/apk_starter/gui.py:492
 msgid "Delete data…"
 msgstr "データを削除…"
 
-#: src/apk_starter/gui.py:492
+#: src/apk_starter/gui.py:500
 msgid "Version"
 msgstr "バージョン"
 
-#: src/apk_starter/gui.py:493
+#: src/apk_starter/gui.py:501
 msgid "Target SDK"
 msgstr "ターゲット SDK"
 
-#: src/apk_starter/gui.py:494
+#: src/apk_starter/gui.py:502
 msgid "Installed"
 msgstr "インストール日時"
 
-#: src/apk_starter/gui.py:496
+#: src/apk_starter/gui.py:504
 msgid "Data"
 msgstr "データ"
 
-#: src/apk_starter/gui.py:496
+#: src/apk_starter/gui.py:504
 msgid "no data"
 msgstr "データなし"
 
-#: src/apk_starter/gui.py:497
+#: src/apk_starter/gui.py:505
 msgid "Status"
 msgstr "状態"
 
-#: src/apk_starter/gui.py:497
+#: src/apk_starter/gui.py:505
 msgid "Prepared for this computer"
 msgstr "このコンピューター向けに準備済み"
 
-#: src/apk_starter/gui.py:498
+#: src/apk_starter/gui.py:506
 msgid "Not prepared yet (done at the next start)"
 msgstr "未準備 (次回起動時に実行)"
 
-#: src/apk_starter/gui.py:511
+#: src/apk_starter/gui.py:519
 msgid "Window bar:"
 msgstr "ウィンドウバー:"
 
-#: src/apk_starter/gui.py:512
+#: src/apk_starter/gui.py:520
 msgid "From the system"
 msgstr "システム"
 
-#: src/apk_starter/gui.py:512
+#: src/apk_starter/gui.py:520
 msgid "With back button"
 msgstr "戻るボタン付き"
 
-#: src/apk_starter/gui.py:513
+#: src/apk_starter/gui.py:521
 msgid "From the system + navigation bar"
 msgstr "システム + ナビゲーションバー"
 
-#: src/apk_starter/gui.py:521 src/apk_starter/gui.py:549
+#: src/apk_starter/gui.py:529 src/apk_starter/gui.py:557
 msgid "Log"
 msgstr "ログ"
 
-#: src/apk_starter/gui.py:522
+#: src/apk_starter/gui.py:530
 msgid "Debug (next start only)"
 msgstr "デバッグ (次回の起動のみ)"
 
-#: src/apk_starter/gui.py:523
+#: src/apk_starter/gui.py:531
 msgid "Debug runs a little slower."
 msgstr "デバッグは少し遅くなります。"
 
-#: src/apk_starter/gui.py:548
+#: src/apk_starter/gui.py:556
 msgid "Recordings"
 msgstr "記録"
 
-#: src/apk_starter/gui.py:549
+#: src/apk_starter/gui.py:557
 msgid "Debug"
 msgstr "デバッグ"
 
-#: src/apk_starter/gui.py:552 src/apk_starter/gui.py:587
+#: src/apk_starter/gui.py:560 src/apk_starter/gui.py:595
 msgid "Open log folder"
 msgstr "ログフォルダーを開く"
 
-#: src/apk_starter/gui.py:563
+#: src/apk_starter/gui.py:571
 #, python-brace-format
 msgid "Cannot start {app}"
 msgstr "{app} を起動できません"
 
-#: src/apk_starter/gui.py:585
+#: src/apk_starter/gui.py:593
 msgid "Tick “Log” under ⚙ and start the app again to record the error."
 msgstr ""
 "⚙ で「ログ」にチェックを入れてアプリを再起動すると、エラーが記録されます。"
 
-#: src/apk_starter/gui.py:586
+#: src/apk_starter/gui.py:594
 #, python-brace-format
 msgid "{app} ended unexpectedly."
 msgstr "{app} が予期せず終了しました。"
 
-#: src/apk_starter/gui.py:596 src/apk_starter/gui.py:604
+#: src/apk_starter/gui.py:604 src/apk_starter/gui.py:612
 msgid "Cannot open the log folder"
 msgstr "ログフォルダーを開けません"
 
-#: src/apk_starter/gui.py:608
+#: src/apk_starter/gui.py:616
 msgid "Android apps"
 msgstr "Android アプリ"
 
-#: src/apk_starter/gui.py:613
+#: src/apk_starter/gui.py:622
 msgid "Install APK"
 msgstr "APK をインストール"
 
-#: src/apk_starter/gui.py:639
+#: src/apk_starter/gui.py:652 src/apk_starter/gui.py:666
 #, python-brace-format
 msgid "{app} installed"
 msgstr "{app} をインストールしました"
 
-#: src/apk_starter/gui.py:640
+#: src/apk_starter/gui.py:653
 #, python-brace-format
 msgid "Installing {file}…"
 msgstr "{file} をインストールしています…"
 
-#: src/apk_starter/gui.py:642
+#: src/apk_starter/gui.py:656
 #, python-brace-format
 msgid "Cannot install {file}"
 msgstr "{file} をインストールできません"
 
-#: src/apk_starter/gui.py:646
+#: src/apk_starter/gui.py:669
+msgid "Cannot set up Aurora Store"
+msgstr "Aurora Store をセットアップできません"
+
+#: src/apk_starter/gui.py:670
+msgid "Set up Aurora Store?"
+msgstr "Aurora Store をセットアップしますか?"
+
+#: src/apk_starter/gui.py:671
+msgid ""
+"Aurora Store installs free apps from Google Play; the apps it installs "
+"appear here. APK Starter downloads the official Aurora Store from F-Droid "
+"and checks its signature.\n"
+"\n"
+"Sign in anonymously in Aurora Store. Signing in with your own Google account "
+"may break Google's terms of service, and Google can block the account."
+msgstr "Aurora Store は Google Play から無料アプリをインストールします。インストールしたアプリはここに表示されます。APK Starter は公式の Aurora Store を F-Droid からダウンロードし、署名を確認します。\n\nAurora Store では匿名でログインしてください。自分の Google アカウントでログインすると Google の利用規約に違反するおそれがあり、Google がアカウントをブロックすることがあります。"
+
+#: src/apk_starter/gui.py:675 src/apk_starter/gui.py:680
+#: src/apk_starter/install_request.py:44
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: src/apk_starter/gui.py:651
+#: src/apk_starter/gui.py:675
+msgid "Set up"
+msgstr "セットアップ"
+
+#: src/apk_starter/gui.py:685
 #, python-brace-format
 msgid "Delete the data of {app}?"
 msgstr "{app} のデータを削除しますか？"
 
-#: src/apk_starter/gui.py:652
+#: src/apk_starter/gui.py:686
 msgid ""
 "The app stays installed. Its settings, accounts and files are deleted. Close "
 "the app first."
@@ -538,38 +613,38 @@ msgstr ""
 "アプリはインストールされたままです。設定、アカウント、ファイルは削除されま"
 "す。先にアプリを閉じてください。"
 
-#: src/apk_starter/gui.py:653
+#: src/apk_starter/gui.py:687
 msgid "Delete Data"
 msgstr "データを削除"
 
-#: src/apk_starter/gui.py:655
+#: src/apk_starter/gui.py:689
 #, python-brace-format
 msgid "Cannot delete the data of {app}"
 msgstr "{app} のデータを削除できません"
 
-#: src/apk_starter/gui.py:659
+#: src/apk_starter/gui.py:693
 msgid "Also delete app data"
 msgstr "アプリのデータも削除する"
 
-#: src/apk_starter/gui.py:666
+#: src/apk_starter/gui.py:700
 #, python-brace-format
 msgid "{app} uninstalled"
 msgstr "{app} をアンインストールしました"
 
-#: src/apk_starter/gui.py:667
+#: src/apk_starter/gui.py:701
 #, python-brace-format
 msgid "Uninstall {app}?"
 msgstr "{app} をアンインストールしますか？"
 
-#: src/apk_starter/gui.py:668
+#: src/apk_starter/gui.py:702
 msgid "The app and its menu entry are removed. Close the app first."
 msgstr "アプリとそのメニュー項目が削除されます。先にアプリを閉じてください。"
 
-#: src/apk_starter/gui.py:668
+#: src/apk_starter/gui.py:702
 msgid "Uninstall"
 msgstr "アンインストール"
 
-#: src/apk_starter/gui.py:670
+#: src/apk_starter/gui.py:704
 #, python-brace-format
 msgid "Cannot uninstall {app}"
 msgstr "{app} をアンインストールできません"
@@ -645,16 +720,55 @@ msgstr "引数 %s と一緒には使えません"
 msgid "invalid %(type)s value: %(value)r"
 msgstr "無効な %(type)s 値: %(value)r"
 
+#: src/apk_starter/install_request.py:28
+#, python-brace-format
+msgid "no display to ask whether to install {app}"
+msgstr "{app} をインストールするか確認する画面がありません"
+
+#: src/apk_starter/install_request.py:40
+msgid "Update"
+msgstr "更新"
+
+#: src/apk_starter/install_request.py:40
+msgid "Install"
+msgstr "インストール"
+
+#: src/apk_starter/install_request.py:41
+#, python-brace-format
+msgid "Update {app}?"
+msgstr "{app} を更新しますか?"
+
+#: src/apk_starter/install_request.py:41
+#, python-brace-format
+msgid "Install {app}?"
+msgstr "{app} をインストールしますか?"
+
+#: src/apk_starter/install_request.py:42
+#, python-brace-format
+msgid ""
+"{installer} wants to install {app} {version}. It gets a menu entry like "
+"every installed app."
+msgstr "{installer} が {app} {version} をインストールしようとしています。インストールしたアプリと同様にメニュー項目が追加されます。"
+
+#: src/apk_starter/install_request.py:55
+msgid "An app"
+msgstr "アプリ"
+
+#: src/apk_starter/install_request.py:62
+#, python-brace-format
+msgid "Installation of {app} cancelled"
+msgstr "{app} のインストールを中止しました"
+
 #: src/apk_starter/launch.py:29
 #, python-brace-format
 msgid "invalid --size, expected WxH: {value}"
 msgstr "--size が無効です (WxH 形式で指定してください): {value}"
 
-#: src/apk_starter/launch.py:97
+#: src/apk_starter/launch.py:98
 msgid "Start page of the app"
 msgstr "アプリのスタートページ"
 
-#: src/apk_starter/launch.py:97
+#: src/apk_starter/launch.py:98
 msgid "Open pages of the app"
 msgstr "アプリの開いているページ"
 
@@ -701,3 +815,47 @@ msgstr "android-translation-layer を起動できません: {reason}"
 #, python-brace-format
 msgid "android-translation-layer was killed by {signal}"
 msgstr "android-translation-layer はシグナル {signal} で強制終了されました"
+
+#: src/apk_starter/splits.py:49
+#, python-brace-format
+msgid "no APK in {file}"
+msgstr "{file} に APK がありません"
+
+#: src/apk_starter/splits.py:51
+#, python-brace-format
+msgid "too many parts in {file}"
+msgstr "{file} の部分が多すぎます"
+
+#: src/apk_starter/splits.py:91
+#, python-brace-format
+msgid "invalid split name in {file}"
+msgstr "{file} の部分名が無効です"
+
+#: src/apk_starter/splits.py:104
+#, python-brace-format
+msgid "the parts belong to different apps: {a} and {b}"
+msgstr "部分が別々のアプリのものです: {a} と {b}"
+
+#: src/apk_starter/splits.py:108
+#, python-brace-format
+msgid "more than one base APK: {a} and {b}"
+msgstr "ベース APK が複数あります: {a} と {b}"
+
+#: src/apk_starter/splits.py:113
+#, python-brace-format
+msgid "the part {split} is there twice"
+msgstr "部分 {split} が重複しています"
+
+#: src/apk_starter/splits.py:116
+msgid "no base APK among the files (only configuration parts)"
+msgstr "ファイルの中にベース APK がありません (構成部分のみ)"
+
+#: src/apk_starter/splits.py:130
+#, python-brace-format
+msgid ""
+"{app} is only available for ARM devices: it has no code for this computer "
+"({abis})."
+msgstr "{app} は ARM デバイス専用です: このコンピューター用のコードがありません ({abis})。"
+
+#~ msgid "install the APK and add a menu entry"
+#~ msgstr "APK をインストールしてメニュー項目を追加する"

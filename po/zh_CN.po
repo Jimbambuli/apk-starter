@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-02 17:16+0000\n"
+"POT-Creation-Date: 2026-11-02 19:36+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -89,7 +89,7 @@ msgstr ""
 msgid "The app list with three free apps from F-Droid"
 msgstr "应用列表，其中有三个来自 F-Droid 的自由应用"
 
-#: src/apk_starter/apkinfo.py:45
+#: src/apk_starter/apkinfo.py:45 src/apk_starter/splits.py:77
 #, python-brace-format
 msgid "{file} is too large ({size} bytes)"
 msgstr "{file} 过大（{size} 字节）"
@@ -100,19 +100,27 @@ msgid "split APK bundles (.apks/.xapk) are not supported yet: {file}"
 msgstr "尚不支持拆分 APK 包（.apks/.xapk）：{file}"
 
 #: src/apk_starter/apkinfo.py:94 src/apk_starter/apkinfo.py:115
+#: src/apk_starter/splits.py:75 src/apk_starter/splits.py:82
 #, python-brace-format
 msgid "not an APK (no AndroidManifest.xml): {file}"
 msgstr "不是 APK（缺少 AndroidManifest.xml）：{file}"
 
-#: src/apk_starter/apkinfo.py:98
+#: src/apk_starter/apkinfo.py:98 src/apk_starter/splits.py:89
 #, python-brace-format
 msgid "invalid package name in manifest: {package}"
 msgstr "清单中的包名无效：{package}"
 
 #: src/apk_starter/apkinfo.py:117 src/apk_starter/apkinfo.py:119
+#: src/apk_starter/splits.py:62 src/apk_starter/splits.py:64
+#: src/apk_starter/splits.py:84 src/apk_starter/splits.py:86
 #, python-brace-format
 msgid "cannot read {file}: {reason}"
 msgstr "无法读取 {file}：{reason}"
+
+#: src/apk_starter/apksig.py:30
+#, python-brace-format
+msgid "the signature of the APK is not valid: {reason}"
+msgstr "APK 的签名无效：{reason}"
 
 #: src/apk_starter/arsc.py:32 src/apk_starter/arsc.py:37
 msgid "resource reference loop"
@@ -125,23 +133,53 @@ msgstr "资源引用存在循环"
 msgid "corrupt resources.arsc"
 msgstr "resources.arsc 已损坏"
 
-#: src/apk_starter/axml.py:47 src/apk_starter/axml.py:53
+#: src/apk_starter/aurora.py:32
+#, python-brace-format
+msgid "the download is larger than expected: {url}"
+msgstr "下载内容比预期的大：{url}"
+
+#: src/apk_starter/aurora.py:44 src/apk_starter/aurora.py:46
+msgid "F-Droid gave no version of Aurora Store"
+msgstr "F-Droid 未给出 Aurora Store 的版本"
+
+#: src/apk_starter/aurora.py:60
+#, python-brace-format
+msgid "cannot download Aurora Store from F-Droid: {reason}"
+msgstr "无法从 F-Droid 下载 Aurora Store：{reason}"
+
+#: src/apk_starter/aurora.py:64
+#, python-brace-format
+msgid ""
+"the downloaded Aurora Store is not signed by Aurora OSS (certificate "
+"{found}); it was not installed"
+msgstr "下载的 Aurora Store 并非由 Aurora OSS 签名（证书 {found}），未安装"
+
+#: src/apk_starter/aurora.py:68
+#, python-brace-format
+msgid "the downloaded file is not Aurora Store {code}"
+msgstr "下载的文件不是 Aurora Store {code}"
+
+#: src/apk_starter/aurora.py:75 src/apk_starter/gui.py:667
+msgid "Downloading Aurora Store from F-Droid…"
+msgstr "正在从 F-Droid 下载 Aurora Store…"
+
+#: src/apk_starter/axml.py:48 src/apk_starter/axml.py:54
 msgid "corrupt AndroidManifest.xml"
 msgstr "AndroidManifest.xml 已损坏"
 
-#: src/apk_starter/cli.py:45
+#: src/apk_starter/cli.py:46
 msgid "--log and --debug exclude each other"
 msgstr "--log 和 --debug 不能同时使用"
 
-#: src/apk_starter/cli.py:47
+#: src/apk_starter/cli.py:48
 msgid "--log= needs a file name"
 msgstr "--log= 需要文件名"
 
-#: src/apk_starter/cli.py:47
+#: src/apk_starter/cli.py:48
 msgid "--debug= needs a folder name"
 msgstr "--debug= 需要文件夹名称"
 
-#: src/apk_starter/cli.py:70
+#: src/apk_starter/cli.py:71
 #, python-brace-format
 msgid ""
 "cannot read {file}: no such file (inside the Flatpak sandbox only paths "
@@ -150,22 +188,22 @@ msgstr ""
 "无法读取 {file}：文件不存在（在 Flatpak 沙盒中只能看到通过 --file-forwarding "
 "传入的路径：{command}）"
 
-#: src/apk_starter/cli.py:73 src/apk_starter/cli.py:221
+#: src/apk_starter/cli.py:74 src/apk_starter/cli.py:273
 #, python-brace-format
 msgid "not installed: {package}"
 msgstr "未安装：{package}"
 
-#: src/apk_starter/cli.py:122
+#: src/apk_starter/cli.py:142
 #, python-brace-format
 msgid "Preparing {app} for this computer…"
 msgstr "正在为此计算机准备 {app}…"
 
-#: src/apk_starter/cli.py:125
+#: src/apk_starter/cli.py:145
 #, python-brace-format
 msgid "{app} could not be prepared in advance: {reason}"
 msgstr "无法提前准备 {app}：{reason}"
 
-#: src/apk_starter/cli.py:167
+#: src/apk_starter/cli.py:219
 #, python-brace-format
 msgid ""
 "{app} is installed without a menu entry: the DynamicLauncher portal is not "
@@ -174,35 +212,35 @@ msgstr ""
 "{app} 已安装，但没有菜单项：DynamicLauncher 门户不可用；请使用以下命令启动应"
 "用：{command}"
 
-#: src/apk_starter/cli.py:171
+#: src/apk_starter/cli.py:223
 #, python-brace-format
 msgid "{app} is installed without a menu entry: {reason}"
 msgstr "{app} 已安装，但没有菜单项：{reason}"
 
-#: src/apk_starter/cli.py:205
+#: src/apk_starter/cli.py:257
 #, python-brace-format
 msgid "cannot remove {folder}: {reason}"
 msgstr "无法删除 {folder}：{reason}"
 
-#: src/apk_starter/cli.py:225
+#: src/apk_starter/cli.py:277
 msgid ""
 "the DynamicLauncher portal is not available; the menu entry was not removed"
 msgstr "DynamicLauncher 门户不可用；菜单项未删除"
 
-#: src/apk_starter/cli.py:227
+#: src/apk_starter/cli.py:279
 #, python-brace-format
 msgid "the menu entry was not removed: {reason}"
 msgstr "菜单项未删除：{reason}"
 
-#: src/apk_starter/cli.py:260
+#: src/apk_starter/cli.py:313
 msgid "(no arguments: open the management window)"
 msgstr "（不带参数：打开管理窗口）"
 
-#: src/apk_starter/cli.py:261
+#: src/apk_starter/cli.py:314
 msgid "Start Android apps (APK) with Android Translation Layer."
 msgstr "使用 Android Translation Layer 启动 Android 应用（APK）。"
 
-#: src/apk_starter/cli.py:263
+#: src/apk_starter/cli.py:316
 msgid ""
 "write a log for atl-doctor (default: logs/<package>-<time>.log); use --"
 "log=FILE"
@@ -210,7 +248,7 @@ msgstr ""
 "为 atl-doctor 写入日志（默认：logs/<包名>-<时间>.log）；可用 --log=FILE 指定"
 "其他文件"
 
-#: src/apk_starter/cli.py:265
+#: src/apk_starter/cli.py:318
 msgid ""
 "record the app for atl-doctor: exceptions, ATL stub calls, time line, view "
 "trees, verbose log; a little slower (default: logs/<package>-<time>/); use --"
@@ -219,64 +257,70 @@ msgstr ""
 "为 atl-doctor 记录应用：异常、ATL 桩调用、时间线、视图树、详细日志；稍慢一些"
 "（默认：logs/<package>-<time>/）；使用 --debug=DIR"
 
-#: src/apk_starter/cli.py:267
+#: src/apk_starter/cli.py:320
 msgid "override the SDK level passed to ATL"
 msgstr "覆盖传给 ATL 的 SDK 级别"
 
-#: src/apk_starter/cli.py:268
+#: src/apk_starter/cli.py:321
 msgid "window size (remembered per app)"
 msgstr "窗口大小（按应用记住）"
 
-#: src/apk_starter/cli.py:269
+#: src/apk_starter/cli.py:322
 msgid "with --remove/--remove-all: also delete the app data"
 msgstr "与 --remove/--remove-all 一起使用：同时删除应用数据"
 
-#: src/apk_starter/cli.py:271
-msgid "install the APK and add a menu entry"
-msgstr "安装 APK 并添加菜单项"
+#: src/apk_starter/cli.py:324
+msgid ""
+"install the APK and add a menu entry; a split APK: the base and its parts, "
+"or one .apks/.xapk file"
+msgstr "安装 APK 并添加菜单项；拆分 APK：基础包及其部分，或一个 .apks/.xapk 文件"
 
-#: src/apk_starter/cli.py:272
+#: src/apk_starter/cli.py:328
+msgid "download Aurora Store from F-Droid, check its signature and install it"
+msgstr "从 F-Droid 下载 Aurora Store，检查签名并安装"
+
+#: src/apk_starter/cli.py:329
 msgid "list installed apps"
 msgstr "列出已安装的应用"
 
-#: src/apk_starter/cli.py:273
+#: src/apk_starter/cli.py:330
 msgid "remove an installed app"
 msgstr "卸载已安装的应用"
 
-#: src/apk_starter/cli.py:275
+#: src/apk_starter/cli.py:332
 msgid ""
 "remove all installed apps and their menu entries (before uninstalling the "
 "Flatpak)"
 msgstr "删除所有已安装的应用及其菜单项（在卸载 Flatpak 之前）"
 
-#: src/apk_starter/cli.py:276
+#: src/apk_starter/cli.py:333
 msgid "show the version and exit"
 msgstr "显示版本并退出"
 
-#: src/apk_starter/cli.py:310
+#: src/apk_starter/cli.py:368
 msgid ""
 "--install, --list, --remove, --remove-all and --version take no other "
 "arguments"
 msgstr "--install、--list、--remove、--remove-all 和 --version 不接受其他参数"
 
-#: src/apk_starter/cli.py:312
+#: src/apk_starter/cli.py:370
 msgid "--purge only works with --remove or --remove-all"
 msgstr "--purge 只能与 --remove 或 --remove-all 一起使用"
 
-#: src/apk_starter/cli.py:337
+#: src/apk_starter/cli.py:402
 msgid "no APK given and no display for the window"
 msgstr "未指定 APK，且没有可用于显示窗口的显示器"
 
-#: src/apk_starter/cli.py:341
+#: src/apk_starter/cli.py:406
 msgid "no APK given"
 msgstr "未指定 APK"
 
-#: src/apk_starter/cli.py:396 src/apk_starter/cli.py:414
+#: src/apk_starter/cli.py:462 src/apk_starter/cli.py:480
 #, python-brace-format
 msgid "the Android runtime could not be prepared in advance: {reason}"
 msgstr "无法提前准备 Android 运行时：{reason}"
 
-#: src/apk_starter/cli.py:418
+#: src/apk_starter/cli.py:484
 msgid "Preparing apps for this computer…"
 msgstr "正在为此计算机准备应用…"
 
@@ -316,7 +360,7 @@ msgstr "搜索应用"
 msgid "Name"
 msgstr "名称"
 
-#: src/apk_starter/gui.py:141 src/apk_starter/gui.py:495
+#: src/apk_starter/gui.py:141 src/apk_starter/gui.py:503
 msgid "Last started"
 msgstr "最近启动"
 
@@ -332,230 +376,261 @@ msgstr "数据大小"
 msgid "Sort"
 msgstr "排序"
 
-#: src/apk_starter/gui.py:148
+#: src/apk_starter/gui.py:149
 msgid "Install APK…"
 msgstr "安装 APK…"
 
-#: src/apk_starter/gui.py:150
+#: src/apk_starter/gui.py:150 src/apk_starter/gui.py:254
+msgid "Set up Aurora Store…"
+msgstr "设置 Aurora Store…"
+
+#: src/apk_starter/gui.py:151
+msgid "Add apps"
+msgstr "添加应用"
+
+#: src/apk_starter/gui.py:152
 msgid "Working…"
 msgstr "正在处理…"
 
-#: src/apk_starter/gui.py:158
+#: src/apk_starter/gui.py:160
 msgid "No app matches."
 msgstr "没有匹配的应用。"
 
-#: src/apk_starter/gui.py:166 src/apk_starter/launch.py:97
+#: src/apk_starter/gui.py:168 src/apk_starter/launch.py:98
 msgid "Back"
 msgstr "返回"
 
-#: src/apk_starter/gui.py:200
+#: src/apk_starter/gui.py:202
 msgid "Drop the APK to install it"
 msgstr "松开以安装 APK"
 
-#: src/apk_starter/gui.py:241
+#: src/apk_starter/gui.py:247
 msgid "No apps installed"
 msgstr "尚未安装应用"
 
-#: src/apk_starter/gui.py:242
+#: src/apk_starter/gui.py:248
 msgid "Drag an APK here or choose one."
 msgstr "将 APK 拖到这里或选择一个。"
 
-#: src/apk_starter/gui.py:244
+#: src/apk_starter/gui.py:250
 msgid "Choose APK…"
 msgstr "选择 APK…"
 
-#: src/apk_starter/gui.py:255 src/apk_starter/gui.py:587
+#: src/apk_starter/gui.py:263 src/apk_starter/gui.py:595
 msgid "Close"
 msgstr "关闭"
 
-#: src/apk_starter/gui.py:342
+#: src/apk_starter/gui.py:350
 msgid "Cannot read the app list"
 msgstr "无法读取应用列表"
 
-#: src/apk_starter/gui.py:412
+#: src/apk_starter/gui.py:420
 msgid "Could not save the setting"
 msgstr "无法保存设置"
 
-#: src/apk_starter/gui.py:468
+#: src/apk_starter/gui.py:476
 msgid "Start"
 msgstr "启动"
 
-#: src/apk_starter/gui.py:472
+#: src/apk_starter/gui.py:480
 msgid "Uninstall…"
 msgstr "卸载…"
 
-#: src/apk_starter/gui.py:474
+#: src/apk_starter/gui.py:482
 msgid "Options"
 msgstr "选项"
 
-#: src/apk_starter/gui.py:479
+#: src/apk_starter/gui.py:487
 msgid "Log or Debug is on"
 msgstr "日志或调试已开启"
 
-#: src/apk_starter/gui.py:484
+#: src/apk_starter/gui.py:492
 msgid "Delete data…"
 msgstr "删除数据…"
 
-#: src/apk_starter/gui.py:492
+#: src/apk_starter/gui.py:500
 msgid "Version"
 msgstr "版本"
 
-#: src/apk_starter/gui.py:493
+#: src/apk_starter/gui.py:501
 msgid "Target SDK"
 msgstr "目标 SDK"
 
-#: src/apk_starter/gui.py:494
+#: src/apk_starter/gui.py:502
 msgid "Installed"
 msgstr "安装时间"
 
-#: src/apk_starter/gui.py:496
+#: src/apk_starter/gui.py:504
 msgid "Data"
 msgstr "数据"
 
-#: src/apk_starter/gui.py:496
+#: src/apk_starter/gui.py:504
 msgid "no data"
 msgstr "无数据"
 
-#: src/apk_starter/gui.py:497
+#: src/apk_starter/gui.py:505
 msgid "Status"
 msgstr "状态"
 
-#: src/apk_starter/gui.py:497
+#: src/apk_starter/gui.py:505
 msgid "Prepared for this computer"
 msgstr "已为本机准备"
 
-#: src/apk_starter/gui.py:498
+#: src/apk_starter/gui.py:506
 msgid "Not prepared yet (done at the next start)"
 msgstr "尚未准备（下次启动时完成）"
 
-#: src/apk_starter/gui.py:511
+#: src/apk_starter/gui.py:519
 msgid "Window bar:"
 msgstr "窗口栏："
 
-#: src/apk_starter/gui.py:512
+#: src/apk_starter/gui.py:520
 msgid "From the system"
 msgstr "系统提供"
 
-#: src/apk_starter/gui.py:512
+#: src/apk_starter/gui.py:520
 msgid "With back button"
 msgstr "带返回按钮"
 
-#: src/apk_starter/gui.py:513
+#: src/apk_starter/gui.py:521
 msgid "From the system + navigation bar"
 msgstr "系统提供 + 导航栏"
 
-#: src/apk_starter/gui.py:521 src/apk_starter/gui.py:549
+#: src/apk_starter/gui.py:529 src/apk_starter/gui.py:557
 msgid "Log"
 msgstr "日志"
 
-#: src/apk_starter/gui.py:522
+#: src/apk_starter/gui.py:530
 msgid "Debug (next start only)"
 msgstr "调试（仅下次启动）"
 
-#: src/apk_starter/gui.py:523
+#: src/apk_starter/gui.py:531
 msgid "Debug runs a little slower."
 msgstr "调试模式会稍慢一些。"
 
-#: src/apk_starter/gui.py:548
+#: src/apk_starter/gui.py:556
 msgid "Recordings"
 msgstr "记录"
 
-#: src/apk_starter/gui.py:549
+#: src/apk_starter/gui.py:557
 msgid "Debug"
 msgstr "调试"
 
-#: src/apk_starter/gui.py:552 src/apk_starter/gui.py:587
+#: src/apk_starter/gui.py:560 src/apk_starter/gui.py:595
 msgid "Open log folder"
 msgstr "打开日志文件夹"
 
-#: src/apk_starter/gui.py:563
+#: src/apk_starter/gui.py:571
 #, python-brace-format
 msgid "Cannot start {app}"
 msgstr "无法启动 {app}"
 
-#: src/apk_starter/gui.py:585
+#: src/apk_starter/gui.py:593
 msgid "Tick “Log” under ⚙ and start the app again to record the error."
 msgstr "在 ⚙ 中勾选“日志”并重新启动应用以记录错误。"
 
-#: src/apk_starter/gui.py:586
+#: src/apk_starter/gui.py:594
 #, python-brace-format
 msgid "{app} ended unexpectedly."
 msgstr "{app} 意外退出。"
 
-#: src/apk_starter/gui.py:596 src/apk_starter/gui.py:604
+#: src/apk_starter/gui.py:604 src/apk_starter/gui.py:612
 msgid "Cannot open the log folder"
 msgstr "无法打开日志文件夹"
 
-#: src/apk_starter/gui.py:608
+#: src/apk_starter/gui.py:616
 msgid "Android apps"
 msgstr "Android 应用"
 
-#: src/apk_starter/gui.py:613
+#: src/apk_starter/gui.py:622
 msgid "Install APK"
 msgstr "安装 APK"
 
-#: src/apk_starter/gui.py:639
+#: src/apk_starter/gui.py:652 src/apk_starter/gui.py:666
 #, python-brace-format
 msgid "{app} installed"
 msgstr "已安装 {app}"
 
-#: src/apk_starter/gui.py:640
+#: src/apk_starter/gui.py:653
 #, python-brace-format
 msgid "Installing {file}…"
 msgstr "正在安装 {file}…"
 
-#: src/apk_starter/gui.py:642
+#: src/apk_starter/gui.py:656
 #, python-brace-format
 msgid "Cannot install {file}"
 msgstr "无法安装 {file}"
 
-#: src/apk_starter/gui.py:646
+#: src/apk_starter/gui.py:669
+msgid "Cannot set up Aurora Store"
+msgstr "无法设置 Aurora Store"
+
+#: src/apk_starter/gui.py:670
+msgid "Set up Aurora Store?"
+msgstr "设置 Aurora Store？"
+
+#: src/apk_starter/gui.py:671
+msgid ""
+"Aurora Store installs free apps from Google Play; the apps it installs "
+"appear here. APK Starter downloads the official Aurora Store from F-Droid "
+"and checks its signature.\n"
+"\n"
+"Sign in anonymously in Aurora Store. Signing in with your own Google account "
+"may break Google's terms of service, and Google can block the account."
+msgstr "Aurora Store 从 Google Play 安装免费应用；安装的应用会显示在这里。APK Starter 从 F-Droid 下载官方 Aurora Store 并检查其签名。\n\n请在 Aurora Store 中匿名登录。使用自己的 Google 帐号登录可能违反 Google 的服务条款，Google 可能会封禁该帐号。"
+
+#: src/apk_starter/gui.py:675 src/apk_starter/gui.py:680
+#: src/apk_starter/install_request.py:44
 msgid "Cancel"
 msgstr "取消"
 
-#: src/apk_starter/gui.py:651
+#: src/apk_starter/gui.py:675
+msgid "Set up"
+msgstr "设置"
+
+#: src/apk_starter/gui.py:685
 #, python-brace-format
 msgid "Delete the data of {app}?"
 msgstr "删除 {app} 的数据？"
 
-#: src/apk_starter/gui.py:652
+#: src/apk_starter/gui.py:686
 msgid ""
 "The app stays installed. Its settings, accounts and files are deleted. Close "
 "the app first."
 msgstr "应用将保持安装。其设置、账户和文件将被删除。请先关闭应用。"
 
-#: src/apk_starter/gui.py:653
+#: src/apk_starter/gui.py:687
 msgid "Delete Data"
 msgstr "删除数据"
 
-#: src/apk_starter/gui.py:655
+#: src/apk_starter/gui.py:689
 #, python-brace-format
 msgid "Cannot delete the data of {app}"
 msgstr "无法删除 {app} 的数据"
 
-#: src/apk_starter/gui.py:659
+#: src/apk_starter/gui.py:693
 msgid "Also delete app data"
 msgstr "同时删除应用数据"
 
-#: src/apk_starter/gui.py:666
+#: src/apk_starter/gui.py:700
 #, python-brace-format
 msgid "{app} uninstalled"
 msgstr "已卸载 {app}"
 
-#: src/apk_starter/gui.py:667
+#: src/apk_starter/gui.py:701
 #, python-brace-format
 msgid "Uninstall {app}?"
 msgstr "卸载 {app}？"
 
-#: src/apk_starter/gui.py:668
+#: src/apk_starter/gui.py:702
 msgid "The app and its menu entry are removed. Close the app first."
 msgstr "应用及其菜单项将被删除。请先关闭应用。"
 
-#: src/apk_starter/gui.py:668
+#: src/apk_starter/gui.py:702
 msgid "Uninstall"
 msgstr "卸载"
 
-#: src/apk_starter/gui.py:670
+#: src/apk_starter/gui.py:704
 #, python-brace-format
 msgid "Cannot uninstall {app}"
 msgstr "无法卸载 {app}"
@@ -631,16 +706,55 @@ msgstr "不能与参数 %s 同时使用"
 msgid "invalid %(type)s value: %(value)r"
 msgstr "无效的 %(type)s 值：%(value)r"
 
+#: src/apk_starter/install_request.py:28
+#, python-brace-format
+msgid "no display to ask whether to install {app}"
+msgstr "没有可用于询问是否安装 {app} 的显示器"
+
+#: src/apk_starter/install_request.py:40
+msgid "Update"
+msgstr "更新"
+
+#: src/apk_starter/install_request.py:40
+msgid "Install"
+msgstr "安装"
+
+#: src/apk_starter/install_request.py:41
+#, python-brace-format
+msgid "Update {app}?"
+msgstr "更新 {app}？"
+
+#: src/apk_starter/install_request.py:41
+#, python-brace-format
+msgid "Install {app}?"
+msgstr "安装 {app}？"
+
+#: src/apk_starter/install_request.py:42
+#, python-brace-format
+msgid ""
+"{installer} wants to install {app} {version}. It gets a menu entry like "
+"every installed app."
+msgstr "{installer} 想要安装 {app} {version}。它会像其他已安装的应用一样获得一个菜单项。"
+
+#: src/apk_starter/install_request.py:55
+msgid "An app"
+msgstr "某个应用"
+
+#: src/apk_starter/install_request.py:62
+#, python-brace-format
+msgid "Installation of {app} cancelled"
+msgstr "已取消安装 {app}"
+
 #: src/apk_starter/launch.py:29
 #, python-brace-format
 msgid "invalid --size, expected WxH: {value}"
 msgstr "--size 无效，应为 WxH：{value}"
 
-#: src/apk_starter/launch.py:97
+#: src/apk_starter/launch.py:98
 msgid "Start page of the app"
 msgstr "应用的起始页"
 
-#: src/apk_starter/launch.py:97
+#: src/apk_starter/launch.py:98
 msgid "Open pages of the app"
 msgstr "应用已打开的页面"
 
@@ -687,3 +801,47 @@ msgstr "无法启动 android-translation-layer：{reason}"
 #, python-brace-format
 msgid "android-translation-layer was killed by {signal}"
 msgstr "android-translation-layer 被 {signal} 终止"
+
+#: src/apk_starter/splits.py:49
+#, python-brace-format
+msgid "no APK in {file}"
+msgstr "{file} 中没有 APK"
+
+#: src/apk_starter/splits.py:51
+#, python-brace-format
+msgid "too many parts in {file}"
+msgstr "{file} 中的部分过多"
+
+#: src/apk_starter/splits.py:91
+#, python-brace-format
+msgid "invalid split name in {file}"
+msgstr "{file} 中的部分名称无效"
+
+#: src/apk_starter/splits.py:104
+#, python-brace-format
+msgid "the parts belong to different apps: {a} and {b}"
+msgstr "这些部分属于不同的应用：{a} 和 {b}"
+
+#: src/apk_starter/splits.py:108
+#, python-brace-format
+msgid "more than one base APK: {a} and {b}"
+msgstr "有多个基础 APK：{a} 和 {b}"
+
+#: src/apk_starter/splits.py:113
+#, python-brace-format
+msgid "the part {split} is there twice"
+msgstr "部分 {split} 出现了两次"
+
+#: src/apk_starter/splits.py:116
+msgid "no base APK among the files (only configuration parts)"
+msgstr "文件中没有基础 APK（只有配置部分）"
+
+#: src/apk_starter/splits.py:130
+#, python-brace-format
+msgid ""
+"{app} is only available for ARM devices: it has no code for this computer "
+"({abis})."
+msgstr "{app} 仅适用于 ARM 设备：没有适用于这台电脑的代码（{abis}）。"
+
+#~ msgid "install the APK and add a menu entry"
+#~ msgstr "安装 APK 并添加菜单项"

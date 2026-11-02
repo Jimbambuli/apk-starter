@@ -2,7 +2,9 @@
 data/io.github.Jimbambuli.ApkStarter.desktop.in
 data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in
 src/apk_starter/apkinfo.py
+src/apk_starter/apksig.py
 src/apk_starter/arsc.py
+src/apk_starter/aurora.py
 src/apk_starter/axml.py
 src/apk_starter/cli.py
 src/apk_starter/dexopt.py
@@ -11,8 +13,10 @@ src/apk_starter/errors.py
 src/apk_starter/gui.py
 src/apk_starter/gui_model.py
 src/apk_starter/i18n.py
+src/apk_starter/install_request.py
 src/apk_starter/launch.py
 src/apk_starter/paths.py
 src/apk_starter/portal.py
 src/apk_starter/resbin.py
 src/apk_starter/run.py
+src/apk_starter/splits.py
