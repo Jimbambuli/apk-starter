@@ -149,12 +149,15 @@ def load_report(path: Path):
     """atl-doctor's report of a log file or a recording folder."""
     try:
         from atl_doctor.errors import DoctorError
-        from atl_doctor.report import build_capture_report, build_log_report
+        from atl_doctor.report import apply_capture_aosp, build_capture_report, build_log_report
     except ImportError as e:
         raise StarterError(_("the report needs atl-doctor: {reason}").format(reason=e)) from None
     try:
         if path.is_dir():
-            return build_capture_report(path)[0]
+            # like `atl-doctor report DIR`: stub hits compared with AOSP source (fetched once into the cache)
+            report, root = build_capture_report(path)
+            apply_capture_aosp(report, root)
+            return report
         return build_log_report([path])
     except (DoctorError, OSError, ValueError, KeyError, TypeError) as e:
         raise StarterError(_("cannot read the recording {file}: {reason}").format(file=path, reason=e)) from None
@@ -190,6 +193,11 @@ SECTIONS = (("Crash", lambda f: f.kind == "crash" and f.klass == "crash"),
 # a normal end (exit status 0, System.exit(0)) is no finding here: the summary shows the exit status
 
 
+def aosp_unavailable(report) -> bool:
+    """The stub hits could not be compared with AOSP (no network and nothing in the cache): they stay unfiltered."""
+    return report.environment.get("aosp", "").startswith("AOSP comparison not possible")
+
+
 def _summary(env: Mapping[str, str]) -> list[ReportItem]:
     items = []
     if env.get("package"):
@@ -199,7 +207,7 @@ def _summary(env: Mapping[str, str]) -> list[ReportItem]:
         items.append(ReportItem(f"killed by {env['signal']}" + (f" ({status})" if status else "")))
     elif status:
         items.append(ReportItem(status))
-    for key in ("agent", "trace", "tracecount"):
+    for key in ("agent", "trace", "tracecount", "aosp"):
         if env.get(key):
             items.append(ReportItem(f"{key}: {env[key]}"))
     return items
@@ -214,15 +222,23 @@ def _item(f) -> ReportItem:
         details.append(f"... {len(stack) - STACK_LINES} more")
     callers = f.details.get("callers") or []
     details += [f"called from {c}" for c in callers[:3]]
+    from atl_doctor.sources.aosp import aosp_line
+
+    if aosp_line(f):
+        details.append(aosp_line(f))
     return ReportItem(title, "\n".join(details))
 
 
 def report_view(report) -> list[ReportSection]:
     """Summary, then crash, ATL gaps (missing and stub), exceptions and the rest, each in fix-first order."""
     from atl_doctor.findings import rank
+    from atl_doctor.report import like_aosp
 
-    ranked = rank(report.findings)
-    view = [ReportSection("Summary", _summary(report.environment))]
+    ranked = [f for f in rank(report.findings) if not like_aosp(f)]   # trivial in AOSP as well: no ATL gap
+    like = len(report.findings) - len(ranked)
+    view = [ReportSection("Summary", _summary(report.environment)
+                          + ([ReportItem(f"{like} stub hit{'s' if like > 1 else ''} behave like AOSP (trivial there as "
+                                         "well), not listed")] if like else []))]
     for title, pred in SECTIONS:
         items = [_item(f) for f in ranked if pred(f)]
         if items:

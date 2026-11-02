@@ -717,8 +717,11 @@ class ReportWindow(Gtk.Window):
         none.append(label(_("No recordings"), "welcome-title", xalign=0.5))
         none.append(label(_("Start the app with log or with debug first."), "dim-label", xalign=0.5))
         self.stack.add_named(none, "none")
-        self.stack.add_named(Gtk.Spinner(spinning=True, halign=Gtk.Align.CENTER, valign=Gtk.Align.CENTER),
-                             "loading")
+        loading = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12, valign=Gtk.Align.CENTER)
+        loading.append(Gtk.Spinner(spinning=True, halign=Gtk.Align.CENTER))
+        loading.append(label(_("The first report fetches Android's source once to compare with (about 200 MB)."),
+                             "dim-label", xalign=0.5, wrap=True))
+        self.stack.add_named(loading, "loading")
         self.stack.add_named(Gtk.ScrolledWindow(child=self.sections, hscrollbar_policy=Gtk.PolicyType.NEVER),
                              "report")
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
@@ -758,6 +761,11 @@ class ReportWindow(Gtk.Window):
     def show(self, view: list[diag.ReportSection]) -> None:
         while (child := self.sections.get_first_child()) is not None:
             self.sections.remove(child)
+        if self.report is not None and diag.aosp_unavailable(self.report):
+            hint = label(_("Not compared with Android: without network the source could not be fetched. Stub hits "
+                           "that behave the same in Android are listed too."), wrap=True)
+            hint.add_css_class("warning")
+            self.sections.append(hint)
         for section in view:
             group = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
             group.title = section.title

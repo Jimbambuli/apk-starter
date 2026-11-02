@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 23:47+0000\n"
+"POT-Creation-Date: 2026-11-02 14:33+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -334,7 +334,7 @@ msgstr "nog geen opnamen; start een app met --log of --debug"
 msgid "the report needs atl-doctor: {reason}"
 msgstr "het rapport heeft atl-doctor nodig: {reason}"
 
-#: src/apk_starter/diag.py:160
+#: src/apk_starter/diag.py:163
 #, python-brace-format
 msgid "cannot read the recording {file}: {reason}"
 msgstr "kan opname {file} niet lezen: {reason}"
@@ -361,7 +361,7 @@ msgstr "Apps zoeken"
 msgid "Name"
 msgstr "Naam"
 
-#: src/apk_starter/gui.py:145 src/apk_starter/gui.py:515
+#: src/apk_starter/gui.py:145 src/apk_starter/gui.py:517
 msgid "Last started"
 msgstr "Laatst gestart"
 
@@ -373,200 +373,202 @@ msgstr "Laatst geïnstalleerd"
 msgid "Data size"
 msgstr "Gegevensgrootte"
 
-#: src/apk_starter/gui.py:149
+#: src/apk_starter/gui.py:148
 msgid "Sort"
 msgstr "Sorteren"
 
-#: src/apk_starter/gui.py:150
+#: src/apk_starter/gui.py:152
 msgid "Install APK…"
 msgstr "APK installeren…"
 
-#: src/apk_starter/gui.py:152
+#: src/apk_starter/gui.py:154
 msgid "Working…"
 msgstr "Bezig…"
 
-#: src/apk_starter/gui.py:160
+#: src/apk_starter/gui.py:162
 msgid "No app matches."
 msgstr "Geen app gevonden."
 
-#: src/apk_starter/gui.py:168
+#: src/apk_starter/gui.py:170
 msgid "Back"
 msgstr "Terug"
 
-#: src/apk_starter/gui.py:199
+#: src/apk_starter/gui.py:201
 msgid "Drop the APK to install it"
 msgstr "Laat de APK los om hem te installeren"
 
-#: src/apk_starter/gui.py:241
+#: src/apk_starter/gui.py:243
 msgid "No apps installed"
 msgstr "Geen apps geïnstalleerd"
 
-#: src/apk_starter/gui.py:242
+#: src/apk_starter/gui.py:244
 msgid "Drag an APK here or choose one."
 msgstr "Sleep een APK hierheen of kies er een."
 
-#: src/apk_starter/gui.py:244
+#: src/apk_starter/gui.py:246
 msgid "Choose APK…"
 msgstr "APK kiezen…"
 
-#: src/apk_starter/gui.py:255 src/apk_starter/gui.py:593
-#: src/apk_starter/gui.py:595
+#: src/apk_starter/gui.py:257 src/apk_starter/gui.py:595
+#: src/apk_starter/gui.py:597
 msgid "Close"
 msgstr "Sluiten"
 
-#: src/apk_starter/gui.py:345
+#: src/apk_starter/gui.py:347
 msgid "Cannot read the app list"
 msgstr "Kan de applijst niet lezen"
 
-#: src/apk_starter/gui.py:415
+#: src/apk_starter/gui.py:417
 msgid "Could not save the setting"
 msgstr "De instelling kon niet worden opgeslagen"
 
-#: src/apk_starter/gui.py:471
+#: src/apk_starter/gui.py:473
 msgid "Start"
 msgstr "Starten"
 
-#: src/apk_starter/gui.py:477
+#: src/apk_starter/gui.py:479
 msgid "Window bar:"
 msgstr "Vensterbalk:"
 
-#: src/apk_starter/gui.py:478
+#: src/apk_starter/gui.py:480
 msgid "From the system"
 msgstr "Van het systeem"
 
-#: src/apk_starter/gui.py:478
+#: src/apk_starter/gui.py:480
 msgid "With back button"
 msgstr "Met terugknop"
 
-#: src/apk_starter/gui.py:479
+#: src/apk_starter/gui.py:481
 msgid "From the system + navigation bar"
 msgstr "Van het systeem + navigatiebalk"
 
-#: src/apk_starter/gui.py:487 src/apk_starter/gui.py:532
-#: src/apk_starter/gui.py:699
+#: src/apk_starter/gui.py:489 src/apk_starter/gui.py:534
+#: src/apk_starter/gui.py:701
 msgid "Log"
 msgstr "Logboek"
 
-#: src/apk_starter/gui.py:488 src/apk_starter/gui.py:532
-#: src/apk_starter/gui.py:699
+#: src/apk_starter/gui.py:490 src/apk_starter/gui.py:534
+#: src/apk_starter/gui.py:701
 msgid "Debug"
 msgstr "Debug"
 
-#: src/apk_starter/gui.py:489
+#: src/apk_starter/gui.py:491
 msgid "Debug runs a little slower; use it for error reports."
 msgstr "Debug is iets trager; gebruik het voor foutrapporten."
 
-#: src/apk_starter/gui.py:512
+#: src/apk_starter/gui.py:514
 msgid "Version"
 msgstr "Versie"
 
-#: src/apk_starter/gui.py:513
+#: src/apk_starter/gui.py:515
 msgid "Target SDK"
 msgstr "Doel-SDK"
 
-#: src/apk_starter/gui.py:514
+#: src/apk_starter/gui.py:516
 msgid "Installed"
 msgstr "Geïnstalleerd"
 
-#: src/apk_starter/gui.py:516
+#: src/apk_starter/gui.py:518
 msgid "Data"
 msgstr "Gegevens"
 
-#: src/apk_starter/gui.py:516
+#: src/apk_starter/gui.py:518
 msgid "no data"
 msgstr "geen gegevens"
 
-#: src/apk_starter/gui.py:517
+#: src/apk_starter/gui.py:519
 msgid "Status"
 msgstr "Status"
 
-#: src/apk_starter/gui.py:517
+#: src/apk_starter/gui.py:519
 msgid "Prepared for this computer"
 msgstr "Voorbereid voor deze computer"
 
-#: src/apk_starter/gui.py:518
+#: src/apk_starter/gui.py:520
 msgid "Not prepared yet (done at the next start)"
 msgstr "Nog niet voorbereid (gebeurt bij de volgende start)"
 
-#: src/apk_starter/gui.py:525
+#: src/apk_starter/gui.py:527
 msgid "Recordings"
 msgstr "Opnames"
 
-#: src/apk_starter/gui.py:526
+#: src/apk_starter/gui.py:528
 msgid "Open log folder"
 msgstr "Logboekmap openen"
 
-#: src/apk_starter/gui.py:536 src/apk_starter/gui.py:593
+#: src/apk_starter/gui.py:538 src/apk_starter/gui.py:595
 msgid "Show report"
 msgstr "Rapport tonen"
 
-#: src/apk_starter/gui.py:538 src/apk_starter/gui.py:704
+#: src/apk_starter/gui.py:540 src/apk_starter/gui.py:706
 msgid "Save Report…"
 msgstr "Rapport opslaan…"
 
-#: src/apk_starter/gui.py:544
+#: src/apk_starter/gui.py:546
 msgid "None yet. Tick “Log” or “Debug” and start the app to record one."
-msgstr "Nog geen. Vink ‘Logboek’ of ‘Debug’ aan en start de app om er een op te nemen."
+msgstr ""
+"Nog geen. Vink ‘Logboek’ of ‘Debug’ aan en start de app om er een op te "
+"nemen."
 
-#: src/apk_starter/gui.py:555
+#: src/apk_starter/gui.py:557
 msgid "Delete data…"
 msgstr "Gegevens wissen…"
 
-#: src/apk_starter/gui.py:556
+#: src/apk_starter/gui.py:558
 msgid "Uninstall…"
 msgstr "Verwijderen…"
 
-#: src/apk_starter/gui.py:570
+#: src/apk_starter/gui.py:572
 #, python-brace-format
 msgid "Cannot start {app}"
 msgstr "Kan {app} niet starten"
 
-#: src/apk_starter/gui.py:596
+#: src/apk_starter/gui.py:598
 msgid "Tick “Log” and start the app again to get a report."
 msgstr "Vink ‘Logboek’ aan en start de app opnieuw om een rapport te krijgen."
 
-#: src/apk_starter/gui.py:597
+#: src/apk_starter/gui.py:599
 #, python-brace-format
 msgid "{app} ended unexpectedly."
 msgstr "{app} is onverwacht gestopt."
 
-#: src/apk_starter/gui.py:610 src/apk_starter/gui.py:618
+#: src/apk_starter/gui.py:612 src/apk_starter/gui.py:620
 msgid "Cannot open the log folder"
 msgstr "Kan de logboekmap niet openen"
 
-#: src/apk_starter/gui.py:622
+#: src/apk_starter/gui.py:624
 msgid "Android apps"
 msgstr "Android-apps"
 
-#: src/apk_starter/gui.py:627
+#: src/apk_starter/gui.py:629
 msgid "Install APK"
 msgstr "APK installeren"
 
-#: src/apk_starter/gui.py:653
+#: src/apk_starter/gui.py:655
 #, python-brace-format
 msgid "{app} installed"
 msgstr "{app} geïnstalleerd"
 
-#: src/apk_starter/gui.py:654
+#: src/apk_starter/gui.py:656
 #, python-brace-format
 msgid "Installing {file}…"
 msgstr "{file} wordt geïnstalleerd…"
 
-#: src/apk_starter/gui.py:656
+#: src/apk_starter/gui.py:658
 #, python-brace-format
 msgid "Cannot install {file}"
 msgstr "Kan {file} niet installeren"
 
-#: src/apk_starter/gui.py:660
+#: src/apk_starter/gui.py:662
 msgid "Cancel"
 msgstr "Annuleren"
 
-#: src/apk_starter/gui.py:665
+#: src/apk_starter/gui.py:667
 #, python-brace-format
 msgid "Delete the data of {app}?"
 msgstr "Gegevens van {app} wissen?"
 
-#: src/apk_starter/gui.py:666
+#: src/apk_starter/gui.py:668
 msgid ""
 "The app stays installed. Its settings, accounts and files are deleted. Close "
 "the app first."
@@ -574,74 +576,87 @@ msgstr ""
 "De app blijft geïnstalleerd. De instellingen, accounts en bestanden worden "
 "gewist. Sluit eerst de app."
 
-#: src/apk_starter/gui.py:667
+#: src/apk_starter/gui.py:669
 msgid "Delete Data"
 msgstr "Gegevens wissen"
 
-#: src/apk_starter/gui.py:669
+#: src/apk_starter/gui.py:671
 #, python-brace-format
 msgid "Cannot delete the data of {app}"
 msgstr "Kan de gegevens van {app} niet wissen"
 
-#: src/apk_starter/gui.py:673
+#: src/apk_starter/gui.py:675
 msgid "Also delete app data"
 msgstr "Ook appgegevens wissen"
 
-#: src/apk_starter/gui.py:680
+#: src/apk_starter/gui.py:682
 #, python-brace-format
 msgid "{app} uninstalled"
 msgstr "{app} verwijderd"
 
-#: src/apk_starter/gui.py:681
+#: src/apk_starter/gui.py:683
 #, python-brace-format
 msgid "Uninstall {app}?"
 msgstr "{app} verwijderen?"
 
-#: src/apk_starter/gui.py:682
+#: src/apk_starter/gui.py:684
 msgid "The app and its menu entry are removed. Close the app first."
 msgstr "De app en het menu-item worden verwijderd. Sluit eerst de app."
 
-#: src/apk_starter/gui.py:682
+#: src/apk_starter/gui.py:684
 msgid "Uninstall"
 msgstr "Verwijderen"
 
-#: src/apk_starter/gui.py:684
+#: src/apk_starter/gui.py:686
 #, python-brace-format
 msgid "Cannot uninstall {app}"
 msgstr "Kan {app} niet verwijderen"
 
-#: src/apk_starter/gui.py:692
+#: src/apk_starter/gui.py:694
 #, python-brace-format
 msgid "Report: {app}"
 msgstr "Rapport: {app}"
 
-#: src/apk_starter/gui.py:702
+#: src/apk_starter/gui.py:704
 msgid "Recording"
 msgstr "Opname"
 
-#: src/apk_starter/gui.py:715
+#: src/apk_starter/gui.py:717
 msgid "No recordings"
 msgstr "Geen opnamen"
 
-#: src/apk_starter/gui.py:716
+#: src/apk_starter/gui.py:718
 msgid "Start the app with log or with debug first."
 msgstr "Start de app eerst met logboek of met debug."
 
-#: src/apk_starter/gui.py:754
+#: src/apk_starter/gui.py:722
+msgid ""
+"The first report fetches Android's source once to compare with (about 200 "
+"MB)."
+msgstr "Het eerste rapport haalt eenmalig de broncode van Android op om mee te vergelijken (ongeveer 200 MB)."
+
+#: src/apk_starter/gui.py:759
 msgid "Cannot read the report"
 msgstr "Kan het rapport niet lezen"
 
-#: src/apk_starter/gui.py:783
+#: src/apk_starter/gui.py:765
+msgid ""
+"Not compared with Android: without network the source could not be fetched. "
+"Stub hits that behave the same in Android are listed too."
+msgstr "Niet vergeleken met Android: zonder netwerk kon de broncode niet worden opgehaald. Stub-aanroepen die zich in Android hetzelfde gedragen, staan er ook bij."
+
+#: src/apk_starter/gui.py:793
 msgid "Save Report"
 msgstr "Rapport opslaan"
 
-#: src/apk_starter/gui.py:799
+#: src/apk_starter/gui.py:809
 msgid "Cannot save the report"
 msgstr "Kan het rapport niet opslaan"
 
 #: src/apk_starter/gui_model.py:146
 msgid "Exit code 10: crash (an exception the app did not catch)"
-msgstr "Afsluitcode 10: crash (een uitzondering die de app niet heeft opgevangen)"
+msgstr ""
+"Afsluitcode 10: crash (een uitzondering die de app niet heeft opgevangen)"
 
 #: src/apk_starter/gui_model.py:148
 msgid "Exit code 1: a function that ATL does not support yet"

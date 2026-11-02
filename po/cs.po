@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 23:47+0000\n"
+"POT-Creation-Date: 2026-11-02 14:33+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -332,7 +332,7 @@ msgstr "zatím žádné nahrávky; spusťte aplikaci s --log nebo --debug"
 msgid "the report needs atl-doctor: {reason}"
 msgstr "zpráva vyžaduje atl-doctor: {reason}"
 
-#: src/apk_starter/diag.py:160
+#: src/apk_starter/diag.py:163
 #, python-brace-format
 msgid "cannot read the recording {file}: {reason}"
 msgstr "nahrávku {file} nelze přečíst: {reason}"
@@ -359,7 +359,7 @@ msgstr "Hledat aplikace"
 msgid "Name"
 msgstr "Název"
 
-#: src/apk_starter/gui.py:145 src/apk_starter/gui.py:515
+#: src/apk_starter/gui.py:145 src/apk_starter/gui.py:517
 msgid "Last started"
 msgstr "Naposledy spuštěno"
 
@@ -371,200 +371,202 @@ msgstr "Naposledy nainstalováno"
 msgid "Data size"
 msgstr "Velikost dat"
 
-#: src/apk_starter/gui.py:149
+#: src/apk_starter/gui.py:148
 msgid "Sort"
 msgstr "Řadit"
 
-#: src/apk_starter/gui.py:150
+#: src/apk_starter/gui.py:152
 msgid "Install APK…"
 msgstr "Instalovat APK…"
 
-#: src/apk_starter/gui.py:152
+#: src/apk_starter/gui.py:154
 msgid "Working…"
 msgstr "Probíhá zpracování…"
 
-#: src/apk_starter/gui.py:160
+#: src/apk_starter/gui.py:162
 msgid "No app matches."
 msgstr "Žádná aplikace neodpovídá."
 
-#: src/apk_starter/gui.py:168
+#: src/apk_starter/gui.py:170
 msgid "Back"
 msgstr "Zpět"
 
-#: src/apk_starter/gui.py:199
+#: src/apk_starter/gui.py:201
 msgid "Drop the APK to install it"
 msgstr "Pusťte APK pro instalaci"
 
-#: src/apk_starter/gui.py:241
+#: src/apk_starter/gui.py:243
 msgid "No apps installed"
 msgstr "Nejsou nainstalovány žádné aplikace"
 
-#: src/apk_starter/gui.py:242
+#: src/apk_starter/gui.py:244
 msgid "Drag an APK here or choose one."
 msgstr "Přetáhněte sem APK nebo nějaké vyberte."
 
-#: src/apk_starter/gui.py:244
+#: src/apk_starter/gui.py:246
 msgid "Choose APK…"
 msgstr "Vybrat APK…"
 
-#: src/apk_starter/gui.py:255 src/apk_starter/gui.py:593
-#: src/apk_starter/gui.py:595
+#: src/apk_starter/gui.py:257 src/apk_starter/gui.py:595
+#: src/apk_starter/gui.py:597
 msgid "Close"
 msgstr "Zavřít"
 
-#: src/apk_starter/gui.py:345
+#: src/apk_starter/gui.py:347
 msgid "Cannot read the app list"
 msgstr "Nelze načíst seznam aplikací"
 
-#: src/apk_starter/gui.py:415
+#: src/apk_starter/gui.py:417
 msgid "Could not save the setting"
 msgstr "Nastavení nelze uložit"
 
-#: src/apk_starter/gui.py:471
+#: src/apk_starter/gui.py:473
 msgid "Start"
 msgstr "Spustit"
 
-#: src/apk_starter/gui.py:477
+#: src/apk_starter/gui.py:479
 msgid "Window bar:"
 msgstr "Lišta okna:"
 
-#: src/apk_starter/gui.py:478
+#: src/apk_starter/gui.py:480
 msgid "From the system"
 msgstr "Ze systému"
 
-#: src/apk_starter/gui.py:478
+#: src/apk_starter/gui.py:480
 msgid "With back button"
 msgstr "S tlačítkem Zpět"
 
-#: src/apk_starter/gui.py:479
+#: src/apk_starter/gui.py:481
 msgid "From the system + navigation bar"
 msgstr "Ze systému + navigační lišta"
 
-#: src/apk_starter/gui.py:487 src/apk_starter/gui.py:532
-#: src/apk_starter/gui.py:699
+#: src/apk_starter/gui.py:489 src/apk_starter/gui.py:534
+#: src/apk_starter/gui.py:701
 msgid "Log"
 msgstr "Protokol"
 
-#: src/apk_starter/gui.py:488 src/apk_starter/gui.py:532
-#: src/apk_starter/gui.py:699
+#: src/apk_starter/gui.py:490 src/apk_starter/gui.py:534
+#: src/apk_starter/gui.py:701
 msgid "Debug"
 msgstr "Ladění"
 
-#: src/apk_starter/gui.py:489
+#: src/apk_starter/gui.py:491
 msgid "Debug runs a little slower; use it for error reports."
 msgstr "Ladění běží o něco pomaleji; použijte ho pro hlášení chyb."
 
-#: src/apk_starter/gui.py:512
+#: src/apk_starter/gui.py:514
 msgid "Version"
 msgstr "Verze"
 
-#: src/apk_starter/gui.py:513
+#: src/apk_starter/gui.py:515
 msgid "Target SDK"
 msgstr "Cílové SDK"
 
-#: src/apk_starter/gui.py:514
+#: src/apk_starter/gui.py:516
 msgid "Installed"
 msgstr "Nainstalováno"
 
-#: src/apk_starter/gui.py:516
+#: src/apk_starter/gui.py:518
 msgid "Data"
 msgstr "Data"
 
-#: src/apk_starter/gui.py:516
+#: src/apk_starter/gui.py:518
 msgid "no data"
 msgstr "žádná data"
 
-#: src/apk_starter/gui.py:517
+#: src/apk_starter/gui.py:519
 msgid "Status"
 msgstr "Stav"
 
-#: src/apk_starter/gui.py:517
+#: src/apk_starter/gui.py:519
 msgid "Prepared for this computer"
 msgstr "Připraveno pro tento počítač"
 
-#: src/apk_starter/gui.py:518
+#: src/apk_starter/gui.py:520
 msgid "Not prepared yet (done at the next start)"
 msgstr "Zatím nepřipraveno (proběhne při příštím spuštění)"
 
-#: src/apk_starter/gui.py:525
+#: src/apk_starter/gui.py:527
 msgid "Recordings"
 msgstr "Záznamy"
 
-#: src/apk_starter/gui.py:526
+#: src/apk_starter/gui.py:528
 msgid "Open log folder"
 msgstr "Otevřít složku protokolů"
 
-#: src/apk_starter/gui.py:536 src/apk_starter/gui.py:593
+#: src/apk_starter/gui.py:538 src/apk_starter/gui.py:595
 msgid "Show report"
 msgstr "Zobrazit zprávu"
 
-#: src/apk_starter/gui.py:538 src/apk_starter/gui.py:704
+#: src/apk_starter/gui.py:540 src/apk_starter/gui.py:706
 msgid "Save Report…"
 msgstr "Uložit zprávu…"
 
-#: src/apk_starter/gui.py:544
+#: src/apk_starter/gui.py:546
 msgid "None yet. Tick “Log” or “Debug” and start the app to record one."
-msgstr "Zatím žádný. Zaškrtněte „Protokol“ nebo „Ladění“ a spusťte aplikaci, aby se nahrál."
+msgstr ""
+"Zatím žádný. Zaškrtněte „Protokol“ nebo „Ladění“ a spusťte aplikaci, aby se "
+"nahrál."
 
-#: src/apk_starter/gui.py:555
+#: src/apk_starter/gui.py:557
 msgid "Delete data…"
 msgstr "Smazat data…"
 
-#: src/apk_starter/gui.py:556
+#: src/apk_starter/gui.py:558
 msgid "Uninstall…"
 msgstr "Odinstalovat…"
 
-#: src/apk_starter/gui.py:570
+#: src/apk_starter/gui.py:572
 #, python-brace-format
 msgid "Cannot start {app}"
 msgstr "Aplikaci {app} nelze spustit"
 
-#: src/apk_starter/gui.py:596
+#: src/apk_starter/gui.py:598
 msgid "Tick “Log” and start the app again to get a report."
 msgstr "Zaškrtněte „Protokol“ a spusťte aplikaci znovu, abyste získali zprávu."
 
-#: src/apk_starter/gui.py:597
+#: src/apk_starter/gui.py:599
 #, python-brace-format
 msgid "{app} ended unexpectedly."
 msgstr "{app} neočekávaně skončila."
 
-#: src/apk_starter/gui.py:610 src/apk_starter/gui.py:618
+#: src/apk_starter/gui.py:612 src/apk_starter/gui.py:620
 msgid "Cannot open the log folder"
 msgstr "Nelze otevřít složku protokolů"
 
-#: src/apk_starter/gui.py:622
+#: src/apk_starter/gui.py:624
 msgid "Android apps"
 msgstr "Aplikace pro Android"
 
-#: src/apk_starter/gui.py:627
+#: src/apk_starter/gui.py:629
 msgid "Install APK"
 msgstr "Instalovat APK"
 
-#: src/apk_starter/gui.py:653
+#: src/apk_starter/gui.py:655
 #, python-brace-format
 msgid "{app} installed"
 msgstr "Aplikace {app} nainstalována"
 
-#: src/apk_starter/gui.py:654
+#: src/apk_starter/gui.py:656
 #, python-brace-format
 msgid "Installing {file}…"
 msgstr "Instaluje se {file}…"
 
-#: src/apk_starter/gui.py:656
+#: src/apk_starter/gui.py:658
 #, python-brace-format
 msgid "Cannot install {file}"
 msgstr "{file} nelze nainstalovat"
 
-#: src/apk_starter/gui.py:660
+#: src/apk_starter/gui.py:662
 msgid "Cancel"
 msgstr "Zrušit"
 
-#: src/apk_starter/gui.py:665
+#: src/apk_starter/gui.py:667
 #, python-brace-format
 msgid "Delete the data of {app}?"
 msgstr "Smazat data aplikace {app}?"
 
-#: src/apk_starter/gui.py:666
+#: src/apk_starter/gui.py:668
 msgid ""
 "The app stays installed. Its settings, accounts and files are deleted. Close "
 "the app first."
@@ -572,69 +574,81 @@ msgstr ""
 "Aplikace zůstane nainstalována. Její nastavení, účty a soubory budou "
 "smazány. Nejprve aplikaci zavřete."
 
-#: src/apk_starter/gui.py:667
+#: src/apk_starter/gui.py:669
 msgid "Delete Data"
 msgstr "Smazat data"
 
-#: src/apk_starter/gui.py:669
+#: src/apk_starter/gui.py:671
 #, python-brace-format
 msgid "Cannot delete the data of {app}"
 msgstr "Data aplikace {app} nelze smazat"
 
-#: src/apk_starter/gui.py:673
+#: src/apk_starter/gui.py:675
 msgid "Also delete app data"
 msgstr "Smazat i data aplikace"
 
-#: src/apk_starter/gui.py:680
+#: src/apk_starter/gui.py:682
 #, python-brace-format
 msgid "{app} uninstalled"
 msgstr "Aplikace {app} odinstalována"
 
-#: src/apk_starter/gui.py:681
+#: src/apk_starter/gui.py:683
 #, python-brace-format
 msgid "Uninstall {app}?"
 msgstr "Odinstalovat aplikaci {app}?"
 
-#: src/apk_starter/gui.py:682
+#: src/apk_starter/gui.py:684
 msgid "The app and its menu entry are removed. Close the app first."
 msgstr ""
 "Aplikace a její položka v nabídce budou odstraněny. Nejprve aplikaci zavřete."
 
-#: src/apk_starter/gui.py:682
+#: src/apk_starter/gui.py:684
 msgid "Uninstall"
 msgstr "Odinstalovat"
 
-#: src/apk_starter/gui.py:684
+#: src/apk_starter/gui.py:686
 #, python-brace-format
 msgid "Cannot uninstall {app}"
 msgstr "Aplikaci {app} nelze odinstalovat"
 
-#: src/apk_starter/gui.py:692
+#: src/apk_starter/gui.py:694
 #, python-brace-format
 msgid "Report: {app}"
 msgstr "Zpráva: {app}"
 
-#: src/apk_starter/gui.py:702
+#: src/apk_starter/gui.py:704
 msgid "Recording"
 msgstr "Nahrávka"
 
-#: src/apk_starter/gui.py:715
+#: src/apk_starter/gui.py:717
 msgid "No recordings"
 msgstr "Žádné nahrávky"
 
-#: src/apk_starter/gui.py:716
+#: src/apk_starter/gui.py:718
 msgid "Start the app with log or with debug first."
 msgstr "Nejprve spusťte aplikaci s protokolem nebo s laděním."
 
-#: src/apk_starter/gui.py:754
+#: src/apk_starter/gui.py:722
+msgid ""
+"The first report fetches Android's source once to compare with (about 200 "
+"MB)."
+msgstr "První zpráva jednou stáhne zdrojový kód Androidu k porovnání (asi 200 MB)."
+
+#: src/apk_starter/gui.py:759
 msgid "Cannot read the report"
 msgstr "Zprávu nelze přečíst"
 
-#: src/apk_starter/gui.py:783
+#: src/apk_starter/gui.py:765
+msgid ""
+"Not compared with Android: without network the source could not be fetched. "
+"Stub hits that behave the same in Android are listed too."
+msgstr "Neporovnáno s Androidem: bez sítě nešlo zdrojový kód stáhnout. Volání stubů, která se v Androidu chovají stejně, jsou uvedena také."
+
+#: src/apk_starter/gui.py:793
 msgid "Save Report"
 msgstr "Uložit zprávu"
 
-#: src/apk_starter/gui.py:799
+#: src/apk_starter/gui.py:809
 msgid "Cannot save the report"
 msgstr "Zprávu nelze uložit"
 

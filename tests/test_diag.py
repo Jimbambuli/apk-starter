@@ -156,3 +156,36 @@ def test_report_view_shows_the_time_line(tmp_path):
     assert view[-1].title == "Time line"
     assert view[-1].items[0].title == "start"
     assert view[-1].items[0].details.splitlines() == ["250.0 ms  main  org.ex.App.load", "12.5 ms  pool-3-thread-1  a.B.c"]
+
+
+def test_report_of_a_recording_is_compared_with_aosp(tmp_path, monkeypatch):
+    """Like `atl-doctor report DIR`: the stub hits of a recording are compared with AOSP (fetched once)."""
+    pytest.importorskip("atl_doctor")
+    import atl_doctor.report as ar
+    from atl_doctor.capture import Capture
+
+    root = Capture.create(tmp_path / "rec", "atl").root
+    seen = []
+    monkeypatch.setattr(ar, "apply_capture_aosp", lambda r, d: seen.append(d) or r.environment.update(aosp="/c/aosp"))
+    r = diag.load_report(root)
+    assert seen == [root] and r.environment["aosp"] == "/c/aosp" and not diag.aosp_unavailable(r)
+    assert "aosp: /c/aosp" in [i.title for i in diag.report_view(r)[0].items]
+
+
+def test_report_view_leaves_out_stub_hits_like_aosp(tmp_path):
+    pytest.importorskip("atl_doctor")
+    r = diag.load_report(_log_with_agent(tmp_path))
+    gap = next(f for f in r.findings if f.kind in diag.GAP_KINDS and "STUB" in f.title)
+    gap.details["like_aosp"] = True
+    view = diag.report_view(r)
+    assert "1 stub hit behave like AOSP (trivial there as well), not listed" in [i.title for i in view[0].items]
+    gaps = next(s for s in view if s.title == "ATL gaps")
+    assert [i.title for i in gaps.items] == ["missing method android.view.View#foo()V"]
+
+
+def test_aosp_unavailable_without_network(tmp_path):
+    pytest.importorskip("atl_doctor")
+    r = diag.load_report(_log_with_agent(tmp_path))
+    assert not diag.aosp_unavailable(r)
+    r.environment["aosp"] = "AOSP comparison not possible (git ls-remote failed: x; use --aosp DIR); stub hits unfiltered"
+    assert diag.aosp_unavailable(r)

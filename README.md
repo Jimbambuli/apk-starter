@@ -71,7 +71,10 @@ runtime runs (exceptions with stack, also caught ones, lifecycle), the calls of 
 itself), a time line from ART's sampling profiler, the view trees and a verbose Android log; the app runs only a
 little slower (no full method trace, which made apps lose their own start-up races). **Show report** in the window or
 `apk-starter --report` turns a recording into a report (crash cause, ATL gaps, exceptions; in English), the same one
-`atl-doctor report --log FILE` or `atl-doctor report DIR` gives.
+`atl-doctor report --log FILE` or `atl-doctor report DIR` gives. Like there, the stub hits of a Debug recording are
+compared with Android's source, so that methods as trivial in Android are not counted as gaps: the first report
+fetches it once with git (sparse, about 200 MB) into `~/.var/app/io.github.Jimbambuli.ApkStarter/cache/atl-doctor`;
+without network the report says so and lists the stub hits unfiltered.
 
 Like Android, installing compiles an app for your processor (shown as «Preparing …»), so its first start is as
 fast as later ones; the Android runtime itself is prepared once and again after an update of APK Starter. An APK

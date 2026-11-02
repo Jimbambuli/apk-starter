@@ -129,7 +129,7 @@ modules:
         commit: 53f7a8d07be39214e54902fb4f060779eeb1eecc
       - type: git
         url: https://github.com/Jimbambuli/atl-doctor.git
-        commit: d6198852fa10406328a9f50e03aaec3c2493e4d4
+        commit: d7d830af2f72d8865c508c2c0d99fde30071f865
         dest: atl-doctor
 
   # ATL's jni_upcall_gen resolves asm/asm-tree/java-getopt via xmvn5-resolve or
@@ -166,7 +166,26 @@ modules:
       - type: git
         url: https://gitlab.com/Jimbambuli/android_translation_layer.git
         branch: apk-starter-tv4
-        commit: be3bfaaf11fc923b87f26dab8da820e50d3fc453
+        commit: a09f1dd4ded8aa547d9f4b86e409160f036f90e3
+
+  # git for «Show report»: atl-doctor compares the stub hits with AOSP source, which it fetches once (sparse,
+  # shallow) into the cache with git; the runtime has no git.
+  - name: git
+    buildsystem: simple
+    build-commands:
+      - make -j$FLATPAK_BUILDER_N_JOBS prefix=/app NO_PERL=1 NO_PYTHON=1 NO_TCLTK=1 NO_GETTEXT=1 NO_EXPAT=1 INSTALL_SYMLINKS=1 install
+    sources:
+      - type: archive
+        url: https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.56.0.tar.xz
+        sha256: 26c56c296b38c0695b26fa95f475f1d01704d2d38e73465ca30b0b2f5dc789d3
+    cleanup:
+      - /share/git-gui
+      - /share/gitk
+      - /share/gitweb
+      - /share/perl5
+      - /bin/scalar
+      - /bin/git-shell
+      - /bin/git-cvsserver
 
   # atl-doctor (public, fixed commit): JVMTI agent and trace counter for «Start with log/debug», its Python
   # package for the recorder and «Show report», and the stub list of exactly this ATL (for stub hits).
@@ -187,10 +206,10 @@ modules:
     sources:
       - type: git
         url: https://github.com/Jimbambuli/atl-doctor.git
-        commit: d6198852fa10406328a9f50e03aaec3c2493e4d4
+        commit: d7d830af2f72d8865c508c2c0d99fde30071f865
       - type: git
         url: https://gitlab.com/Jimbambuli/android_translation_layer.git
-        commit: be3bfaaf11fc923b87f26dab8da820e50d3fc453
+        commit: a09f1dd4ded8aa547d9f4b86e409160f036f90e3
         dest: atl-src
 
   - name: apk-starter
