@@ -97,7 +97,12 @@ change of them at once:
   `/usr/share/themes` and `/usr/share/icons`;
 - `--filesystem=xdg-config/gtk-4.0:ro` and `--filesystem=xdg-config/gtk-3.0:ro`: your GTK settings (read only);
   those of GTK 3 count where there are none for GTK 4, and under KDE `gtk-3.0/assets` holds the pictures of the
-  KWin window buttons for the apps' title bars.
+  KWin window buttons for the apps' title bars;
+- `--filesystem=xdg-config/kdeglobals:ro`, `xdg-config/kwinrc:ro` and `xdg-config/breezerc:ro`: KDE's title font,
+  window decoration and Breeze button size (read only), so the apps' title bars are as high as KWin's.
+
+For the apps' media in the desktop's media controls and its media keys (MPRIS), APK Starter may own the D-Bus names
+`org.mpris.MediaPlayer2.*` (`--own-name`).
 
 Without them (e.g. `flatpak override --user --nofilesystem=host-os io.github.Jimbambuli.ApkStarter`) everything
 works with GTK's default theme in the desktop's light or dark variant.

@@ -17,6 +17,12 @@ finish-args:
   - --filesystem=host-os:ro
   - --filesystem=xdg-config/gtk-4.0:ro
   - --filesystem=xdg-config/gtk-3.0:ro
+  # KWin's title font, decoration and Breeze button size, for the height of ATL's title bar (read only)
+  - --filesystem=xdg-config/kdeglobals:ro
+  - --filesystem=xdg-config/kwinrc:ro
+  - --filesystem=xdg-config/breezerc:ro
+  # media of the apps in the desktop's media controls (MPRIS, ATL's MediaSession)
+  - --own-name=org.mpris.MediaPlayer2.*
 build-options:
   append-path: /usr/lib/sdk/openjdk21/bin
   env:
@@ -119,11 +125,11 @@ modules:
     sources:
       - type: git
         url: https://gitlab.com/Jimbambuli/art_standalone.git
-        branch: debug-leicht
-        commit: 5da2b5987fafba445d244ae4c7d96b976a75d6f8
+        branch: apk-starter-tv4
+        commit: 53f7a8d07be39214e54902fb4f060779eeb1eecc
       - type: git
         url: https://github.com/Jimbambuli/atl-doctor.git
-        commit: 9c25a561c05ea7981a82b1465cb9dccd0e038288
+        commit: d6198852fa10406328a9f50e03aaec3c2493e4d4
         dest: atl-doctor
 
   # ATL's jni_upcall_gen resolves asm/asm-tree/java-getopt via xmvn5-resolve or
@@ -159,8 +165,8 @@ modules:
     sources:
       - type: git
         url: https://gitlab.com/Jimbambuli/android_translation_layer.git
-        branch: apk-starter-next
-        commit: 04b9bd763084775e2a85746ec7b3dd84bd222ec0
+        branch: apk-starter-tv4
+        commit: b7b0113674e83fb1b3fd60f30504fa4f09c03270
 
   # atl-doctor (public, fixed commit): JVMTI agent and trace counter for «Start with log/debug», its Python
   # package for the recorder and «Show report», and the stub list of exactly this ATL (for stub hits).
@@ -181,10 +187,10 @@ modules:
     sources:
       - type: git
         url: https://github.com/Jimbambuli/atl-doctor.git
-        commit: 9c25a561c05ea7981a82b1465cb9dccd0e038288
+        commit: d6198852fa10406328a9f50e03aaec3c2493e4d4
       - type: git
         url: https://gitlab.com/Jimbambuli/android_translation_layer.git
-        commit: 04b9bd763084775e2a85746ec7b3dd84bd222ec0
+        commit: b7b0113674e83fb1b3fd60f30504fa4f09c03270
         dest: atl-src
 
   - name: apk-starter

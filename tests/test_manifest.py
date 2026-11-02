@@ -37,7 +37,12 @@ def test_finish_args_exact():
                              "--socket=pulseaudio", "--share=network", "--share=ipc",
                              # the system's GTK theme, read only (Spec 14, README «Permissions»)
                              "--filesystem=host-os:ro", "--filesystem=xdg-config/gtk-4.0:ro",
-                             "--filesystem=xdg-config/gtk-3.0:ro"}
+                             "--filesystem=xdg-config/gtk-3.0:ro",
+                             # KWin's title font/decoration/button size for the title bar's height, read only
+                             "--filesystem=xdg-config/kdeglobals:ro", "--filesystem=xdg-config/kwinrc:ro",
+                             "--filesystem=xdg-config/breezerc:ro",
+                             # the apps' media in the desktop's media controls (MPRIS)
+                             "--own-name=org.mpris.MediaPlayer2.*"}
 
 
 def test_all_git_sources_pinned():
@@ -58,8 +63,8 @@ def test_atl_doctor_pinned_with_the_same_atl_source():
     assert f"commit: {pins['atl-doctor']}" in art and "libopenjdkjvmti.so" in art   # JVMTI plugin, same atl-doctor
 
 
-def test_atl_from_the_apk_starter_next_branch():
+def test_atl_from_the_apk_starter_tv4_branch():
     text = (ROOT / "io.github.Jimbambuli.ApkStarter.yml").read_text()
     module = text[text.index("- name: android_translation_layer"):text.index("- name: atl-doctor")]
-    assert "branch: apk-starter-next" in module   # theme + debug-leicht + f178-digest + crypto-native + title bars
+    assert "branch: apk-starter-tv4" in module   # apk-starter-next + jw-funktionen + jw-fehler
     assert text.count(f"commit: {manifest_commits()['android_translation_layer']}") == 2      # also atl-src
