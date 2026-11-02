@@ -66,3 +66,7 @@ def test_titlebar_of_the_app_reaches_atl(tmp_path):
     assert build_env(p, "org.b", {})["ATL_TITLEBAR"] == "system-navigation"
     env = build_env(p, "org.c", {"ATL_SYSTEM_TITLEBAR": "1", "ATL_TITLEBAR": "system"})
     assert env["ATL_TITLEBAR"] == "atl" and "ATL_SYSTEM_TITLEBAR" not in env
+    assert "ATL_APP_ICON" not in env
+    p.icon("org.c").parent.mkdir(parents=True, exist_ok=True)
+    p.icon("org.c").write_bytes(b"png")
+    assert build_env(p, "org.c", {})["ATL_APP_ICON"] == str(p.icon("org.c"))

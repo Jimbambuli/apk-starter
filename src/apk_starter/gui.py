@@ -145,8 +145,10 @@ class Window(Gtk.ApplicationWindow):
         for key, text in (("name", _("Name")), ("started", _("Last started")), ("installed", _("Last installed")),
                           ("size", _("Data size"))):
             sort_menu.append(text, f"win.sort::{key}")
-        sort = Gtk.MenuButton(icon_name="view-sort-descending-symbolic", menu_model=sort_menu,
-                              tooltip_text=_("Sort"))
+        sort = Gtk.MenuButton(menu_model=sort_menu, tooltip_text=_("Sort"))
+        # Breeze has no symbolic variant of this icon
+        sort.set_child(Gtk.Image.new_from_gicon(Gio.ThemedIcon.new_from_names(
+            ["view-sort-descending-symbolic", "view-sort-descending"])))
         install = Gtk.Button(icon_name="list-add-symbolic", tooltip_text=_("Install APK…"))
         install.connect("clicked", lambda _b: self.choose_apk())
         self.spinner = Gtk.Spinner(visible=False, spinning=True, tooltip_text=_("Working…"))

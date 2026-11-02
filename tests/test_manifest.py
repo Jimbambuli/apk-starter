@@ -58,8 +58,8 @@ def test_atl_doctor_pinned_with_the_same_atl_source():
     assert f"commit: {pins['atl-doctor']}" in art and "libopenjdkjvmti.so" in art   # JVMTI plugin, same atl-doctor
 
 
-def test_atl_from_the_debug_leicht_branch():
+def test_atl_from_the_apk_starter_next_branch():
     text = (ROOT / "io.github.Jimbambuli.ApkStarter.yml").read_text()
     module = text[text.index("- name: android_translation_layer"):text.index("- name: atl-doctor")]
-    assert "branch: debug-leicht" in module   # theme + attach-agent and stub hits for Debug
+    assert "branch: apk-starter-next" in module   # theme + debug-leicht + f178-digest + crypto-native + title bars
     assert text.count(f"commit: {manifest_commits()['android_translation_layer']}") == 2      # also atl-src
