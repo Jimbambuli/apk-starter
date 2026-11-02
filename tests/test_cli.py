@@ -358,7 +358,7 @@ def _agent(box):
     return prefix
 
 
-def test_log_level_loads_the_agent_and_keeps_its_output_in_the_log(box, capsys):
+def test_log_level_loads_the_agent_and_keeps_its_output_in_the_log(box):
     prefix = _agent(box)
     assert main(["--log", str(box.apk)], env=box.env) == 0
     a = json.loads(box.record.read_text())["argv"]
@@ -370,11 +370,6 @@ def test_log_level_loads_the_agent_and_keeps_its_output_in_the_log(box, capsys):
     assert log.read_text().splitlines()[-1].startswith("# atl-doctor-agent: E\t200\t7\tjava.lang.IllegalState")
     assert not Path(f"{log}.agent").exists()
     assert json.loads(box.record.read_text())["log_tags"] is None
-    pytest.importorskip("atl_doctor")
-    capsys.readouterr()
-    assert main(["--report"], env=box.env) == 0
-    out = capsys.readouterr().out
-    assert "java.lang.IllegalStateException: boom" in out and "Exceptions" in out
 
 
 def test_remembered_log_applies_to_every_start_of_the_app(box):
@@ -392,7 +387,7 @@ def test_log_without_agent_is_a_plain_log(box):
     assert not any(x.startswith("-agentpath") for x in json.loads(box.record.read_text())["argv"])
 
 
-def test_debug_level_records_a_folder_for_atl_doctor(box, capsys):
+def test_debug_level_records_a_folder_for_atl_doctor(box):
     pytest.importorskip("atl_doctor")
     make_apk(box.apk, manifest=axml_manifest(), files={"classes.dex": DEX})     # atl-doctor reads the code
     prefix = Path(box.env["APK_STARTER_PREFIX"])
@@ -405,20 +400,14 @@ def test_debug_level_records_a_folder_for_atl_doctor(box, capsys):
     folder = next((box.data / "logs").glob(f"{PKG}-*"))
     m = json.loads((folder / "manifest.json").read_text())
     assert m["exit_status"] == 3 and m["package"] == PKG and "fake atl output" in (folder / "atl.log").read_text()
-    capsys.readouterr()
-    assert main(["--report", PKG], env=box.env) == 0
-    assert "exit status 3" in capsys.readouterr().out
     assert main(["--debug=" + str(box.tmp / "own"), str(box.apk)], env=box.env) == 0
     assert (box.tmp / "own/manifest.json").is_file()
 
 
-def test_report_and_diag_usage_errors(box, capsys):
+def test_diag_usage_errors_and_no_report_option(box):
     assert main(["--log", "--debug", str(box.apk)], env=box.env) == 2
     assert main(["--debug=", str(box.apk)], env=box.env) == 2
-    assert main(["--report", "org.none.app"], env=box.env) == 2
-    assert main(["--report"], env=box.env) == 1
-    assert main(["--report", "a", "b"], env=box.env) == 2
-    assert main(["--report", "--list"], env=box.env) == 2
+    assert main(["--report"], env=box.env) == 2          # reports come from atl-doctor itself
 
 
 def test_debug_asks_for_a_view_tree_while_the_app_runs(box, monkeypatch):

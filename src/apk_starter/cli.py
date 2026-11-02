@@ -49,9 +49,6 @@ def _scan(argv: list[str]) -> tuple[list[str], str | None, Path | None, int]:
         elif tok in VALUE_OPTIONS:
             kept += argv[i:i + 2]
             i += 1
-        elif tok == "--report" and i + 1 < len(argv) and not argv[i + 1].startswith("-"):
-            kept += argv[i:i + 2]            # optional value: a recording or a package
-            i += 1
         else:
             kept.append(tok)
         i += 1
@@ -259,7 +256,6 @@ def _parser() -> argparse.ArgumentParser:
         prog="apk-starter", allow_abbrev=False,
         usage="%(prog)s [--log[=FILE] | --debug[=DIR]] [--sdk N] [--size WxH] [--] [APK|PACKAGE] [ATL-ARGS...]\n"
               "       %(prog)s --install APK | --list | --remove PACKAGE [--purge] | --remove-all [--purge]\n"
-              "       %(prog)s --report [RECORDING|PACKAGE]\n"
               "       %(prog)s --version\n"
               "       %(prog)s            " + _("(no arguments: open the management window)"),
         description=_("Start Android apps (APK) with Android Translation Layer."))
@@ -277,9 +273,6 @@ def _parser() -> argparse.ArgumentParser:
     g.add_argument("--remove", metavar="PACKAGE", help=_("remove an installed app"))
     g.add_argument("--remove-all", action="store_true",
                    help=_("remove all installed apps and their menu entries (before uninstalling the Flatpak)"))
-    g.add_argument("--report", nargs="?", const="", metavar="RECORDING",
-                   help=_("show the report of a log or debug recording (default: the newest; a package name: its "
-                          "newest)"))
     g.add_argument("--version", action="store_true", help=_("show the version and exit"))
     return p
 
@@ -312,9 +305,9 @@ def _main(argv: list[str], env: Mapping[str, str]) -> int:
         args = parser.parse_args([a for a in kept if a != "--"])
     except SystemExit as e:
         return e.code if isinstance(e.code, int) else 0
-    mode = args.install or args.list or args.remove or args.remove_all or args.version or args.report is not None
+    mode = args.install or args.list or args.remove or args.remove_all or args.version
     if mode and (tail or level is not None or args.sdk is not None or args.size):
-        parser.error(_("--install, --list, --remove, --remove-all, --report and --version take no other arguments"))
+        parser.error(_("--install, --list, --remove, --remove-all and --version take no other arguments"))
     if args.purge and not (args.remove or args.remove_all):
         parser.error(_("--purge only works with --remove or --remove-all"))
     paths = Paths.from_env(env)
@@ -338,10 +331,6 @@ def _main(argv: list[str], env: Mapping[str, str]) -> int:
         return 1 if errors else 0
     if args.install:
         install_apk(paths, Path(args.install), lang_from_env(env), env)
-        return 0
-    if args.report is not None:
-        from . import diag
-        sys.stdout.write(diag.report_text(diag.load_report(diag.find_recording(paths, args.report or None))))
         return 0
     if not tail and level is None and args.sdk is None and not args.size:
         if not any(env.get(v) for v in DISPLAY_VARS):

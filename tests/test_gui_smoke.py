@@ -81,40 +81,6 @@ def test_window_speaks_the_system_language(tmp_path, lang, title, error):
 
 
 @needs_broadway
-def test_show_report_lists_recordings_shows_and_saves(tmp_path):
-    pytest.importorskip("atl_doctor")
-    d = tmp_path / "d"
-    (d / "apps").mkdir(parents=True)
-    for pkg, label in (("org.example.demo", "Demo"), ("org.example.none", "None")):
-        (d / "apps" / f"{pkg}.json").write_text(json.dumps({"package": pkg, "label": label}))
-    (d / "logs").mkdir()
-    (d / "logs/org.example.demo-20261101-090000.log").write_text(
-        "# apk-starter: package=org.example.demo\nall fine\n# apk-starter: exit=0\n")
-    (d / "logs/org.example.demo-20261101-100000.log").write_text(
-        "# apk-starter: package=org.example.demo\n# apk-starter: version_name=1.2\n"
-        "java.lang.NoSuchMethodError: No virtual method foo()V in class Landroid/view/View; or its super classes\n"
-        "# apk-starter: signal=SIGSEGV\n# apk-starter: exit=139\n"
-        "# atl-doctor-agent: E\t200\t7\tjava.lang.IllegalStateException\tboom\tB:android.view.View.measure\t"
-        "B:android.view.View.measure|org.example.demo.Main.onCreate\n")
-    with broadway() as env:
-        out = subprocess.run([sys.executable, str(HERE / "gui_report_probe.py"), str(d), str(tmp_path / "r.txt")],
-                             env=env, capture_output=True, text=True, timeout=60)
-    report = json.loads(out.stdout.strip().splitlines()[-1])
-    assert report == {
-        "title": "Report: Demo",
-        "choices": ["2026-11-01 10:00:00 · Log", "2026-11-01 09:00:00 · Log"],
-        "newest": [["Summary", ["org.example.demo 1.2", "killed by SIGSEGV (exit status 139)"]],
-                   ["Crash", ["fatal signal SIGSEGV"]],
-                   ["ATL gaps", ["missing method android.view.View#foo()V"]],
-                   ["Exceptions", ["java.lang.IllegalStateException: boom"]]],
-        "save_enabled": True,
-        "older": [["Summary", ["org.example.demo", "exit status 0"]],
-                  ["Findings", ["No crash, ATL gap or exception was found."]]],
-        "empty_page": "none", "empty_choice_visible": False}, out.stderr
-    assert "Environment" in (tmp_path / "r.txt").read_text()
-
-
-@needs_broadway
 def test_search_sort_keys_narrow_layout_and_remembered_state(tmp_path):
     d = tmp_path / "d"
     (d / "apps").mkdir(parents=True)
@@ -128,12 +94,17 @@ def test_search_sort_keys_narrow_layout_and_remembered_state(tmp_path):
             (d / "apps" / f"{pkg}.started").touch()
             os.utime(d / "apps" / f"{pkg}.started", (started, started))
     (d / "window.json").write_text(json.dumps({"width": 900, "height": 600, "selected": "org.b.bravo"}))
+    (d / "logs").mkdir()
+    (d / "logs/org.b.bravo-20261101-100000.log").write_text("# apk-starter: exit=0\n")
     with broadway() as env:
         out = subprocess.run([sys.executable, str(HERE / "gui_layout_probe.py"), str(d), str(tmp_path / "started")],
                              env=env, capture_output=True, text=True, timeout=60)
     report = json.loads(out.stdout.strip().splitlines()[-1])
     assert report == {
         "restored": ["org.b.bravo", "Bravo", ["Alpha", "Bravo", "Charlie"]], "opened_focus_on_start": True,
+        "bravo_menu": [1, False], "charlie_menu": [0, False], "dot_with_log": True,
+        "crash_dialog": ["Charlie ended unexpectedly.",
+                         "Exit code 10: crash\nTick “Log” under ⚙ and start the app again to record the error."],
         "search": [["Charlie"], "org.c.charlie"], "kept_after_search": "org.c.charlie",
         "by_size": ["Bravo", "Alpha", "Charlie"], "by_started": ["Bravo", "Charlie", "Alpha"],
         "ctrl_f_in_search": True, "enter_to_list": True, "delete_key": "Uninstall Charlie?",

@@ -1,9 +1,10 @@
-"""Diagnose levels and reports (Spec 12).
+"""Diagnose levels (Spec 12).
 
 Log: the log of run.py plus atl-doctor's JVMTI agent (exceptions with stack, lifecycle), its output appended to the
 log so that `atl-doctor report --log` reads both. Debug: atl-doctor's light recorder (agent attached when the runtime
 runs, stub calls counted by ATL, time line from ART's sampling profiler, view trees, verbose Android log) writes a
-recording folder; the app keeps nearly its normal speed (no full method trace). Reports come from atl-doctor's report code (English on purpose)."""
+recording folder; the app keeps nearly its normal speed (no full method trace). The starter only records: reports
+come from atl-doctor itself (`atl-doctor report`)."""
 import re
 from collections.abc import Mapping
 from dataclasses import dataclass
@@ -11,7 +12,7 @@ from datetime import datetime
 from pathlib import Path
 
 from .apkinfo import PACKAGE_RE
-from .errors import StarterError, UsageError
+from .errors import StarterError
 from .i18n import _
 from .paths import Paths
 
@@ -129,125 +130,3 @@ def recordings(paths: Paths, pkg: str | None = None) -> list[Recording]:
             continue
         out.append(Recording(p, m["pkg"], started, kind))
     return sorted(out, key=lambda r: (r.started, r.path.name), reverse=True)
-
-
-def find_recording(paths: Paths, target: str | None) -> Path:
-    """`--report` argument: a log file or recording folder, a package (its newest recording), or none (the newest)."""
-    if target and Path(target).exists():
-        return Path(target)
-    if target and not PACKAGE_RE.fullmatch(target):
-        raise UsageError(_("no such recording: {file}").format(file=target))
-    found = recordings(paths, target)
-    if not found:
-        if target:
-            raise UsageError(_("no recording of {package}; start it with --log or --debug").format(package=target))
-        raise StarterError(_("no recordings yet; start an app with --log or --debug"))
-    return found[0].path
-
-
-def load_report(path: Path):
-    """atl-doctor's report of a log file or a recording folder."""
-    try:
-        from atl_doctor.errors import DoctorError
-        from atl_doctor.report import apply_capture_aosp, build_capture_report, build_log_report
-    except ImportError as e:
-        raise StarterError(_("the report needs atl-doctor: {reason}").format(reason=e)) from None
-    try:
-        if path.is_dir():
-            # like `atl-doctor report DIR`: stub hits compared with AOSP source (fetched once into the cache)
-            report, root = build_capture_report(path)
-            apply_capture_aosp(report, root)
-            return report
-        return build_log_report([path])
-    except (DoctorError, OSError, ValueError, KeyError, TypeError) as e:
-        raise StarterError(_("cannot read the recording {file}: {reason}").format(file=path, reason=e)) from None
-
-
-def report_text(report) -> str:
-    """atl-doctor's text report (also what «Save report» writes)."""
-    from atl_doctor.report import render_text
-
-    return render_text(report)
-
-
-# -- what the window shows (English like the report itself) -------------------------------------------------
-@dataclass(frozen=True)
-class ReportItem:
-    title: str
-    details: str = ""
-
-
-@dataclass(frozen=True)
-class ReportSection:
-    title: str
-    items: list[ReportItem]
-
-
-GAP_KINDS = ("missing", "stub", "stublog")
-STACK_LINES = 8
-SECTIONS = (("Crash", lambda f: f.kind == "crash" and f.klass == "crash"),
-            ("ATL gaps", lambda f: f.kind in GAP_KINDS),
-            ("Exceptions", lambda f: f.kind == "exc"),
-            ("Other findings", lambda f: not (f.kind in GAP_KINDS or f.kind == "exc" or f.klass == "crash"
-                                               or (f.kind == "crash" and f.key.startswith("exit:")))))
-# a normal end (exit status 0, System.exit(0)) is no finding here: the summary shows the exit status
-
-
-def aosp_unavailable(report) -> bool:
-    """The stub hits could not be compared with AOSP (no network and nothing in the cache): they stay unfiltered."""
-    return report.environment.get("aosp", "").startswith("AOSP comparison not possible")
-
-
-def _summary(env: Mapping[str, str]) -> list[ReportItem]:
-    items = []
-    if env.get("package"):
-        items.append(ReportItem(" ".join(filter(None, (env["package"], env.get("version_name"))))))
-    status = f"exit status {env['exit']}" if env.get("exit") else ""
-    if env.get("signal"):
-        items.append(ReportItem(f"killed by {env['signal']}" + (f" ({status})" if status else "")))
-    elif status:
-        items.append(ReportItem(status))
-    for key in ("agent", "trace", "tracecount", "aosp"):
-        if env.get(key):
-            items.append(ReportItem(f"{key}: {env[key]}"))
-    return items
-
-
-def _item(f) -> ReportItem:
-    title = f.title + (f" ({f.total_count}x)" if f.total_count > 1 else "")
-    details = [f.suggestion] if f.suggestion else []
-    stack = f.details.get("stack") or []
-    details += [f"at {frame}" for frame in stack[:STACK_LINES]]
-    if len(stack) > STACK_LINES:
-        details.append(f"... {len(stack) - STACK_LINES} more")
-    callers = f.details.get("callers") or []
-    details += [f"called from {c}" for c in callers[:3]]
-    from atl_doctor.sources.aosp import aosp_line
-
-    if aosp_line(f):
-        details.append(aosp_line(f))
-    return ReportItem(title, "\n".join(details))
-
-
-def report_view(report) -> list[ReportSection]:
-    """Summary, then crash, ATL gaps (missing and stub), exceptions and the rest, each in fix-first order."""
-    from atl_doctor.findings import rank
-    from atl_doctor.report import like_aosp
-
-    ranked = [f for f in rank(report.findings) if not like_aosp(f)]   # trivial in AOSP as well: no ATL gap
-    like = len(report.findings) - len(ranked)
-    view = [ReportSection("Summary", _summary(report.environment)
-                          + ([ReportItem(f"{like} stub hit{'s' if like > 1 else ''} behave like AOSP (trivial there as "
-                                         "well), not listed")] if like else []))]
-    for title, pred in SECTIONS:
-        items = [_item(f) for f in ranked if pred(f)]
-        if items:
-            view.append(ReportSection(title, items))
-    if len(view) == 1:
-        view.append(ReportSection("Findings", [ReportItem("No crash, ATL gap or exception was found.")]))
-    timeline = report.extras.get("timeline") or []     # Debug: busiest methods per phase (ART's sampling profiler)
-    if timeline:
-        view.append(ReportSection("Time line", [
-            ReportItem(p["phase"], "\n".join(f"{e['ms']:.1f} ms  {e['thread']}  {e['method']}" for e in p["top"]))
-            for p in timeline]))
-    return view

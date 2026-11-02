@@ -21,17 +21,20 @@ alias apk-starter='flatpak run --file-forwarding io.github.Jimbambuli.ApkStarter
 Open **APK Starter** from the application menu (or run `apk-starter` without arguments): the installed apps are
 listed on the left (search with Ctrl+F or by just typing, sort by name, last start, last install or data size), the
 chosen app's details on the right – version, target SDK, dates, data size, whether it is prepared for this computer,
-its log and debug recordings with their reports. Double-click or Enter starts an app, Delete asks to uninstall it.
+and its newest log and debug recordings. Double-click or Enter starts an app, Delete asks to uninstall it.
 Install a new APK with **+** or by dropping it anywhere onto the window. The window takes the desktop's GTK theme,
 colour scheme and accent colour and keeps the desktop's own title bar (plain GTK 4); it remembers its size, the sort
 order and the chosen app. Every installed app also gets its own menu entry.
 
-Below **Start**, each app has its own **Window bar** (remembered): **With back button** (the default) is a title
+Next to **Start** stand **Delete data …**, **Uninstall …** and **⚙**. The ⚙ menu holds each app's own **Window bar**
+(remembered): **With back button** (the default) is a title
 bar drawn in the desktop's GTK theme with a back button; under KDE it gets the buttons and the height of the KWin
 decoration. **From the system** is the desktop's own title bar (where the compositor draws one, e.g. KDE Plasma),
 without the back button; **From the system + navigation bar** adds Android's navigation bar under the window (◁ back,
 ○ the app's first page, □ its open pages). Escape and the back button of the mouse always go back. **Log** (also
-remembered per app) records every start of the app, also from its menu entry; **Debug** is for one start only.
+remembered per app) records every start of the app, also from its menu entry; **Debug** is for the next start only.
+A dot on ⚙ shows that Log or Debug is on; once there are recordings, the menu lists them with **Open log folder**.
+When an app crashes, a message says what its exit code means and offers **Open log folder**.
 
 The same is available on the command line:
 
@@ -46,7 +49,6 @@ apk-starter --log @@ app.apk @@      # write a log that atl-doctor can read
 apk-starter --log=FILE @@ app.apk @@ # same, to a chosen file (must be writable inside the sandbox,
                                      # e.g. under ~/.var/app/io.github.Jimbambuli.ApkStarter/)
 apk-starter --debug @@ app.apk @@    # record the app for atl-doctor (a little slower), --debug=DIR for a folder
-apk-starter --report [FILE|DIR|PACKAGE]  # report of the newest (or the given) log/debug recording
 apk-starter --sdk N @@ app.apk @@    # override the SDK level passed to ATL
 apk-starter --size WxH @@ app.apk @@ # window size (remembered per app)
 apk-starter @@ app.apk @@ -- ARGS    # everything after the APK is passed on to ATL
@@ -69,12 +71,18 @@ callbacks; the agent comes 3 s after the start, so exceptions of the start itsel
 almost full speed. **Debug** (`--debug`, «Debug» ticked) records a folder: the agent attached as soon as the
 runtime runs (exceptions with stack, also caught ones, lifecycle), the calls of ATL's stub methods (counted by ATL
 itself), a time line from ART's sampling profiler, the view trees and a verbose Android log; the app runs only a
-little slower (no full method trace, which made apps lose their own start-up races). **Show report** in the window or
-`apk-starter --report` turns a recording into a report (crash cause, ATL gaps, exceptions; in English), the same one
-`atl-doctor report --log FILE` or `atl-doctor report DIR` gives. Like there, the stub hits of a Debug recording are
-compared with Android's source, so that methods as trivial in Android are not counted as gaps: the first report
-fetches it once with git (sparse, about 200 MB) into `~/.var/app/io.github.Jimbambuli.ApkStarter/cache/atl-doctor`;
-without network the report says so and lists the stub hits unfiltered.
+little slower (no full method trace, which made apps lose their own start-up races).
+
+APK Starter only records; [atl-doctor](https://github.com/Jimbambuli/atl-doctor) evaluates the recordings (crash
+cause, ATL gaps, exceptions; it compares the stub hits with Android's source so that methods as trivial in Android
+are not counted as gaps). Install it once with `pipx install git+https://github.com/Jimbambuli/atl-doctor`, then:
+
+```
+cd ~/.var/app/io.github.Jimbambuli.ApkStarter/data/logs
+atl-doctor report --log org.example.app-20261102-101010.log    # a Log recording
+atl-doctor report org.example.app-20261102-101010              # a Debug recording (folder)
+atl-doctor report -f html -o report.html org.example.app-20261102-101010   # as a page, e.g. for a bug report
+```
 
 Like Android, installing compiles an app for your processor (shown as «Preparing …»), so its first start is as
 fast as later ones; the Android runtime itself is prepared once and again after an update of APK Starter. An APK

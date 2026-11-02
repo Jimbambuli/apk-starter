@@ -1,7 +1,9 @@
-"""Drive list, search, sort, keys, the narrow layout and the remembered state headless; print JSON.
+"""Drive list, search, sort, keys, the ⚙ menu, the crash dialog, the narrow layout and the remembered state headless;
+print JSON.
 
 Usage: gui_layout_probe.py DATA_HOME START_RECORD
-DATA_HOME holds three installed apps (Alpha, Bravo, Charlie) and window.json (Bravo chosen, 900 px wide).
+DATA_HOME holds three installed apps (Alpha, Bravo, Charlie), one log of Bravo and window.json (Bravo chosen, 900 px
+wide).
 """
 import json
 import sys
@@ -64,6 +66,7 @@ def activate(a) -> None:
     def listed():
         report["restored"] = [win.selected, win.details_title.get_text(), titles(win)]
         report["opened_focus_on_start"] = win.get_focus() is win.start_button
+        report["bravo_menu"] = [win.recordings_shown, win.gear_dot.get_visible()]
         win.search.set_text("CHA")
         wait(lambda: titles(win) == ["Charlie"], searched)
 
@@ -91,8 +94,10 @@ def activate(a) -> None:
     def started():
         report["started"] = Path(record).read_text().split()
         report["focus_on_start"] = win.get_focus() is win.start_button
+        report["charlie_menu"] = [win.recordings_shown, win.gear_dot.get_visible()]
         win.titlebar_choice.set_selected(2)                       # From the system + navigation bar
         win.log_check.set_active(True)
+        report["dot_with_log"] = win.gear_dot.get_visible()
         report["settings"] = json.loads(paths.settings().read_text())
         win.debug_check.set_active(True)
         report["debug_locks_log"] = [win.log_check.get_active(), win.log_check.get_sensitive()]
@@ -104,6 +109,9 @@ def activate(a) -> None:
         report["debug_started"] = Path(record).read_text().split()
         report["debug_off_after_start"] = [win.debug, win.debug_check.get_active(), win.log_check.get_active(),
                                            win.log_check.get_sensitive()]
+        win.crashed("Charlie", "Exit code 10: crash", False)
+        report["crash_dialog"] = [win.dialog.heading, win.dialog.extra.get_text()]
+        win.dialog.respond("close")
         win.set_default_size(500, 600)              # remembered at close, used by the next window
         win.close()
         GLib.timeout_add(100, reopen)

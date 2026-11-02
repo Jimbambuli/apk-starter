@@ -119,15 +119,13 @@ def start_argv(launcher: list[str], pkg: str, level: str | None) -> list[str]:
     return launcher + ([f"--{level}", "--", pkg] if level else [pkg])
 
 
-SIDE_BY_SIDE = 1000         # details at least this wide: facts and recordings next to each other
-DETAILS_MAX = (720, 1240)   # readable width of the details: one column, two columns
+DETAILS_MAX = 720            # readable width of the details
 
 
-def details_layout(width: int) -> tuple[bool, int]:
-    """Details of `width` px (without margins): (facts and recordings side by side, extra right margin that keeps
-    them at a readable width). They stand left, next to the list, and grow with the window."""
-    side_by_side = width >= SIDE_BY_SIDE
-    return side_by_side, max(0, width - DETAILS_MAX[side_by_side])
+def details_layout(width: int) -> int:
+    """Details of `width` px (without margins): the extra right margin that keeps them at a readable width. They
+    stand left, next to the list, and grow with the window."""
+    return max(0, width - DETAILS_MAX)
 
 
 SIGNALS = {6: "SIGABRT", 9: "SIGKILL", 11: "SIGSEGV", 15: "SIGTERM"}

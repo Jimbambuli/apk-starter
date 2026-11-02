@@ -52,7 +52,7 @@ def test_all_git_sources_pinned():
 
 
 def test_atl_doctor_pinned_with_the_same_atl_source():
-    """Agent, trace counter and report module come from one atl-doctor commit; the stub list is made from the
+    """Agent, trace counter and recorder come from one atl-doctor commit; the stub list is made from the
     very ATL source the Flatpak runs."""
     pins = manifest_commits()
     bi = dict(l.split("=", 1) for l in (ROOT / "data/build-info").read_text().split())

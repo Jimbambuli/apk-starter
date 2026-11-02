@@ -95,12 +95,11 @@ def test_start_argv():
         ["/app/bin/apk-starter", "--debug", "--", "org.a.app"]
 
 
-def test_details_grow_left_aligned_and_split_when_very_wide():
+def test_details_grow_left_aligned_up_to_a_readable_width():
     from apk_starter.gui_model import details_layout
-    assert details_layout(500) == (False, 0)
-    assert details_layout(900) == (False, 180)
-    assert details_layout(1000) == (True, 0)
-    assert details_layout(1600) == (True, 360)
+    assert details_layout(500) == 0
+    assert details_layout(900) == 180
+    assert details_layout(1600) == 880
 
 
 def test_crash_meaning_only_for_real_crashes():

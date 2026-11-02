@@ -168,34 +168,9 @@ modules:
         branch: apk-starter-tv4
         commit: a09f1dd4ded8aa547d9f4b86e409160f036f90e3
 
-  # git for «Show report»: atl-doctor compares the stub hits with AOSP source, which it fetches once (sparse,
-  # shallow) into the cache with git; the runtime has no git.
-  - name: git
-    buildsystem: simple
-    build-commands:
-      - make -j$FLATPAK_BUILDER_N_JOBS prefix=/app NO_RUST=1 NO_PERL=1 NO_PYTHON=1 NO_TCLTK=1 NO_GETTEXT=1 NO_EXPAT=1 INSTALL_SYMLINKS=1 install
-    sources:
-      - type: archive
-        url: https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.56.0.tar.xz
-        sha256: 26c56c296b38c0695b26fa95f475f1d01704d2d38e73465ca30b0b2f5dc789d3
-    cleanup:
-      - /share/git-gui
-      - /share/gitk
-      - /share/gitweb
-      - /share/perl5
-      - /bin/scalar
-      - /bin/git-shell
-      - /bin/git-cvsserver
-      # servers and helpers the report never uses (it only runs ls-remote, clone, sparse-checkout, checkout)
-      - /libexec/git-core/git-daemon
-      - /libexec/git-core/git-http-backend
-      - /libexec/git-core/git-http-fetch
-      - /libexec/git-core/git-imap-send
-      - /libexec/git-core/git-sh-i18n--envsubst
-      - /libexec/git-core/git-shell
-
-  # atl-doctor (public, fixed commit): JVMTI agent and trace counter for «Start with log/debug», its Python
-  # package for the recorder and «Show report», and the stub list of exactly this ATL (for stub hits).
+  # atl-doctor (public, fixed commit): JVMTI agent and trace counter for Log/Debug, its Python package for the
+  # Debug recorder, and the stub list of exactly this ATL (for stub hits). The starter only records: reports come
+  # from atl-doctor itself, so its report, diff and AOSP code are left out.
   - name: atl-doctor
     buildsystem: simple
     build-commands:
@@ -209,6 +184,7 @@ modules:
         from atl_doctor.sources.stubs import build_stub_list, save_stub_tsv;
         jars = sorted(pathlib.Path('/app/lib/java/dex/android_translation_layer').glob('*.jar'));
         save_stub_tsv(build_stub_list(pathlib.Path('atl-src'), jars), pathlib.Path('/app/share/apk-starter/stubs.tsv'))"
+      - cd /app/share/apk-starter/atl_doctor && rm report.py diff.py sources/aosp.py sources/aosp_fetch.py sources/scan.py
       - find /app/share/apk-starter/atl_doctor -name __pycache__ -prune -exec rm -rf {} +
     sources:
       - type: git
