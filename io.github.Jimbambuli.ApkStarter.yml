@@ -96,6 +96,9 @@ modules:
         url: https://github.com/wolfSSL/wolfssl.git
         tag: v5.9.4-stable
         commit: 3c5eead44904df64e6a5a1f4ebdce377d35a849a
+      # A declined TLS 1.2 session ticket must fall back to a full handshake (RFC 5077 3.4), not fail with -373.
+      - type: patch
+        path: build-aux/wolfssl-ticket-decline.patch
     cleanup:
       - /bin
       - /include
@@ -128,11 +131,11 @@ modules:
     sources:
       - type: git
         url: https://gitlab.com/Jimbambuli/art_standalone.git
-        branch: apk-starter-tv4
-        commit: 20da12b7ed8913e9056b733206e058a866b3fb5b
+        branch: apk-starter-tv6
+        commit: 4c51f876fbc382c31982b3e0a224699e90da6c89
       - type: git
         url: https://github.com/Jimbambuli/atl-doctor.git
-        commit: d7d830af2f72d8865c508c2c0d99fde30071f865
+        commit: 12918db62ca8ffbfbeadfc3c933457ef5277e247
         dest: atl-doctor
 
   # ATL's jni_upcall_gen resolves asm/asm-tree/java-getopt via xmvn5-resolve or
@@ -192,7 +195,7 @@ modules:
     sources:
       - type: git
         url: https://github.com/Jimbambuli/atl-doctor.git
-        commit: d7d830af2f72d8865c508c2c0d99fde30071f865
+        commit: 12918db62ca8ffbfbeadfc3c933457ef5277e247
       - type: git
         url: https://gitlab.com/Jimbambuli/android_translation_layer.git
         commit: fd44f38e094e0c3812a3c51f1229766e58083571
