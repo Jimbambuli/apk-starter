@@ -168,7 +168,7 @@ modules:
     sources:
       - type: git
         url: https://gitlab.com/Jimbambuli/android_translation_layer.git
-        branch: apk-starter-tv5
+        branch: jw-feinschliff
         commit: e0fd48f60d27f6b73e4ed735e37925eeccdd50c1
 
   # atl-doctor (public, fixed commit): JVMTI agent and trace counter for Log/Debug, its Python package for the
