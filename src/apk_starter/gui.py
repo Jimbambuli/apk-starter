@@ -250,7 +250,11 @@ class Window(Gtk.ApplicationWindow):
         choose.add_css_class("suggested-action")
         choose.add_css_class("start-button")
         choose.connect("clicked", lambda _b: self.choose_apk())
-        for w in (self.welcome_title, self.welcome_text, choose):
+        # test build with microG: the same as the microG button above the list, which this page does not show
+        self.microg_welcome = Gtk.Button(label=_("Set up microG"), halign=Gtk.Align.CENTER,
+                                         visible=self.microg_button.get_visible())
+        self.microg_welcome.connect("clicked", lambda _b: self.setup_microg())
+        for w in (self.welcome_title, self.welcome_text, choose, self.microg_welcome):
             box.append(w)
         return box
 
@@ -651,6 +655,7 @@ class Window(Gtk.ApplicationWindow):
 
         def done(info) -> None:
             self.microg_button.set_visible(False)
+            self.microg_welcome.set_visible(False)
             self.selected = info.package
             self.alert(_("microG is set up"), "\n".join(warnings + [microg_hint()]))
         self.progress(_("Setting up microG…"))
