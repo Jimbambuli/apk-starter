@@ -33,7 +33,7 @@ def test_accent_css_uses_the_colour_and_a_readable_text_colour():
 
 
 # --- GTK theme of the system (Spec 14) ---
-from apk_starter.theme import (SystemTheme, data_dirs_with_host, host_config_dir, read_system,  # noqa: E402
+from apk_starter.theme import (SystemTheme, host_config_dir, read_system,  # noqa: E402
                                theme_dirs, window_css)
 
 
@@ -43,12 +43,12 @@ def _theme(root, name):
     (d / "gtk.css").write_text("")
 
 
-def test_system_settings_from_gtk4_else_gtk3(tmp_path):
+def test_system_settings_from_gtk4_only(tmp_path):
     cfg, themes = tmp_path / "cfg", tmp_path / "themes"
     _theme(themes, "Breeze")
     (cfg / "gtk-3.0").mkdir(parents=True)
     (cfg / "gtk-3.0" / "settings.ini").write_text("[Settings]\ngtk-theme-name=Breeze\n")
-    assert read_system(cfg, [themes]).theme_name == "Breeze"
+    assert read_system(cfg, [themes]) == SystemTheme()          # GTK 3's settings are not read (no access)
     (cfg / "gtk-4.0").mkdir()
     (cfg / "gtk-4.0" / "settings.ini").write_text(
         "[Settings]\ngtk-theme-name=Breeze\ngtk-icon-theme-name=breeze\ngtk-cursor-theme-name=breeze_cursors\n"
@@ -75,18 +75,12 @@ def test_missing_or_unknown_theme_is_not_found(tmp_path):
     assert read_system(tmp_path / "cfg", []) == SystemTheme()
 
 
-def test_host_data_dirs_and_config_dir(tmp_path):
-    share = tmp_path / "share"
-    assert data_dirs_with_host("/app/share:/usr/share", share) is None          # no themes there
-    (share / "themes").mkdir(parents=True)
-    assert data_dirs_with_host("/app/share:/usr/share", share) == f"/app/share:/usr/share:{share}"
-    assert data_dirs_with_host(f"/usr/share:{share}", share) is None            # already there
-    assert data_dirs_with_host(None, share) == f"/usr/local/share:/usr/share:{share}"
+def test_config_dir_and_theme_dirs():
     assert host_config_dir({"HOME": "/home/m"}) == Path("/home/m/.config")
     assert host_config_dir({"HOME": "/home/m", "HOST_XDG_CONFIG_HOME": "/cfg"}) == Path("/cfg")
-    assert theme_dirs({"HOME": "/home/m", "XDG_DATA_DIRS": "/app/share:/run/host/usr/share"}) == [
+    assert theme_dirs({"HOME": "/home/m", "XDG_DATA_DIRS": "/app/share:/usr/share"}) == [
         Path("/home/m/.local/share/themes"), Path("/home/m/.themes"), Path("/app/share/themes"),
-        Path("/run/host/usr/share/themes")]
+        Path("/usr/share/themes")]
 
 
 def test_own_accent_only_without_a_system_theme():
