@@ -35,9 +35,10 @@ def test_build_info_matches_manifest():
 def test_finish_args_exact():
     assert finish_args() == {"--socket=wayland", "--socket=fallback-x11", "--device=dri",
                              "--socket=pulseaudio", "--share=network", "--share=ipc",
-                             # the system's GTK theme, read only (Spec 14, README «Permissions»)
-                             "--filesystem=host-os:ro", "--filesystem=xdg-config/gtk-4.0:ro",
-                             "--filesystem=xdg-config/gtk-3.0:ro",
+                             # the desktop's GTK 4 settings and colours, read only (Spec 14, README «Permissions»)
+                             "--filesystem=xdg-config/gtk-4.0:ro",
+                             # the pictures of the KWin window buttons for ATL's title bar, read only
+                             "--filesystem=xdg-config/gtk-3.0/assets:ro",
                              # KWin's title font/decoration/button size for the title bar's height, read only
                              "--filesystem=xdg-config/kdeglobals:ro", "--filesystem=xdg-config/kwinrc:ro",
                              "--filesystem=xdg-config/breezerc:ro",

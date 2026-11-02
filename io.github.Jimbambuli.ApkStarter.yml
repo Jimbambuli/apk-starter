@@ -12,11 +12,10 @@ finish-args:
   - --socket=pulseaudio
   - --share=network
   - --share=ipc
-  # the system's GTK theme, read only: themes/icons of the host (/run/host/usr/share) and its GTK settings and
-  # colours (README «Permissions»)
-  - --filesystem=host-os:ro
+  # the desktop's GTK 4 settings and colours on GTK's own Adwaita, read only; no host-os (README «Permissions»)
   - --filesystem=xdg-config/gtk-4.0:ro
-  - --filesystem=xdg-config/gtk-3.0:ro
+  # KDE draws the KWin window buttons there, for ATL's title bar (read only)
+  - --filesystem=xdg-config/gtk-3.0/assets:ro
   # KWin's title font, decoration and Breeze button size, for the height of ATL's title bar (read only)
   - --filesystem=xdg-config/kdeglobals:ro
   - --filesystem=xdg-config/kwinrc:ro
@@ -166,7 +165,7 @@ modules:
       - type: git
         url: https://gitlab.com/Jimbambuli/android_translation_layer.git
         branch: apk-starter-tv5
-        commit: e0fd48f60d27f6b73e4ed735e37925eeccdd50c1
+        commit: 49d7c341fe33e6ac523ae82d142e29683129e0ff
 
   # atl-doctor (public, fixed commit): JVMTI agent and trace counter for Log/Debug, its Python package for the
   # Debug recorder, and the stub list of exactly this ATL (for stub hits). The starter only records: reports come
@@ -192,7 +191,7 @@ modules:
         commit: d7d830af2f72d8865c508c2c0d99fde30071f865
       - type: git
         url: https://gitlab.com/Jimbambuli/android_translation_layer.git
-        commit: e0fd48f60d27f6b73e4ed735e37925eeccdd50c1
+        commit: 49d7c341fe33e6ac523ae82d142e29683129e0ff
         dest: atl-src
 
   - name: apk-starter

@@ -1,10 +1,11 @@
 """The look of the desktop (no GTK in this module):
 
-- the GTK theme of the system (Spec 14): in the Flatpak, GTK only sees the runtime's themes and the app's own
-  configuration. With read access to the host's system files (--filesystem=host-os:ro, /run/host) and its GTK
-  configuration (--filesystem=xdg-config/gtk-4.0:ro, gtk-3.0:ro) the window takes the theme, icons, cursor and
-  font from the host's settings.ini, finds the theme in the host's themes folder and loads the host's gtk.css
-  (KDE: the colours of the colour scheme), as GTK does outside the sandbox;
+- the GTK configuration of the system (Spec 14, Standardweg A, Marcel 2.11.2026): in the Flatpak, GTK only sees
+  the runtime's theme (Adwaita, the base) and the app's own configuration. With read access to the host's GTK 4
+  configuration (--filesystem=xdg-config/gtk-4.0:ro) the window takes icons, cursor and font from the host's
+  settings.ini and loads the host's gtk.css (KDE: the colours of the colour scheme), as GTK does outside the
+  sandbox. The host's theme itself is not visible (no host-os); an icon theme is there when its Flatpak extension
+  (org.freedesktop.Platform.Icontheme.*) is installed, else GTK's Adwaita icons stay;
 - colour scheme, accent colour and font from the XDG settings portal (Spec 13); the accent is put on the window's
   accented parts only without a system theme (the theme brings the desktop's accent itself).
 Plain GTK 4 without libadwaita keeps the compositor's own title bar (Breeze under KWin)."""
@@ -13,7 +14,6 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
-HOST_SHARE = Path("/run/host/usr/share")
 BUILTIN_THEMES = ("Default", "Adwaita", "HighContrast", "HighContrastInverse")
 
 APPEARANCE = "org.freedesktop.appearance"
@@ -101,16 +101,6 @@ def host_config_dir(env: Mapping[str, str]) -> Path:
     return Path(host) if host else Path(env.get("HOME", "/")) / ".config"
 
 
-def data_dirs_with_host(current: str | None, host_share: Path = HOST_SHARE) -> str | None:
-    """XDG_DATA_DIRS with the host's share folder at the end (its themes and icons), None if nothing to add."""
-    if not (host_share / "themes").is_dir():
-        return None
-    current = current or "/usr/local/share:/usr/share"
-    if str(host_share) in current.split(":"):
-        return None
-    return f"{current}:{host_share}"
-
-
 def theme_dirs(env: Mapping[str, str]) -> list[Path]:
     """Where GTK looks for a theme by name (gtkcssprovider.c), the sandbox's own folders first."""
     home = Path(env.get("HOME", "/"))
@@ -120,15 +110,13 @@ def theme_dirs(env: Mapping[str, str]) -> list[Path]:
 
 
 def read_system(config_dir: Path, dirs: Sequence[Path]) -> SystemTheme:
-    """settings.ini of gtk-4.0 (else gtk-3.0) in config_dir; not the dark variant (portal) and not gtk-xft-dpi
-    (for X11, the compositor gives the scale)."""
+    """settings.ini of gtk-4.0 in config_dir; not the dark variant (portal) and not gtk-xft-dpi (for X11, the
+    compositor gives the scale)."""
     ini = configparser.ConfigParser(interpolation=None, strict=False)
-    for sub in ("gtk-4.0", "gtk-3.0"):
-        try:
-            if ini.read(config_dir / sub / "settings.ini", encoding="utf-8"):
-                break
-        except (configparser.Error, UnicodeDecodeError):
-            return SystemTheme()
+    try:
+        ini.read(config_dir / "gtk-4.0" / "settings.ini", encoding="utf-8")
+    except (configparser.Error, UnicodeDecodeError):
+        return SystemTheme()
     if not ini.has_section("Settings"):
         return SystemTheme()
     sec = ini["Settings"]

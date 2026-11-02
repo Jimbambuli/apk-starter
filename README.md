@@ -100,22 +100,24 @@ Services, Jetpack Compose or ARM-only native libraries are not expected to work.
 ## Permissions
 
 Besides the display, sound, network and GPU, APK Starter reads – never writes – these parts of your system, to take
-over the desktop's GTK theme (`settings.ini` of GTK: theme, icons, cursor, font and the order of the window buttons;
-the theme's files; KDE's colour scheme in `colors.css`), for its window and for the apps' title bars, and to follow a
-change of them at once:
+over the desktop's look on GTK's own Adwaita (`settings.ini` of GTK 4: icons, cursor, font and the order of the window
+buttons; KDE's colour scheme in `colors.css`), for its window and for the apps' title bars, and to follow a change of
+them at once:
 
-- `--filesystem=host-os:ro`: the system's files under `/run/host` (read only) – the themes and icons in
-  `/usr/share/themes` and `/usr/share/icons`;
-- `--filesystem=xdg-config/gtk-4.0:ro` and `--filesystem=xdg-config/gtk-3.0:ro`: your GTK settings (read only);
-  those of GTK 3 count where there are none for GTK 4, and under KDE `gtk-3.0/assets` holds the pictures of the
-  KWin window buttons for the apps' title bars;
+- `--filesystem=xdg-config/gtk-4.0:ro`: your GTK 4 settings and colours (read only);
+- `--filesystem=xdg-config/gtk-3.0/assets:ro`: under KDE the pictures of the KWin window buttons, for the apps'
+  title bars (read only);
 - `--filesystem=xdg-config/kdeglobals:ro`, `xdg-config/kwinrc:ro` and `xdg-config/breezerc:ro`: KDE's title font,
   window decoration and Breeze button size (read only), so the apps' title bars are as high as KWin's.
+
+The system's own themes and icons are not visible in the sandbox. Your icon theme is used when it is installed as a
+Flatpak extension (e.g. `flatpak install flathub org.freedesktop.Platform.Icontheme.Paper`); otherwise the icons
+are GTK's Adwaita icons.
 
 For the apps' media in the desktop's media controls and its media keys (MPRIS), APK Starter may own the D-Bus names
 `org.mpris.MediaPlayer2.*` (`--own-name`).
 
-Without them (e.g. `flatpak override --user --nofilesystem=host-os io.github.Jimbambuli.ApkStarter`) everything
+Without them (e.g. `flatpak override --user --nofilesystem=xdg-config/gtk-4.0 io.github.Jimbambuli.ApkStarter`) everything
 works with GTK's default theme in the desktop's light or dark variant.
 
 ## Translations

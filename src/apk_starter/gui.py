@@ -17,11 +17,6 @@ from .gui_model import (AppRow, WindowState, crash_meaning, details_layout, filt
 from .paths import Paths
 from .settings import TITLEBARS, load_settings, save_settings
 
-# The host's themes and icons (Spec 14): XDG_DATA_DIRS has to be complete before GTK reads it for the first time.
-_data_dirs = theme.data_dirs_with_host(os.environ.get("XDG_DATA_DIRS"))
-if _data_dirs:
-    os.environ["XDG_DATA_DIRS"] = _data_dirs
-
 try:
     import gi
     gi.require_version("Gtk", "4.0")
@@ -43,7 +38,6 @@ CSS = """
 .section-title { font-weight: 700; }
 .row-name { font-weight: 600; }
 .caption { font-size: 0.85em; }
-.start-button { font-size: 1.15em; font-weight: 700; padding-left: 20px; padding-right: 20px; }
 .drop-zone { margin: 12px; background-color: @theme_bg_color; }
 .progress-bar { padding: 6px 12px; }
 """
@@ -243,7 +237,6 @@ class Window(Gtk.ApplicationWindow):
                                   justify=Gtk.Justification.CENTER)
         choose = Gtk.Button(label=_("Choose APK…"), halign=Gtk.Align.CENTER, margin_top=10)
         choose.add_css_class("suggested-action")
-        choose.add_css_class("start-button")
         choose.connect("clicked", lambda _b: self.choose_apk())
         for w in (self.welcome_title, self.welcome_text, choose):
             box.append(w)
@@ -466,24 +459,25 @@ class Window(Gtk.ApplicationWindow):
 
         # one row: Start, Delete data, Uninstall, ⚙ (window bar, Log, Debug, recordings) (Marcel 2.11.2026)
         start = Gtk.Button(label=_("Start"), action_name="win.start", action_target=target)
-        start.add_css_class("suggested-action")
-        start.add_css_class("start-button")
+        start.add_css_class("suggested-action")         # the main action in the theme's accent (KDE/GNOME)
         self.start_button = start
         uninstall = Gtk.Button(label=_("Uninstall…"), action_name="win.uninstall", action_target=target)
         uninstall.add_css_class("danger-text")         # calm until the question, which is red
-        gear = Gtk.MenuButton(popover=self.make_options(r, app), always_show_arrow=True, tooltip_text=_("Options"))
-        icon = Gtk.Box(spacing=2)
-        icon.append(Gtk.Image.new_from_gicon(Gio.ThemedIcon.new_from_names(
-            ["emblem-system-symbolic", "configure-symbolic", "configure"])))
-        self.gear_dot = label("●", "caption", "accent", valign=Gtk.Align.START,
+        # a square icon button drawn by the theme; the icon from the icon theme: KDE's «configure» (Breeze),
+        # else the gear of Adwaita
+        gear = Gtk.MenuButton(popover=self.make_options(r, app), tooltip_text=_("Options"))
+        gear.get_first_child().add_css_class("image-button")    # the inner button, as set_icon_name() does
+        icon = Gtk.Overlay(child=Gtk.Image.new_from_gicon(Gio.ThemedIcon.new_from_names(
+            ["configure-symbolic", "configure", "emblem-system-symbolic"])))
+        self.gear_dot = label("●", "caption", "accent", halign=Gtk.Align.END, valign=Gtk.Align.START,
                               visible=app.log or self.debug, tooltip_text=_("Log or Debug is on"))
-        icon.append(self.gear_dot)
+        icon.add_overlay(self.gear_dot)
         gear.set_child(icon)
         self.gear = gear
-        actions = Gtk.Box(spacing=8)
+        # one height and font for all (the box gives them its height), only the theme draws them
+        actions = Gtk.Box(spacing=8, valign=Gtk.Align.CENTER)
         for w in (start, Gtk.Button(label=_("Delete data…"), action_name="win.clear-data", action_target=target),
                   uninstall, gear):
-            w.set_valign(Gtk.Align.CENTER)
             actions.append(w)
         self.details.append(actions)
 
@@ -688,14 +682,13 @@ class ThemeWatcher:
         self.proxy = None
         self.monitors = []
         self.reload_source = 0
-        for sub in ("gtk-4.0", "gtk-3.0"):
-            try:
-                monitor = Gio.File.new_for_path(str(self.config_dir / sub)).monitor_directory(
-                    Gio.FileMonitorFlags.WATCH_MOVES, None)
-            except GLib.Error:
-                continue
+        try:
+            monitor = Gio.File.new_for_path(str(self.config_dir / "gtk-4.0")).monitor_directory(
+                Gio.FileMonitorFlags.WATCH_MOVES, None)
             monitor.connect("changed", self.on_file_changed)
             self.monitors.append(monitor)
+        except GLib.Error:
+            pass
         try:
             self.proxy = Gio.DBusProxy.new_for_bus_sync(
                 Gio.BusType.SESSION,
@@ -732,7 +725,7 @@ class ThemeWatcher:
         return False
 
     def load_system(self) -> None:
-        # where GTK in this process looks for themes (XDG_DATA_DIRS completed at import)
+        # where GTK in this process looks for themes (the sandbox's own folders)
         self.system = theme.read_system(self.config_dir, theme.theme_dirs(os.environ))
         settings = Gtk.Settings.get_for_display(self.display)
         for prop, value in (("gtk-theme-name", self.system.theme_name), ("gtk-icon-theme-name", self.system.icon_theme),
