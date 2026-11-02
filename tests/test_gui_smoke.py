@@ -145,6 +145,8 @@ def test_window_takes_the_system_gtk_theme_live(tmp_path):
     share, cfg = tmp_path / "share", tmp_path / "cfg"
     (share / "themes" / "Testthema" / "gtk-4.0").mkdir(parents=True)
     (share / "themes" / "Testthema" / "gtk-4.0" / "gtk.css").write_text("label.theme-probe { color: rgb(1,2,3); }\n")
+    (share / "icons" / "Testsymbole").mkdir(parents=True)        # installed (else Adwaita's icons stay)
+    (share / "icons" / "Testsymbole" / "index.theme").write_text("[Icon Theme]\nName=Testsymbole\nDirectories=\n")
     (cfg / "gtk-4.0").mkdir(parents=True)
     (cfg / "gtk-4.0" / "settings.ini").write_text(
         "[Settings]\ngtk-theme-name=Testthema\ngtk-icon-theme-name=Testsymbole\ngtk-font-name=Testschrift 13\n")

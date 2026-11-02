@@ -752,8 +752,11 @@ class ThemeWatcher:
         for prop, value in (("gtk-theme-name", self.system.theme_name), ("gtk-icon-theme-name", self.system.icon_theme),
                             ("gtk-cursor-theme-name", self.system.cursor_theme),
                             ("gtk-cursor-theme-size", self.system.cursor_size)):
-            if value is not None and (prop != "gtk-theme-name" or self.system.found):
-                settings.set_property(prop, value)
+            if value is None or (prop == "gtk-theme-name" and not self.system.found):
+                continue
+            if prop == "gtk-icon-theme-name" and not theme.icon_theme_available(value, theme.icon_theme_dirs(os.environ)):
+                continue                            # not installed for the runtime: Adwaita's icons stay
+            settings.set_property(prop, value)
         if self.system.gtk_css:
             self.user_css.load_from_path(str(self.system.gtk_css))
         else:

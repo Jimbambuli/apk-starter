@@ -33,7 +33,7 @@ def test_accent_css_uses_the_colour_and_a_readable_text_colour():
 
 
 # --- GTK theme of the system (Spec 14) ---
-from apk_starter.theme import (SystemTheme, host_config_dir, read_system,  # noqa: E402
+from apk_starter.theme import (SystemTheme, host_config_dir, icon_theme_available, icon_theme_dirs, read_system,  # noqa: E402
                                theme_dirs, window_css)
 
 
@@ -81,6 +81,16 @@ def test_config_dir_and_theme_dirs():
     assert theme_dirs({"HOME": "/home/m", "XDG_DATA_DIRS": "/app/share:/usr/share"}) == [
         Path("/home/m/.local/share/themes"), Path("/home/m/.themes"), Path("/app/share/themes"),
         Path("/usr/share/themes")]
+
+
+def test_icon_theme_only_when_installed(tmp_path):
+    dirs = icon_theme_dirs({"HOME": str(tmp_path), "XDG_DATA_DIRS": f"{tmp_path}/runtime/share:/usr/share"})
+    assert dirs[0] == tmp_path / ".local/share/icons" and dirs[2] == tmp_path / "runtime/share/icons"
+    assert not icon_theme_available("breeze", dirs) and not icon_theme_available(None, dirs)
+    (tmp_path / "runtime/share/icons/breeze").mkdir(parents=True)
+    assert not icon_theme_available("breeze", dirs)                      # a folder without index.theme
+    (tmp_path / "runtime/share/icons/breeze/index.theme").write_text("[Icon Theme]\n")
+    assert icon_theme_available("breeze", dirs)
 
 
 def test_own_accent_only_without_a_system_theme():
