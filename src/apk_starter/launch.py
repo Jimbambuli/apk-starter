@@ -92,7 +92,7 @@ def build_env(paths: Paths, pkg: str, base: Mapping[str, str]) -> dict[str, str]
     data = paths.data(pkg)
     data.mkdir(parents=True, exist_ok=True)
     env["ANDROID_APP_DATA_DIR"] = str(data)
-    microg.link_into(paths, pkg)                    # test build with microG: Play Services for every app
+    microg.link_into(paths, pkg)                    # microG: Play Services for every app
     env["ATL_UGLY_ENABLE_WEBVIEW"] = "1"
     env.pop("ATL_SYSTEM_TITLEBAR", None)
     env["ATL_TITLEBAR"] = load_settings(paths.settings()).app(pkg).titlebar     # chosen in the window, per app

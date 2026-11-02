@@ -1,4 +1,4 @@
-"""microG test build: profile folders beside stable, microG for every app, «microG settings»."""
+"""microG for every app, «microG settings», and profile folders of a test build beside stable."""
 import os
 from pathlib import Path
 
@@ -36,9 +36,8 @@ def test_microg_settings_and_every_app_shares_microg(box, capsys):  # noqa: F811
     assert main(["--install", str(box.apk)], env=box.env) == 0
     assert main([PKG], env=box.env) == 0 and main([GMS], env=box.env) == 0
     data = box.data / "data"
-    for app in (PKG, GMS):
-        for m in (GMS, GSF):
-            assert os.readlink(data / app / "_installed_apks_" / f"{m}.apk") == str(bundle / f"{m}.apk")
+    assert os.readlink(box.data / "apps" / f"{GSF}.apk") == str(bundle / f"{GSF}.apk")    # ATL_INSTALLED_APKS_DIR
+    assert (box.data / "apps" / f"{GMS}.apk").is_file()                                   # «microG settings»
     assert os.readlink(data / PKG / f"{GMS}.apk_") == str(data / GMS / f"{GMS}.apk_")
     assert os.readlink(data / GMS / f"{GSF}.apk_") == str(data / GSF / f"{GSF}.apk_")
     assert not (data / GMS / f"{GMS}.apk_").is_symlink()      # microG's own folder is the shared one

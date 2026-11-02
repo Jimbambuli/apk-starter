@@ -44,8 +44,8 @@ def test_finish_args_exact():
                              "--filesystem=xdg-config/breezerc:ro",
                              # the apps' media in the desktop's media controls (MPRIS)
                              "--own-name=org.mpris.MediaPlayer2.*",
-                             # microG test build: accounts in the secret store, own profile beside stable
-                             "--talk-name=org.freedesktop.secrets", "--env=APK_STARTER_PROFILE=microg"}
+                             # microG: accounts in the secret store
+                             "--talk-name=org.freedesktop.secrets"}
 
 
 def test_all_git_sources_pinned():

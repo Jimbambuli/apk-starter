@@ -22,10 +22,8 @@ finish-args:
   - --filesystem=xdg-config/breezerc:ro
   # media of the apps in the desktop's media controls (MPRIS, ATL's MediaSession)
   - --own-name=org.mpris.MediaPlayer2.*
-  # microG test build: accounts of microG (ATL's AccountManager) in the desktop's secret store (libsecret), and its
-  # own data, cache and menu entries beside those of stable (APK_STARTER_PROFILE)
+  # accounts of microG (ATL's AccountManager) in the desktop's secret store (libsecret)
   - --talk-name=org.freedesktop.secrets
-  - --env=APK_STARTER_PROFILE=microg
 build-options:
   append-path: /usr/lib/sdk/openjdk21/bin
   env:
@@ -201,7 +199,7 @@ modules:
         commit: fd44f38e094e0c3812a3c51f1229766e58083571
         dest: atl-src
 
-  # microG test build: GmsCore and GsfProxy from the official microG F-Droid repository (signing certificate
+  # microG: GmsCore and GsfProxy from the official microG F-Droid repository (signing certificate
   # SHA-256 9BD06727…D14165, NOGAPPS Project), given to every app by the starter (src/apk_starter/microg.py).
   - name: microg
     buildsystem: simple

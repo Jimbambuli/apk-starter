@@ -245,7 +245,7 @@ def microg_hint() -> str:
 
 def setup_microg(paths: Paths, lang: str | None, env: Mapping[str, str] | None = None,
                  report: Callable[[str], None] = _stderr, warn: Callable[[str], None] = _stderr) -> ApkInfo:
-    """Test build with microG: install the shipped GmsCore as «microG settings» (in the app list)."""
+    """Install the shipped GmsCore as «microG settings» (app list and menu entry)."""
     from . import microg
     apk = microg.bundle_dir(paths) / f"{microg.GMS}.apk"
     if not apk.is_file():
@@ -360,7 +360,7 @@ def _parser() -> argparse.ArgumentParser:
     g.add_argument("--remove-all", action="store_true",
                    help=_("remove all installed apps and their menu entries (before uninstalling the Flatpak)"))
     g.add_argument("--version", action="store_true", help=_("show the version and exit"))
-    g.add_argument("--setup-microg", action="store_true", help=_("test build with microG: add «microG settings»"))
+    g.add_argument("--setup-microg", action="store_true", help=_("add «microG settings» (Google services for the apps)"))
     return p
 
 
