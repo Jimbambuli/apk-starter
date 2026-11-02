@@ -8,7 +8,7 @@ import os
 import shutil
 import sys
 import threading
-from collections.abc import Callable, Iterator, Mapping
+from collections.abc import Callable, Iterator, Mapping, MutableMapping
 from datetime import datetime
 from pathlib import Path
 
@@ -18,12 +18,19 @@ from .i18n import _
 from . import dexopt, diag, i18n
 from .launch import (DEFAULT_SIZE, build_command, build_env, cached_apk_info, parse_size, prepare_apk,
                      remember_size, remembered_size, sdk_for)
-from .paths import Paths
+from .paths import PROFILE_RE, Paths, apply_profile
 from .settings import load_settings
 from .run import (default_log_path, header_fields, read_build_info, run_atl, runtime_name)
 
 VERSION = "0.1.0"
 APP_ID = "io.github.Jimbambuli.ApkStarter"
+# A test build's menu entries and windows are its own (profile), so they do not replace those of stable.
+_PROFILE = os.environ.get("APK_STARTER_PROFILE", "")
+ENTRY_PREFIX = f"{APP_ID}.{_PROFILE}" if PROFILE_RE.fullmatch(_PROFILE) else APP_ID
+RUN_REF = f"{APP_ID}//{_PROFILE}" if PROFILE_RE.fullmatch(_PROFILE) else APP_ID     # its Flatpak branch
+# The portal's menu entries run the current branch (no --branch), so a test build makes none: its apps start from
+# its own window.
+MENU_ENTRIES = RUN_REF == APP_ID
 VALUE_OPTIONS = ("--sdk", "--size", "--install", "--remove")
 DISPLAY_VARS = ("WAYLAND_DISPLAY", "DISPLAY")
 
@@ -69,12 +76,12 @@ def resolve_target(paths: Paths, target: str) -> Path:
         raise ApkError(
             _("cannot read {file}: no such file (inside the Flatpak sandbox only paths passed with "
               "--file-forwarding are visible: {command})").format(
-                file=target, command=f"flatpak run --file-forwarding {APP_ID} @@ FILE @@"))
+                file=target, command=f"flatpak run --file-forwarding {RUN_REF} @@ FILE @@"))
     raise UsageError(_("not installed: {package}").format(package=target))
 
 
 def _desktop_id(pkg: str) -> str:
-    return f"{APP_ID}.{pkg}.desktop"
+    return f"{ENTRY_PREFIX}.{pkg}.desktop"
 
 
 def _write_atomic(dest: Path, data: bytes) -> None:
@@ -145,15 +152,20 @@ def _compile_and_unpack(paths: Paths, env: Mapping[str, str], pkg: str, apk: Pat
 
 
 def install_apk(paths: Paths, apk: Path, lang: str | None, env: Mapping[str, str] | None = None,
-                report: Callable[[str], None] = _stderr, warn: Callable[[str], None] = _stderr) -> ApkInfo:
+                report: Callable[[str], None] = _stderr, warn: Callable[[str], None] = _stderr,
+                label: str | None = None) -> ApkInfo:
     """Copy the APK into apps/, compile it for this computer and add a menu entry (DynamicLauncher portal)."""
     from . import portal
     info = read_apk_info(apk, lang)
+    if label:
+        info = dataclasses.replace(info, label=label)
     with package_lock(paths, info.package):
         install_app(paths, info)
         with contextlib.suppress(OSError):          # the first start then needs not parse the APK (F182)
             cached_apk_info(paths, paths.apk(info.package), lang, lambda p, _l: dataclasses.replace(info, path=p))
         prepare_installed(paths, os.environ if env is None else env, info, report, warn)
+        if not MENU_ENTRIES:
+            return info
         icon = info.icon
         if icon is None:
             try:
@@ -166,11 +178,26 @@ def install_apk(paths: Paths, apk: Path, lang: str | None, env: Mapping[str, str
             raise StarterError(
                 _("{app} is installed without a menu entry: the DynamicLauncher portal is not available; "
                   "start the app with: {command}").format(app=info.label,
-                                                         command=f"flatpak run {APP_ID} {info.package}")) from None
+                                                         command=f"flatpak run {RUN_REF} {info.package}")) from None
         except StarterError as e:
             raise StarterError(_("{app} is installed without a menu entry: {reason}").format(
                 app=info.label, reason=e)) from None
     return info
+
+
+def microg_hint() -> str:
+    return _("In «microG settings» switch on «Google device registration» and «Cloud Messaging». "
+             "To sign in: Accounts → Add Google account.")
+
+
+def setup_microg(paths: Paths, lang: str | None, env: Mapping[str, str] | None = None,
+                 report: Callable[[str], None] = _stderr, warn: Callable[[str], None] = _stderr) -> ApkInfo:
+    """Test build with microG: install the shipped GmsCore as «microG settings» (in the app list)."""
+    from . import microg
+    apk = microg.bundle_dir(paths) / f"{microg.GMS}.apk"
+    if not apk.is_file():
+        raise UsageError(_("this build has no microG"))
+    return install_apk(paths, apk, lang, env, report, warn, label=_("microG settings"))
 
 
 def list_installed(paths: Paths) -> list[dict]:
@@ -220,7 +247,8 @@ def remove_app(paths: Paths, pkg: str, purge: bool) -> list[str]:
         if not paths.meta(pkg).exists() and not paths.apk(pkg).exists():
             raise UsageError(_("not installed: {package}").format(package=pkg))
         try:
-            portal.uninstall_launcher(pkg)
+            if MENU_ENTRIES:
+                portal.uninstall_launcher(pkg)
         except portal.PortalUnavailable:
             warnings.append(_("the DynamicLauncher portal is not available; the menu entry was not removed"))
         except StarterError as e:
@@ -274,12 +302,15 @@ def _parser() -> argparse.ArgumentParser:
     g.add_argument("--remove-all", action="store_true",
                    help=_("remove all installed apps and their menu entries (before uninstalling the Flatpak)"))
     g.add_argument("--version", action="store_true", help=_("show the version and exit"))
+    g.add_argument("--setup-microg", action="store_true", help=_("test build with microG: add «microG settings»"))
     return p
 
 
 def main(argv: list[str] | None = None, env: Mapping[str, str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     env = os.environ if env is None else env
+    if isinstance(env, MutableMapping):
+        apply_profile(env)
     i18n.setup(Paths.from_env(env).prefix)
     try:
         return _main(argv, env)
@@ -305,7 +336,7 @@ def _main(argv: list[str], env: Mapping[str, str]) -> int:
         args = parser.parse_args([a for a in kept if a != "--"])
     except SystemExit as e:
         return e.code if isinstance(e.code, int) else 0
-    mode = args.install or args.list or args.remove or args.remove_all or args.version
+    mode = args.install or args.list or args.remove or args.remove_all or args.version or args.setup_microg
     if mode and (tail or level is not None or args.sdk is not None or args.size):
         parser.error(_("--install, --list, --remove, --remove-all and --version take no other arguments"))
     if args.purge and not (args.remove or args.remove_all):
@@ -331,6 +362,10 @@ def _main(argv: list[str], env: Mapping[str, str]) -> int:
         return 1 if errors else 0
     if args.install:
         install_apk(paths, Path(args.install), lang_from_env(env), env)
+        return 0
+    if args.setup_microg:
+        setup_microg(paths, lang_from_env(env), env)
+        print(microg_hint())
         return 0
     if not tail and level is None and args.sdk is None and not args.size:
         if not any(env.get(v) for v in DISPLAY_VARS):
@@ -363,7 +398,7 @@ def _start(paths: Paths, args, level: str | None, into: Path | None, tail: list[
         debug_dir = into or diag.default_debug_dir(paths, info.package, started)
     apk_path = prepare_apk(paths, info)
     cmd = build_command(paths, apk_path, size=size, sdk=sdk_for(info, args.sdk), atl_args=atl_args,
-                        app_id=f"{APP_ID}.{info.package}")
+                        app_id=f"{ENTRY_PREFIX}.{info.package}")
     child_env = build_env(paths, info.package, env)
     if args.size:
         remember_size(paths, info.package, size)

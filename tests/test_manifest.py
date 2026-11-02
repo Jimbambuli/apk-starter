@@ -43,7 +43,9 @@ def test_finish_args_exact():
                              "--filesystem=xdg-config/kdeglobals:ro", "--filesystem=xdg-config/kwinrc:ro",
                              "--filesystem=xdg-config/breezerc:ro",
                              # the apps' media in the desktop's media controls (MPRIS)
-                             "--own-name=org.mpris.MediaPlayer2.*"}
+                             "--own-name=org.mpris.MediaPlayer2.*",
+                             # microG test build: accounts in the secret store, own profile beside stable
+                             "--talk-name=org.freedesktop.secrets", "--env=APK_STARTER_PROFILE=microg"}
 
 
 def test_all_git_sources_pinned():
@@ -64,8 +66,8 @@ def test_atl_doctor_pinned_with_the_same_atl_source():
     assert f"commit: {pins['atl-doctor']}" in art and "libopenjdkjvmti.so" in art   # JVMTI plugin, same atl-doctor
 
 
-def test_atl_from_the_apk_starter_tv5_branch():
+def test_atl_from_the_microg_1_branch():
     text = (ROOT / "io.github.Jimbambuli.ApkStarter.yml").read_text()
     module = text[text.index("- name: android_translation_layer"):text.index("- name: atl-doctor")]
-    assert "branch: apk-starter-tv5" in module   # apk-starter-tv4 + navigation bar ○ □ and its tooltips
+    assert "branch: microg-1" in module   # apk-starter-tv4 + compose-1 + microG (open ATL MRs, M1-M17)
     assert text.count(f"commit: {manifest_commits()['android_translation_layer']}") == 2      # also atl-src

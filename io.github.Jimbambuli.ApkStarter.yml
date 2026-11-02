@@ -22,6 +22,10 @@ finish-args:
   - --filesystem=xdg-config/breezerc:ro
   # media of the apps in the desktop's media controls (MPRIS, ATL's MediaSession)
   - --own-name=org.mpris.MediaPlayer2.*
+  # microG test build: accounts of microG (ATL's AccountManager) in the desktop's secret store (libsecret), and its
+  # own data, cache and menu entries beside those of stable (APK_STARTER_PROFILE)
+  - --talk-name=org.freedesktop.secrets
+  - --env=APK_STARTER_PROFILE=microg
 build-options:
   append-path: /usr/lib/sdk/openjdk21/bin
   env:
@@ -164,8 +168,8 @@ modules:
     sources:
       - type: git
         url: https://gitlab.com/Jimbambuli/android_translation_layer.git
-        branch: apk-starter-tv5
-        commit: 77d452fe6c8aa6a30694d836a6f8e5d3d751d0f3
+        branch: microg-1
+        commit: d369254a05cfc9875f98900f3ec21ffe530e1e76
 
   # atl-doctor (public, fixed commit): JVMTI agent and trace counter for Log/Debug, its Python package for the
   # Debug recorder, and the stub list of exactly this ATL (for stub hits). The starter only records: reports come
@@ -191,8 +195,24 @@ modules:
         commit: d7d830af2f72d8865c508c2c0d99fde30071f865
       - type: git
         url: https://gitlab.com/Jimbambuli/android_translation_layer.git
-        commit: 77d452fe6c8aa6a30694d836a6f8e5d3d751d0f3
+        commit: d369254a05cfc9875f98900f3ec21ffe530e1e76
         dest: atl-src
+
+  # microG test build: GmsCore and GsfProxy from the official microG F-Droid repository (signing certificate
+  # SHA-256 9BD06727…D14165, NOGAPPS Project), given to every app by the starter (src/apk_starter/microg.py).
+  - name: microg
+    buildsystem: simple
+    build-commands:
+      - install -Dm644 -t /app/share/apk-starter/microg com.google.android.gms.apk com.google.android.gsf.apk
+    sources:
+      - type: file
+        url: https://microg.org/fdroid/repo/com.google.android.gms-252432034.apk
+        sha256: e5e6cba078bdec812b5450599350e5c1a12c8b7438da5bf77123af170f8c1a35
+        dest-filename: com.google.android.gms.apk
+      - type: file
+        url: https://microg.org/fdroid/repo/com.google.android.gsf-8.apk
+        sha256: 86891b174301f06a1c84187b545a0a2a57044c6b768f3e84e865908743349692
+        dest-filename: com.google.android.gsf.apk
 
   - name: apk-starter
     buildsystem: simple
