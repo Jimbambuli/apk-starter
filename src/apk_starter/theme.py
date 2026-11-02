@@ -109,6 +109,20 @@ def theme_dirs(env: Mapping[str, str]) -> list[Path]:
     return [data_home / "themes", home / ".themes"] + [Path(d) / "themes" for d in dirs.split(":") if d]
 
 
+def icon_theme_dirs(env: Mapping[str, str]) -> list[Path]:
+    """Where GTK looks for an icon theme by name (gtkicontheme.c): ~/.icons, the data folders (in the Flatpak also
+    /usr/share/runtime/share, where Icontheme extensions are mounted)."""
+    home = Path(env.get("HOME", "/"))
+    data_home = Path(env.get("XDG_DATA_HOME") or home / ".local/share")
+    dirs = env.get("XDG_DATA_DIRS") or "/usr/local/share:/usr/share"
+    return [data_home / "icons", home / ".icons"] + [Path(d) / "icons" for d in dirs.split(":") if d]
+
+
+def icon_theme_available(name: str | None, dirs: Sequence[Path]) -> bool:
+    """An icon theme that is not installed would hide GTK's own Adwaita icons (GTK then finds only hicolor)."""
+    return bool(name) and any((d / name / "index.theme").is_file() for d in dirs)
+
+
 def read_system(config_dir: Path, dirs: Sequence[Path]) -> SystemTheme:
     """settings.ini of gtk-4.0 in config_dir; not the dark variant (portal) and not gtk-xft-dpi (for X11, the
     compositor gives the scale)."""
