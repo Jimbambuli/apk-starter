@@ -144,9 +144,9 @@ class Window(Gtk.ApplicationWindow):
         add_menu.append(_("Install APK…"), "win.choose-apk")
         add_menu.append(_("Set up Aurora Store…"), "win.setup-aurora")
         install = Gtk.MenuButton(menu_model=add_menu, icon_name="list-add-symbolic", tooltip_text=_("Add apps"))
-        # once, until «microG settings» is installed
+        # once, until «microG settings» is installed (apps/ always links the shipped APK, see microg.link_into)
         self.microg_button = Gtk.Button(label="microG", tooltip_text=_("Set up microG"),
-                                        visible=bool(microg.bundled(paths)) and not paths.apk(microg.GMS).is_file())
+                                        visible=bool(microg.bundled(paths)) and not paths.meta(microg.GMS).is_file())
         self.microg_button.connect("clicked", lambda _b: self.setup_microg())
         self.spinner = Gtk.Spinner(visible=False, spinning=True, tooltip_text=_("Working…"))
         top = Gtk.Box(spacing=6, margin_top=10, margin_bottom=8, margin_start=10, margin_end=10)
