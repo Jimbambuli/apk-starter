@@ -27,6 +27,7 @@ APP_ID = "io.github.Jimbambuli.ApkStarter"
 # A test build's menu entries and windows are its own (profile), so they do not replace those of stable.
 _PROFILE = os.environ.get("APK_STARTER_PROFILE", "")
 ENTRY_PREFIX = f"{APP_ID}.{_PROFILE}" if PROFILE_RE.fullmatch(_PROFILE) else APP_ID
+RUN_REF = f"{APP_ID}//{_PROFILE}" if PROFILE_RE.fullmatch(_PROFILE) else APP_ID     # its Flatpak branch
 VALUE_OPTIONS = ("--sdk", "--size", "--install", "--remove")
 DISPLAY_VARS = ("WAYLAND_DISPLAY", "DISPLAY")
 
@@ -72,7 +73,7 @@ def resolve_target(paths: Paths, target: str) -> Path:
         raise ApkError(
             _("cannot read {file}: no such file (inside the Flatpak sandbox only paths passed with "
               "--file-forwarding are visible: {command})").format(
-                file=target, command=f"flatpak run --file-forwarding {APP_ID} @@ FILE @@"))
+                file=target, command=f"flatpak run --file-forwarding {RUN_REF} @@ FILE @@"))
     raise UsageError(_("not installed: {package}").format(package=target))
 
 
@@ -172,7 +173,7 @@ def install_apk(paths: Paths, apk: Path, lang: str | None, env: Mapping[str, str
             raise StarterError(
                 _("{app} is installed without a menu entry: the DynamicLauncher portal is not available; "
                   "start the app with: {command}").format(app=info.label,
-                                                         command=f"flatpak run {APP_ID} {info.package}")) from None
+                                                         command=f"flatpak run {RUN_REF} {info.package}")) from None
         except StarterError as e:
             raise StarterError(_("{app} is installed without a menu entry: {reason}").format(
                 app=info.label, reason=e)) from None
