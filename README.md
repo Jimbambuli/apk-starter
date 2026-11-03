@@ -31,10 +31,11 @@ Next to **Start** stand **Delete data …**, **Uninstall …** and **⚙**. The 
 bar drawn in the desktop's GTK theme with a back button; under KDE it gets the buttons and the height of the KWin
 decoration. **From the system** is the desktop's own title bar (where the compositor draws one, e.g. KDE Plasma),
 without the back button; **From the system + navigation bar** adds Android's navigation bar under the window (◁ back,
-○ the app's first page, □ its open pages). Escape and the back button of the mouse always go back. **Log** (also
-remembered per app) records every start of the app, also from its menu entry; **Debug** is for the next start only.
-A dot on ⚙ shows that Log or Debug is on; once there are recordings, the menu lists them with **Open log folder**.
-When an app crashes, a message says what its exit code means and offers **Open log folder**.
+○ the app's first page, □ its open pages). Escape and the back button of the mouse always go back. **Debug** (also
+remembered per app, until you untick it) records every start of the app, also from its menu entry; a dot on ⚙ shows
+that it is on. The menu lists the Debug recordings and offers **Open log folder**. Every start of an app, with or
+without Debug, also keeps a plain log of ATL's output (the last 3 per app).
+When an app crashes, a message says what its exit code means; **Open log folder** shows the log of that start.
 
 The same is available on the command line:
 
@@ -48,9 +49,7 @@ apk-starter --setup-aurora           # download Aurora Store from F-Droid, check
 apk-starter --list                   # installed apps
 apk-starter --remove PACKAGE [--purge]
 apk-starter --remove-all [--purge]   # remove every installed app and its menu entry
-apk-starter --log @@ app.apk @@      # write a log that atl-doctor can read
-apk-starter --log=FILE @@ app.apk @@ # same, to a chosen file (must be writable inside the sandbox,
-                                     # e.g. under ~/.var/app/io.github.Jimbambuli.ApkStarter/)
+apk-starter --setup-microg           # download microG from its repository, check it, install it
 apk-starter --debug @@ app.apk @@    # record the app for atl-doctor (a little slower), --debug=DIR for a folder
 apk-starter --sdk N @@ app.apk @@    # override the SDK level passed to ATL
 apk-starter --size WxH @@ app.apk @@ # window size (remembered per app)
@@ -71,20 +70,29 @@ from Google Play (base and configuration parts) are kept together; apps with nat
 with a message. Sign in anonymously in Aurora Store: signing in with your own Google account may break Google's terms
 of service.
 
+### microG (Google services for apps)
+
+**+ → Set up microG…** (or `--setup-microg`) works like Aurora Store: it downloads GmsCore and GsfProxy from the
+official microG repository (microg.org/fdroid), checks the SHA-256 checksums and GmsCore's APK signature against the
+NOGAPPS Project's certificate, and installs GmsCore as the app «microG settings»; GsfProxy goes into the app folder
+for ATL. microG is not part of the Flatpak. Once it is installed, the entry disappears from the menu (Aurora Store's
+too). Every app then shares microG's data. In «microG settings» switch on «Google device registration» and «Cloud
+Messaging»; to sign in: Accounts → Add Google account.
+
 Without the alias use `flatpak run --file-forwarding io.github.Jimbambuli.ApkStarter …` instead of `apk-starter`.
 Double-clicking an APK in the file manager and starting an installed app from the menu work without any command.
 
 Data lives under `~/.var/app/io.github.Jimbambuli.ApkStarter/data/`: `apps/` (installed APKs), `data/<package>/`
-(app data), `logs/` (logs from `--log`, folders from `--debug`).
+(app data), `logs/` (a plain log of every start, folders from Debug).
 
-Diagnose levels, for finding out why an app misbehaves under ATL (with
-[atl-doctor](https://github.com/Jimbambuli/atl-doctor)): a normal start loads nothing extra. **Log** (`--log`,
-«Log» ticked) writes ATL's output plus what atl-doctor's JVMTI agent sees on the fast runtime (lifecycle
-callbacks; the agent comes 3 s after the start, so exceptions of the start itself come with Debug); the app runs at
-almost full speed. **Debug** (`--debug`, «Debug» ticked) records a folder: the agent attached as soon as the
+Logs and recordings, for finding out why an app misbehaves under ATL (with
+[atl-doctor](https://github.com/Jimbambuli/atl-doctor)): every start writes ATL's text output (stdout, stderr, Android
+log) to a plain log in `logs/`, without any extra process; the last 3 per app stay. **Debug** (`--debug`, «Debug»
+ticked) records a folder instead: the agent attached as soon as the
 runtime runs (exceptions with stack, also caught ones, lifecycle), the calls of ATL's stub methods (counted by ATL
 itself), a time line from ART's sampling profiler, the view trees and a verbose Android log; the app runs only a
-little slower (no full method trace, which made apps lose their own start-up races).
+little slower (no full method trace, which made apps lose their own start-up races). Of the Debug recordings the last
+5 per app stay, and together at most 200 MB per app (the older go first, the newest always stays).
 
 APK Starter only records; [atl-doctor](https://github.com/Jimbambuli/atl-doctor) evaluates the recordings (crash
 cause, ATL gaps, exceptions; it compares the stub hits with Android's source so that methods as trivial in Android
@@ -92,7 +100,7 @@ are not counted as gaps). Install it once with `pipx install git+https://github.
 
 ```
 cd ~/.var/app/io.github.Jimbambuli.ApkStarter/data/logs
-atl-doctor report --log org.example.app-20261102-101010.log    # a Log recording
+atl-doctor report --log org.example.app-20261102-101010.log    # a plain log
 atl-doctor report org.example.app-20261102-101010              # a Debug recording (folder)
 atl-doctor report -f html -o report.html org.example.app-20261102-101010   # as a page, e.g. for a bug report
 ```

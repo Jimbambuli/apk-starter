@@ -19,7 +19,7 @@
       <li>A small window lists your apps with icon, version and data size; start, uninstall or delete
         their data from there.</li>
       <li>Each app keeps its own data folder.</li>
-      <li>An optional log helps to find out why an app does not work.</li>
+      <li>Every start keeps a log, and Debug records more, to find out why an app does not work.</li>
     </ul>
     <p>
       No apps are included and no Google services are provided. Apps that need Google Play

@@ -199,22 +199,6 @@ modules:
         commit: 10a6b462aa5cd80e1731f8ea5209e5f03073385c
         dest: atl-src
 
-  # microG: GmsCore and GsfProxy from the official microG F-Droid repository (signing certificate
-  # SHA-256 9BD06727…D14165, NOGAPPS Project), given to every app by the starter (src/apk_starter/microg.py).
-  - name: microg
-    buildsystem: simple
-    build-commands:
-      - install -Dm644 -t /app/share/apk-starter/microg com.google.android.gms.apk com.google.android.gsf.apk
-    sources:
-      - type: file
-        url: https://microg.org/fdroid/repo/com.google.android.gms-252432034.apk
-        sha256: e5e6cba078bdec812b5450599350e5c1a12c8b7438da5bf77123af170f8c1a35
-        dest-filename: com.google.android.gms.apk
-      - type: file
-        url: https://microg.org/fdroid/repo/com.google.android.gsf-8.apk
-        sha256: 86891b174301f06a1c84187b545a0a2a57044c6b768f3e84e865908743349692
-        dest-filename: com.google.android.gsf.apk
-
   - name: apk-starter
     buildsystem: simple
     build-commands:

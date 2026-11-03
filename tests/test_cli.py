@@ -1,4 +1,5 @@
 import json
+import time
 import os
 import sys
 import types
@@ -58,15 +59,17 @@ def box(tmp_path, monkeypatch):
                                  data=tmp_path / "data", art=art, info=info)
 
 
-def test_log_flag_does_not_eat_apk():
-    assert split_diag_option(["--log", "app.apk", "--log=x"]) == (["app.apk", "--log=x"], "log", None)
+def test_debug_flag_does_not_eat_apk():
+    assert split_diag_option(["--debug", "app.apk", "--debug=x"]) == (["app.apk", "--debug=x"], "debug", None)
     assert split_diag_option(["--debug=d", "--", "app.apk"]) == (["--", "app.apk"], "debug", Path("d"))
     assert split_diag_option(["app.apk"]) == (["app.apk"], None, None)
 
 
-def test_unwritable_log_file_fails_before_launch(box):
-    assert main(["--log=/proc/nope/a.log", str(box.apk)], env=box.env) == 1
-    assert not box.record.exists()          # fake ATL never started
+def test_unwritable_log_folder_does_not_stop_the_app(box, capsys):
+    box.data.mkdir(parents=True, exist_ok=True)
+    (box.data / "logs").write_text("a file, not a folder")
+    assert main([str(box.apk)], env=box.env) == 0
+    assert box.record.exists() and "no log: cannot write" in capsys.readouterr().err
 
 
 def test_missing_apk_path_exit_3_with_hint(box, capsys):
@@ -127,8 +130,8 @@ def test_version_line(box, capsys):
     assert capsys.readouterr().out == "apk-starter 0.1.0 (ATL unknown, ART unknown)\n"
 
 
-def test_log_default_location(box):
-    assert main(["--log", str(box.apk)], env=box.env) == 0
+def test_every_start_writes_a_plain_log(box):
+    assert main([str(box.apk)], env=box.env) == 0
     logs = list((box.data / "logs").glob(f"{PKG}-*.log"))
     assert len(logs) == 1
     lines = logs[0].read_text().splitlines()
@@ -350,41 +353,26 @@ def test_direct_start_unpacks_native_libraries_before_atl(box):
     assert json.loads(box.record.read_text())["check"]
 
 
-def _agent(box):
-    prefix = Path(box.env["APK_STARTER_PREFIX"])
-    for f in ("lib/atl-doctor/libatl_doctor_agent.so", "lib/art/libopenjdkjvmti.so"):
-        (prefix / f).parent.mkdir(parents=True, exist_ok=True)
-        (prefix / f).write_bytes(b"")
-    return prefix
+def test_log_has_no_agent_and_only_the_last_three_are_kept(box):
+    for i in range(5):
+        assert main([str(box.apk)], env=box.env) == 0
+        time.sleep(1.1)                                 # the file name has the second
+    logs = sorted((box.data / "logs").glob(f"{PKG}-*.log"))
+    assert len(logs) == 3
+    assert not any(x.startswith("-agentpath") for x in json.loads(box.record.read_text())["argv"])
 
 
-def test_log_level_loads_the_agent_and_keeps_its_output_in_the_log(box):
-    prefix = _agent(box)
-    assert main(["--log", str(box.apk)], env=box.env) == 0
-    a = json.loads(box.record.read_text())["argv"]
-    agent = a[a.index("-X", a.index("--gapplication-app-id")) + 1:]
-    log = next((box.data / "logs").glob(f"{PKG}-*.log"))
-    assert [x for x in a if x.startswith("-agentpath:")] == [
-        f"-agentpath:{prefix}/lib/atl-doctor/libatl_doctor_agent.so={log}.agent,"
-        f"late={prefix}/lib/art/libopenjdkjvmti.so,latesec=3"] and agent
-    assert log.read_text().splitlines()[-1].startswith("# atl-doctor-agent: E\t200\t7\tjava.lang.IllegalState")
-    assert not Path(f"{log}.agent").exists()
-    assert json.loads(box.record.read_text())["log_tags"] is None
-
-
-def test_remembered_log_applies_to_every_start_of_the_app(box):
-    """«Log» ticked in the window: also a start from the menu entry (`apk-starter PACKAGE`) writes a log."""
+def test_remembered_debug_applies_to_every_start_of_the_app(box, monkeypatch):
+    """«Debug» ticked in the window: also a start from the menu entry (`apk-starter PACKAGE`) is recorded."""
+    from apk_starter import cli
     from apk_starter.paths import Paths
     from apk_starter.settings import Settings, save_settings
     assert main(["--install", str(box.apk)], env=box.env) == 0
-    save_settings(Paths.from_env(box.env).settings(), Settings().with_app(PKG, log=True))
+    save_settings(Paths.from_env(box.env).settings(), Settings().with_app(PKG, debug=True))
+    seen = []
+    monkeypatch.setattr(cli.diag, "record_restarting", lambda paths, cmd, env, out, pkg: seen.append(out) or 0)
     assert main([PKG], env=box.env) == 0
-    assert len(list((box.data / "logs").glob(f"{PKG}-*.log"))) == 1
-
-
-def test_log_without_agent_is_a_plain_log(box):
-    assert main(["--log", str(box.apk)], env=box.env) == 0
-    assert not any(x.startswith("-agentpath") for x in json.loads(box.record.read_text())["argv"])
+    assert len(seen) == 1 and not list((box.data / "logs").glob("*.log"))     # a recording folder instead of a log
 
 
 def test_debug_level_records_a_folder_for_atl_doctor(box):
@@ -405,7 +393,7 @@ def test_debug_level_records_a_folder_for_atl_doctor(box):
 
 
 def test_diag_usage_errors_and_no_report_option(box):
-    assert main(["--log", "--debug", str(box.apk)], env=box.env) == 2
+    assert main(["--log", str(box.apk)], env=box.env) == 2          # the option is gone
     assert main(["--debug=", str(box.apk)], env=box.env) == 2
     assert main(["--report"], env=box.env) == 2          # reports come from atl-doctor itself
 

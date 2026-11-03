@@ -89,8 +89,6 @@ def test_narrow():
 
 def test_start_argv():
     assert start_argv(["/app/bin/apk-starter"], "org.a.app", None) == ["/app/bin/apk-starter", "org.a.app"]
-    assert start_argv(["/app/bin/apk-starter"], "org.a.app", "log") == \
-        ["/app/bin/apk-starter", "--log", "--", "org.a.app"]
     assert start_argv(["/app/bin/apk-starter"], "org.a.app", "debug") == \
         ["/app/bin/apk-starter", "--debug", "--", "org.a.app"]
 

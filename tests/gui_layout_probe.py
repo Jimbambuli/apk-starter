@@ -66,7 +66,25 @@ def activate(a) -> None:
     def listed():
         report["restored"] = [win.selected, win.details_title.get_text(), titles(win)]
         report["opened_focus_on_start"] = win.get_focus() is win.start_button
+        report["add_menu"] = win.add_menu.get_n_items()      # APK, Aurora Store and microG: none is set up
+        win.paths.meta("com.aurora.store").write_text("{}")
+        win.update_add_menu()
+        report["add_menu_aurora_installed"] = win.add_menu.get_n_items()
         report["bravo_menu"] = [win.recordings_shown, win.gear_dot.get_visible()]
+        win.saved_rows = win.all_rows
+        win.show_rows([])                                   # no app: only text, «+» accented and focused
+        wait(lambda: focused_in(win.welcome_add), empty_checked)
+
+    def focused_in(widget):
+        f = win.get_focus()
+        return f is not None and (f is widget or f.is_ancestor(widget))
+
+    def empty_checked():
+        report["empty_page"] = [win.stack.get_visible_child_name(), win.welcome_add.has_css_class("suggested-action"),
+                                True, win.welcome_text.get_text()]
+        win.show_rows(win.saved_rows)
+        report["list_page"] = win.stack.get_visible_child_name()
+        win.paths.meta("com.aurora.store").unlink()      # back to the first state
         win.search.set_text("CHA")
         wait(lambda: titles(win) == ["Charlie"], searched)
 
@@ -96,20 +114,17 @@ def activate(a) -> None:
         report["focus_on_start"] = win.get_focus() is win.start_button
         report["charlie_menu"] = [win.recordings_shown, win.gear_dot.get_visible()]
         win.titlebar_choice["system-navigation"].set_active(True)  # From the system + navigation bar
-        win.log_check.set_active(True)
-        report["dot_with_log"] = win.gear_dot.get_visible()
-        report["settings"] = json.loads(paths.settings().read_text())
         win.debug_check.set_active(True)
-        report["debug_locks_log"] = [win.log_check.get_active(), win.log_check.get_sensitive()]
+        report["dot_with_debug"] = win.gear_dot.get_visible()
+        report["settings"] = json.loads(paths.settings().read_text())
         Path(record).unlink()
         win.start_button.emit("clicked")
         wait(lambda: Path(record).exists() and Path(record).read_text(), debug_started)
 
     def debug_started():
-        report["debug_started"] = Path(record).read_text().split()
-        report["debug_off_after_start"] = [win.debug, win.debug_check.get_active(), win.log_check.get_active(),
-                                           win.log_check.get_sensitive()]
-        win.crashed("Charlie", "Exit code 10: crash", False)
+        report["debug_started"] = Path(record).read_text().split()      # the start reads the setting, no option
+        report["debug_stays_on"] = [win.debug_check.get_active(), win.gear_dot.get_visible()]
+        win.crashed("Charlie", "Exit code 10: crash", None)
         report["crash_dialog"] = [win.dialog.heading, win.dialog.extra.get_text()]
         win.dialog.respond("close")
         win.set_default_size(500, 600)              # remembered at close, used by the next window

@@ -15,6 +15,7 @@ src/apk_starter/gui_model.py
 src/apk_starter/i18n.py
 src/apk_starter/install_request.py
 src/apk_starter/launch.py
+src/apk_starter/microg.py
 src/apk_starter/paths.py
 src/apk_starter/portal.py
 src/apk_starter/resbin.py

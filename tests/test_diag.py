@@ -1,4 +1,4 @@
-"""Diagnose levels (Log, Debug) and the recordings they leave."""
+"""Recordings (plain logs, Debug) and their clean-up."""
 from datetime import datetime
 from pathlib import Path
 
@@ -7,40 +7,46 @@ import pytest
 from apk_starter import diag
 from apk_starter.paths import Paths
 
-AGENT_E = "E\t200\t7\tjava.lang.IllegalStateException\tboom\tB:android.view.View.measure\t" \
-          "B:android.view.View.measure|org.example.demo.Main.onCreate"
-
-
 def _paths(tmp_path) -> Paths:
     return Paths(data_home=tmp_path / "d", cache_home=tmp_path / "c", prefix=tmp_path / "p")
 
 
-def _install_agent(p: Paths) -> None:
-    for f in (p.agent(), p.jvmti_plugin()):
-        f.parent.mkdir(parents=True, exist_ok=True)
-        f.write_bytes(b"")
+def _make(p: Paths, pkg: str, n: int, kind: str, size: int = 10) -> Path:
+    """Recording number n (the n-th second of 2026-11-01 10:00) of kind "log" or "debug"."""
+    logs = p.logs_dir()
+    logs.mkdir(parents=True, exist_ok=True)
+    name = f"{pkg}-20261101-1000{n:02d}"
+    if kind == "log":
+        f = logs / f"{name}.log"
+        f.write_bytes(b"x" * size)
+        return f
+    (logs / name).mkdir()
+    (logs / name / "manifest.json").write_text("{}")
+    (logs / name / "atl.log").write_bytes(b"x" * size)
+    return logs / name
 
 
-def test_agent_args_only_when_agent_and_plugin_are_there(tmp_path):
+def test_prune_keeps_the_last_three_logs_and_five_debug_recordings_per_app(tmp_path):
     p = _paths(tmp_path)
-    out = tmp_path / "x.log.agent"
-    assert diag.agent_args(p, out) == []
-    _install_agent(p)
-    assert diag.agent_args(p, out) == [
-        "-X", f"-agentpath:{p.agent()}={out},late={p.jvmti_plugin()},latesec=3"]
-    assert diag.agent_args(p, tmp_path / "a,b.agent") == []        # the agent splits its options at commas
+    logs = [_make(p, "org.a", n, "log") for n in range(6)]
+    debugs = [_make(p, "org.a", n + 10, "debug") for n in range(8)]
+    other = [_make(p, "org.b", n, "log") for n in range(5)] + [_make(p, "org.b", 20, "debug")]
+    (p.logs_dir() / "notes.txt").write_text("mine")
+    diag.prune(p, "org.a")
+    assert [f.exists() for f in logs] == [False] * 3 + [True] * 3        # the newest stay
+    assert [f.exists() for f in debugs] == [False] * 3 + [True] * 5
+    assert all(f.exists() for f in other) and (p.logs_dir() / "notes.txt").exists()
 
 
-def test_agent_output_is_appended_to_the_log(tmp_path):
-    log, out = tmp_path / "a.log", tmp_path / "a.log.agent"
-    log.write_text("# apk-starter: exit=0\n")
-    out.write_text(f"I\t1\t2\tlate: plugin loaded\n{AGENT_E}\nE\t3\t4\tpart")      # last line cut off
-    diag.append_agent_output(log, out)
-    assert log.read_text().splitlines() == ["# apk-starter: exit=0", "# atl-doctor-agent: I\t1\t2\tlate: plugin loaded",
-                                            f"# atl-doctor-agent: {AGENT_E}"]
-    assert not out.exists()
-    diag.append_agent_output(log, out)                                  # no agent output: nothing happens
-    assert len(log.read_text().splitlines()) == 3
+def test_prune_debug_by_size_older_first_but_the_newest_stays(tmp_path, monkeypatch):
+    p = _paths(tmp_path)
+    monkeypatch.setattr(diag, "DEBUG_MAX_BYTES", 100)
+    old, mid, new = (_make(p, "org.a", n, "debug", size) for n, size in ((1, 60), (2, 60), (3, 30)))
+    diag.prune(p, "org.a")
+    assert (old.exists(), mid.exists(), new.exists()) == (False, True, True)       # 30 + 60 + manifest <= 100
+    monkeypatch.setattr(diag, "DEBUG_MAX_BYTES", 10)
+    diag.prune(p, "org.a")
+    assert (mid.exists(), new.exists()) == (False, True)                           # one alone may exceed it
 
 
 def _recordings(p: Paths) -> dict[str, Path]:

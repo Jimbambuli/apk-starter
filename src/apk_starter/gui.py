@@ -125,7 +125,6 @@ class Window(Gtk.ApplicationWindow):
         self.narrow = False
         self.page = "list"                          # narrow window: "list" or "details"
         self.layout = 0                             # extra right margin of the details
-        self.debug = False                          # «Debug» ticked; never remembered (Spec 14)
         self.start_button: Gtk.Button | None = None
 
         self.search = Gtk.SearchEntry(placeholder_text=_("Search apps"), hexpand=True)
@@ -140,17 +139,11 @@ class Window(Gtk.ApplicationWindow):
         # Breeze has no symbolic variant of this icon
         sort.set_child(Gtk.Image.new_from_gicon(Gio.ThemedIcon.new_from_names(
             ["view-sort-descending-symbolic", "view-sort-descending"])))
-        add_menu = Gio.Menu()
-        add_menu.append(_("Install APK…"), "win.choose-apk")
-        add_menu.append(_("Set up Aurora Store…"), "win.setup-aurora")
-        install = Gtk.MenuButton(menu_model=add_menu, icon_name="list-add-symbolic", tooltip_text=_("Add apps"))
-        # once, until «microG settings» is installed (apps/ always links the shipped APK, see microg.link_into)
-        self.microg_button = Gtk.Button(label="microG", tooltip_text=_("Set up microG"),
-                                        visible=bool(microg.bundled(paths)) and not paths.meta(microg.GMS).is_file())
-        self.microg_button.connect("clicked", lambda _b: self.setup_microg())
+        self.add_menu = Gio.Menu()
+        install = Gtk.MenuButton(menu_model=self.add_menu, icon_name="list-add-symbolic", tooltip_text=_("Add apps"))
         self.spinner = Gtk.Spinner(visible=False, spinning=True, tooltip_text=_("Working…"))
         top = Gtk.Box(spacing=6, margin_top=10, margin_bottom=8, margin_start=10, margin_end=10)
-        for w in (self.search, sort, install, self.microg_button, self.spinner):
+        for w in (self.search, sort, install, self.spinner):
             top.append(w)
         self.listbox = Gtk.ListBox(selection_mode=Gtk.SelectionMode.SINGLE, activate_on_single_click=False)
         self.listbox.add_css_class("navigation-sidebar")
@@ -180,7 +173,7 @@ class Window(Gtk.ApplicationWindow):
 
         self.stack = Gtk.Stack(transition_type=Gtk.StackTransitionType.CROSSFADE, vexpand=True)
         self.stack.add_named(Gtk.Box(), "loading")
-        self.stack.add_named(self.make_welcome(), "empty")
+        self.stack.add_named(self.make_empty_page(), "empty")
         self.stack.add_named(apps, "list")
 
         self.progress_label = label("", hexpand=True, ellipsize=Pango.EllipsizeMode.END)
@@ -218,14 +211,15 @@ class Window(Gtk.ApplicationWindow):
         keys.connect("key-pressed", self.on_key)
         self.add_controller(keys)
 
-        for name, handler in (("start", lambda p: self.start(p, "debug" if self.debug else None)),
+        for name, handler in (("start", lambda p: self.start(p, None)),
                               ("open-logs", lambda _p: self.open_logs()),
                               ("clear-data", self.ask_clear_data),
                               ("uninstall", self.ask_uninstall)):
             action = Gio.SimpleAction.new(name, GLib.VariantType.new("s"))
             action.connect("activate", lambda _a, v, h=handler: h(v.get_string()))
             self.add_action(action)
-        for name, handler in (("choose-apk", self.choose_apk), ("setup-aurora", self.ask_setup_aurora)):
+        for name, handler in (("choose-apk", self.choose_apk), ("setup-aurora", self.ask_setup_aurora),
+                              ("setup-microg", self.ask_setup_microg)):
             action = Gio.SimpleAction.new(name, None)
             action.connect("activate", lambda _a, _v, h=handler: h())
             self.add_action(action)
@@ -239,24 +233,28 @@ class Window(Gtk.ApplicationWindow):
             # after a Flatpak update: rebuild once in the background; apps started meanwhile wait for the runtime
             self.background(lambda: prepare_all(self.paths, self.env, self.progress), None, "")
 
+    def make_empty_page(self) -> Gtk.Widget:
+        """No app yet: only text, and the «+» button in the accent colour where it stands beside the list."""
+        self.welcome_add = Gtk.MenuButton(menu_model=self.add_menu, icon_name="list-add-symbolic",
+                                          tooltip_text=_("Add apps"), halign=Gtk.Align.START, margin_top=10,
+                                          margin_start=10)
+        self.welcome_add.add_css_class("suggested-action")
+        page = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        page.append(self.welcome_add)
+        welcome = self.make_welcome()
+        welcome.set_vexpand(True)
+        page.append(welcome)
+        return page
+
     def make_welcome(self) -> Gtk.Widget:
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=14, valign=Gtk.Align.CENTER,
                       halign=Gtk.Align.CENTER, margin_start=24, margin_end=24)
         box.append(Gtk.Image(icon_name=APP_ID, pixel_size=128, margin_bottom=8))
         self.welcome_title = label(_("No apps installed"), "welcome-title", xalign=0.5, wrap=True)
-        self.welcome_text = label(_("Drag an APK here or choose one."), "dim-label", xalign=0.5, wrap=True,
+        self.welcome_text = label(_("Add an app with + or drop an APK here."), "dim-label", xalign=0.5, wrap=True,
                                   justify=Gtk.Justification.CENTER)
-        choose = Gtk.Button(label=_("Choose APK…"), halign=Gtk.Align.CENTER, margin_top=10)
-        choose.add_css_class("suggested-action")
-        choose.connect("clicked", lambda _b: self.choose_apk())
-        aurora_ = Gtk.Button(label=_("Set up Aurora Store…"), halign=Gtk.Align.CENTER)
-        aurora_.connect("clicked", lambda _b: self.ask_setup_aurora())
-        # the same as the microG button above the list, which this page does not show
-        self.microg_welcome = Gtk.Button(label=_("Set up microG"), halign=Gtk.Align.CENTER,
-                                         visible=self.microg_button.get_visible())
-        self.microg_welcome.connect("clicked", lambda _b: self.setup_microg())
-        for w in (self.welcome_title, self.welcome_text, choose, aurora_, self.microg_welcome):
-            box.append(w)
+        box.append(self.welcome_title)
+        box.append(self.welcome_text)
         return box
 
     # -- helpers -----------------------------------------------------------------------------------------
@@ -354,8 +352,22 @@ class Window(Gtk.ApplicationWindow):
     def show_rows(self, rows: list[AppRow]) -> None:
         self.all_rows = rows
         self.rows = {r.package: r for r in rows}
+        self.update_add_menu()
         self.stack.set_visible_child_name("list" if rows else "empty")
+        if not rows:
+            GLib.idle_add(self.welcome_add.grab_focus)      # nothing else to do here but add an app
         self.show_list()
+
+    def update_add_menu(self) -> None:
+        """«Add apps» and the empty page offer a service only while it is not installed."""
+        aurora_todo = not self.paths.meta(aurora.PACKAGE).is_file()
+        microg_todo = not microg.installed(self.paths)
+        self.add_menu.remove_all()
+        self.add_menu.append(_("Install APK…"), "win.choose-apk")
+        if aurora_todo:
+            self.add_menu.append(_("Set up Aurora Store…"), "win.setup-aurora")
+        if microg_todo:
+            self.add_menu.append(_("Set up microG…"), "win.setup-microg")
 
     def visible_rows(self) -> list[AppRow]:
         return filter_rows(sort_rows(self.all_rows, self.sort), self.search.get_text())
@@ -457,11 +469,7 @@ class Window(Gtk.ApplicationWindow):
             self.details.remove(child)
         r = self.rows.get(self.selected or "")
         if r is None:
-            self.debug = False
             return
-        if getattr(self, "debug_for", None) != r.package:
-            self.debug = False                      # «Debug» is never remembered, also not across apps
-        self.debug_for = r.package
         target = GLib.Variant("s", r.package)
         app = load_settings(self.paths.settings()).app(r.package)
 
@@ -474,7 +482,7 @@ class Window(Gtk.ApplicationWindow):
         head.append(names)
         self.details.append(head)
 
-        # one row: Start, Delete data, Uninstall, ⚙ (window bar, Log, Debug, recordings) (Marcel 2.11.2026)
+        # one row: Start, Delete data, Uninstall, ⚙ (window bar, Debug, recordings) (Marcel 2.11.2026)
         start = Gtk.Button(label=_("Start"), action_name="win.start", action_target=target)
         start.add_css_class("suggested-action")         # the main action in the theme's accent (KDE/GNOME)
         self.start_button = start
@@ -487,7 +495,7 @@ class Window(Gtk.ApplicationWindow):
         icon = Gtk.Overlay(child=Gtk.Image.new_from_gicon(Gio.ThemedIcon.new_from_names(
             ["configure-symbolic", "configure", "emblem-system-symbolic"])))
         self.gear_dot = label("●", "caption", "accent", halign=Gtk.Align.END, valign=Gtk.Align.START,
-                              visible=app.log or self.debug, tooltip_text=_("Log or Debug is on"))
+                              visible=app.debug, tooltip_text=_("Debug is on"))
         icon.add_overlay(self.gear_dot)
         gear.set_child(icon)
         self.gear = gear
@@ -515,7 +523,7 @@ class Window(Gtk.ApplicationWindow):
             start.grab_focus()                      # not the name (a focused label shows all of it selected)
 
     def make_options(self, r: AppRow, app) -> Gtk.Popover:
-        """The ⚙ menu: window bar and Log (remembered per app), Debug (next start only), the recordings.
+        """The ⚙ menu: window bar and Debug (both remembered per app), the Debug recordings.
 
         The window bar is a group of option buttons, not a drop-down: the menu keeps one size and nothing in it
         opens over the rest (Marcel 2.11.2026)."""
@@ -532,51 +540,44 @@ class Window(Gtk.ApplicationWindow):
             choice[key] = b
             box.append(b)
         box.append(Gtk.Separator(margin_top=4))
-        log = Gtk.CheckButton(label=_("Log"), active=app.log or self.debug, sensitive=not self.debug)
-        debug = Gtk.CheckButton(label=_("Debug (next start only)"), active=self.debug)
+        debug = Gtk.CheckButton(label=_("Debug"), active=app.debug)
         hint = label(_("Debug runs a little slower."), "dim-label", "caption", wrap=True, max_width_chars=40,
-                     visible=self.debug, margin_start=26)
-
-        def log_toggled(b: Gtk.CheckButton, pkg=r.package) -> None:
-            if not self.debug and b.get_active() != load_settings(self.paths.settings()).app(pkg).log:
-                self.save_app_setting(pkg, log=b.get_active())
-            self.gear_dot.set_visible(b.get_active() or self.debug)
+                     visible=app.debug, margin_start=26)
 
         def debug_toggled(b: Gtk.CheckButton, pkg=r.package) -> None:
-            """Debug includes the log: ticks and locks «Log» while it is ticked."""
-            self.debug = b.get_active()
-            hint.set_visible(self.debug)
-            log.set_sensitive(not self.debug)
-            log.set_active(self.debug or load_settings(self.paths.settings()).app(pkg).log)
-            self.gear_dot.set_visible(log.get_active())
-        log.connect("toggled", log_toggled)
+            """Remembered per app, for every start (also from its menu entry) until it is unticked."""
+            if b.get_active() != load_settings(self.paths.settings()).app(pkg).debug:
+                self.save_app_setting(pkg, debug=b.get_active())
+            hint.set_visible(b.get_active())
+            self.gear_dot.set_visible(b.get_active())
         debug.connect("toggled", debug_toggled)
-        self.debug_check, self.log_check, self.titlebar_choice = debug, log, choice
-        for w in (log, debug, hint):
+        self.debug_check, self.titlebar_choice = debug, choice
+        for w in (debug, hint):
             box.append(w)
 
         recs = diag.recordings(self.paths, r.package)
-        self.recordings_shown = len(recs[:RECORDINGS_SHOWN])
+        debugs = [rec for rec in recs if rec.kind == "debug"]       # the plain logs are in the folder only
+        self.recordings_shown = len(debugs[:RECORDINGS_SHOWN])
         if recs:
             box.append(Gtk.Separator(margin_top=4))
-            box.append(label(_("Recordings"), "section-title"))
-            kinds = {"log": _("Log"), "debug": _("Debug")}
-            for rec in recs[:RECORDINGS_SHOWN]:
-                box.append(label(f"{rec.started:%Y-%m-%d %H:%M} · {kinds[rec.kind]}"))
+            if debugs:
+                box.append(label(_("Recordings"), "section-title"))
+            for rec in debugs[:RECORDINGS_SHOWN]:
+                box.append(label(f"{rec.started:%Y-%m-%d %H:%M} · {_('Debug')}"))
             box.append(Gtk.Button(label=_("Open log folder"), action_name="win.open-logs",
                                   action_target=GLib.Variant("s", r.package), halign=Gtk.Align.START))
         return Gtk.Popover(child=box)
 
     # -- actions -------------------------------------------------------------------------------------------
     def start(self, pkg: str, level: str | None) -> None:
-        """level None: as from the menu entry (with a log if «Log» is ticked for the app), or "debug"."""
+        """level None: as from the menu entry (Debug if it is ticked for the app), or "debug"."""
         label_ = self.rows[pkg].label if pkg in self.rows else pkg
+        before = {rec.path for rec in diag.recordings(self.paths, pkg)}
         try:
             proc = Gio.Subprocess.new(start_argv(self.launcher, pkg, level), Gio.SubprocessFlags.NONE)
         except GLib.Error as e:
             self.alert(_("Cannot start {app}").format(app=label_), e.message)
             return
-        before = {rec.path for rec in diag.recordings(self.paths, pkg)}
 
         def ended(p: Gio.Subprocess, res) -> None:
             p.wait_finish(res)
@@ -584,39 +585,36 @@ class Window(Gtk.ApplicationWindow):
             meaning = crash_meaning(exited, p.get_exit_status() if exited else p.get_term_sig())
             if meaning is not None:
                 new = [rec for rec in diag.recordings(self.paths, pkg) if rec.path not in before]
-                self.crashed(label_, meaning, bool(new))
+                self.crashed(label_, meaning, new[0].path if new else None)
             if pkg in self.rows:
                 self.refresh()                      # «last started», recordings
         proc.wait_async(None, ended)
-        if level == "debug" and self.debug:
-            self.debug = False                      # never remembered: off after the start
-            if self.selected == pkg and getattr(self, "debug_check", None) is not None:
-                self.debug_check.set_active(False)
 
-    def crashed(self, label_: str, meaning: str, recorded: bool) -> None:
-        """A real crash, not a normal end (exit 0, SIGTERM): what it means; atl-doctor reads the recordings."""
-        if not recorded:
-            meaning += "\n" + _("Tick “Log” under ⚙ and start the app again to record the error.")
+    def crashed(self, label_: str, meaning: str, recording: Path | None) -> None:
+        """A real crash, not a normal end (exit 0, SIGTERM): what it means; atl-doctor reads the recordings.
+        «Open log folder» shows the recording of this start."""
         Dialog(self, _("{app} ended unexpectedly.").format(app=label_), "",
                [("close", _("Close")), ("logs", _("Open log folder"))],
-               lambda resp: self.open_logs() if resp == "logs" else None,
+               lambda resp: self.open_logs(recording) if resp == "logs" else None,
                extra=label(meaning, "dim-label", "caption", wrap=True, max_width_chars=56)).present()
 
-    def open_logs(self) -> None:
+    def open_logs(self, select: Path | None = None) -> None:
+        """The log folder; with `select` the file manager shows that recording marked."""
         folder = self.paths.logs_dir()
         try:
             folder.mkdir(parents=True, exist_ok=True)
         except OSError as e:
             self.alert(_("Cannot open the log folder"), describe_error(e))
             return
-        launcher = Gtk.FileLauncher.new(Gio.File.new_for_path(str(folder)))
+        marked = select is not None and select.exists()
+        launcher = Gtk.FileLauncher.new(Gio.File.new_for_path(str(select if marked else folder)))
 
         def opened(lnc: Gtk.FileLauncher, res) -> None:
             try:
-                lnc.launch_finish(res)
+                lnc.open_containing_folder_finish(res) if marked else lnc.launch_finish(res)
             except GLib.Error as e:
                 self.alert(_("Cannot open the log folder"), f"{folder}: {e.message}")
-        launcher.launch(self, None, opened)
+        (launcher.open_containing_folder if marked else launcher.launch)(self, None, opened)
 
     def choose_apk(self) -> None:
         apks = Gtk.FileFilter(name=_("Android apps"))
@@ -681,17 +679,23 @@ class Window(Gtk.ApplicationWindow):
                [("cancel", _("Cancel")), ("ok", _("Set up"))],
                lambda resp: setup() if resp == "ok" else None).present()
 
-    def setup_microg(self) -> None:
-        warnings: list[str] = []
+    def ask_setup_microg(self) -> None:
+        def setup() -> None:
+            warnings: list[str] = []
 
-        def done(info) -> None:
-            self.microg_button.set_visible(False)
-            self.microg_welcome.set_visible(False)
-            self.selected = info.package
-            self.alert(_("microG is set up"), "\n".join(warnings + [microg_hint()]))
-        self.progress(_("Setting up microG…"))
-        self.background(lambda: setup_microg(self.paths, self.lang, self.env, self.progress, warnings.append),
-                        done, _("Cannot set up microG"))
+            def done(info) -> None:
+                self.selected = info.package
+                self.search.set_text("")
+                self.alert(_("microG is set up"), "\n".join(warnings + [microg_hint()]))
+            self.progress(_("Downloading microG from the microG repository…"))
+            self.background(lambda: setup_microg(self.paths, self.lang, self.env, self.progress, warnings.append),
+                            done, _("Cannot set up microG"))
+        Dialog(self, _("Set up microG?"),
+               _("microG gives apps the Google services they ask for (registration, push messages, sign-in) without "
+                 "Google's own software. APK Starter downloads microG from the official microG repository and "
+                 "checks its signature and checksum; it then appears here as «microG settings»."),
+               [("cancel", _("Cancel")), ("ok", _("Set up"))],
+               lambda resp: setup() if resp == "ok" else None).present()
 
     def _confirm(self, heading: str, body: str, verb: str, then: Callable[[], None],
                  extra: Gtk.Widget | None = None) -> None:

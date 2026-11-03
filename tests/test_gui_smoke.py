@@ -96,22 +96,25 @@ def test_search_sort_keys_narrow_layout_and_remembered_state(tmp_path):
     (d / "window.json").write_text(json.dumps({"width": 900, "height": 600, "selected": "org.b.bravo"}))
     (d / "logs").mkdir()
     (d / "logs/org.b.bravo-20261101-100000.log").write_text("# apk-starter: exit=0\n")
+    (d / "logs/org.b.bravo-20261101-090000").mkdir()
+    (d / "logs/org.b.bravo-20261101-090000/manifest.json").write_text("{}")      # a Debug recording
     with broadway() as env:
         out = subprocess.run([sys.executable, str(HERE / "gui_layout_probe.py"), str(d), str(tmp_path / "started")],
                              env=env, capture_output=True, text=True, timeout=60)
     report = json.loads(out.stdout.strip().splitlines()[-1])
     assert report == {
         "restored": ["org.b.bravo", "Bravo", ["Alpha", "Bravo", "Charlie"]], "opened_focus_on_start": True,
-        "bravo_menu": [1, False], "charlie_menu": [0, False], "dot_with_log": True,
+        "empty_page": ["empty", True, True, "Add an app with + or drop an APK here."], "list_page": "list",
+        "add_menu": 3, "add_menu_aurora_installed": 2,
+        "bravo_menu": [1, False], "charlie_menu": [0, False], "dot_with_debug": True,
         "crash_dialog": ["Charlie ended unexpectedly.",
-                         "Exit code 10: crash\nTick “Log” under ⚙ and start the app again to record the error."],
+                         "Exit code 10: crash"],
         "search": [["Charlie"], "org.c.charlie"], "kept_after_search": "org.c.charlie",
         "by_size": ["Bravo", "Alpha", "Charlie"], "by_started": ["Bravo", "Charlie", "Alpha"],
         "ctrl_f_in_search": True, "enter_to_list": True, "delete_key": "Uninstall Charlie?",
         "started": ["org.c.charlie"], "focus_on_start": False,
-        "settings": {"apps": {"org.c.charlie": {"titlebar": "system-navigation", "log": True}}},
-        "debug_locks_log": [True, False], "debug_started": ["--debug", "--", "org.c.charlie"],
-        "debug_off_after_start": [False, False, True, True],
+        "settings": {"apps": {"org.c.charlie": {"titlebar": "system-navigation", "debug": True}}},
+        "debug_started": ["org.c.charlie"], "debug_stays_on": [True, True],
         "saved": {"width": 500, "height": 600, "sort": "started", "selected": "org.c.charlie"},
         "narrow_list": [True, False], "narrow_details": [False, True, True, "Bravo"],
         "narrow_back": [True, False]}, out.stderr

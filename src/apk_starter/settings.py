@@ -1,5 +1,5 @@
 """Settings of the starter that apply to every start of an app, also from the menu (settings.json): per app, the
-title bar of its window and whether every start writes a log (Spec 14)."""
+title bar of its window and whether it always starts with Debug (Spec 14). An old «log» value is ignored."""
 import json
 import os
 from dataclasses import dataclass, field, replace
@@ -12,7 +12,7 @@ TITLEBARS = ("atl", "system", "system-navigation")
 @dataclass(frozen=True)
 class AppSettings:
     titlebar: str = "atl"
-    log: bool = False                   # «Log» ticked: every start of the app writes a log
+    debug: bool = False                 # «Debug» ticked: every start of the app is recorded
 
 
 @dataclass(frozen=True)
@@ -31,7 +31,7 @@ def _app(d: object, default_titlebar: str) -> AppSettings:
     if not isinstance(d, dict):
         return AppSettings(titlebar=default_titlebar)
     titlebar = d.get("titlebar") if d.get("titlebar") in TITLEBARS else default_titlebar
-    return AppSettings(titlebar=titlebar, log=d.get("log") is True)
+    return AppSettings(titlebar=titlebar, debug=d.get("debug") is True)
 
 
 def load_settings(path: Path) -> Settings:
@@ -49,7 +49,7 @@ def load_settings(path: Path) -> Settings:
 
 def save_settings(path: Path, settings: Settings) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    d = {"apps": {k: {"titlebar": v.titlebar, "log": v.log} for k, v in settings.apps.items()}}
+    d = {"apps": {k: {"titlebar": v.titlebar, "debug": v.debug} for k, v in settings.apps.items()}}
     if settings.default_titlebar == "system":
         d["system_titlebar"] = True
     tmp = path.with_name(f"{path.name}.{os.getpid()}.tmp")

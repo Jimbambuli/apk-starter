@@ -37,8 +37,8 @@ DISPLAY_VARS = ("WAYLAND_DISPLAY", "DISPLAY")
 
 
 def _scan(argv: list[str]) -> tuple[list[str], str | None, Path | None, int]:
-    """Options before the first positional (or `--`): returns (kept options, diagnose level "log"/"debug" or None,
-    its file or folder, index of the tail)."""
+    """Options before the first positional (or `--`): returns (kept options, diagnose level "debug" or None,
+    its folder, index of the tail)."""
     kept: list[str] = []
     level: str | None = None
     target: Path | None = None
@@ -48,11 +48,9 @@ def _scan(argv: list[str]) -> tuple[list[str], str | None, Path | None, int]:
         if tok == "--" or not tok.startswith("-"):
             break
         name, eq, value = tok[2:].partition("=")
-        if name in ("log", "debug") and tok.startswith("--"):
-            if level is not None and level != name:
-                raise UsageError(_("--log and --debug exclude each other"))
+        if name == "debug" and tok.startswith("--"):
             if eq and not value:
-                raise UsageError(_("--log= needs a file name") if name == "log" else _("--debug= needs a folder name"))
+                raise UsageError(_("--debug= needs a folder name"))
             level, target = name, Path(value) if value else None
         elif tok in VALUE_OPTIONS:
             kept += argv[i:i + 2]
@@ -245,12 +243,9 @@ def microg_hint() -> str:
 
 def setup_microg(paths: Paths, lang: str | None, env: Mapping[str, str] | None = None,
                  report: Callable[[str], None] = _stderr, warn: Callable[[str], None] = _stderr) -> ApkInfo:
-    """Install the shipped GmsCore as «microG settings» (app list and menu entry)."""
+    """Download microG from its official repository, check it and install it («microG settings» in the list)."""
     from . import microg
-    apk = microg.bundle_dir(paths) / f"{microg.GMS}.apk"
-    if not apk.is_file():
-        raise UsageError(_("this build has no microG"))
-    return install_apk(paths, apk, lang, env, report, warn, label=_("microG settings"))
+    return microg.setup(paths, os.environ if env is None else env, lang, report, warn)
 
 
 def list_installed(paths: Paths) -> list[dict]:
@@ -336,13 +331,11 @@ def lang_from_env(env: Mapping[str, str]) -> str | None:
 def _parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="apk-starter", allow_abbrev=False,
-        usage="%(prog)s [--log[=FILE] | --debug[=DIR]] [--sdk N] [--size WxH] [--] [APK|PACKAGE] [ATL-ARGS...]\n"
+        usage="%(prog)s [--debug[=DIR]] [--sdk N] [--size WxH] [--] [APK|PACKAGE] [ATL-ARGS...]\n"
               "       %(prog)s --install APK | --list | --remove PACKAGE [--purge] | --remove-all [--purge]\n"
               "       %(prog)s --version\n"
               "       %(prog)s            " + _("(no arguments: open the management window)"),
         description=_("Start Android apps (APK) with Android Translation Layer."))
-    p.add_argument("--log", nargs="?", const=True, metavar="FILE",
-                   help=_("write a log for atl-doctor (default: logs/<package>-<time>.log); use --log=FILE"))
     p.add_argument("--debug", nargs="?", const=True, metavar="DIR",
                    help=_("record the app for atl-doctor: exceptions, ATL stub calls, time line, view trees, verbose "
                           "log; a little slower (default: logs/<package>-<time>/); use --debug=DIR"))
@@ -360,7 +353,7 @@ def _parser() -> argparse.ArgumentParser:
     g.add_argument("--remove-all", action="store_true",
                    help=_("remove all installed apps and their menu entries (before uninstalling the Flatpak)"))
     g.add_argument("--version", action="store_true", help=_("show the version and exit"))
-    g.add_argument("--setup-microg", action="store_true", help=_("add «microG settings» (Google services for the apps)"))
+    g.add_argument("--setup-microg", action="store_true", help=_("download microG from its repository, check it and install it (Google services for the apps)"))
     return p
 
 
@@ -454,15 +447,18 @@ def _start(paths: Paths, args, level: str | None, into: Path | None, tail: list[
     else:
         size = remembered_size(paths, info.package) or DEFAULT_SIZE
     started = datetime.now().astimezone()
-    if level is None and load_settings(paths.settings()).app(info.package).log:
-        level = "log"                               # «Log» ticked for this app in the window: every start
-    log_path = debug_dir = agent_out = None
-    if level == "log":
-        log_path = into or default_log_path(paths, info.package, started)
-        agent_out = Path(os.path.abspath(f"{log_path}.agent"))
-        atl_args = diag.agent_args(paths, agent_out) + atl_args
-    elif level == "debug":
+    if level is None and load_settings(paths.settings()).app(info.package).debug:
+        level = "debug"                             # «Debug» ticked for this app in the window: every start
+    log_path = debug_dir = None
+    if level == "debug":
         debug_dir = into or diag.default_debug_dir(paths, info.package, started)
+    else:
+        log_path = default_log_path(paths, info.package, started)     # always: ATL's output, the last 3 are kept
+        try:
+            log_path.parent.mkdir(parents=True, exist_ok=True)
+        except OSError as e:                        # no log is no reason not to start the app
+            _stderr(_("no log: cannot write {file}: {reason}").format(file=log_path.parent, reason=e.strerror))
+            log_path = None
     apk_path = prepare_apk(paths, info)
     parts = paths.installed_splits(info.package) if apk_path == paths.apk(info.package) else []
     cmd = build_command(paths, apk_path, size=size, sdk=sdk_for(info, args.sdk), atl_args=atl_args,
@@ -483,8 +479,7 @@ def _start(paths: Paths, args, level: str | None, into: Path | None, tail: list[
             return diag.record_restarting(paths, cmd, child_env, debug_dir, info.package)
         return run_atl(cmd, child_env, log_path, header)
     finally:
-        if agent_out is not None and log_path.exists():
-            diag.append_agent_output(log_path, agent_out)
+        diag.prune(paths, info.package)
         background.join()       # the Flatpak instance (and every process in it) ends with this one
 
 

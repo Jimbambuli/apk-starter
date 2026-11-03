@@ -1,11 +1,10 @@
-"""Diagnose levels (Spec 12).
-
-Log: the log of run.py plus atl-doctor's JVMTI agent (exceptions with stack, lifecycle), its output appended to the
-log so that `atl-doctor report --log` reads both. Debug: atl-doctor's light recorder (agent attached when the runtime
-runs, stub calls counted by ATL, time line from ART's sampling profiler, view trees, verbose Android log) writes a
-recording folder; the app keeps nearly its normal speed (no full method trace). The starter only records: reports
-come from atl-doctor itself (`atl-doctor report`)."""
+"""Recordings (Spec 12). Every start writes a plain log (ATL's text output, run.py), the last KEEP_LOGS per app are
+kept. Debug: atl-doctor's light recorder (agent attached when the runtime runs, stub calls counted by ATL, time line
+from ART's sampling profiler, view trees, verbose Android log) writes a recording folder; the app keeps nearly its
+normal speed (no full method trace). The starter only records: reports come from atl-doctor itself
+(`atl-doctor report`)."""
 import re
+import shutil
 import time
 from collections.abc import Mapping
 from dataclasses import dataclass
@@ -17,35 +16,11 @@ from .errors import StarterError
 from .i18n import _
 from .paths import Paths
 
-AGENT_PREFIX = "# atl-doctor-agent: "   # atl-doctor's log mode reads agent lines after this prefix
-AGENT_PATH_MAX = 480                    # the agent keeps paths in 512-byte buffers
 # liblog: every Android log level for every tag, but the bionic linker only from info on: its verbose/debug lines
 # (one per symbol it binds, ~550 000 for JW Library) made the start several times slower
 VERBOSE_LOG = {"ANDROID_LOG_TAGS": "*:v [bionic_linker]:i"}
 TREE_AFTER_S = 10.0                     # Debug: one phase mark "running" then (view tree, memory) if the app still runs
 _NAME = re.compile(r"(?P<pkg>.+)-(?P<time>\d{8}-\d{6})(?P<log>\.log)?")
-
-
-def agent_args(paths: Paths, out: Path) -> list[str]:
-    """ATL arguments for the Log level: the agent records exceptions and lifecycle callbacks into `out`; ART's
-    JVMTI plugin is loaded 3 s after the start (the runtime stays fast). Empty if something is missing."""
-    agent, plugin = paths.agent(), paths.jvmti_plugin()
-    if not (agent.is_file() and plugin.is_file()) or "," in str(out) or len(str(out)) > AGENT_PATH_MAX:
-        return []
-    return ["-X", f"-agentpath:{agent}={out},late={plugin},latesec=3"]
-
-
-def append_agent_output(log: Path, out: Path) -> None:
-    """Complete agent lines go to the end of the log, each after AGENT_PREFIX; the agent's file is removed."""
-    try:
-        data = out.read_bytes()
-    except FileNotFoundError:
-        return
-    lines = data.decode("utf-8", "replace").split("\n")
-    lines.pop()                             # "" or a line the agent did not finish
-    with open(log, "a", encoding="utf-8") as f:
-        f.writelines(f"{AGENT_PREFIX}{line}\n" for line in lines)
-    out.unlink(missing_ok=True)
 
 
 def default_debug_dir(paths: Paths, pkg: str, now: datetime) -> Path:
@@ -148,3 +123,34 @@ def recordings(paths: Paths, pkg: str | None = None) -> list[Recording]:
             continue
         out.append(Recording(p, m["pkg"], started, kind))
     return sorted(out, key=lambda r: (r.started, r.path.name), reverse=True)
+
+
+KEEP_LOGS = 3                           # plain logs per app
+KEEP_DEBUG = 5                          # Debug recordings per app ...
+DEBUG_MAX_BYTES = 200 << 20             # ... and at most this much for all of them (the newest always stays)
+
+
+def _size(p: Path) -> int:
+    if p.is_file():
+        return p.stat().st_size
+    return sum(f.stat().st_size for f in p.rglob("*") if f.is_file())
+
+
+def _remove(p: Path) -> None:
+    if p.is_dir():
+        shutil.rmtree(p, ignore_errors=True)
+    else:
+        p.unlink(missing_ok=True)
+
+
+def prune(paths: Paths, pkg: str) -> None:
+    """Old recordings of `pkg` go, the older first: plain logs beyond the last KEEP_LOGS, Debug recordings beyond
+    the last KEEP_DEBUG or beyond DEBUG_MAX_BYTES together."""
+    recs = recordings(paths, pkg)                   # newest first
+    for rec in [r for r in recs if r.kind == "log"][KEEP_LOGS:]:
+        _remove(rec.path)
+    total = 0
+    for i, rec in enumerate(r for r in recs if r.kind == "debug"):
+        total += _size(rec.path)
+        if i >= KEEP_DEBUG or (i > 0 and total > DEBUG_MAX_BYTES):
+            _remove(rec.path)
