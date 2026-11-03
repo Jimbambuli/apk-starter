@@ -95,7 +95,7 @@ def setup(paths: Paths, env: Mapping[str, str], lang: str | None, report: Callab
     info = None
     with parts_dir(paths) as tmp:
         if not paths.meta(GMS).is_file():
-            report(_("Downloading microG from the microG repository…"))
+            report(_("Downloading microG…"))
             apk = Path(tmp) / f"{GMS}.apk"
             download(GMS, apk, fetch)
             info = install_files(paths, [apk], lang, env, report, warn, label=_("microG settings"))

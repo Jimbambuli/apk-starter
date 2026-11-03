@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-03 11:23+0000\n"
+"POT-Creation-Date: 2026-11-03 11:33+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -525,8 +525,8 @@ msgid "Debug"
 msgstr "デバッグ"
 
 #: src/apk_starter/gui.py:544
-msgid "Debug runs a little slower."
-msgstr "デバッグは少し遅くなります。"
+msgid "Slower"
+msgstr "低速"
 
 #: src/apk_starter/gui.py:564
 msgid "Recordings"
@@ -583,64 +583,48 @@ msgstr "Aurora Store をセットアップしますか?"
 
 #: src/apk_starter/gui.py:675
 msgid ""
-"Aurora Store installs free apps from Google Play; the apps it installs "
-"appear here. APK Starter downloads the official Aurora Store from F-Droid "
-"and checks its signature.\n"
+"Free apps from Google Play. Downloaded from F-Droid and checked.\n"
 "\n"
-"Sign in anonymously in Aurora Store. Signing in with your own Google account "
-"may break Google's terms of service, and Google can block the account."
-msgstr ""
-"Aurora Store は Google Play から無料アプリをインストールします。インストール"
-"したアプリはここに表示されます。APK Starter は公式の Aurora Store を F-Droid "
-"からダウンロードし、署名を確認します。\n"
-"\n"
-"Aurora Store では匿名でログインしてください。自分の Google アカウントでログイ"
-"ンすると Google の利用規約に違反するおそれがあり、Google がアカウントをブロッ"
-"クすることがあります。"
+"Sign in anonymously: Google can block your own account."
+msgstr "Google Play の無料アプリ。F-Droid からダウンロードして検証済み。\n\n匿名でサインインしてください: Google は自分のアカウントをブロックすることがあります。"
 
-#: src/apk_starter/gui.py:679 src/apk_starter/gui.py:697
-#: src/apk_starter/gui.py:702 src/apk_starter/install_request.py:44
+#: src/apk_starter/gui.py:677 src/apk_starter/gui.py:694
+#: src/apk_starter/gui.py:699 src/apk_starter/install_request.py:44
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: src/apk_starter/gui.py:679 src/apk_starter/gui.py:697
+#: src/apk_starter/gui.py:677 src/apk_starter/gui.py:694
 msgid "Set up"
 msgstr "セットアップ"
 
-#: src/apk_starter/gui.py:689
+#: src/apk_starter/gui.py:687
 msgid "microG is set up"
 msgstr "microG のセットアップが完了しました"
 
-#: src/apk_starter/gui.py:690 src/apk_starter/microg.py:98
-msgid "Downloading microG from the microG repository…"
-msgstr "microG リポジトリから microG をダウンロードしています…"
+#: src/apk_starter/gui.py:688 src/apk_starter/microg.py:98
+msgid "Downloading microG…"
+msgstr "microG をダウンロード中…"
 
-#: src/apk_starter/gui.py:692
+#: src/apk_starter/gui.py:690
 msgid "Cannot set up microG"
 msgstr "microG をセットアップできません"
 
-#: src/apk_starter/gui.py:693
+#: src/apk_starter/gui.py:691
 msgid "Set up microG?"
 msgstr "microG をセットアップしますか？"
 
-#: src/apk_starter/gui.py:694
+#: src/apk_starter/gui.py:692
 msgid ""
-"microG gives apps the Google services they ask for (registration, push "
-"messages, sign-in) without Google's own software. APK Starter downloads "
-"microG from the official microG repository and checks its signature and "
-"checksum; it then appears here as «microG settings»."
-msgstr ""
-"microG は、Google 独自のソフトウェアなしで、アプリが求める Google サービス"
-"（登録、プッシュ通知、ログイン）を提供します。APK Starter は公式の microG リ"
-"ポジトリから microG をダウンロードし、署名とチェックサムを確認します。その"
-"後、ここに「microG 設定」として表示されます。"
+"Google services for apps (push messages, sign-in). Downloaded from the "
+"official microG repository and checked."
+msgstr "アプリ向けの Google サービス(プッシュ通知、サインイン)。microG 公式リポジトリからダウンロードして検証済み。"
 
-#: src/apk_starter/gui.py:707
+#: src/apk_starter/gui.py:704
 #, python-brace-format
 msgid "Delete the data of {app}?"
 msgstr "{app} のデータを削除しますか？"
 
-#: src/apk_starter/gui.py:708
+#: src/apk_starter/gui.py:705
 msgid ""
 "The app stays installed. Its settings, accounts and files are deleted. Close "
 "the app first."
@@ -648,38 +632,38 @@ msgstr ""
 "アプリはインストールされたままです。設定、アカウント、ファイルは削除されま"
 "す。先にアプリを閉じてください。"
 
-#: src/apk_starter/gui.py:709
+#: src/apk_starter/gui.py:706
 msgid "Delete Data"
 msgstr "データを削除"
 
-#: src/apk_starter/gui.py:711
+#: src/apk_starter/gui.py:708
 #, python-brace-format
 msgid "Cannot delete the data of {app}"
 msgstr "{app} のデータを削除できません"
 
-#: src/apk_starter/gui.py:715
+#: src/apk_starter/gui.py:712
 msgid "Also delete app data"
 msgstr "アプリのデータも削除する"
 
-#: src/apk_starter/gui.py:722
+#: src/apk_starter/gui.py:719
 #, python-brace-format
 msgid "{app} uninstalled"
 msgstr "{app} をアンインストールしました"
 
-#: src/apk_starter/gui.py:723
+#: src/apk_starter/gui.py:720
 #, python-brace-format
 msgid "Uninstall {app}?"
 msgstr "{app} をアンインストールしますか？"
 
-#: src/apk_starter/gui.py:724
+#: src/apk_starter/gui.py:721
 msgid "The app and its menu entry are removed. Close the app first."
 msgstr "アプリとそのメニュー項目が削除されます。先にアプリを閉じてください。"
 
-#: src/apk_starter/gui.py:724
+#: src/apk_starter/gui.py:721
 msgid "Uninstall"
 msgstr "アンインストール"
 
-#: src/apk_starter/gui.py:726
+#: src/apk_starter/gui.py:723
 #, python-brace-format
 msgid "Cannot uninstall {app}"
 msgstr "{app} をアンインストールできません"
@@ -931,38 +915,3 @@ msgid ""
 msgstr ""
 "{app} は ARM デバイス専用です: このコンピューター用のコードがありません "
 "({abis})。"
-
-#~ msgid "Drag an APK here or choose one."
-#~ msgstr "APK をここにドラッグするか選択してください。"
-
-#~ msgid "Choose APK…"
-#~ msgstr "APK を選択…"
-
-#~ msgid "--log and --debug exclude each other"
-#~ msgstr "--log と --debug は同時に指定できません"
-
-#~ msgid "--log= needs a file name"
-#~ msgstr "--log= にはファイル名が必要です"
-
-#~ msgid "this build has no microG"
-#~ msgstr "このビルドには microG がありません"
-
-#~ msgid ""
-#~ "write a log for atl-doctor (default: logs/<package>-<time>.log); use --"
-#~ "log=FILE"
-#~ msgstr ""
-#~ "atl-doctor 用のログを書き出す (既定: logs/<パッケージ>-<時刻>.log)。別の"
-#~ "ファイルは --log=FILE で指定"
-
-#~ msgid "Log"
-#~ msgstr "ログ"
-
-#~ msgid "Debug (next start only)"
-#~ msgstr "デバッグ (次回の起動のみ)"
-
-#~ msgid "Tick “Log” under ⚙ and start the app again to record the error."
-#~ msgstr ""
-#~ "⚙ で「ログ」にチェックを入れてアプリを再起動すると、エラーが記録されます。"
-
-#~ msgid "Setting up microG…"
-#~ msgstr "microG をセットアップしています…"

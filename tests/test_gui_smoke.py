@@ -107,6 +107,8 @@ def test_search_sort_keys_narrow_layout_and_remembered_state(tmp_path):
         "empty_page": ["empty", True, True, "Add an app with + or drop an APK here."], "list_page": "list",
         "add_menu": 3, "add_menu_aurora_installed": 2,
         "bravo_menu": [1, False], "charlie_menu": [0, False], "dot_with_debug": True,
+        "debug_hint": [False, True, "Slower", True],
+        "debug_hint_unticked": False,
         "crash_dialog": ["Charlie ended unexpectedly.",
                          "Exit code 10: crash"],
         "search": [["Charlie"], "org.c.charlie"], "kept_after_search": "org.c.charlie",

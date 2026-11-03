@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-03 11:23+0000\n"
+"POT-Creation-Date: 2026-11-03 11:33+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -529,8 +529,8 @@ msgid "Debug"
 msgstr "Debug"
 
 #: src/apk_starter/gui.py:544
-msgid "Debug runs a little slower."
-msgstr "Debug is iets trager."
+msgid "Slower"
+msgstr "Trager"
 
 #: src/apk_starter/gui.py:564
 msgid "Recordings"
@@ -587,65 +587,48 @@ msgstr "Aurora Store instellen?"
 
 #: src/apk_starter/gui.py:675
 msgid ""
-"Aurora Store installs free apps from Google Play; the apps it installs "
-"appear here. APK Starter downloads the official Aurora Store from F-Droid "
-"and checks its signature.\n"
+"Free apps from Google Play. Downloaded from F-Droid and checked.\n"
 "\n"
-"Sign in anonymously in Aurora Store. Signing in with your own Google account "
-"may break Google's terms of service, and Google can block the account."
-msgstr ""
-"Aurora Store installeert gratis apps uit Google Play; de geïnstalleerde apps "
-"verschijnen hier. APK Starter downloadt de officiële Aurora Store van F-"
-"Droid en controleert de handtekening.\n"
-"\n"
-"Meld je anoniem aan in Aurora Store. Aanmelden met je eigen Google-account "
-"kan in strijd zijn met de servicevoorwaarden van Google, en Google kan het "
-"account blokkeren."
+"Sign in anonymously: Google can block your own account."
+msgstr "Gratis apps uit Google Play. Gedownload van F-Droid en gecontroleerd.\n\nMeld je anoniem aan: Google kan je eigen account blokkeren."
 
-#: src/apk_starter/gui.py:679 src/apk_starter/gui.py:697
-#: src/apk_starter/gui.py:702 src/apk_starter/install_request.py:44
+#: src/apk_starter/gui.py:677 src/apk_starter/gui.py:694
+#: src/apk_starter/gui.py:699 src/apk_starter/install_request.py:44
 msgid "Cancel"
 msgstr "Annuleren"
 
-#: src/apk_starter/gui.py:679 src/apk_starter/gui.py:697
+#: src/apk_starter/gui.py:677 src/apk_starter/gui.py:694
 msgid "Set up"
 msgstr "Instellen"
 
-#: src/apk_starter/gui.py:689
+#: src/apk_starter/gui.py:687
 msgid "microG is set up"
 msgstr "microG is ingesteld"
 
-#: src/apk_starter/gui.py:690 src/apk_starter/microg.py:98
-msgid "Downloading microG from the microG repository…"
-msgstr "microG wordt gedownload uit de microG-repository…"
+#: src/apk_starter/gui.py:688 src/apk_starter/microg.py:98
+msgid "Downloading microG…"
+msgstr "microG downloaden…"
 
-#: src/apk_starter/gui.py:692
+#: src/apk_starter/gui.py:690
 msgid "Cannot set up microG"
 msgstr "Kan microG niet instellen"
 
-#: src/apk_starter/gui.py:693
+#: src/apk_starter/gui.py:691
 msgid "Set up microG?"
 msgstr "microG instellen?"
 
-#: src/apk_starter/gui.py:694
+#: src/apk_starter/gui.py:692
 msgid ""
-"microG gives apps the Google services they ask for (registration, push "
-"messages, sign-in) without Google's own software. APK Starter downloads "
-"microG from the official microG repository and checks its signature and "
-"checksum; it then appears here as «microG settings»."
-msgstr ""
-"microG geeft apps de Google-diensten waar ze om vragen (registratie, "
-"pushberichten, aanmelden) zonder de software van Google zelf. APK Starter "
-"downloadt microG uit de officiële microG-repository en controleert "
-"handtekening en controlesom; daarna verschijnt het hier als «microG-"
-"instellingen»."
+"Google services for apps (push messages, sign-in). Downloaded from the "
+"official microG repository and checked."
+msgstr "Google-diensten voor apps (pushberichten, aanmelden). Gedownload uit de officiële microG-repository en gecontroleerd."
 
-#: src/apk_starter/gui.py:707
+#: src/apk_starter/gui.py:704
 #, python-brace-format
 msgid "Delete the data of {app}?"
 msgstr "Gegevens van {app} wissen?"
 
-#: src/apk_starter/gui.py:708
+#: src/apk_starter/gui.py:705
 msgid ""
 "The app stays installed. Its settings, accounts and files are deleted. Close "
 "the app first."
@@ -653,38 +636,38 @@ msgstr ""
 "De app blijft geïnstalleerd. De instellingen, accounts en bestanden worden "
 "gewist. Sluit eerst de app."
 
-#: src/apk_starter/gui.py:709
+#: src/apk_starter/gui.py:706
 msgid "Delete Data"
 msgstr "Gegevens wissen"
 
-#: src/apk_starter/gui.py:711
+#: src/apk_starter/gui.py:708
 #, python-brace-format
 msgid "Cannot delete the data of {app}"
 msgstr "Kan de gegevens van {app} niet wissen"
 
-#: src/apk_starter/gui.py:715
+#: src/apk_starter/gui.py:712
 msgid "Also delete app data"
 msgstr "Ook appgegevens wissen"
 
-#: src/apk_starter/gui.py:722
+#: src/apk_starter/gui.py:719
 #, python-brace-format
 msgid "{app} uninstalled"
 msgstr "{app} verwijderd"
 
-#: src/apk_starter/gui.py:723
+#: src/apk_starter/gui.py:720
 #, python-brace-format
 msgid "Uninstall {app}?"
 msgstr "{app} verwijderen?"
 
-#: src/apk_starter/gui.py:724
+#: src/apk_starter/gui.py:721
 msgid "The app and its menu entry are removed. Close the app first."
 msgstr "De app en het menu-item worden verwijderd. Sluit eerst de app."
 
-#: src/apk_starter/gui.py:724
+#: src/apk_starter/gui.py:721
 msgid "Uninstall"
 msgstr "Verwijderen"
 
-#: src/apk_starter/gui.py:726
+#: src/apk_starter/gui.py:723
 #, python-brace-format
 msgid "Cannot uninstall {app}"
 msgstr "Kan {app} niet verwijderen"
@@ -937,39 +920,3 @@ msgid ""
 msgstr ""
 "{app} is alleen beschikbaar voor ARM-apparaten: er is geen code voor deze "
 "computer ({abis})."
-
-#~ msgid "Drag an APK here or choose one."
-#~ msgstr "Sleep een APK hierheen of kies er een."
-
-#~ msgid "Choose APK…"
-#~ msgstr "APK kiezen…"
-
-#~ msgid "--log and --debug exclude each other"
-#~ msgstr "--log en --debug sluiten elkaar uit"
-
-#~ msgid "--log= needs a file name"
-#~ msgstr "--log= heeft een bestandsnaam nodig"
-
-#~ msgid "this build has no microG"
-#~ msgstr "deze build heeft geen microG"
-
-#~ msgid ""
-#~ "write a log for atl-doctor (default: logs/<package>-<time>.log); use --"
-#~ "log=FILE"
-#~ msgstr ""
-#~ "logboek voor atl-doctor schrijven (standaard: logs/<pakket>-<tijd>.log); "
-#~ "ander bestand met --log=FILE"
-
-#~ msgid "Log"
-#~ msgstr "Logboek"
-
-#~ msgid "Debug (next start only)"
-#~ msgstr "Debug (alleen volgende start)"
-
-#~ msgid "Tick “Log” under ⚙ and start the app again to record the error."
-#~ msgstr ""
-#~ "Vink ‘Logboek’ aan onder ⚙ en start de app opnieuw om de fout vast te "
-#~ "leggen."
-
-#~ msgid "Setting up microG…"
-#~ msgstr "microG wordt ingesteld…"

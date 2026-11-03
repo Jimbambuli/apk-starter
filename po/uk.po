@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-03 11:23+0000\n"
+"POT-Creation-Date: 2026-11-03 11:33+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -527,8 +527,8 @@ msgid "Debug"
 msgstr "Налагодження"
 
 #: src/apk_starter/gui.py:544
-msgid "Debug runs a little slower."
-msgstr "Налагодження працює трохи повільніше."
+msgid "Slower"
+msgstr "Повільніше"
 
 #: src/apk_starter/gui.py:564
 msgid "Recordings"
@@ -585,64 +585,48 @@ msgstr "Налаштувати Aurora Store?"
 
 #: src/apk_starter/gui.py:675
 msgid ""
-"Aurora Store installs free apps from Google Play; the apps it installs "
-"appear here. APK Starter downloads the official Aurora Store from F-Droid "
-"and checks its signature.\n"
+"Free apps from Google Play. Downloaded from F-Droid and checked.\n"
 "\n"
-"Sign in anonymously in Aurora Store. Signing in with your own Google account "
-"may break Google's terms of service, and Google can block the account."
-msgstr ""
-"Aurora Store встановлює безкоштовні застосунки з Google Play; встановлені "
-"застосунки з’являються тут. APK Starter завантажує офіційний Aurora Store з "
-"F-Droid і перевіряє його підпис.\n"
-"\n"
-"Увійдіть в Aurora Store анонімно. Вхід із власним обліковим записом Google "
-"може порушувати умови використання Google, і Google може заблокувати "
-"обліковий запис."
+"Sign in anonymously: Google can block your own account."
+msgstr "Безкоштовні застосунки з Google Play. Завантажено з F-Droid і перевірено.\n\nВходьте анонімно: Google може заблокувати ваш власний обліковий запис."
 
-#: src/apk_starter/gui.py:679 src/apk_starter/gui.py:697
-#: src/apk_starter/gui.py:702 src/apk_starter/install_request.py:44
+#: src/apk_starter/gui.py:677 src/apk_starter/gui.py:694
+#: src/apk_starter/gui.py:699 src/apk_starter/install_request.py:44
 msgid "Cancel"
 msgstr "Скасувати"
 
-#: src/apk_starter/gui.py:679 src/apk_starter/gui.py:697
+#: src/apk_starter/gui.py:677 src/apk_starter/gui.py:694
 msgid "Set up"
 msgstr "Налаштувати"
 
-#: src/apk_starter/gui.py:689
+#: src/apk_starter/gui.py:687
 msgid "microG is set up"
 msgstr "microG налаштовано"
 
-#: src/apk_starter/gui.py:690 src/apk_starter/microg.py:98
-msgid "Downloading microG from the microG repository…"
-msgstr "Завантаження microG з репозиторію microG…"
+#: src/apk_starter/gui.py:688 src/apk_starter/microg.py:98
+msgid "Downloading microG…"
+msgstr "Завантаження microG…"
 
-#: src/apk_starter/gui.py:692
+#: src/apk_starter/gui.py:690
 msgid "Cannot set up microG"
 msgstr "Не вдається налаштувати microG"
 
-#: src/apk_starter/gui.py:693
+#: src/apk_starter/gui.py:691
 msgid "Set up microG?"
 msgstr "Налаштувати microG?"
 
-#: src/apk_starter/gui.py:694
+#: src/apk_starter/gui.py:692
 msgid ""
-"microG gives apps the Google services they ask for (registration, push "
-"messages, sign-in) without Google's own software. APK Starter downloads "
-"microG from the official microG repository and checks its signature and "
-"checksum; it then appears here as «microG settings»."
-msgstr ""
-"microG дає застосункам служби Google, яких вони потребують (реєстрація, push-"
-"повідомлення, вхід), без програмного забезпечення Google. APK Starter "
-"завантажує microG з офіційного репозиторію microG і перевіряє підпис та "
-"контрольну суму; потім він з'являється тут як «Налаштування microG»."
+"Google services for apps (push messages, sign-in). Downloaded from the "
+"official microG repository and checked."
+msgstr "Сервіси Google для застосунків (push-сповіщення, вхід). Завантажено з офіційного репозиторію microG і перевірено."
 
-#: src/apk_starter/gui.py:707
+#: src/apk_starter/gui.py:704
 #, python-brace-format
 msgid "Delete the data of {app}?"
 msgstr "Очистити дані {app}?"
 
-#: src/apk_starter/gui.py:708
+#: src/apk_starter/gui.py:705
 msgid ""
 "The app stays installed. Its settings, accounts and files are deleted. Close "
 "the app first."
@@ -650,39 +634,39 @@ msgstr ""
 "Застосунок залишиться встановленим. Його налаштування, облікові записи й "
 "файли буде видалено. Спершу закрийте застосунок."
 
-#: src/apk_starter/gui.py:709
+#: src/apk_starter/gui.py:706
 msgid "Delete Data"
 msgstr "Очистити дані"
 
-#: src/apk_starter/gui.py:711
+#: src/apk_starter/gui.py:708
 #, python-brace-format
 msgid "Cannot delete the data of {app}"
 msgstr "Не вдалося очистити дані {app}"
 
-#: src/apk_starter/gui.py:715
+#: src/apk_starter/gui.py:712
 msgid "Also delete app data"
 msgstr "Також очистити дані застосунку"
 
-#: src/apk_starter/gui.py:722
+#: src/apk_starter/gui.py:719
 #, python-brace-format
 msgid "{app} uninstalled"
 msgstr "Застосунок {app} видалено"
 
-#: src/apk_starter/gui.py:723
+#: src/apk_starter/gui.py:720
 #, python-brace-format
 msgid "Uninstall {app}?"
 msgstr "Видалити {app}?"
 
-#: src/apk_starter/gui.py:724
+#: src/apk_starter/gui.py:721
 msgid "The app and its menu entry are removed. Close the app first."
 msgstr ""
 "Застосунок і його пункт меню буде вилучено. Спершу закрийте застосунок."
 
-#: src/apk_starter/gui.py:724
+#: src/apk_starter/gui.py:721
 msgid "Uninstall"
 msgstr "Видалити"
 
-#: src/apk_starter/gui.py:726
+#: src/apk_starter/gui.py:723
 #, python-brace-format
 msgid "Cannot uninstall {app}"
 msgstr "Не вдалося видалити {app}"
@@ -934,38 +918,3 @@ msgid ""
 msgstr ""
 "{app} доступний лише для пристроїв ARM: немає коду для цього комп’ютера "
 "({abis})."
-
-#~ msgid "Drag an APK here or choose one."
-#~ msgstr "Перетягніть APK сюди або виберіть його."
-
-#~ msgid "Choose APK…"
-#~ msgstr "Вибрати APK…"
-
-#~ msgid "--log and --debug exclude each other"
-#~ msgstr "--log і --debug взаємовиключні"
-
-#~ msgid "--log= needs a file name"
-#~ msgstr "--log= потребує назви файлу"
-
-#~ msgid "this build has no microG"
-#~ msgstr "у цій збірці немає microG"
-
-#~ msgid ""
-#~ "write a log for atl-doctor (default: logs/<package>-<time>.log); use --"
-#~ "log=FILE"
-#~ msgstr ""
-#~ "записати журнал для atl-doctor (типово: logs/<пакунок>-<час>.log); інший "
-#~ "файл через --log=FILE"
-
-#~ msgid "Log"
-#~ msgstr "Журнал"
-
-#~ msgid "Debug (next start only)"
-#~ msgstr "Налагодження (лише наступний запуск)"
-
-#~ msgid "Tick “Log” under ⚙ and start the app again to record the error."
-#~ msgstr ""
-#~ "Позначте «Журнал» у ⚙ і запустіть застосунок знову, щоб записати помилку."
-
-#~ msgid "Setting up microG…"
-#~ msgstr "Налаштування microG…"

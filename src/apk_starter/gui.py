@@ -541,7 +541,7 @@ class Window(Gtk.ApplicationWindow):
             box.append(b)
         box.append(Gtk.Separator(margin_top=4))
         debug = Gtk.CheckButton(label=_("Debug"), active=app.debug)
-        hint = label(_("Debug runs a little slower."), "dim-label", "caption", wrap=True, max_width_chars=40,
+        hint = label(_("Slower"), "dim-label", "caption", wrap=True, max_width_chars=40,
                      visible=app.debug, margin_start=26)
 
         def debug_toggled(b: Gtk.CheckButton, pkg=r.package) -> None:
@@ -551,7 +551,7 @@ class Window(Gtk.ApplicationWindow):
             hint.set_visible(b.get_active())
             self.gear_dot.set_visible(b.get_active())
         debug.connect("toggled", debug_toggled)
-        self.debug_check, self.titlebar_choice = debug, choice
+        self.debug_check, self.debug_hint, self.titlebar_choice = debug, hint, choice
         for w in (debug, hint):
             box.append(w)
 
@@ -672,10 +672,8 @@ class Window(Gtk.ApplicationWindow):
             self.background(lambda: aurora.setup(self.paths, self.env, self.progress, warnings.append), done,
                             _("Cannot set up Aurora Store"))
         Dialog(self, _("Set up Aurora Store?"),
-               _("Aurora Store installs free apps from Google Play; the apps it installs appear here. APK Starter "
-                 "downloads the official Aurora Store from F-Droid and checks its signature.\n\n"
-                 "Sign in anonymously in Aurora Store. Signing in with your own Google account may break Google's "
-                 "terms of service, and Google can block the account."),
+               _("Free apps from Google Play. Downloaded from F-Droid and checked.\n\n"
+                 "Sign in anonymously: Google can block your own account."),
                [("cancel", _("Cancel")), ("ok", _("Set up"))],
                lambda resp: setup() if resp == "ok" else None).present()
 
@@ -687,13 +685,12 @@ class Window(Gtk.ApplicationWindow):
                 self.selected = info.package
                 self.search.set_text("")
                 self.alert(_("microG is set up"), "\n".join(warnings + [microg_hint()]))
-            self.progress(_("Downloading microG from the microG repository…"))
+            self.progress(_("Downloading microG…"))
             self.background(lambda: setup_microg(self.paths, self.lang, self.env, self.progress, warnings.append),
                             done, _("Cannot set up microG"))
         Dialog(self, _("Set up microG?"),
-               _("microG gives apps the Google services they ask for (registration, push messages, sign-in) without "
-                 "Google's own software. APK Starter downloads microG from the official microG repository and "
-                 "checks its signature and checksum; it then appears here as «microG settings»."),
+               _("Google services for apps (push messages, sign-in). Downloaded from the official microG "
+                 "repository and checked."),
                [("cancel", _("Cancel")), ("ok", _("Set up"))],
                lambda resp: setup() if resp == "ok" else None).present()
 
