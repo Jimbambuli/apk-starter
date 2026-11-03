@@ -60,8 +60,8 @@ def test_setup_downloads_checks_and_installs_microg(box, tmp_path, monkeypatch, 
     repo(tmp_path, monkeypatch, served=served)
     assert not microg.installed(Paths.from_env(box.env))
     assert main(["--setup-microg"], env=box.env) == 0
-    assert served == [microg.INDEX, "https://microg.org/fdroid/repo/com.google.android.gms-252432034.apk",
-                      microg.INDEX, "https://microg.org/fdroid/repo/com.google.android.gsf-8.apk"]
+    assert served == [microg.INDEX, "https://microg.org/fdroid/repo/com.google.android.gsf-8.apk",
+                      microg.INDEX, "https://microg.org/fdroid/repo/com.google.android.gms-252432034.apk"]
     assert box.calls == [("install", GMS, "microG settings", b"<svg/>")]      # GsfProxy: no menu entry
     assert (box.data / "apps" / f"{GSF}.apk").is_file() and not (box.data / "apps" / f"{GSF}.json").exists()
     assert microg.installed(Paths.from_env(box.env))
@@ -115,3 +115,15 @@ def test_test_build_makes_no_menu_entries(box, monkeypatch):  # noqa: F811
     assert main(["--install", str(box.apk)], env=box.env) == 0
     assert main(["--remove", PKG], env=box.env) == 0
     assert box.calls == []
+
+
+def test_setup_without_portal_still_installs_both(box, tmp_path, monkeypatch, capsys):  # noqa: F811
+    """No launcher portal (or the entry refused): GmsCore is installed without a menu entry, GsfProxy all the same."""
+    repo(tmp_path, monkeypatch)
+
+    def boom(*a):
+        raise box.fake.PortalUnavailable("x")
+    box.fake.install_launcher = boom
+    assert main(["--setup-microg"], env=box.env) == 1
+    assert microg.installed(Paths.from_env(box.env))
+    assert f"flatpak run io.github.Jimbambuli.ApkStarter {GMS}" in capsys.readouterr().err

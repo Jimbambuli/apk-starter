@@ -94,11 +94,9 @@ def setup(paths: Paths, env: Mapping[str, str], lang: str | None, report: Callab
     from .cli import install_files, parts_dir
     info = None
     with parts_dir(paths) as tmp:
-        if not paths.meta(GMS).is_file():
+        if not paths.meta(GMS).is_file() or not paths.apk(GSF).is_file():
             report(_("Downloading microG…"))
-            apk = Path(tmp) / f"{GMS}.apk"
-            download(GMS, apk, fetch)
-            info = install_files(paths, [apk], lang, env, report, warn, label=_("microG settings"))
+        # GsfProxy first: installing GmsCore fails at its menu entry when the launcher portal is missing or refused
         if not paths.apk(GSF).is_file():
             apk = Path(tmp) / f"{GSF}.apk"
             download(GSF, apk, fetch)
@@ -106,6 +104,10 @@ def setup(paths: Paths, env: Mapping[str, str], lang: str | None, report: Callab
             part = paths.apk(GSF).with_name(f"{GSF}.apk.{os.getpid()}.tmp")
             part.write_bytes(apk.read_bytes())
             os.replace(part, paths.apk(GSF))    # a dangling link from an older build is replaced, not followed
+        if not paths.meta(GMS).is_file():
+            apk = Path(tmp) / f"{GMS}.apk"
+            download(GMS, apk, fetch)
+            info = install_files(paths, [apk], lang, env, report, warn, label=_("microG settings"))
     return info or read_apk_info(paths.apk(GMS), lang)
 
 
