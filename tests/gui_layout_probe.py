@@ -80,8 +80,8 @@ def activate(a) -> None:
         return f is not None and (f is widget or f.is_ancestor(widget))
 
     def empty_checked():
-        report["empty_page"] = [win.stack.get_visible_child_name(), win.welcome_add.has_css_class("suggested-action"),
-                                True, win.welcome_text.get_text()]
+        report["empty_page"] = [win.stack.get_visible_child_name(), win.welcome_add.get_first_child().has_css_class("suggested-action"),
+                                win.get_focus_visible(), win.welcome_text.get_text()]
         win.show_rows(win.saved_rows)
         report["list_page"] = win.stack.get_visible_child_name()
         win.paths.meta("com.aurora.store").unlink()      # back to the first state

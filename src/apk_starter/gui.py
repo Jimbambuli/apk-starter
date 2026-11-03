@@ -238,7 +238,8 @@ class Window(Gtk.ApplicationWindow):
         self.welcome_add = Gtk.MenuButton(menu_model=self.add_menu, icon_name="list-add-symbolic",
                                           tooltip_text=_("Add apps"), halign=Gtk.Align.START, margin_top=10,
                                           margin_start=10)
-        self.welcome_add.add_css_class("suggested-action")
+        # the theme colours the button inside a menu button, not the menu button itself
+        self.welcome_add.get_first_child().add_css_class("suggested-action")
         page = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         page.append(self.welcome_add)
         welcome = self.make_welcome()
@@ -355,8 +356,14 @@ class Window(Gtk.ApplicationWindow):
         self.update_add_menu()
         self.stack.set_visible_child_name("list" if rows else "empty")
         if not rows:
-            GLib.idle_add(self.welcome_add.grab_focus)      # nothing else to do here but add an app
+            GLib.idle_add(self.focus_welcome_add)           # nothing else to do here but add an app
         self.show_list()
+
+    def focus_welcome_add(self) -> bool:
+        """Focused with the focus ring showing (GTK shows it only after a key otherwise): Enter opens the menu."""
+        self.welcome_add.grab_focus()
+        self.set_focus_visible(True)
+        return GLib.SOURCE_REMOVE
 
     def update_add_menu(self) -> None:
         """«Add apps» and the empty page offer a service only while it is not installed."""
