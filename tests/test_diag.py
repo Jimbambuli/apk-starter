@@ -86,3 +86,29 @@ def test_debug_options_for_the_recorder(tmp_path):
 def test_debug_dir_name(tmp_path):
     p = _paths(tmp_path)
     assert diag.default_debug_dir(p, "org.a", datetime(2026, 11, 1, 9, 5, 7)) == p.logs_dir() / "org.a-20261101-090507"
+
+
+def test_debug_restart_records_again(tmp_path):
+    """Exit 75 (the app restarts itself) under Debug: recorded again into a new recording, like run.run_atl."""
+    p = _paths(tmp_path)
+    p.logs_dir().mkdir(parents=True, exist_ok=True)
+    seen = []
+
+    def once(paths, cmd, env, out):
+        out.mkdir()
+        seen.append(out)
+        return 75 if len(seen) == 1 else 3
+    first = diag.default_debug_dir(p, "org.a", datetime(2026, 11, 3, 6, 0, 0))
+    assert diag.record_restarting(p, ["atl"], {}, first, "org.a", record_once=once) == 3
+    assert seen[0] == first and len(seen) == 2 and seen[1] != first
+    assert seen[1].name.startswith("org.a-")
+
+
+def test_debug_restart_is_limited(tmp_path, monkeypatch):
+    p = _paths(tmp_path)
+    calls = []
+    monkeypatch.setattr(diag, "default_debug_dir", lambda paths, pkg, now: tmp_path / f"r{len(calls)}")
+    assert diag.record_restarting(p, ["atl"], {}, tmp_path / "first", "org.a",
+                                  record_once=lambda *a: calls.append(1) or 75) == 75
+    from apk_starter.run import MAX_RESTARTS
+    assert len(calls) == MAX_RESTARTS + 1

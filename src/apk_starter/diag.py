@@ -6,6 +6,7 @@ runs, stub calls counted by ATL, time line from ART's sampling profiler, view tr
 recording folder; the app keeps nearly its normal speed (no full method trace). The starter only records: reports
 come from atl-doctor itself (`atl-doctor report`)."""
 import re
+import time
 from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import datetime
@@ -97,6 +98,23 @@ def record(paths: Paths, cmd: list[str], env: Mapping[str, str], out: Path) -> i
         except KeyError:
             return 128
     return m.exit_status or 0
+
+
+def record_restarting(paths: Paths, cmd: list[str], env: Mapping[str, str], out: Path, pkg: str,
+                      record_once=None) -> int:
+    """record() and, like run.run_atl, again when the app restarts itself (exit 75, at most MAX_RESTARTS
+    times); each run is its own recording, the next one under a new default name (a new second)."""
+    from .run import EXIT_RESTART, MAX_RESTARTS
+    record_once = record_once or record
+    restarts = 0
+    while True:
+        rc = record_once(paths, cmd, env, out)
+        if rc != EXIT_RESTART or restarts == MAX_RESTARTS:
+            return rc
+        restarts += 1
+        while (nxt := default_debug_dir(paths, pkg, datetime.now().astimezone())).exists() or nxt == out:
+            time.sleep(0.2)
+        out = nxt
 
 
 @dataclass(frozen=True)

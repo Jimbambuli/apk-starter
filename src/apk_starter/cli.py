@@ -480,7 +480,7 @@ def _start(paths: Paths, args, level: str | None, into: Path | None, tail: list[
     background.start()
     try:
         if debug_dir is not None:
-            return diag.record(paths, cmd, child_env, debug_dir)
+            return diag.record_restarting(paths, cmd, child_env, debug_dir, info.package)
         return run_atl(cmd, child_env, log_path, header)
     finally:
         if agent_out is not None and log_path.exists():
