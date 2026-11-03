@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-03 11:33+0000\n"
+"POT-Creation-Date: 2026-11-03 18:04+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -99,28 +99,28 @@ msgstr ""
 msgid "The app list with three free apps from F-Droid"
 msgstr "Список застосунків із трьома вільними застосунками з F-Droid"
 
-#: src/apk_starter/apkinfo.py:45 src/apk_starter/splits.py:77
+#: src/apk_starter/apkinfo.py:46 src/apk_starter/splits.py:77
 #, python-brace-format
 msgid "{file} is too large ({size} bytes)"
 msgstr "{file} завеликий ({size} Б)"
 
-#: src/apk_starter/apkinfo.py:88
+#: src/apk_starter/apkinfo.py:89
 #, python-brace-format
 msgid "split APK bundles (.apks/.xapk) are not supported yet: {file}"
 msgstr "розділені пакети APK (.apks/.xapk) поки що не підтримуються: {file}"
 
-#: src/apk_starter/apkinfo.py:94 src/apk_starter/apkinfo.py:115
+#: src/apk_starter/apkinfo.py:95 src/apk_starter/apkinfo.py:117
 #: src/apk_starter/splits.py:75 src/apk_starter/splits.py:82
 #, python-brace-format
 msgid "not an APK (no AndroidManifest.xml): {file}"
 msgstr "це не APK (немає AndroidManifest.xml): {file}"
 
-#: src/apk_starter/apkinfo.py:98 src/apk_starter/splits.py:89
+#: src/apk_starter/apkinfo.py:99 src/apk_starter/splits.py:89
 #, python-brace-format
 msgid "invalid package name in manifest: {package}"
 msgstr "некоректна назва пакунка в маніфесті: {package}"
 
-#: src/apk_starter/apkinfo.py:117 src/apk_starter/apkinfo.py:119
+#: src/apk_starter/apkinfo.py:119 src/apk_starter/apkinfo.py:121
 #: src/apk_starter/splits.py:62 src/apk_starter/splits.py:64
 #: src/apk_starter/splits.py:84 src/apk_starter/splits.py:86
 #, python-brace-format
@@ -171,11 +171,11 @@ msgstr ""
 msgid "the downloaded file is not Aurora Store {code}"
 msgstr "завантажений файл не є Aurora Store {code}"
 
-#: src/apk_starter/aurora.py:75 src/apk_starter/gui.py:671
+#: src/apk_starter/aurora.py:75 src/apk_starter/gui.py:678
 msgid "Downloading Aurora Store from F-Droid…"
 msgstr "Завантаження Aurora Store з F-Droid…"
 
-#: src/apk_starter/axml.py:48 src/apk_starter/axml.py:54
+#: src/apk_starter/axml.py:62 src/apk_starter/axml.py:68
 msgid "corrupt AndroidManifest.xml"
 msgstr "пошкоджений AndroidManifest.xml"
 
@@ -192,7 +192,7 @@ msgstr ""
 "не вдалося прочитати {file}: файлу не існує (у пісочниці Flatpak видно лише "
 "шляхи, передані через --file-forwarding: {command})"
 
-#: src/apk_starter/cli.py:79 src/apk_starter/cli.py:296
+#: src/apk_starter/cli.py:79 src/apk_starter/cli.py:297
 #, python-brace-format
 msgid "not installed: {package}"
 msgstr "не встановлено: {package}"
@@ -207,7 +207,7 @@ msgstr "Підготовка {app} для цього комп’ютера…"
 msgid "{app} could not be prepared in advance: {reason}"
 msgstr "не вдалося заздалегідь підготувати {app}: {reason}"
 
-#: src/apk_starter/cli.py:230
+#: src/apk_starter/cli.py:231
 #, python-brace-format
 msgid ""
 "{app} is installed without a menu entry: the DynamicLauncher portal is not "
@@ -216,12 +216,12 @@ msgstr ""
 "Застосунок {app} встановлено без пункту меню: портал DynamicLauncher "
 "недоступний; запустіть застосунок командою: {command}"
 
-#: src/apk_starter/cli.py:234
+#: src/apk_starter/cli.py:235
 #, python-brace-format
 msgid "{app} is installed without a menu entry: {reason}"
 msgstr "Застосунок {app} встановлено без пункту меню: {reason}"
 
-#: src/apk_starter/cli.py:240
+#: src/apk_starter/cli.py:241
 msgid ""
 "In «microG settings» switch on «Google device registration» and «Cloud "
 "Messaging». To sign in: Accounts → Add Google account."
@@ -229,31 +229,31 @@ msgstr ""
 "У «Налаштуваннях microG» увімкніть «Реєстрація пристрою в Google» і «Хмарні "
 "повідомлення». Вхід: Облікові записи → Додати обліковий запис Google."
 
-#: src/apk_starter/cli.py:280
+#: src/apk_starter/cli.py:281
 #, python-brace-format
 msgid "cannot remove {folder}: {reason}"
 msgstr "не вдалося вилучити {folder}: {reason}"
 
-#: src/apk_starter/cli.py:301
+#: src/apk_starter/cli.py:302
 msgid ""
 "the DynamicLauncher portal is not available; the menu entry was not removed"
 msgstr "портал DynamicLauncher недоступний; пункт меню не вилучено"
 
-#: src/apk_starter/cli.py:303
+#: src/apk_starter/cli.py:304
 #, python-brace-format
 msgid "the menu entry was not removed: {reason}"
 msgstr "пункт меню не вилучено: {reason}"
 
-#: src/apk_starter/cli.py:337
+#: src/apk_starter/cli.py:338
 msgid "(no arguments: open the management window)"
 msgstr "(без аргументів: відкрити вікно керування)"
 
-#: src/apk_starter/cli.py:338
+#: src/apk_starter/cli.py:339
 msgid "Start Android apps (APK) with Android Translation Layer."
 msgstr ""
 "Запуск Android-застосунків (APK) за допомогою Android Translation Layer."
 
-#: src/apk_starter/cli.py:340
+#: src/apk_starter/cli.py:341
 msgid ""
 "record the app for atl-doctor: exceptions, ATL stub calls, time line, view "
 "trees, verbose log; a little slower (default: logs/<package>-<time>/); use --"
@@ -263,19 +263,23 @@ msgstr ""
 "шкала, дерева представлень, докладний журнал; трохи повільніше (типово: logs/"
 "<package>-<time>/); використовуйте --debug=ТЕКА"
 
-#: src/apk_starter/cli.py:342
+#: src/apk_starter/cli.py:343
 msgid "override the SDK level passed to ATL"
 msgstr "перевизначити рівень SDK, що передається ATL"
 
-#: src/apk_starter/cli.py:343
+#: src/apk_starter/cli.py:344
 msgid "window size (remembered per app)"
 msgstr "розмір вікна (запам’ятовується для кожного застосунку)"
 
-#: src/apk_starter/cli.py:344
+#: src/apk_starter/cli.py:345
+msgid "open a link in the app (the menu entry passes it)"
+msgstr "відкрити посилання в застосунку (його передає пункт меню)"
+
+#: src/apk_starter/cli.py:346
 msgid "with --remove/--remove-all: also delete the app data"
 msgstr "з --remove/--remove-all: також очистити дані застосунку"
 
-#: src/apk_starter/cli.py:346
+#: src/apk_starter/cli.py:348
 msgid ""
 "install the APK and add a menu entry; a split APK: the base and its parts, "
 "or one .apks/.xapk file"
@@ -283,19 +287,19 @@ msgstr ""
 "встановити APK і додати пункт меню; розділений APK: основа та її частини або "
 "один файл .apks/.xapk"
 
-#: src/apk_starter/cli.py:350
+#: src/apk_starter/cli.py:352
 msgid "download Aurora Store from F-Droid, check its signature and install it"
 msgstr "завантажити Aurora Store з F-Droid, перевірити підпис і встановити"
 
-#: src/apk_starter/cli.py:351
+#: src/apk_starter/cli.py:353
 msgid "list installed apps"
 msgstr "показати встановлені застосунки"
 
-#: src/apk_starter/cli.py:352
+#: src/apk_starter/cli.py:354
 msgid "remove an installed app"
 msgstr "видалити встановлений застосунок"
 
-#: src/apk_starter/cli.py:354
+#: src/apk_starter/cli.py:356
 msgid ""
 "remove all installed apps and their menu entries (before uninstalling the "
 "Flatpak)"
@@ -303,11 +307,11 @@ msgstr ""
 "видалити всі встановлені застосунки та їхні пункти меню (перед видаленням "
 "Flatpak)"
 
-#: src/apk_starter/cli.py:355
+#: src/apk_starter/cli.py:357
 msgid "show the version and exit"
 msgstr "показати версію і вийти"
 
-#: src/apk_starter/cli.py:356
+#: src/apk_starter/cli.py:358
 msgid ""
 "download microG from its repository, check it and install it (Google "
 "services for the apps)"
@@ -315,7 +319,7 @@ msgstr ""
 "завантажити microG з його репозиторію, перевірити та встановити (служби "
 "Google для застосунків)"
 
-#: src/apk_starter/cli.py:394
+#: src/apk_starter/cli.py:396
 msgid ""
 "--install, --list, --remove, --remove-all and --version take no other "
 "arguments"
@@ -323,30 +327,30 @@ msgstr ""
 "--install, --list, --remove, --remove-all і --version не приймають інших "
 "аргументів"
 
-#: src/apk_starter/cli.py:396
+#: src/apk_starter/cli.py:398
 msgid "--purge only works with --remove or --remove-all"
 msgstr "--purge працює лише з --remove або --remove-all"
 
-#: src/apk_starter/cli.py:432
+#: src/apk_starter/cli.py:434
 msgid "no APK given and no display for the window"
 msgstr "не вказано APK і немає дисплея для вікна"
 
-#: src/apk_starter/cli.py:436
+#: src/apk_starter/cli.py:438
 msgid "no APK given"
 msgstr "не вказано APK"
 
-#: src/apk_starter/cli.py:460
+#: src/apk_starter/cli.py:464
 #, python-brace-format
 msgid "no log: cannot write {file}: {reason}"
 msgstr "немає журналу: не вдається записати в {file}: {reason}"
 
-#: src/apk_starter/cli.py:494 src/apk_starter/cli.py:512
+#: src/apk_starter/cli.py:498 src/apk_starter/cli.py:516
 #, python-brace-format
 msgid "the Android runtime could not be prepared in advance: {reason}"
 msgstr ""
 "не вдалося заздалегідь підготувати середовище виконання Android: {reason}"
 
-#: src/apk_starter/cli.py:516
+#: src/apk_starter/cli.py:520
 msgid "Preparing apps for this computer…"
 msgstr "Підготовка застосунків для цього комп’ютера…"
 
@@ -386,7 +390,7 @@ msgstr "Пошук застосунків"
 msgid "Name"
 msgstr "Назва"
 
-#: src/apk_starter/gui.py:135 src/apk_starter/gui.py:514
+#: src/apk_starter/gui.py:135 src/apk_starter/gui.py:521
 msgid "Last started"
 msgstr "Останній запуск"
 
@@ -422,211 +426,216 @@ msgstr "Назад"
 msgid "Drop the APK to install it"
 msgstr "Відпустіть APK, щоб установити"
 
-#: src/apk_starter/gui.py:253
+#: src/apk_starter/gui.py:254
 msgid "No apps installed"
 msgstr "Немає встановлених застосунків"
 
-#: src/apk_starter/gui.py:254
+#: src/apk_starter/gui.py:255
 msgid "Add an app with + or drop an APK here."
 msgstr "Додайте застосунок кнопкою + або перетягніть сюди APK."
 
-#: src/apk_starter/gui.py:263 src/apk_starter/gui.py:597
+#: src/apk_starter/gui.py:264 src/apk_starter/gui.py:604
 msgid "Close"
 msgstr "Закрити"
 
-#: src/apk_starter/gui.py:350
+#: src/apk_starter/gui.py:351
 msgid "Cannot read the app list"
 msgstr "Не вдалося прочитати список застосунків"
 
-#: src/apk_starter/gui.py:366
+#: src/apk_starter/gui.py:373
 msgid "Install APK…"
 msgstr "Встановити APK…"
 
-#: src/apk_starter/gui.py:368
+#: src/apk_starter/gui.py:375
 msgid "Set up Aurora Store…"
 msgstr "Налаштувати Aurora Store…"
 
-#: src/apk_starter/gui.py:370
+#: src/apk_starter/gui.py:377
 msgid "Set up microG…"
 msgstr "Налаштувати microG…"
 
-#: src/apk_starter/gui.py:434
+#: src/apk_starter/gui.py:441
 msgid "Could not save the setting"
 msgstr "Не вдалося зберегти налаштування"
 
-#: src/apk_starter/gui.py:486
+#: src/apk_starter/gui.py:493
 msgid "Start"
 msgstr "Запустити"
 
-#: src/apk_starter/gui.py:489
+#: src/apk_starter/gui.py:496
 msgid "Uninstall…"
 msgstr "Видалити…"
 
-#: src/apk_starter/gui.py:493
+#: src/apk_starter/gui.py:500
 msgid "Options"
 msgstr "Параметри"
 
-#: src/apk_starter/gui.py:498
+#: src/apk_starter/gui.py:505
 msgid "Debug is on"
 msgstr "Налагодження ввімкнено"
 
-#: src/apk_starter/gui.py:504
+#: src/apk_starter/gui.py:511
 msgid "Delete data…"
 msgstr "Очистити дані…"
 
-#: src/apk_starter/gui.py:511
+#: src/apk_starter/gui.py:518
 msgid "Version"
 msgstr "Версія"
 
-#: src/apk_starter/gui.py:512
+#: src/apk_starter/gui.py:519
 msgid "Target SDK"
 msgstr "Цільовий SDK"
 
-#: src/apk_starter/gui.py:513
+#: src/apk_starter/gui.py:520
 msgid "Installed"
 msgstr "Установлено"
 
-#: src/apk_starter/gui.py:515
+#: src/apk_starter/gui.py:522
 msgid "Data"
 msgstr "Дані"
 
-#: src/apk_starter/gui.py:515
+#: src/apk_starter/gui.py:522
 msgid "no data"
 msgstr "немає даних"
 
-#: src/apk_starter/gui.py:516
+#: src/apk_starter/gui.py:523
 msgid "Status"
 msgstr "Стан"
 
-#: src/apk_starter/gui.py:516
+#: src/apk_starter/gui.py:523
 msgid "Prepared for this computer"
 msgstr "Підготовлено для цього комп’ютера"
 
-#: src/apk_starter/gui.py:517
+#: src/apk_starter/gui.py:524
 msgid "Not prepared yet (done at the next start)"
 msgstr "Ще не підготовлено (відбудеться під час наступного запуску)"
 
-#: src/apk_starter/gui.py:532
+#: src/apk_starter/gui.py:539
 msgid "Window bar"
 msgstr "Панель вікна"
 
-#: src/apk_starter/gui.py:533
+#: src/apk_starter/gui.py:540
 msgid "With back button"
 msgstr "З кнопкою «Назад»"
 
-#: src/apk_starter/gui.py:533
+#: src/apk_starter/gui.py:540
 msgid "From the system"
 msgstr "Від системи"
 
-#: src/apk_starter/gui.py:534
+#: src/apk_starter/gui.py:541
 msgid "From the system + navigation bar"
 msgstr "Від системи + панель навігації"
 
-#: src/apk_starter/gui.py:543 src/apk_starter/gui.py:566
+#: src/apk_starter/gui.py:550 src/apk_starter/gui.py:573
 msgid "Debug"
 msgstr "Налагодження"
 
-#: src/apk_starter/gui.py:544
+#: src/apk_starter/gui.py:551
 msgid "Slower"
 msgstr "Повільніше"
 
-#: src/apk_starter/gui.py:564
+#: src/apk_starter/gui.py:571
 msgid "Recordings"
 msgstr "Записи"
 
-#: src/apk_starter/gui.py:567 src/apk_starter/gui.py:597
+#: src/apk_starter/gui.py:574 src/apk_starter/gui.py:604
 msgid "Open log folder"
 msgstr "Відкрити теку журналів"
 
-#: src/apk_starter/gui.py:579
+#: src/apk_starter/gui.py:586
 #, python-brace-format
 msgid "Cannot start {app}"
 msgstr "Не вдалося запустити {app}"
 
-#: src/apk_starter/gui.py:596
+#: src/apk_starter/gui.py:603
 #, python-brace-format
 msgid "{app} ended unexpectedly."
 msgstr "{app} неочікувано завершився."
 
-#: src/apk_starter/gui.py:607 src/apk_starter/gui.py:616
+#: src/apk_starter/gui.py:614 src/apk_starter/gui.py:623
 msgid "Cannot open the log folder"
 msgstr "Не вдалося відкрити теку журналів"
 
-#: src/apk_starter/gui.py:620
+#: src/apk_starter/gui.py:627
 msgid "Android apps"
 msgstr "Android-застосунки"
 
-#: src/apk_starter/gui.py:626
+#: src/apk_starter/gui.py:633
 msgid "Install APK"
 msgstr "Встановити APK"
 
-#: src/apk_starter/gui.py:656 src/apk_starter/gui.py:670
+#: src/apk_starter/gui.py:663 src/apk_starter/gui.py:677
 #, python-brace-format
 msgid "{app} installed"
 msgstr "Застосунок {app} встановлено"
 
-#: src/apk_starter/gui.py:657
+#: src/apk_starter/gui.py:664
 #, python-brace-format
 msgid "Installing {file}…"
 msgstr "Установлення {file}…"
 
-#: src/apk_starter/gui.py:660
+#: src/apk_starter/gui.py:667
 #, python-brace-format
 msgid "Cannot install {file}"
 msgstr "Не вдалося встановити {file}"
 
-#: src/apk_starter/gui.py:673
+#: src/apk_starter/gui.py:680
 msgid "Cannot set up Aurora Store"
 msgstr "Не вдається налаштувати Aurora Store"
 
-#: src/apk_starter/gui.py:674
+#: src/apk_starter/gui.py:681
 msgid "Set up Aurora Store?"
 msgstr "Налаштувати Aurora Store?"
 
-#: src/apk_starter/gui.py:675
+#: src/apk_starter/gui.py:682
 msgid ""
 "Free apps from Google Play. Downloaded from F-Droid and checked.\n"
 "\n"
 "Sign in anonymously: Google can block your own account."
-msgstr "Безкоштовні застосунки з Google Play. Завантажено з F-Droid і перевірено.\n\nВходьте анонімно: Google може заблокувати ваш власний обліковий запис."
+msgstr ""
+"Безкоштовні застосунки з Google Play. Завантажено з F-Droid і перевірено.\n"
+"\n"
+"Входьте анонімно: Google може заблокувати ваш власний обліковий запис."
 
-#: src/apk_starter/gui.py:677 src/apk_starter/gui.py:694
-#: src/apk_starter/gui.py:699 src/apk_starter/install_request.py:44
+#: src/apk_starter/gui.py:684 src/apk_starter/gui.py:701
+#: src/apk_starter/gui.py:706 src/apk_starter/install_request.py:44
 msgid "Cancel"
 msgstr "Скасувати"
 
-#: src/apk_starter/gui.py:677 src/apk_starter/gui.py:694
+#: src/apk_starter/gui.py:684 src/apk_starter/gui.py:701
 msgid "Set up"
 msgstr "Налаштувати"
 
-#: src/apk_starter/gui.py:687
+#: src/apk_starter/gui.py:694
 msgid "microG is set up"
 msgstr "microG налаштовано"
 
-#: src/apk_starter/gui.py:688 src/apk_starter/microg.py:98
+#: src/apk_starter/gui.py:695 src/apk_starter/microg.py:98
 msgid "Downloading microG…"
 msgstr "Завантаження microG…"
 
-#: src/apk_starter/gui.py:690
+#: src/apk_starter/gui.py:697
 msgid "Cannot set up microG"
 msgstr "Не вдається налаштувати microG"
 
-#: src/apk_starter/gui.py:691
+#: src/apk_starter/gui.py:698
 msgid "Set up microG?"
 msgstr "Налаштувати microG?"
 
-#: src/apk_starter/gui.py:692
+#: src/apk_starter/gui.py:699
 msgid ""
 "Google services for apps (push messages, sign-in). Downloaded from the "
 "official microG repository and checked."
-msgstr "Сервіси Google для застосунків (push-сповіщення, вхід). Завантажено з офіційного репозиторію microG і перевірено."
+msgstr ""
+"Сервіси Google для застосунків (push-сповіщення, вхід). Завантажено з "
+"офіційного репозиторію microG і перевірено."
 
-#: src/apk_starter/gui.py:704
+#: src/apk_starter/gui.py:711
 #, python-brace-format
 msgid "Delete the data of {app}?"
 msgstr "Очистити дані {app}?"
 
-#: src/apk_starter/gui.py:705
+#: src/apk_starter/gui.py:712
 msgid ""
 "The app stays installed. Its settings, accounts and files are deleted. Close "
 "the app first."
@@ -634,39 +643,39 @@ msgstr ""
 "Застосунок залишиться встановленим. Його налаштування, облікові записи й "
 "файли буде видалено. Спершу закрийте застосунок."
 
-#: src/apk_starter/gui.py:706
+#: src/apk_starter/gui.py:713
 msgid "Delete Data"
 msgstr "Очистити дані"
 
-#: src/apk_starter/gui.py:708
+#: src/apk_starter/gui.py:715
 #, python-brace-format
 msgid "Cannot delete the data of {app}"
 msgstr "Не вдалося очистити дані {app}"
 
-#: src/apk_starter/gui.py:712
+#: src/apk_starter/gui.py:719
 msgid "Also delete app data"
 msgstr "Також очистити дані застосунку"
 
-#: src/apk_starter/gui.py:719
+#: src/apk_starter/gui.py:726
 #, python-brace-format
 msgid "{app} uninstalled"
 msgstr "Застосунок {app} видалено"
 
-#: src/apk_starter/gui.py:720
+#: src/apk_starter/gui.py:727
 #, python-brace-format
 msgid "Uninstall {app}?"
 msgstr "Видалити {app}?"
 
-#: src/apk_starter/gui.py:721
+#: src/apk_starter/gui.py:728
 msgid "The app and its menu entry are removed. Close the app first."
 msgstr ""
 "Застосунок і його пункт меню буде вилучено. Спершу закрийте застосунок."
 
-#: src/apk_starter/gui.py:721
+#: src/apk_starter/gui.py:728
 msgid "Uninstall"
 msgstr "Видалити"
 
-#: src/apk_starter/gui.py:723
+#: src/apk_starter/gui.py:730
 #, python-brace-format
 msgid "Cannot uninstall {app}"
 msgstr "Не вдалося видалити {app}"
@@ -828,25 +837,25 @@ msgstr ""
 msgid "the downloaded file is not {package} {code}"
 msgstr "завантажений файл не є {package} {code}"
 
-#: src/apk_starter/microg.py:101
+#: src/apk_starter/microg.py:110
 msgid "microG settings"
 msgstr "Налаштування microG"
 
-#: src/apk_starter/paths.py:30 src/apk_starter/portal.py:26
+#: src/apk_starter/paths.py:30 src/apk_starter/portal.py:28
 #, python-brace-format
 msgid "invalid package name: {package}"
 msgstr "некоректна назва пакунка: {package}"
 
-#: src/apk_starter/portal.py:74
+#: src/apk_starter/portal.py:109
 #, python-brace-format
 msgid "portal call {method} failed: {reason}"
 msgstr "виклик порталу {method} не вдався: {reason}"
 
-#: src/apk_starter/portal.py:99
+#: src/apk_starter/portal.py:134
 msgid "portal did not answer"
 msgstr "портал не відповів"
 
-#: src/apk_starter/portal.py:119
+#: src/apk_starter/portal.py:154
 msgid "menu entry not created (cancelled)"
 msgstr "пункт меню не створено (скасовано)"
 

@@ -19,6 +19,11 @@ NAME_TO_ID = {
     "label": 0x01010001, "icon": 0x01010002, "versionCode": 0x0101021B,
     "versionName": 0x0101021C, "minSdkVersion": 0x0101020C, "targetSdkVersion": 0x01010270,
 }
+# <intent-filter android:autoVerify>, <action|category android:name>, <data android:scheme|host>
+LINK_ATTRS = {0x01010003: "name", 0x01010027: "scheme", 0x01010028: "host", 0x010104EE: "autoVerify"}
+LINK_NAMES = {v: k for k, v in LINK_ATTRS.items()}
+VIEW = "android.intent.action.VIEW"
+BROWSABLE = "android.intent.category.BROWSABLE"
 
 
 @dataclass(frozen=True)
@@ -27,6 +32,14 @@ class ResRef:
 
 
 Value = str | ResRef
+
+
+@dataclass(frozen=True)
+class LinkFilter:
+    """An activity's intent filter for links: action VIEW, category BROWSABLE (what a browser may start)."""
+    schemes: tuple[str, ...]
+    hosts: tuple[str, ...]
+    auto_verify: bool
 
 
 @dataclass(frozen=True)
@@ -39,6 +52,7 @@ class ManifestInfo:
     label: Value | None
     icon: int | None
     split: str | None = None        # <manifest split="config.x86_64">: a configuration part of a split APK
+    link_filters: tuple[LinkFilter, ...] = ()
 
 
 def parse_manifest(data: bytes) -> ManifestInfo:
@@ -57,6 +71,9 @@ def _parse(data: bytes) -> ManifestInfo:
     package = None
     split = None
     found: dict[tuple[str, str], object] = {}
+    links: list[LinkFilter] = []
+    in_activity = False
+    flt: dict | None = None             # the <intent-filter> being read inside an <activity>
     pos = hsize
     end = size
     while pos + 8 <= end:
@@ -69,6 +86,22 @@ def _parse(data: bytes) -> ManifestInfo:
         elif t == 0x0102:
             tag = strings[struct.unpack_from("<I", data, pos + 20)[0]]
             astart, asize, acount = struct.unpack_from("<3H", data, pos + 24)
+            if tag in ("activity", "activity-alias"):
+                in_activity = True
+            elif tag in ("intent-filter", "action", "category", "data") and in_activity:
+                attrs = _link_attrs(data, pos, astart, asize, acount, strings, resmap)
+                if tag == "intent-filter":
+                    flt = {"auto_verify": attrs.get("autoVerify") is True, "actions": set(), "categories": set(),
+                           "schemes": [], "hosts": []}
+                elif flt is not None and tag == "action" and isinstance(attrs.get("name"), str):
+                    flt["actions"].add(attrs["name"])
+                elif flt is not None and tag == "category" and isinstance(attrs.get("name"), str):
+                    flt["categories"].add(attrs["name"])
+                elif flt is not None and tag == "data":
+                    for key, out in (("scheme", "schemes"), ("host", "hosts")):
+                        v = attrs.get(key)
+                        if isinstance(v, str) and v not in flt[out]:
+                            flt[out].append(v)
             for k in range(acount):
                 ao = pos + 16 + astart + asize * k
                 ns, name, raw, _s, _r, dt, val = struct.unpack_from("<IIIHBBI", data, ao)
@@ -96,6 +129,14 @@ def _parse(data: bytes) -> ManifestInfo:
                 else:
                     v = None
                 found[(tag, field)] = v
+        elif t == 0x0103:
+            tag = strings[struct.unpack_from("<I", data, pos + 20)[0]]
+            if tag in ("activity", "activity-alias"):
+                in_activity, flt = False, None
+            elif tag == "intent-filter" and flt is not None:
+                if VIEW in flt["actions"] and BROWSABLE in flt["categories"] and flt["schemes"]:
+                    links.append(LinkFilter(tuple(flt["schemes"]), tuple(flt["hosts"]), flt["auto_verify"]))
+                flt = None
         pos += sz
 
     def num(tag: str, field: str) -> int | None:
@@ -116,4 +157,24 @@ def _parse(data: bytes) -> ManifestInfo:
         label=val_("application", "label"),
         icon=icon.id if isinstance(icon, ResRef) else None,
         split=split,
+        link_filters=tuple(links),
     )
+
+
+def _link_attrs(data: bytes, pos: int, astart: int, asize: int, acount: int, strings: list[str],
+                resmap: list[int]) -> dict[str, object]:
+    """The link attributes of an element: literal strings, autoVerify as bool (by resource ID or name)."""
+    out: dict[str, object] = {}
+    for k in range(acount):
+        ao = pos + 16 + astart + asize * k
+        _ns, name, raw, _s, _r, dt, val = struct.unpack_from("<IIIHBBI", data, ao)
+        key = LINK_ATTRS.get(resmap[name] if name < len(resmap) else 0)
+        if key is None and name < len(strings) and strings[name] in LINK_NAMES:
+            key = strings[name]
+        if key is None:
+            continue
+        if dt == 0x03 and raw != NONE:
+            out[key] = strings[raw]
+        elif dt == 0x12:
+            out[key] = val != 0
+    return out

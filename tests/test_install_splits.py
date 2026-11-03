@@ -92,7 +92,7 @@ def test_install_request_failure_is_status_failure(box, monkeypatch, capsys):
 def test_install_request_without_menu_entry_is_still_installed(box, monkeypatch, capsys):
     from test_cli import PortalUnavailable
 
-    def boom(*a):
+    def boom(*a, **kw):
         raise PortalUnavailable("x")
     box.fake.install_launcher = boom
     monkeypatch.setattr(install_request, "ask", lambda *a: True)

@@ -87,3 +87,38 @@ def test_install_from_worker_thread_while_main_loop_runs(tmp_path):
             svc.kill()
     finally:
         bus.kill()
+
+
+def test_link_mime_types_own_schemes_and_verified_web():
+    from apk_starter.axml import LinkFilter
+    from apk_starter.portal import link_mime_types
+    jw = (LinkFilter(("jwlibrary",), (), False), LinkFilter(("jwlplaylist",), (), False),
+          LinkFilter(("content", "file"), (), False), LinkFilter(("https",), ("www.jw.org",), True))
+    assert link_mime_types(jw, "org.jw.jwlibrary.mobile") == [
+        "x-scheme-handler/https", "x-scheme-handler/jwlibrary", "x-scheme-handler/jwlplaylist"]
+
+
+def test_link_mime_types_web_only_for_verified_or_own_hosts():
+    from apk_starter.axml import LinkFilter
+    from apk_starter.portal import link_mime_types
+    newpipe = (LinkFilter(("http", "https"), ("youtube.com", "youtu.be"), False),
+               LinkFilter(("vnd.youtube",), (), False), LinkFilter(("http", "https"), (), False))
+    assert link_mime_types(newpipe, "org.schabi.newpipe") == ["x-scheme-handler/vnd.youtube"]
+    own = (LinkFilter(("https",), ("k9mail.app", "www.example.org"), False),)
+    assert link_mime_types(own, "app.k9mail") == ["x-scheme-handler/https"]
+    assert link_mime_types(own, "io.github.someone.app") == []
+    assert link_mime_types((LinkFilter(("https",), ("someone.github.io",), False),), "io.github.someone") == []
+
+
+def test_link_mime_types_skips_odd_schemes():
+    from apk_starter.axml import LinkFilter
+    from apk_starter.portal import link_mime_types
+    odd = (LinkFilter(("javascript", "data", "intent", "about", "Bad Scheme", "x;y", "MAILTO"), (), False),)
+    assert link_mime_types(odd, "org.x.y") == ["x-scheme-handler/mailto"]
+
+
+def test_desktop_entry_with_links_takes_the_uri():
+    entry = desktop_entry("org.x.y", "Demo", ["x-scheme-handler/demo", "x-scheme-handler/https"])
+    assert "Exec=apk-starter --uri %u org.x.y\n" in entry
+    assert "MimeType=x-scheme-handler/demo;x-scheme-handler/https;\n" in entry
+    assert desktop_entry("org.x.y", "Demo", []) == EXPECTED

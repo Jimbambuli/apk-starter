@@ -53,12 +53,20 @@ apk-starter --setup-microg           # download microG from its repository, chec
 apk-starter --debug @@ app.apk @@    # record the app for atl-doctor (a little slower), --debug=DIR for a folder
 apk-starter --sdk N @@ app.apk @@    # override the SDK level passed to ATL
 apk-starter --size WxH @@ app.apk @@ # window size (remembered per app)
+apk-starter --uri URI PACKAGE        # open a link in the app (in the running app, if it runs)
 apk-starter @@ app.apk @@ -- ARGS    # everything after the APK is passed on to ATL
 apk-starter --version
 ```
 
 Exit codes: 0 ok, 1 error (e.g. cannot write), 2 wrong usage, 3 APK not readable, 7 the app has native code only
 for other processors (e.g. ARM); if the app is ended by a signal, 128+N.
+
+### Links
+
+The menu entry of an installed app offers it for the links its activities accept (Android intent filters with
+VIEW and BROWSABLE): its own schemes (e.g. `jwlibrary:`) and, for web links, only verified (`android:autoVerify`)
+or the app's own domains, under **Open with**; the web browser stays the default. A link goes to the running app,
+which gets it like on Android (`onNewIntent`). Apps installed before this need `--install` again.
 
 ### App stores (Aurora Store)
 

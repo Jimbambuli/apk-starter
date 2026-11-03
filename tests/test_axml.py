@@ -1,6 +1,6 @@
 import pytest
 
-from apk_starter.axml import ResRef, parse_manifest
+from apk_starter.axml import LinkFilter, ResRef, parse_manifest
 from apk_starter.errors import ApkError
 from apkgen import axml_manifest
 
@@ -28,3 +28,30 @@ def test_stripped_attribute_names_use_resource_map():
 def test_truncated_manifest_raises_apk_error():
     with pytest.raises(ApkError):
         parse_manifest(axml_manifest()[:200])
+
+
+VIEW = "android.intent.action.VIEW"
+BROWSABLE = "android.intent.category.BROWSABLE"
+DEFAULT = "android.intent.category.DEFAULT"
+JW_ACTIVITIES = [[
+    {"actions": ["android.intent.action.SEARCH"]},
+    {"actions": [VIEW], "categories": [DEFAULT, BROWSABLE], "data": [{"scheme": "jwlibrary"}]},
+    {"actions": [VIEW], "categories": [DEFAULT, BROWSABLE], "data": [{"scheme": "content"}, {"scheme": "file"}]},
+    {"actions": [VIEW], "categories": [DEFAULT, BROWSABLE], "autoVerify": True,
+     "data": [{"scheme": "https", "host": "www.jw.org", "pathPrefix": "/finder"}]},
+    {"actions": [VIEW], "categories": [DEFAULT], "data": [{"scheme": "notbrowsable"}]},
+]]
+
+
+@pytest.mark.parametrize("strip", [False, True])
+def test_reads_browsable_view_filters(strip):
+    m = parse_manifest(axml_manifest(activities=JW_ACTIVITIES, strip_names=strip))
+    assert m.link_filters == (
+        LinkFilter(schemes=("jwlibrary",), hosts=(), auto_verify=False),
+        LinkFilter(schemes=("content", "file"), hosts=(), auto_verify=False),
+        LinkFilter(schemes=("https",), hosts=("www.jw.org",), auto_verify=True),
+    )
+
+
+def test_no_activities_no_link_filters():
+    assert parse_manifest(axml_manifest()).link_filters == ()

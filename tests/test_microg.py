@@ -121,7 +121,7 @@ def test_setup_without_portal_still_installs_both(box, tmp_path, monkeypatch, ca
     """No launcher portal (or the entry refused): GmsCore is installed without a menu entry, GsfProxy all the same."""
     repo(tmp_path, monkeypatch)
 
-    def boom(*a):
+    def boom(*a, **kw):
         raise box.fake.PortalUnavailable("x")
     box.fake.install_launcher = boom
     assert main(["--setup-microg"], env=box.env) == 1

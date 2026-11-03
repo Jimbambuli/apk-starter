@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from .arsc import Config, ResourceTable, parse_table
-from .axml import ResRef, Value, parse_manifest
+from .axml import LinkFilter, ResRef, Value, parse_manifest
 from .errors import ApkError
 from .i18n import _
 
@@ -31,6 +31,7 @@ class ApkInfo:
     min_sdk: int | None
     target_sdk: int | None
     icon: bytes | None
+    link_filters: tuple[LinkFilter, ...] = ()      # for the menu entry's MimeType (links opened in the app)
 
 
 def png_size(data: bytes) -> tuple[int, int] | None:
@@ -110,6 +111,7 @@ def read_apk_info(path: Path, lang: str | None = None) -> ApkInfo:
                 min_sdk=m.min_sdk,
                 target_sdk=m.target_sdk,
                 icon=_icon(z, table, m.icon),
+                link_filters=m.link_filters,
             )
     except zipfile.BadZipFile:
         raise ApkError(_("not an APK (no AndroidManifest.xml): {file}").format(file=path)) from None

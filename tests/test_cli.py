@@ -7,6 +7,8 @@ from pathlib import Path
 
 import pytest
 
+from apk_starter.portal import link_mime_types as real_link_mime_types
+
 import apk_starter
 from apk_starter.cli import main, split_diag_option
 from apk_starter import dexopt
@@ -39,9 +41,14 @@ def box(tmp_path, monkeypatch):
     monkeypatch.setattr(dexopt, "FLATPAK_INFO", info)
     record = tmp_path / "record.json"
     calls = []
+    links = {}
     fake = types.ModuleType("apk_starter.portal")
     fake.PortalUnavailable = PortalUnavailable
-    fake.install_launcher = lambda pkg, label, icon: calls.append(("install", pkg, label, icon))
+    fake.link_mime_types = real_link_mime_types
+    def install_launcher(pkg, label, icon, mime_types=()):
+        calls.append(("install", pkg, label, icon))
+        links[pkg] = list(mime_types)
+    fake.install_launcher = install_launcher
     fake.uninstall_launcher = lambda pkg: calls.append(("uninstall", pkg))
     monkeypatch.setitem(sys.modules, "apk_starter.portal", fake)
     monkeypatch.setattr(apk_starter, "portal", fake, raising=False)
@@ -56,7 +63,7 @@ def box(tmp_path, monkeypatch):
         f = tmp_path / "art.jsonl"
         return [json.loads(line) for line in f.read_text().splitlines()] if f.exists() else []
     return types.SimpleNamespace(env=env, record=record, calls=calls, apk=apk, tmp=tmp_path, fake=fake,
-                                 data=tmp_path / "data", art=art, info=info)
+                                 data=tmp_path / "data", art=art, info=info, links=links)
 
 
 def test_debug_flag_does_not_eat_apk():
@@ -117,7 +124,7 @@ def test_install_list_remove_purge(box, capsys):
 
 
 def test_install_without_portal_keeps_apk(box, capsys):
-    def boom(*a):
+    def boom(*a, **kw):
         raise PortalUnavailable("x")
     box.fake.install_launcher = boom
     assert main(["--install", str(box.apk)], env=box.env) == 1
@@ -208,7 +215,7 @@ def test_portal_error_on_remove_does_not_leave_the_app_half_installed(box):
 
 
 def test_cancelled_menu_entry_says_the_app_is_installed(box, capsys):
-    def cancel(*a):
+    def cancel(*a, **kw):
         raise StarterError("menu entry not created (cancelled)")
     box.fake.install_launcher = cancel
     assert main(["--install", str(box.apk)], env=box.env) == 1
@@ -246,7 +253,7 @@ def _dex(call):
 def test_install_prepares_runtime_app_and_natives_before_the_menu_entry(box, capsys):
     apk = make_apk(box.tmp / "libs.apk", manifest=axml_manifest(), files={"lib/x86_64/libx.so": b"x"})
     order = []
-    box.fake.install_launcher = lambda *a: order.append(len(box.art()))
+    box.fake.install_launcher = lambda *a, **kw: order.append(len(box.art()))
     assert main(["--install", str(apk)], env=box.env) == 0
     art = box.art()
     installed = str(box.data / "apps" / f"{PKG}.apk")
@@ -427,3 +434,26 @@ def test_direct_start_of_an_app_that_is_not_installed_notes_nothing(box):
     paths = apk_starter.paths.Paths.from_env(box.env)
     assert main([str(box.apk)], env=box.env) == 0
     assert not paths.started(PKG).exists()
+
+
+def test_install_offers_the_app_for_its_links(box):
+    view = {"actions": ["android.intent.action.VIEW"],
+            "categories": ["android.intent.category.DEFAULT", "android.intent.category.BROWSABLE"]}
+    apk = make_apk(box.tmp / "links.apk", manifest=axml_manifest(activities=[[
+        dict(view, data=[{"scheme": "demo"}]),
+        dict(view, data=[{"scheme": "https", "host": "www.example.net"}]),
+        dict(view, autoVerify=True, data=[{"scheme": "https", "host": "example.com"}])]]))
+    assert main(["--install", str(apk)], env=box.env) == 0
+    assert box.links[PKG] == ["x-scheme-handler/demo", "x-scheme-handler/https"]
+    assert main(["--install", str(box.apk)], env=box.env) == 0
+    assert box.links[PKG] == []
+
+
+def test_uri_goes_to_atl(box):
+    assert main(["--uri", "demo://open?x=1&y=2", str(box.apk)], env=box.env) == 0
+    assert "--uri=demo://open?x=1&y=2" in json.loads(box.record.read_text())["argv"]
+
+
+def test_empty_uri_from_the_menu_starts_the_app(box):
+    assert main(["--uri", "", str(box.apk)], env=box.env) == 0
+    assert not any(a.startswith("--uri") for a in json.loads(box.record.read_text())["argv"])

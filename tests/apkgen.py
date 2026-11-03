@@ -48,12 +48,20 @@ def _end(name: int) -> bytes:
 
 def axml_manifest(*, package="org.example.demo", version_code=7, version_name="1.2", min_sdk=21,
                   target_sdk=34, label: str | int = "Demo", icon: int | None = None,
-                  utf8=True, strip_names=False, split: str | None = None) -> bytes:
+                  utf8=True, strip_names=False, split: str | None = None,
+                  activities: list | None = None) -> bytes:
+    """activities: one list of intent filters per <activity>; a filter is a dict with "actions", "categories",
+    "data" (list of {attribute: value}) and optionally "autoVerify": True. Their attribute names are plain
+    strings (with strip_names=True empty, found by resource ID like in shrunk APKs)."""
     ids = {"label": 0x01010001, "icon": 0x01010002, "versionCode": 0x0101021B,
            "versionName": 0x0101021C, "minSdkVersion": 0x0101020C, "targetSdkVersion": 0x01010270}
     attr_names = ["versionCode", "versionName", "minSdkVersion", "targetSdkVersion", "label"]
     if icon is not None:
         attr_names.append("icon")
+    if activities is not None:
+        ids.update({"name": 0x01010003, "scheme": 0x01010027, "host": 0x01010028, "pathPrefix": 0x0101002b,
+                    "autoVerify": 0x010104ee})
+        attr_names += ["name", "scheme", "host", "pathPrefix", "autoVerify"]
     strings = [("" if strip_names else n) for n in attr_names]  # resource-mapped names come first
     resmap = [ids[n] for n in attr_names]
     idx = {n: i for i, n in enumerate(attr_names)}
@@ -81,10 +89,31 @@ def axml_manifest(*, package="org.example.demo", version_code=7, version_name="1
                  else (A, idx["label"], 0xFFFFFFFF, 0x01, label)]
     if icon is not None:
         app_attrs.append((A, idx["icon"], 0xFFFFFFFF, 0x01, icon))
+    inner = b""
+    for filters in activities or []:
+        n_act = add("activity")
+        inner += _start(n_act, [(A, idx["name"], add(".Main"), 0x03, len(strings) - 1)])
+        for f in filters:
+            n_f = add("intent-filter")
+            fa = [(A, idx["autoVerify"], 0xFFFFFFFF, 0x12, 0xFFFFFFFF)] if f.get("autoVerify") else []
+            inner += _start(n_f, fa)
+            for tag, key in (("action", "actions"), ("category", "categories")):
+                for v in f.get(key, []):
+                    n_t, v_i = add(tag), add(v)
+                    inner += _start(n_t, [(A, idx["name"], v_i, 0x03, v_i)]) + _end(n_t)
+            for d in f.get("data", []):
+                n_d = add("data")
+                attrs = []
+                for k, v in d.items():
+                    v_i = add(v)
+                    attrs.append((A, idx[k], v_i, 0x03, v_i))
+                inner += _start(n_d, attrs) + _end(n_d)
+            inner += _end(n_f)
+        inner += _end(n_act)
     body = (_chunk(0x0100, 16, struct.pack("<IIII", 1, 0xFFFFFFFF, 0xFFFFFFFF, ns))
             + _start(n_manifest, manifest_attrs)
             + _start(n_sdk, sdk_attrs) + _end(n_sdk)
-            + _start(n_app, app_attrs) + _end(n_app)
+            + _start(n_app, app_attrs) + inner + _end(n_app)
             + _end(n_manifest))
     pool = string_pool(strings, utf8)
     rm = _chunk(0x0180, 8, b"".join(struct.pack("<I", r) for r in resmap))

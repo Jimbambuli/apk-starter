@@ -1,8 +1,10 @@
 """XDG desktop portal DynamicLauncher (menu entries). `gi` is imported only inside functions."""
 import re
 import uuid
+from collections.abc import Iterable
 
 from .apkinfo import PACKAGE_RE
+from .axml import LinkFilter
 from .cli import ENTRY_PREFIX
 from .errors import StarterError, UsageError
 from .i18n import _
@@ -27,19 +29,52 @@ def _check_pkg(pkg: str) -> str:
     return pkg
 
 
-def desktop_entry(pkg: str, label: str) -> str:
+# RFC 3986 scheme; not links: files, inline content, script and Android-internal intents
+_SCHEME_RE = re.compile(r"[a-z][a-z0-9+.-]*")
+_NOT_LINKS = {"content", "file", "data", "javascript", "vbscript", "about", "blob", "intent"}
+_SHARED_DOMAINS = {"github.io", "gitlab.io", "codeberg.page", "sourceforge.io", "appspot.com", "web.app"}
+
+
+def _own_host(host: str, pkg: str) -> bool:
+    """The app's own web domain: the reversed start of its package name (org.jw.… -> jw.org)."""
+    parts = pkg.lower().split(".")
+    domain = f"{parts[1]}.{parts[0]}"
+    host = host.lower().lstrip("*.")
+    return domain not in _SHARED_DOMAINS and (host == domain or host.endswith("." + domain))
+
+
+def link_mime_types(filters: Iterable[LinkFilter], pkg: str) -> list[str]:
+    """x-scheme-handler types for the menu entry from the app's link filters (VIEW + BROWSABLE). Its own schemes,
+    and http(s) only for verified (android:autoVerify) or its own hosts: a web browser stays the default, the app
+    is offered under «Open with»."""
+    out: set[str] = set()
+    for f in filters:
+        web_ok = f.auto_verify or any(_own_host(h, pkg) for h in f.hosts)
+        for scheme in (s.lower() for s in f.schemes):
+            if not _SCHEME_RE.fullmatch(scheme) or scheme in _NOT_LINKS:
+                continue
+            if scheme in ("http", "https") and not web_ok:
+                continue
+            out.add(f"x-scheme-handler/{scheme}")
+    return sorted(out)
+
+
+def desktop_entry(pkg: str, label: str, mime_types: list[str] = ()) -> str:
     _check_pkg(pkg)
     text = re.sub(r"\r\n|\r|\n", " ", label)
     text = "".join(c for c in text if c == " " or c.isprintable())[:100].strip() or pkg
+    # a link: the desktop passes it with %u, the starter hands it to the app (--uri), empty from the menu
+    exec_line = f"apk-starter --uri %u {pkg}" if mime_types else f"apk-starter {pkg}"
     return (
         "[Desktop Entry]\n"
         "Type=Application\n"
         f"Name={text}\n"
-        f"Exec=apk-starter {pkg}\n"
+        f"Exec={exec_line}\n"
         "Terminal=false\n"
         "Categories=Utility;\n"
         f"StartupWMClass={ENTRY_PREFIX}.{pkg}\n"
         f"X-ApkStarter-Package={pkg}\n"
+        + (f"MimeType={';'.join(mime_types)};\n" if mime_types else "")
     )
 
 
@@ -102,7 +137,7 @@ def _request(conn, Gio, GLib, iface: str, method: str, make_params):
         conn.signal_unsubscribe(sub)
 
 
-def install_launcher(pkg: str, label: str, icon: bytes) -> None:
+def install_launcher(pkg: str, label: str, icon: bytes, mime_types: list[str] = ()) -> None:
     _check_pkg(pkg)
     Gio, GLib = _gi()
     conn = _connect(Gio, GLib)
@@ -118,7 +153,7 @@ def install_launcher(pkg: str, label: str, icon: bytes) -> None:
     if response != 0 or "token" not in results:
         raise StarterError(_("menu entry not created (cancelled)"))
     _call(conn, Gio, GLib, iface, "Install",
-          GLib.Variant("(sssa{sv})", (results["token"], desktop_file_id(pkg), desktop_entry(pkg, label), {})))
+          GLib.Variant("(sssa{sv})", (results["token"], desktop_file_id(pkg), desktop_entry(pkg, label, mime_types), {})))
 
 
 def uninstall_launcher(pkg: str) -> None:

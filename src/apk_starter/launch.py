@@ -114,7 +114,7 @@ def build_env(paths: Paths, pkg: str, base: Mapping[str, str]) -> dict[str, str]
 def cached_apk_info(paths: Paths, apk: Path, lang: str | None,
                     read: Callable[[Path, str | None], ApkInfo]) -> ApkInfo:
     """Like Android's package cache: parse an APK once, keyed by path, size, mtime and language (F182).
-    The icon is not kept: starting does not need it."""
+    The icon and the link filters are not kept: starting does not need them."""
     path = os.path.abspath(apk)
     st = os.stat(path)
     key = [path, st.st_size, st.st_mtime_ns, lang]
@@ -126,7 +126,7 @@ def cached_apk_info(paths: Paths, apk: Path, lang: str | None,
     except (OSError, ValueError, KeyError, TypeError, AttributeError):
         pass
     info = read(apk, lang)
-    d = {k: v for k, v in dataclasses.asdict(info).items() if k not in ("path", "icon")}
+    d = {k: v for k, v in dataclasses.asdict(info).items() if k not in ("path", "icon", "link_filters")}
     try:
         f.parent.mkdir(parents=True, exist_ok=True)
         tmp = f.with_name(f"{f.name}.{os.getpid()}.tmp")

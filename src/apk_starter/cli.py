@@ -32,7 +32,7 @@ RUN_REF = f"{APP_ID}//{_PROFILE}" if PROFILE_RE.fullmatch(_PROFILE) else APP_ID 
 # The portal's menu entries run the current branch (no --branch), so a test build makes none: its apps start from
 # its own window.
 MENU_ENTRIES = RUN_REF == APP_ID
-VALUE_OPTIONS = ("--sdk", "--size", "--install", "--install-request", "--remove")
+VALUE_OPTIONS = ("--sdk", "--size", "--uri", "--install", "--install-request", "--remove")
 DISPLAY_VARS = ("WAYLAND_DISPLAY", "DISPLAY")
 
 
@@ -224,7 +224,8 @@ def install_parts(paths: Paths, info: ApkInfo, parts: tuple[tuple[str, Path], ..
             except OSError:
                 icon = b""
         try:
-            portal.install_launcher(info.package, info.label, icon)
+            portal.install_launcher(info.package, info.label, icon,
+                                    mime_types=portal.link_mime_types(info.link_filters, info.package))
         except portal.PortalUnavailable:
             raise StarterError(
                 _("{app} is installed without a menu entry: the DynamicLauncher portal is not available; "
@@ -341,6 +342,7 @@ def _parser() -> argparse.ArgumentParser:
                           "log; a little slower (default: logs/<package>-<time>/); use --debug=DIR"))
     p.add_argument("--sdk", type=int, metavar="N", help=_("override the SDK level passed to ATL"))
     p.add_argument("--size", metavar="WxH", help=_("window size (remembered per app)"))
+    p.add_argument("--uri", metavar="URI", help=_("open a link in the app (the menu entry passes it)"))
     p.add_argument("--purge", action="store_true", help=_("with --remove/--remove-all: also delete the app data"))
     g = p.add_mutually_exclusive_group()
     g.add_argument("--install", metavar="APK", help=_("install the APK and add a menu entry; a split APK: the base "
@@ -390,7 +392,7 @@ def _main(argv: list[str], env: Mapping[str, str]) -> int:
     mode = (args.install or args.install_request or args.setup_aurora or args.setup_microg or args.list or args.remove
             or args.remove_all or args.version)
     more = tail if (args.install or args.install_request) else []       # the further parts of a split APK
-    if mode and ((tail and not more) or level is not None or args.sdk is not None or args.size):
+    if mode and ((tail and not more) or level is not None or args.sdk is not None or args.size or args.uri):
         parser.error(_("--install, --list, --remove, --remove-all and --version take no other arguments"))
     if args.purge and not (args.remove or args.remove_all):
         parser.error(_("--purge only works with --remove or --remove-all"))
@@ -440,6 +442,8 @@ def _main(argv: list[str], env: Mapping[str, str]) -> int:
 def _start(paths: Paths, args, level: str | None, into: Path | None, tail: list[str],
            env: Mapping[str, str]) -> int:
     target, atl_args = tail[0], tail[1:]
+    if args.uri:                                    # empty: the menu entry started without a link
+        atl_args = [f"--uri={args.uri}", *atl_args]
     apk = resolve_target(paths, target)
     info = cached_apk_info(paths, apk, lang_from_env(env), read_apk_info)
     if args.size:
