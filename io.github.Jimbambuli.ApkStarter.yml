@@ -170,7 +170,7 @@ modules:
       - type: git
         url: https://gitlab.com/Jimbambuli/android_translation_layer.git
         branch: tv6-fix1
-        commit: 902ebde7ffecf1c8b8f4577482b96549d96ba69f
+        commit: 10a6b462aa5cd80e1731f8ea5209e5f03073385c
 
   # atl-doctor (public, fixed commit): JVMTI agent and trace counter for Log/Debug, its Python package for the
   # Debug recorder, and the stub list of exactly this ATL (for stub hits). The starter only records: reports come
@@ -196,7 +196,7 @@ modules:
         commit: db670bef245ca1213ebd05926adb97460c7d48a7
       - type: git
         url: https://gitlab.com/Jimbambuli/android_translation_layer.git
-        commit: 902ebde7ffecf1c8b8f4577482b96549d96ba69f
+        commit: 10a6b462aa5cd80e1731f8ea5209e5f03073385c
         dest: atl-src
 
   # microG: GmsCore and GsfProxy from the official microG F-Droid repository (signing certificate
