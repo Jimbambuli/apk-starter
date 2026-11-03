@@ -121,3 +121,38 @@ def test_desktop_entry_with_links_takes_the_uri():
     assert "Exec=apk-starter --uri %u org.x.y\n" in entry
     assert "MimeType=x-scheme-handler/demo;x-scheme-handler/https;\n" in entry
     assert desktop_entry("org.x.y", "Demo", []) == EXPECTED
+
+
+ENTRY_CLIENT = """
+from apk_starter import portal
+print(repr((portal.launcher_entry("org.x.y"), portal.launcher_entry("org.x.z"))))
+"""
+
+
+def test_launcher_entry_reads_the_entry_or_none(tmp_path):
+    """GetDesktopEntry: the entry the portal keeps; a missing file (removed entry) is None."""
+    import os
+    import shutil
+    import subprocess
+    import sys
+    from pathlib import Path
+    pytest.importorskip("gi")
+    if not shutil.which("dbus-daemon"):
+        pytest.skip("dbus-daemon not installed")
+    here = Path(__file__).parent
+    bus = subprocess.Popen(["dbus-daemon", "--session", "--nofork", "--print-address"], stdout=subprocess.PIPE,
+                           text=True)
+    try:
+        env = {**os.environ, "DBUS_SESSION_BUS_ADDRESS": bus.stdout.readline().strip(),
+               "PYTHONPATH": str(here.parent / "src")}
+        svc = subprocess.Popen([sys.executable, str(here / "fake_portal.py"), str(tmp_path / "calls")], env=env,
+                               stdout=subprocess.PIPE, text=True)
+        try:
+            assert svc.stdout.readline().strip() == "ready"
+            out = subprocess.run([sys.executable, "-c", ENTRY_CLIENT], env=env, capture_output=True, text=True,
+                                 timeout=30)
+            assert out.stdout.strip() == repr(("[Desktop Entry]\nName=Demo\n", None)), out.stderr
+        finally:
+            svc.kill()
+    finally:
+        bus.kill()

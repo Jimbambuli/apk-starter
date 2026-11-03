@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from apk_starter.portal import link_mime_types as real_link_mime_types
+from apk_starter.portal import desktop_entry as real_desktop_entry, link_mime_types as real_link_mime_types
 
 import apk_starter
 from apk_starter.cli import main, split_diag_option
@@ -45,6 +45,8 @@ def box(tmp_path, monkeypatch):
     fake = types.ModuleType("apk_starter.portal")
     fake.PortalUnavailable = PortalUnavailable
     fake.link_mime_types = real_link_mime_types
+    fake.desktop_entry = real_desktop_entry
+    fake.launcher_entry = lambda pkg: None
     def install_launcher(pkg, label, icon, mime_types=()):
         calls.append(("install", pkg, label, icon))
         links[pkg] = list(mime_types)
@@ -461,3 +463,64 @@ def test_uri_goes_to_atl(box):
 def test_empty_uri_from_the_menu_starts_the_app(box):
     assert main(["--uri", "", str(box.apk)], env=box.env) == 0
     assert not any(a.startswith("--uri") for a in json.loads(box.record.read_text())["argv"])
+
+
+OLD_ENTRY = """[Desktop Entry]
+Type=Application
+Name=Mein Demo
+Exec=flatpak run --command=apk-starter io.github.Jimbambuli.ApkStarter org.example.demo
+Icon=/x/io.github.Jimbambuli.ApkStarter.org.example.demo.png
+Terminal=false
+Categories=Utility;
+StartupWMClass=io.github.Jimbambuli.ApkStarter.org.example.demo
+X-ApkStarter-Package=org.example.demo
+"""
+
+
+def _links_apk(box):
+    view = {"actions": ["android.intent.action.VIEW"],
+            "categories": ["android.intent.category.DEFAULT", "android.intent.category.BROWSABLE"]}
+    return make_apk(box.tmp / "links.apk", manifest=axml_manifest(activities=[[dict(view, data=[{"scheme": "demo"}])]]))
+
+
+def test_starter_update_renews_menu_entries_without_new_fields(box):
+    """An entry from an older starter lacks MimeType: after an update it is made again, with the user's name."""
+    from apk_starter.cli import refresh_menu_entries
+    assert main(["--install", str(_links_apk(box))], env=box.env) == 0
+    entries = {PKG: OLD_ENTRY}
+    box.fake.launcher_entry = entries.get
+    box.calls.clear()
+    box.info.write_text("[Instance]\napp-commit=bbbb\n")
+    paths = apk_starter.paths.Paths.from_env(box.env)
+    assert refresh_menu_entries(paths, "de") == [PKG]
+    assert box.calls == [("install", PKG, "Mein Demo", box.calls[0][3])] and box.calls[0][3]
+    assert box.links[PKG] == ["x-scheme-handler/demo"]
+    box.calls.clear()
+    assert refresh_menu_entries(paths, "de") == []      # once per starter build
+    assert box.calls == []
+
+
+def test_starter_update_leaves_current_and_removed_entries(box):
+    from apk_starter.cli import refresh_menu_entries
+    from apk_starter.portal import desktop_entry
+    assert main(["--install", str(_links_apk(box))], env=box.env) == 0
+    paths = apk_starter.paths.Paths.from_env(box.env)
+    box.calls.clear()
+    current = desktop_entry(PKG, "Demo", ["x-scheme-handler/demo"]).replace("Exec=apk-starter", "Exec=flatpak run x")
+    box.fake.launcher_entry = {PKG: current}.get
+    box.info.write_text("[Instance]\napp-commit=bbbb\n")
+    assert refresh_menu_entries(paths, "de") == []
+    box.fake.launcher_entry = {}.get                     # the user removed the entry: not made again
+    box.info.write_text("[Instance]\napp-commit=cccc\n")
+    assert refresh_menu_entries(paths, "de") == []
+    assert box.calls == []
+
+
+def test_window_after_update_renews_menu_entries(box):
+    from apk_starter.cli import prepare_all
+    assert main(["--install", str(_links_apk(box))], env=box.env) == 0
+    box.fake.launcher_entry = {PKG: OLD_ENTRY}.get
+    box.calls.clear()
+    box.info.write_text("[Instance]\napp-commit=bbbb\n")
+    prepare_all(apk_starter.paths.Paths.from_env(box.env), box.env, lambda _m: None)
+    assert [c[:3] for c in box.calls] == [("install", PKG, "Mein Demo")]

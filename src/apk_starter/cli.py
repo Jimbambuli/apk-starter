@@ -508,17 +508,61 @@ def _prepare_start(paths: Paths, env: Mapping[str, str], pkg: str, apk: Path) ->
 
 
 def prepare_all(paths: Paths, env: Mapping[str, str], report: Callable[[str], None]) -> None:
-    """Window opened after a Flatpak update (or before anything was prepared): runtime and all apps, once.
-    A failure is only noted on stderr: ART then compiles at the start, as before."""
+    """Window opened after a Flatpak update (or before anything was prepared): runtime and all apps, once;
+    then the menu entries get what this starter writes. A failure is only noted on stderr: ART then compiles
+    at the start, as before."""
     try:
         dexopt.ensure_runtime(paths, env, report)
     except (StarterError, OSError) as e:
         _stderr(_("the Android runtime could not be prepared in advance: {reason}").format(reason=describe_error(e)))
         return
+    refresh_menu_entries(paths, lang_from_env(env))
     stale = dexopt.stale_installed(paths)
     if stale:
         report(_("Preparing apps for this computer…"))
     _compile_later(paths, env, stale)
+
+
+def _entry_fields(entry: str) -> dict[str, str]:
+    return dict(line.split("=", 1) for line in entry.splitlines() if "=" in line and not line.startswith("#"))
+
+
+def refresh_menu_entries(paths: Paths, lang: str | None) -> list[str]:
+    """Once per starter build: menu entries made by an older starter get the fields it did not write yet
+    (e.g. MimeType). Name (the user may have changed it) and Exec (the portal rewrites it) are kept; removed
+    entries stay removed. Each renewed entry is a portal confirmation, like installing."""
+    from . import portal
+    marker = paths.cache_home / "apk-starter" / "menu-entries"
+    key = dexopt.runtime_key(paths)
+    try:
+        if not MENU_ENTRIES or marker.read_text(encoding="utf-8") == key:
+            return []
+    except OSError:
+        pass
+    renewed = []
+    for meta in list_installed(paths):
+        pkg = meta["package"]
+        try:
+            current = portal.launcher_entry(pkg)
+            if current is None:
+                continue
+            have = _entry_fields(current)
+            info = read_apk_info(paths.apk(pkg), lang)
+            mime = portal.link_mime_types(info.link_filters)
+            want = _entry_fields(portal.desktop_entry(pkg, have.get("Name", info.label), mime))
+            if all(have.get(k) == v for k, v in want.items() if k not in ("Name", "Exec")):
+                continue
+            with package_lock(paths, pkg):
+                icon = info.icon if info.icon is not None else paths.default_icon().read_bytes()
+                portal.install_launcher(pkg, want["Name"], icon, mime_types=mime)
+            renewed.append(pkg)
+        except (StarterError, OSError) as e:
+            _stderr(_("{app} keeps its old menu entry: {reason}").format(app=meta.get("label", pkg),
+                                                                        reason=describe_error(e)))
+    with contextlib.suppress(OSError):
+        marker.parent.mkdir(parents=True, exist_ok=True)
+        _write_atomic(marker, key.encode("utf-8"))
+    return renewed
 
 
 def _compile_later(paths: Paths, env: Mapping[str, str], locations: list[str]) -> None:

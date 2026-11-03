@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-03 18:04+0000\n"
+"POT-Creation-Date: 2026-11-03 21:18+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -347,15 +347,20 @@ msgstr "keine APK angegeben"
 msgid "no log: cannot write {file}: {reason}"
 msgstr "kein Protokoll: {file} kann nicht beschrieben werden: {reason}"
 
-#: src/apk_starter/cli.py:498 src/apk_starter/cli.py:516
+#: src/apk_starter/cli.py:498 src/apk_starter/cli.py:517
 #, python-brace-format
 msgid "the Android runtime could not be prepared in advance: {reason}"
 msgstr ""
 "die Android-Laufzeit konnte nicht im Voraus vorbereitet werden: {reason}"
 
-#: src/apk_starter/cli.py:520
+#: src/apk_starter/cli.py:522
 msgid "Preparing apps for this computer…"
 msgstr "Apps werden für diesen Computer vorbereitet …"
+
+#: src/apk_starter/cli.py:560
+#, python-brace-format
+msgid "{app} keeps its old menu entry: {reason}"
+msgstr "{app} behält den alten Menüeintrag: {reason}"
 
 #: src/apk_starter/dexopt.py:140
 #, python-brace-format
@@ -850,16 +855,16 @@ msgstr "microG-Einstellungen"
 msgid "invalid package name: {package}"
 msgstr "ungültiger Paketname: {package}"
 
-#: src/apk_starter/portal.py:109
+#: src/apk_starter/portal.py:97
 #, python-brace-format
 msgid "portal call {method} failed: {reason}"
 msgstr "Portal-Aufruf {method} fehlgeschlagen: {reason}"
 
-#: src/apk_starter/portal.py:134
+#: src/apk_starter/portal.py:122
 msgid "portal did not answer"
 msgstr "das Portal hat nicht geantwortet"
 
-#: src/apk_starter/portal.py:154
+#: src/apk_starter/portal.py:142
 msgid "menu entry not created (cancelled)"
 msgstr "Menüeintrag nicht angelegt (abgebrochen)"
 

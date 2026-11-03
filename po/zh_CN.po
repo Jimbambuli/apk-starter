@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-03 18:04+0000\n"
+"POT-Creation-Date: 2026-11-03 21:18+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -325,14 +325,19 @@ msgstr "未指定 APK"
 msgid "no log: cannot write {file}: {reason}"
 msgstr "无日志：无法写入 {file}：{reason}"
 
-#: src/apk_starter/cli.py:498 src/apk_starter/cli.py:516
+#: src/apk_starter/cli.py:498 src/apk_starter/cli.py:517
 #, python-brace-format
 msgid "the Android runtime could not be prepared in advance: {reason}"
 msgstr "无法提前准备 Android 运行时：{reason}"
 
-#: src/apk_starter/cli.py:520
+#: src/apk_starter/cli.py:522
 msgid "Preparing apps for this computer…"
 msgstr "正在为此计算机准备应用…"
+
+#: src/apk_starter/cli.py:560
+#, python-brace-format
+msgid "{app} keeps its old menu entry: {reason}"
+msgstr "{app} 保留旧的菜单项：{reason}"
 
 #: src/apk_starter/dexopt.py:140
 #, python-brace-format
@@ -818,16 +823,16 @@ msgstr "microG 设置"
 msgid "invalid package name: {package}"
 msgstr "无效的包名：{package}"
 
-#: src/apk_starter/portal.py:109
+#: src/apk_starter/portal.py:97
 #, python-brace-format
 msgid "portal call {method} failed: {reason}"
 msgstr "门户调用 {method} 失败：{reason}"
 
-#: src/apk_starter/portal.py:134
+#: src/apk_starter/portal.py:122
 msgid "portal did not answer"
 msgstr "门户没有响应"
 
-#: src/apk_starter/portal.py:154
+#: src/apk_starter/portal.py:142
 msgid "menu entry not created (cancelled)"
 msgstr "未创建菜单项（已取消）"
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-03 18:04+0000\n"
+"POT-Creation-Date: 2026-11-03 21:18+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -308,13 +308,18 @@ msgstr ""
 msgid "no log: cannot write {file}: {reason}"
 msgstr ""
 
-#: src/apk_starter/cli.py:498 src/apk_starter/cli.py:516
+#: src/apk_starter/cli.py:498 src/apk_starter/cli.py:517
 #, python-brace-format
 msgid "the Android runtime could not be prepared in advance: {reason}"
 msgstr ""
 
-#: src/apk_starter/cli.py:520
+#: src/apk_starter/cli.py:522
 msgid "Preparing apps for this computer…"
+msgstr ""
+
+#: src/apk_starter/cli.py:560
+#, python-brace-format
+msgid "{app} keeps its old menu entry: {reason}"
 msgstr ""
 
 #: src/apk_starter/dexopt.py:140
@@ -795,16 +800,16 @@ msgstr ""
 msgid "invalid package name: {package}"
 msgstr ""
 
-#: src/apk_starter/portal.py:109
+#: src/apk_starter/portal.py:97
 #, python-brace-format
 msgid "portal call {method} failed: {reason}"
 msgstr ""
 
-#: src/apk_starter/portal.py:134
+#: src/apk_starter/portal.py:122
 msgid "portal did not answer"
 msgstr ""
 
-#: src/apk_starter/portal.py:154
+#: src/apk_starter/portal.py:142
 msgid "menu entry not created (cancelled)"
 msgstr ""
 

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-03 18:04+0000\n"
+"POT-Creation-Date: 2026-11-03 21:18+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -347,14 +347,19 @@ msgstr "geen APK opgegeven"
 msgid "no log: cannot write {file}: {reason}"
 msgstr "geen logboek: kan niet schrijven naar {file}: {reason}"
 
-#: src/apk_starter/cli.py:498 src/apk_starter/cli.py:516
+#: src/apk_starter/cli.py:498 src/apk_starter/cli.py:517
 #, python-brace-format
 msgid "the Android runtime could not be prepared in advance: {reason}"
 msgstr "de Android-runtime kon niet vooraf worden voorbereid: {reason}"
 
-#: src/apk_starter/cli.py:520
+#: src/apk_starter/cli.py:522
 msgid "Preparing apps for this computer…"
 msgstr "Apps worden voorbereid voor deze computer…"
+
+#: src/apk_starter/cli.py:560
+#, python-brace-format
+msgid "{app} keeps its old menu entry: {reason}"
+msgstr "{app} houdt het oude menu-item: {reason}"
 
 #: src/apk_starter/dexopt.py:140
 #, python-brace-format
@@ -848,16 +853,16 @@ msgstr "microG-instellingen"
 msgid "invalid package name: {package}"
 msgstr "ongeldige pakketnaam: {package}"
 
-#: src/apk_starter/portal.py:109
+#: src/apk_starter/portal.py:97
 #, python-brace-format
 msgid "portal call {method} failed: {reason}"
 msgstr "portaalaanroep {method} mislukt: {reason}"
 
-#: src/apk_starter/portal.py:134
+#: src/apk_starter/portal.py:122
 msgid "portal did not answer"
 msgstr "het portaal antwoordde niet"
 
-#: src/apk_starter/portal.py:154
+#: src/apk_starter/portal.py:142
 msgid "menu entry not created (cancelled)"
 msgstr "menu-item niet aangemaakt (geannuleerd)"
 

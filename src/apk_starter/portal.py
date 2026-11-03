@@ -144,6 +144,21 @@ def install_launcher(pkg: str, label: str, icon: bytes, mime_types: list[str] = 
           GLib.Variant("(sssa{sv})", (results["token"], desktop_file_id(pkg), desktop_entry(pkg, label, mime_types), {})))
 
 
+def launcher_entry(pkg: str) -> str | None:
+    """The menu entry as the portal keeps it (its Exec and Icon rewritten), None when there is none."""
+    _check_pkg(pkg)
+    Gio, GLib = _gi()
+    conn = _connect(Gio, GLib)
+    try:
+        reply = _call(conn, Gio, GLib, "org.freedesktop.portal.DynamicLauncher", "GetDesktopEntry",
+                      GLib.Variant("(s)", (desktop_file_id(pkg),)))
+    except PortalUnavailable:
+        raise
+    except StarterError:
+        return None                     # the portal answers with the file's error: removed or never made
+    return reply.unpack()[0]
+
+
 def uninstall_launcher(pkg: str) -> None:
     _check_pkg(pkg)
     Gio, GLib = _gi()
