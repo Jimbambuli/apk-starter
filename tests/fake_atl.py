@@ -17,7 +17,8 @@ if rec:
                    "check": bool(check) and os.path.exists(check),
                    "log_tags": os.environ.get("ANDROID_LOG_TAGS"),
                    "installed_apks": os.environ.get("ATL_INSTALLED_APKS_DIR"),
-                   "install_command": os.environ.get("ATL_INSTALL_COMMAND")}, f)
+                   "install_command": os.environ.get("ATL_INSTALL_COMMAND"),
+                   "launch_command": os.environ.get("ATL_LAUNCH_COMMAND")}, f)
 for a in sys.argv[1:]:
     if a.startswith("-agentpath:"):
         with open(a.split("=", 1)[1].split(",")[0], "a") as f:

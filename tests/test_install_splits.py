@@ -37,6 +37,7 @@ def test_install_base_and_parts_then_start_with_them(box):
                      str(apps / f"{PKG}.splits" / "config.x86_64.apk")]
     assert rec["installed_apks"] == str(apps)
     assert rec["install_command"].endswith("apk-starter --install-request")
+    assert rec["launch_command"].endswith("bin/apk-starter")
     assert main(["--remove", PKG], env=box.env) == 0
     assert not (apps / f"{PKG}.splits").exists()
 

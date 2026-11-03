@@ -101,6 +101,7 @@ def build_env(paths: Paths, pkg: str, base: Mapping[str, str]) -> dict[str, str]
     # app stores (Aurora Store): ATL finds the installed apps here and hands installs back to the starter
     env["ATL_INSTALLED_APKS_DIR"] = str(paths.apps_dir())
     env["ATL_INSTALL_COMMAND"] = f"{paths.program()} --install-request"
+    env["ATL_LAUNCH_COMMAND"] = str(paths.program())   # "Open" in the store: the starter starts the package
     env.pop("ATL_APP_ICON", None)
     if paths.icon(pkg).is_file():
         env["ATL_APP_ICON"] = str(paths.icon(pkg))     # for ATL's title bar; ATL cannot draw adaptive icons
