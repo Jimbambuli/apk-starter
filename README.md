@@ -3,6 +3,9 @@
 Run Android apps (APK files) on the Linux desktop – a Flatpak built on
 [Android Translation Layer (ATL)](https://gitlab.com/android_translation_layer/android_translation_layer).
 
+Works: JW Library, Jetpack Compose apps, Aurora Store, microG (Google sign-in for apps), most free apps from F-Droid.
+Limits: x86_64 APKs only, no ARM-only apps; camera, Bluetooth and telephony are not supported.
+
 ## Install
 
 ```
@@ -123,8 +126,8 @@ Uninstalling: run `apk-starter --remove-all` before `flatpak uninstall io.github
 `flatpak uninstall` does not remove the menu entries of the installed apps; desktops hide them once APK Starter is
 gone, but the files stay in `~/.local/share/xdg-desktop-portal/` (and come back if you install APK Starter again).
 
-Bring your own APK – this project ships ATL and its free dependencies only, no apps. Apps that need Google Play
-Services, Jetpack Compose or ARM-only native libraries are not expected to work.
+Bring your own APK – this project ships ATL and its free dependencies only, no apps. Only apps with x86_64 native libraries (or none) run;
+ARM-only apps are refused. Apps that use Google Play Services need microG (see above).
 
 ## Permissions
 
@@ -168,7 +171,9 @@ for l in $(cat po/LINGUAS); do msgmerge --update --backup=none po/$l.po po/apk-s
 
 ## Credits and license
 
-License: GPL-3.0-or-later (same as ATL), see [LICENSE](LICENSE). Not affiliated with Google; Android is a trademark
+License: GPL-3.0-or-later (same as ATL), see [LICENSE](LICENSE). Built from: ATL (GPL-3.0), art_standalone
+(Apache-2.0), bionic_translation, wolfSSL (GPL). Aurora Store and microG are not shipped; on request they are
+downloaded from their official sources and checked. Not affiliated with Google; Android is a trademark
 of Google LLC.
 
 The app icon (`data/icons/io.github.Jimbambuli.ApkStarter.svg`) is licensed under
