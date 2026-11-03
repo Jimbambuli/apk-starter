@@ -112,6 +112,15 @@ modules:
         url: https://gitlab.com/Jimbambuli/bionic_translation.git
         commit: c845fedd3a7f9a473e58c96608ac38735e2c0553
 
+  # ATL project's OpenSL ES (SDL2 + libsndfile from the runtime): native app libraries that open
+  # libOpenSLES.so (e.g. WhatsApp's libwhatsapp.so needs slCreateEngine).
+  - name: libopensles-standalone
+    buildsystem: meson
+    sources:
+      - type: git
+        url: https://gitlab.com/android_translation_layer/libopensles-standalone.git
+        commit: c6982620c7dadeb90220b23c575b25eeffda765f
+
   - name: art_standalone
     buildsystem: simple
     build-options:
@@ -130,10 +139,10 @@ modules:
       - type: git
         url: https://gitlab.com/Jimbambuli/art_standalone.git
         branch: tv6-fix1
-        commit: a6a9158dcc24c17e3c86ec030588ebe59148ccb8
+        commit: 4ad87c43ae406e1c6ecf351c37c24f941d1bef64
       - type: git
         url: https://github.com/Jimbambuli/atl-doctor.git
-        commit: db670bef245ca1213ebd05926adb97460c7d48a7
+        commit: cf285a8ed17bed86251160fe6048d0ed4bf1ac1a
         dest: atl-doctor
 
   # ATL's jni_upcall_gen resolves asm/asm-tree/java-getopt via xmvn5-resolve or
@@ -170,7 +179,7 @@ modules:
       - type: git
         url: https://gitlab.com/Jimbambuli/android_translation_layer.git
         branch: tv6-fix1
-        commit: 10a6b462aa5cd80e1731f8ea5209e5f03073385c
+        commit: 01891a261b42f94607c250fcbee60f706009e4f2
 
   # atl-doctor (public, fixed commit): JVMTI agent and trace counter for Log/Debug, its Python package for the
   # Debug recorder, and the stub list of exactly this ATL (for stub hits). The starter only records: reports come
@@ -193,10 +202,10 @@ modules:
     sources:
       - type: git
         url: https://github.com/Jimbambuli/atl-doctor.git
-        commit: db670bef245ca1213ebd05926adb97460c7d48a7
+        commit: cf285a8ed17bed86251160fe6048d0ed4bf1ac1a
       - type: git
         url: https://gitlab.com/Jimbambuli/android_translation_layer.git
-        commit: 10a6b462aa5cd80e1731f8ea5209e5f03073385c
+        commit: 01891a261b42f94607c250fcbee60f706009e4f2
         dest: atl-src
 
   - name: apk-starter
