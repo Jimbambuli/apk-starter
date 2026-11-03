@@ -225,7 +225,7 @@ def install_parts(paths: Paths, info: ApkInfo, parts: tuple[tuple[str, Path], ..
                 icon = b""
         try:
             portal.install_launcher(info.package, info.label, icon,
-                                    mime_types=portal.link_mime_types(info.link_filters, info.package))
+                                    mime_types=portal.link_mime_types(info.link_filters))
         except portal.PortalUnavailable:
             raise StarterError(
                 _("{app} is installed without a menu entry: the DynamicLauncher portal is not available; "

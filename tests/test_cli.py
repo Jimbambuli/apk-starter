@@ -445,6 +445,10 @@ def test_install_offers_the_app_for_its_links(box):
         dict(view, autoVerify=True, data=[{"scheme": "https", "host": "example.com"}])]]))
     assert main(["--install", str(apk)], env=box.env) == 0
     assert box.links[PKG] == ["x-scheme-handler/demo", "x-scheme-handler/https"]
+    web = make_apk(box.tmp / "web.apk", manifest=axml_manifest(activities=[[
+        dict(view, data=[{"scheme": "http"}, {"scheme": "https"}, {"host": "www.example.net"}])]]))
+    assert main(["--install", str(web)], env=box.env) == 0
+    assert box.links[PKG] == ["x-scheme-handler/http", "x-scheme-handler/https"]
     assert main(["--install", str(box.apk)], env=box.env) == 0
     assert box.links[PKG] == []
 

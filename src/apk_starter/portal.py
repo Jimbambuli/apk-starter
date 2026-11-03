@@ -32,28 +32,16 @@ def _check_pkg(pkg: str) -> str:
 # RFC 3986 scheme; not links: files, inline content, script and Android-internal intents
 _SCHEME_RE = re.compile(r"[a-z][a-z0-9+.-]*")
 _NOT_LINKS = {"content", "file", "data", "javascript", "vbscript", "about", "blob", "intent"}
-_SHARED_DOMAINS = {"github.io", "gitlab.io", "codeberg.page", "sourceforge.io", "appspot.com", "web.app"}
 
 
-def _own_host(host: str, pkg: str) -> bool:
-    """The app's own web domain: the reversed start of its package name (org.jw.… -> jw.org)."""
-    parts = pkg.lower().split(".")
-    domain = f"{parts[1]}.{parts[0]}"
-    host = host.lower().lstrip("*.")
-    return domain not in _SHARED_DOMAINS and (host == domain or host.endswith("." + domain))
-
-
-def link_mime_types(filters: Iterable[LinkFilter], pkg: str) -> list[str]:
-    """x-scheme-handler types for the menu entry from the app's link filters (VIEW + BROWSABLE). Its own schemes,
-    and http(s) only for verified (android:autoVerify) or its own hosts: a web browser stays the default, the app
-    is offered under «Open with»."""
+def link_mime_types(filters: Iterable[LinkFilter]) -> list[str]:
+    """x-scheme-handler types for the menu entry from the app's link filters (VIEW + BROWSABLE). MimeType only offers
+    the app (http(s) under «Open with», like Android's chooser); the default stays what mimeapps.list says, for
+    web links the browser."""
     out: set[str] = set()
     for f in filters:
-        web_ok = f.auto_verify or any(_own_host(h, pkg) for h in f.hosts)
         for scheme in (s.lower() for s in f.schemes):
             if not _SCHEME_RE.fullmatch(scheme) or scheme in _NOT_LINKS:
-                continue
-            if scheme in ("http", "https") and not web_ok:
                 continue
             out.add(f"x-scheme-handler/{scheme}")
     return sorted(out)

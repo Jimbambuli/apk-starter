@@ -64,8 +64,8 @@ for other processors (e.g. ARM); if the app is ended by a signal, 128+N.
 ### Links
 
 The menu entry of an installed app offers it for the links its activities accept (Android intent filters with
-VIEW and BROWSABLE): its own schemes (e.g. `jwlibrary:`) and, for web links, only verified (`android:autoVerify`)
-or the app's own domains, under **Open with**; the web browser stays the default. A link goes to the running app,
+VIEW and BROWSABLE): its own schemes (e.g. `jwlibrary:`) and web links (`https:`, e.g. YouTube links for NewPipe)
+under **Open with**; the web browser stays the default for web links. A link goes to the running app,
 which gets it like on Android (`onNewIntent`). Apps installed before this need `--install` again.
 
 ### App stores (Aurora Store)
