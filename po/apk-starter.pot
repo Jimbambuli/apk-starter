@@ -806,6 +806,11 @@ msgstr ""
 msgid "cannot write log {file}: {reason}"
 msgstr ""
 
+#: src/apk_starter/run.py:141
+#, python-brace-format
+msgid "android-translation-layer was killed by {signal}"
+msgstr ""
+
 #: src/apk_starter/run.py:102
 msgid "android-translation-layer not found"
 msgstr ""
@@ -813,11 +818,6 @@ msgstr ""
 #: src/apk_starter/run.py:107
 #, python-brace-format
 msgid "cannot start android-translation-layer: {reason}"
-msgstr ""
-
-#: src/apk_starter/run.py:141
-#, python-brace-format
-msgid "android-translation-layer was killed by {signal}"
 msgstr ""
 
 #: src/apk_starter/splits.py:49

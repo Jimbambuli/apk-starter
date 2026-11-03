@@ -856,6 +856,11 @@ msgstr "beschadigd bronblok op positie {offset}"
 msgid "cannot write log {file}: {reason}"
 msgstr "kan logboek {file} niet schrijven: {reason}"
 
+#: src/apk_starter/run.py:141
+#, python-brace-format
+msgid "android-translation-layer was killed by {signal}"
+msgstr "android-translation-layer is beëindigd door {signal}"
+
 #: src/apk_starter/run.py:102
 msgid "android-translation-layer not found"
 msgstr "android-translation-layer niet gevonden"
@@ -864,11 +869,6 @@ msgstr "android-translation-layer niet gevonden"
 #, python-brace-format
 msgid "cannot start android-translation-layer: {reason}"
 msgstr "kan android-translation-layer niet starten: {reason}"
-
-#: src/apk_starter/run.py:141
-#, python-brace-format
-msgid "android-translation-layer was killed by {signal}"
-msgstr "android-translation-layer is beëindigd door {signal}"
 
 #: src/apk_starter/splits.py:49
 #, python-brace-format

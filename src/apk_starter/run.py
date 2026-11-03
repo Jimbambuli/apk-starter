@@ -17,6 +17,10 @@ from .paths import Paths
 LOG_FORMAT = 1
 HEADER_PREFIX = "# apk-starter: "
 FORWARDED = (signal.SIGINT, signal.SIGTERM, signal.SIGHUP)
+# ATL's exit status when the app ends its process to be started anew (ProcessPhoenix: on Android a component of
+# another process kills the main process and starts the app again; ATL runs all of them in one process)
+EXIT_RESTART = 75
+MAX_RESTARTS = 5        # per start, against an app that restarts in a loop
 
 
 def default_log_path(paths: Paths, pkg: str, now: datetime) -> Path:
@@ -92,6 +96,38 @@ def run_atl(cmd: list[str], env: dict[str, str], log: Path | None, header: dict[
         except OSError as e:
             raise StarterError(_("cannot write log {file}: {reason}").format(file=log, reason=e.strerror)) from None
     t0 = time.monotonic()
+    restarts = 0
+    while True:
+        rc, last = _run_once(cmd, env, log, logf)
+        if rc != EXIT_RESTART or restarts == MAX_RESTARTS:
+            break
+        restarts += 1
+        if logf:
+            logf.write(("" if last == b"\n" else "\n").encode() + f"{HEADER_PREFIX}restart\n".encode())
+            logf.flush()
+    duration = time.monotonic() - t0
+    sig_name = None
+    if rc < 0:
+        try:
+            sig_name = signal.Signals(-rc).name
+        except ValueError:
+            sig_name = f"SIG{-rc}"
+        rc = 128 - rc
+        msg = _("android-translation-layer was killed by {signal}").format(signal=sig_name)
+        sys.stderr.write(f"apk-starter: {msg}\n")
+        sys.stderr.flush()
+    if logf:
+        tail = b"" if last == b"\n" else b"\n"
+        if sig_name:
+            tail += f"{HEADER_PREFIX}signal={sig_name}\n".encode()
+        tail += f"{HEADER_PREFIX}exit={rc}\n{HEADER_PREFIX}duration={duration:.1f}\n".encode()
+        logf.write(tail)
+        logf.close()
+    return rc
+
+
+def _run_once(cmd: list[str], env: dict[str, str], log: Path | None, logf) -> tuple[int, bytes]:
+    """One ATL process: its exit status (negative: the signal) and the last byte of its output."""
     try:
         proc = subprocess.Popen(cmd, env=env, **({"stdout": subprocess.PIPE, "stderr": subprocess.STDOUT}
                                                  if logf else {}))
@@ -130,22 +166,4 @@ def run_atl(cmd: list[str], env: dict[str, str], log: Path | None, header: dict[
             signal.signal(sig, old)
         if proc.stdout:
             proc.stdout.close()
-    duration = time.monotonic() - t0
-    sig_name = None
-    if rc < 0:
-        try:
-            sig_name = signal.Signals(-rc).name
-        except ValueError:
-            sig_name = f"SIG{-rc}"
-        rc = 128 - rc
-        msg = _("android-translation-layer was killed by {signal}").format(signal=sig_name)
-        sys.stderr.write(f"apk-starter: {msg}\n")
-        sys.stderr.flush()
-    if logf:
-        tail = b"" if last == b"\n" else b"\n"
-        if sig_name:
-            tail += f"{HEADER_PREFIX}signal={sig_name}\n".encode()
-        tail += f"{HEADER_PREFIX}exit={rc}\n{HEADER_PREFIX}duration={duration:.1f}\n".encode()
-        logf.write(tail)
-        logf.close()
-    return rc
+    return rc, last

@@ -851,6 +851,11 @@ msgstr "オフセット {offset} のリソースチャンクが破損してい�
 msgid "cannot write log {file}: {reason}"
 msgstr "ログ {file} を書き込めません: {reason}"
 
+#: src/apk_starter/run.py:141
+#, python-brace-format
+msgid "android-translation-layer was killed by {signal}"
+msgstr "android-translation-layer はシグナル {signal} で強制終了されました"
+
 #: src/apk_starter/run.py:102
 msgid "android-translation-layer not found"
 msgstr "android-translation-layer が見つかりません"
@@ -859,11 +864,6 @@ msgstr "android-translation-layer が見つかりません"
 #, python-brace-format
 msgid "cannot start android-translation-layer: {reason}"
 msgstr "android-translation-layer を起動できません: {reason}"
-
-#: src/apk_starter/run.py:141
-#, python-brace-format
-msgid "android-translation-layer was killed by {signal}"
-msgstr "android-translation-layer はシグナル {signal} で強制終了されました"
 
 #: src/apk_starter/splits.py:49
 #, python-brace-format

@@ -851,6 +851,11 @@ msgstr "poškozený blok prostředků na pozici {offset}"
 msgid "cannot write log {file}: {reason}"
 msgstr "nelze zapsat protokol {file}: {reason}"
 
+#: src/apk_starter/run.py:141
+#, python-brace-format
+msgid "android-translation-layer was killed by {signal}"
+msgstr "android-translation-layer byl ukončen signálem {signal}"
+
 #: src/apk_starter/run.py:102
 msgid "android-translation-layer not found"
 msgstr "android-translation-layer nebyl nalezen"
@@ -859,11 +864,6 @@ msgstr "android-translation-layer nebyl nalezen"
 #, python-brace-format
 msgid "cannot start android-translation-layer: {reason}"
 msgstr "nelze spustit android-translation-layer: {reason}"
-
-#: src/apk_starter/run.py:141
-#, python-brace-format
-msgid "android-translation-layer was killed by {signal}"
-msgstr "android-translation-layer byl ukončen signálem {signal}"
 
 #: src/apk_starter/splits.py:49
 #, python-brace-format

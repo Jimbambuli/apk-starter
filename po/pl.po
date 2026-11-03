@@ -855,6 +855,11 @@ msgstr "uszkodzony blok zasobów na pozycji {offset}"
 msgid "cannot write log {file}: {reason}"
 msgstr "nie można zapisać dziennika {file}: {reason}"
 
+#: src/apk_starter/run.py:141
+#, python-brace-format
+msgid "android-translation-layer was killed by {signal}"
+msgstr "android-translation-layer został zakończony sygnałem {signal}"
+
 #: src/apk_starter/run.py:102
 msgid "android-translation-layer not found"
 msgstr "nie znaleziono android-translation-layer"
@@ -863,11 +868,6 @@ msgstr "nie znaleziono android-translation-layer"
 #, python-brace-format
 msgid "cannot start android-translation-layer: {reason}"
 msgstr "nie można uruchomić android-translation-layer: {reason}"
-
-#: src/apk_starter/run.py:141
-#, python-brace-format
-msgid "android-translation-layer was killed by {signal}"
-msgstr "android-translation-layer został zakończony sygnałem {signal}"
 
 #: src/apk_starter/splits.py:49
 #, python-brace-format

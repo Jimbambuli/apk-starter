@@ -852,6 +852,11 @@ msgstr "повреждённый блок ресурсов в позиции {of
 msgid "cannot write log {file}: {reason}"
 msgstr "не удалось записать журнал {file}: {reason}"
 
+#: src/apk_starter/run.py:141
+#, python-brace-format
+msgid "android-translation-layer was killed by {signal}"
+msgstr "android-translation-layer завершён сигналом {signal}"
+
 #: src/apk_starter/run.py:102
 msgid "android-translation-layer not found"
 msgstr "android-translation-layer не найден"
@@ -860,11 +865,6 @@ msgstr "android-translation-layer не найден"
 #, python-brace-format
 msgid "cannot start android-translation-layer: {reason}"
 msgstr "не удалось запустить android-translation-layer: {reason}"
-
-#: src/apk_starter/run.py:141
-#, python-brace-format
-msgid "android-translation-layer was killed by {signal}"
-msgstr "android-translation-layer завершён сигналом {signal}"
 
 #: src/apk_starter/splits.py:49
 #, python-brace-format

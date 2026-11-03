@@ -832,6 +832,11 @@ msgstr "偏移 {offset} 处的资源块已损坏"
 msgid "cannot write log {file}: {reason}"
 msgstr "无法写入日志 {file}：{reason}"
 
+#: src/apk_starter/run.py:141
+#, python-brace-format
+msgid "android-translation-layer was killed by {signal}"
+msgstr "android-translation-layer 被 {signal} 终止"
+
 #: src/apk_starter/run.py:102
 msgid "android-translation-layer not found"
 msgstr "找不到 android-translation-layer"
@@ -840,11 +845,6 @@ msgstr "找不到 android-translation-layer"
 #, python-brace-format
 msgid "cannot start android-translation-layer: {reason}"
 msgstr "无法启动 android-translation-layer：{reason}"
-
-#: src/apk_starter/run.py:141
-#, python-brace-format
-msgid "android-translation-layer was killed by {signal}"
-msgstr "android-translation-layer 被 {signal} 终止"
 
 #: src/apk_starter/splits.py:49
 #, python-brace-format

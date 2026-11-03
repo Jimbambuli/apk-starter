@@ -26,6 +26,24 @@ def test_exit_code_passed_through(tmp_path):
     assert run_atl(fake_cmd(), fake_env("exit:3"), None, {}) == 3
 
 
+def test_restart_status_starts_atl_again_into_the_same_log(tmp_path):
+    """ATL ends with 75 when the app restarts itself (ProcessPhoenix): the starter starts it again."""
+    log = tmp_path / "a.log"
+    assert run_atl(fake_cmd(), fake_env(f"restart:{tmp_path / 'once'}"), log, {"format": "1"}) == 0
+    text = log.read_text()
+    assert text.count("fake atl output\n") == 2 and text.count("# apk-starter: format=1") == 1
+    assert "# apk-starter: restart\n" in text and text.endswith(text[text.rindex("# apk-starter: exit=0"):])
+
+
+def test_restart_is_limited(tmp_path, monkeypatch):
+    import apk_starter.run as run
+    monkeypatch.setattr(run, "MAX_RESTARTS", 2)
+    calls = tmp_path / "calls"
+    cmd = [sys.executable, "-c", f"open({str(calls)!r}, 'a').write('x'); raise SystemExit(75)"]
+    assert run_atl(cmd, dict(os.environ), None, {}) == 75
+    assert calls.read_text() == "xxx"
+
+
 def test_signal_maps_to_128_plus_n_and_trailer(tmp_path, capsys):
     log = tmp_path / "a.log"
     assert run_atl(fake_cmd(), fake_env("signal:11"), log, {"format": "1"}) == 139

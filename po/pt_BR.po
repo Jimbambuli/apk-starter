@@ -856,6 +856,11 @@ msgstr "bloco de recursos corrompido na posição {offset}"
 msgid "cannot write log {file}: {reason}"
 msgstr "não foi possível gravar o log {file}: {reason}"
 
+#: src/apk_starter/run.py:141
+#, python-brace-format
+msgid "android-translation-layer was killed by {signal}"
+msgstr "android-translation-layer foi encerrado por {signal}"
+
 #: src/apk_starter/run.py:102
 msgid "android-translation-layer not found"
 msgstr "android-translation-layer não encontrado"
@@ -864,11 +869,6 @@ msgstr "android-translation-layer não encontrado"
 #, python-brace-format
 msgid "cannot start android-translation-layer: {reason}"
 msgstr "não foi possível iniciar o android-translation-layer: {reason}"
-
-#: src/apk_starter/run.py:141
-#, python-brace-format
-msgid "android-translation-layer was killed by {signal}"
-msgstr "android-translation-layer foi encerrado por {signal}"
 
 #: src/apk_starter/splits.py:49
 #, python-brace-format
