@@ -45,6 +45,8 @@ def test_select_keeps_x86_64_and_drops_other_abis(tmp_path):
 @pytest.mark.parametrize("base_files,parts", [
     ({"lib/arm64-v8a/l.so": b"x", "lib/armeabi-v7a/l.so": b"x"}, []),
     ({}, [("config.arm64_v8a", {"lib/arm64-v8a/l.so": b"x"})]),
+    ({}, [("config.arm64_v8a", {})]),                                   # the name alone tells the ABI
+    ({}, [("feature", {"lib/arm64-v8a/l.so": b"x"}), ("config.de", {})]),   # lib/ in any part
 ])
 def test_select_refuses_arm_only_apps(tmp_path, base_files, parts):
     s = splits.collect([part(tmp_path, "b.apk", files=base_files)]
@@ -84,3 +86,8 @@ def test_bundle_without_apk_is_refused(tmp_path):
         z.writestr("toc.pb", b"")
     with pytest.raises(ApkError, match="no APK"):
         splits.expand([bundle], tmp_path / "out")
+
+
+def test_base_with_x86_64_part_is_allowed(tmp_path):
+    s = splits.collect([part(tmp_path, "b.apk"), part(tmp_path, "x.apk", "config.x86_64", files={"lib/x86_64/l.so": b"x"})])
+    assert splits.select(s, "Demo") == s

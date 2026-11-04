@@ -118,8 +118,12 @@ def collect(files: list[Path]) -> SplitSet:
 
 
 def abis(s: SplitSet) -> set[str]:
-    """The ABIs with native code: lib/ folders of the base and the ABI parts."""
-    return read_part(s.base)[2] | {ABI_SPLITS[n] for n, _p in s.splits if n in ABI_SPLITS}
+    """The ABIs with native code: lib/ folders of the base and of every part, and the names of the ABI parts."""
+    found = read_part(s.base)[2]
+    for n, p in s.splits:
+        found |= read_part(p)[2]
+        found |= {ABI_SPLITS[k] for k in (n, n.removeprefix("split_")) if k in ABI_SPLITS}
+    return found
 
 
 def select(s: SplitSet, label: str) -> SplitSet:
