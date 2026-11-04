@@ -573,3 +573,21 @@ def test_update_with_another_signer_is_refused_like_android(box, capsys):
     assert (box.data / "apps" / f"{PKG}.apk").read_bytes() == before
     same = sign_block(make_apk(box.tmp / "c.apk", manifest=axml_manifest(version_name="3.0")), fake_cert("microG"))
     assert main(["--install", str(same)], env=box.env) == 0
+
+
+def test_starter_update_finds_the_icon_an_older_one_missed(box):
+    """Apps from an app store had no icon (bitmaps in the density part): the update finds it and renews the entry."""
+    from test_apkinfo import _split_app, _res
+    from apkgen import Res, png_bytes
+    from apk_starter.portal import desktop_entry
+    from apk_starter.cli import refresh_menu_entries
+    base, part, _ids = _split_app(box.tmp, _res({"anydpi-v26": "res/c.xml"}), {"res/c.xml": b"<x/>"},
+                                  _res({"xxhdpi": "res/ic.png"}), {"res/ic.png": png_bytes(144, 144)})
+    assert main(["--install", str(base), str(part)], env=box.env) == 0
+    paths = apk_starter.paths.Paths.from_env(box.env)
+    paths.icon(PKG).unlink()                            # as an older starter left it
+    box.fake.launcher_entry = {PKG: desktop_entry(PKG, "Demo")}.get
+    box.calls.clear()
+    box.info.write_text("[Instance]\napp-commit=bbbb\n")
+    assert refresh_menu_entries(paths, None) == [PKG]
+    assert box.calls[0][3] == png_bytes(144, 144) == paths.icon(PKG).read_bytes()

@@ -108,3 +108,68 @@ def test_fuzz_damaged_zip_bytes_never_traceback(tmp_path):
             read_apk_info(bad)
         except ApkError:
             pass
+
+
+# -- icons of apps from an app store: in the density parts, adaptive icons (Marcel 4.11.2026) ---------------------
+import xml.etree.ElementTree as ET  # noqa: E402
+
+from apkgen import axml_doc  # noqa: E402
+
+
+def _res(icon_cfgs, extra=()):
+    return [Res("string", "app_name", {"": "Demo"}), Res("mipmap", "ic", icon_cfgs), *extra]
+
+
+def _split_app(tmp_path, base_res, base_files, split_res, split_files):
+    """A base and its config.xxhdpi part, both with a resources.arsc of the same IDs, like bundletool makes them."""
+    arsc, ids = arsc_table("org.example.demo", base_res)
+    man = axml_manifest(label=ids["string/app_name"], icon=ids["mipmap/ic"])
+    base = make_apk(tmp_path / "base.apk", manifest=man, arsc=arsc, files=base_files)
+    sarsc, _ = arsc_table("org.example.demo", split_res)
+    part = make_apk(tmp_path / "x.apk", manifest=axml_manifest(split="config.xxhdpi"), arsc=sarsc, files=split_files)
+    return base, part, ids
+
+
+def test_icon_from_the_density_part(tmp_path):
+    from apk_starter.cli import read_parts
+    base, part, _ = _split_app(tmp_path, _res({"anydpi-v26": "res/c.xml"}), {"res/c.xml": b"<x/>"},
+                               _res({"xxhdpi": "res/ic.png"}), {"res/ic.png": png_bytes(144, 144)})
+    info, _parts = read_parts(None, [base, part], None, tmp_path)
+    assert png_size(info.icon) == (144, 144)
+
+
+def _adaptive(ids, foreground):
+    return axml_doc(("adaptive-icon", {}, [("background", {"drawable": ("ref", ids["color/bg"])}, []),
+                                           ("foreground", {"drawable": ("ref", ids[foreground])}, [])]))
+
+
+VECTOR = ("vector", {"width": ("dimen", 108), "height": ("dimen", 108), "viewportWidth": ("float", 108.0),
+                     "viewportHeight": ("float", 108.0)},
+          [("group", {"translateX": ("float", 10.0), "rotation": ("float", 45.0), "pivotX": ("float", 54.0),
+                      "pivotY": ("float", 54.0)},
+            [("path", {"pathData": "M30,30h48v48h-48z", "fillColor": ("color", 0xFFFFFFFF)}, [])])])
+
+
+def test_adaptive_icon_with_a_vector_foreground_is_drawn_as_svg(tmp_path):
+    names = _res({"anydpi-v26": "res/ic.xml"}, [Res("color", "bg", {"": (0x1C, 0xFF3366CC)}),
+                                               Res("drawable", "fg", {"": "res/fg.xml"})])
+    arsc, ids = arsc_table("org.example.demo", names)
+    apk = make_apk(tmp_path / "a.apk", manifest=axml_manifest(label=ids["string/app_name"], icon=ids["mipmap/ic"]),
+                   arsc=arsc, files={"res/ic.xml": _adaptive(ids, "drawable/fg"), "res/fg.xml": axml_doc(VECTOR)})
+    svg = read_apk_info(apk).icon
+    root = ET.fromstring(svg)                       # well-formed
+    text = svg.decode()
+    assert root.tag.endswith("svg") and 'fill="#3366cc"' in text and 'd="M30,30h48v48h-48z"' in text
+    assert 'fill="#ffffff"' in text and "rotate(45" in text and "translate(64" in text
+
+
+def test_adaptive_icon_with_a_bitmap_foreground_in_the_density_part(tmp_path):
+    from apk_starter.cli import read_parts
+    extra = [Res("color", "bg", {"": (0x1C, 0xFF000000)}), Res("mipmap", "fg", {})]   # its bitmaps: only in the part
+    _a, ids = arsc_table("org.example.demo", _res({}, extra))
+    base, part, ids = _split_app(
+        tmp_path, _res({"anydpi-v26": "res/ic.xml"}, extra), {"res/ic.xml": _adaptive(ids, "mipmap/fg")},
+        _res({}, [Res("color", "bg", {"": (0x1C, 0xFF000000)}), Res("mipmap", "fg", {"xxhdpi": "res/fg.png"})]),
+        {"res/fg.png": png_bytes(162, 162)})
+    info, _parts = read_parts(None, [base, part], None, tmp_path)
+    assert b"data:image/png;base64," in info.icon and ET.fromstring(info.icon) is not None

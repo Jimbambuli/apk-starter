@@ -27,6 +27,23 @@ class ResourceTable:
         steps = [0]
         return self._resolve(res_id, 0, steps)
 
+    def resolve_values(self, res_id: int) -> list[tuple[Config, int, int, str | None]]:
+        """Every value of the resource after following references: (config, data type, data, string or None)."""
+        out: list[tuple[Config, int, int, str | None]] = []
+        todo, seen = [res_id], set()
+        while todo and len(seen) < MAX_STEPS:
+            rid = todo.pop(0)
+            if rid in seen:
+                continue
+            seen.add(rid)
+            for cfg, dtype, data in self._entries.get(rid, []):
+                if dtype == 0x01:
+                    todo.append(data)
+                else:
+                    out.append((cfg, dtype, data,
+                                self._strings[data] if dtype == 0x03 and data < len(self._strings) else None))
+        return out
+
     def _resolve(self, res_id: int, depth: int, steps: list[int]) -> list[tuple[Config, str]]:
         if depth > MAX_DEPTH:
             raise ApkError(_("resource reference loop"))

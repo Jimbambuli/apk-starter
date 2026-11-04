@@ -162,6 +162,8 @@ def arsc_table(package: str, res: list[Res], *, utf8=True, mode: str = "dense") 
     values: list[str] = []
 
     def value(v):
+        if isinstance(v, tuple):                    # a typed value (dataType, data), e.g. (0x1C, 0xFF3366CC)
+            return v
         if isinstance(v, int):
             return 0x01, v
         if v.startswith("@"):
@@ -283,3 +285,48 @@ def pkcs7(cert: bytes) -> bytes:
     signed_data = _der(0x30, _der(0x02, b"\x01") + _der(0x31, b"") + _der(0x30, _der(0x06, b"\x2a\x86\x48\x86\xf7\x0d\x01\x07\x01"))
                        + _der(0xA0, cert) + _der(0x31, b""))
     return _der(0x30, _der(0x06, b"\x2a\x86\x48\x86\xf7\x0d\x01\x07\x02") + _der(0xA0, signed_data))
+
+
+ANDROID_ATTRS = {"drawable": 0x01010199, "pathData": 0x01010405, "fillColor": 0x01010404, "strokeColor": 0x01010406,
+                 "strokeWidth": 0x01010407, "fillAlpha": 0x010104cc, "fillType": 0x0101051e, "width": 0x01010159,
+                 "height": 0x01010155, "viewportWidth": 0x01010402, "viewportHeight": 0x01010403,
+                 "rotation": 0x01010326, "pivotX": 0x010101b5, "pivotY": 0x010101b6, "scaleX": 0x01010324,
+                 "scaleY": 0x01010325, "translateX": 0x0101045a, "translateY": 0x0101045b, "inset": 0x010104b5}
+
+
+def axml_doc(root: tuple) -> bytes:
+    """Binary XML of a tree (tag, {android attribute: value}, [children]). A value is a str, ("ref", id),
+    ("color", 0xAARRGGBB), ("float", f) or ("dimen", dp) - as aapt2 writes them."""
+    names = list(ANDROID_ATTRS)
+    strings = list(names)
+
+    def add(x: str) -> int:
+        strings.append(x)
+        return len(strings) - 1
+    ns = add(NS_URI)
+
+    def element(node) -> bytes:
+        tag, attrs, children = node
+        n = add(tag)
+        out = []
+        for k, v in attrs.items():
+            i = names.index(k)
+            if isinstance(v, str):
+                r = add(v)
+                out.append((ns, i, r, 0x03, r))
+            elif v[0] == "ref":
+                out.append((ns, i, 0xFFFFFFFF, 0x01, v[1]))
+            elif v[0] == "color":
+                out.append((ns, i, 0xFFFFFFFF, 0x1C, v[1]))
+            elif v[0] == "float":
+                out.append((ns, i, 0xFFFFFFFF, 0x04, struct.unpack("<I", struct.pack("<f", v[1]))[0]))
+            elif v[0] == "dimen":
+                out.append((ns, i, 0xFFFFFFFF, 0x05, (int(v[1]) << 8) | 0x01))   # radix 23p0, unit dp
+            elif v[0] == "fraction":
+                out.append((ns, i, 0xFFFFFFFF, 0x06, (int(v[1] * (1 << 23)) << 8) & 0xFFFFFF00 | 0x30))
+        return _start(n, out) + b"".join(element(c) for c in children) + _end(n)
+    body = _chunk(0x0100, 16, struct.pack("<IIII", 1, 0xFFFFFFFF, 0xFFFFFFFF, ns)) + element(root)
+    pool = string_pool(strings, True)
+    rm = _chunk(0x0180, 8, b"".join(struct.pack("<I", ANDROID_ATTRS[n]) for n in names))
+    payload = pool + rm + body
+    return struct.pack("<HHI", 0x0003, 8, 8 + len(payload)) + payload

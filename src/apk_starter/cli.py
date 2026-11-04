@@ -13,7 +13,7 @@ from collections.abc import Callable, Iterator, Mapping, MutableMapping
 from datetime import datetime
 from pathlib import Path
 
-from .apkinfo import PACKAGE_RE, ApkInfo, read_apk_info
+from .apkinfo import PACKAGE_RE, ApkInfo, read_apk_info, read_icon
 from .errors import ApkError, SignatureConflict, StarterError, UsageError, describe_error
 from .i18n import _
 from . import dexopt, diag, i18n, splits
@@ -201,7 +201,10 @@ def read_parts(paths: Paths, files: list[Path], lang: str | None, tmp: Path) -> 
         return info, splits.select(splits.SplitSet(info.package, parts[0], ()), info.label)
     s = splits.collect(parts)
     info = read_apk_info(s.base, lang)
-    return info, splits.select(s, info.label)
+    chosen = splits.select(s, info.label)
+    if chosen.splits:                               # an app store puts the bitmaps into the density parts
+        info = dataclasses.replace(info, icon=read_icon(s.base, [p for _n, p in chosen.splits]) or info.icon)
+    return info, chosen
 
 
 def parts_dir(paths: Paths) -> tempfile.TemporaryDirectory:
@@ -581,11 +584,16 @@ def refresh_menu_entries(paths: Paths, lang: str | None, renewing: Callable[[str
             info = read_apk_info(paths.apk(pkg), lang)
             mime = portal.link_mime_types(info.link_filters)
             want = _entry_fields(portal.desktop_entry(pkg, have.get("Name", info.label), mime))
-            if all(have.get(k) == v for k, v in want.items() if k not in ("Name", "Exec")):
+            # an icon an older starter did not find (density parts, adaptive icons)
+            new_icon = None if paths.icon(pkg).is_file() else \
+                read_icon(paths.apk(pkg), paths.installed_splits(pkg)) or info.icon
+            if new_icon is None and all(have.get(k) == v for k, v in want.items() if k not in ("Name", "Exec")):
                 continue
             renewing(pkg)
             with package_lock(paths, pkg):
-                icon = info.icon if info.icon is not None else paths.default_icon().read_bytes()
+                if new_icon is not None:
+                    _write_atomic(paths.icon(pkg), new_icon)
+                icon = paths.icon(pkg).read_bytes() if paths.icon(pkg).is_file() else paths.default_icon().read_bytes()
                 portal.install_launcher(pkg, want["Name"], icon, mime_types=mime)
             renewed.append(pkg)
         except portal.PortalUnavailable:
