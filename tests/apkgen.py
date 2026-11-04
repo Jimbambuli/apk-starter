@@ -60,8 +60,8 @@ def axml_manifest(*, package="org.example.demo", version_code=7, version_name="1
         attr_names.append("icon")
     if activities is not None:
         ids.update({"name": 0x01010003, "scheme": 0x01010027, "host": 0x01010028, "pathPrefix": 0x0101002b,
-                    "autoVerify": 0x010104ee})
-        attr_names += ["name", "scheme", "host", "pathPrefix", "autoVerify"]
+                    "autoVerify": 0x010104ee, "mimeType": 0x01010026})
+        attr_names += ["name", "scheme", "host", "pathPrefix", "autoVerify", "mimeType"]
     strings = [("" if strip_names else n) for n in attr_names]  # resource-mapped names come first
     resmap = [ids[n] for n in attr_names]
     idx = {n: i for i, n in enumerate(attr_names)}

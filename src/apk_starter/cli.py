@@ -244,7 +244,7 @@ def install_parts(paths: Paths, info: ApkInfo, parts: tuple[tuple[str, Path], ..
                 icon = b""
         try:
             portal.install_launcher(info.package, info.label, icon,
-                                    mime_types=portal.link_mime_types(info.link_filters))
+                                    mime_types=menu_mime_types(portal, info))
         except portal.PortalUnavailable:
             raise StarterError(
                 _("{app} is installed without a menu entry: the DynamicLauncher portal is not available; "
@@ -565,6 +565,11 @@ def prepare_all(paths: Paths, env: Mapping[str, str], report: Callable[[str], No
         working({})
 
 
+def menu_mime_types(portal, info: ApkInfo) -> list[str]:
+    """MimeType of the menu entry: the links the app opens and the files it takes shared («Open with»)."""
+    return portal.link_mime_types(info.link_filters) + portal.share_mime_types(info.share_types)
+
+
 def _entry_fields(entry: str) -> dict[str, str]:
     return dict(line.split("=", 1) for line in entry.splitlines() if "=" in line and not line.startswith("#"))
 
@@ -591,7 +596,7 @@ def refresh_menu_entries(paths: Paths, lang: str | None, renewing: Callable[[str
                 continue
             have = _entry_fields(current)
             info = read_apk_info(paths.apk(pkg), lang)
-            mime = portal.link_mime_types(info.link_filters)
+            mime = menu_mime_types(portal, info)
             want = _entry_fields(portal.desktop_entry(pkg, have.get("Name", info.label), mime))
             # an icon an older starter did not find (density parts, adaptive icons)
             new_icon = None if paths.icon(pkg).is_file() else \

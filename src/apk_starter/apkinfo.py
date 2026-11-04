@@ -32,6 +32,7 @@ class ApkInfo:
     target_sdk: int | None
     icon: bytes | None
     link_filters: tuple[LinkFilter, ...] = ()      # for the menu entry's MimeType (links opened in the app)
+    share_types: tuple[str, ...] = ()               # likewise: files it takes shared (ACTION_SEND)
 
 
 def _read(z: zipfile.ZipFile, name: str, limit: int) -> bytes:
@@ -114,6 +115,7 @@ def read_apk_info(path: Path, lang: str | None = None) -> ApkInfo:
                 target_sdk=m.target_sdk,
                 icon=icon,
                 link_filters=m.link_filters,
+                share_types=m.share_types,
             )
     except zipfile.BadZipFile:
         raise ApkError(_("not an APK (no AndroidManifest.xml): {file}").format(file=path)) from None

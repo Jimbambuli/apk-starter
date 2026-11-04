@@ -47,6 +47,16 @@ def link_mime_types(filters: Iterable[LinkFilter]) -> list[str]:
     return sorted(out)
 
 
+_MIME_RE = re.compile(r"[a-z0-9][a-z0-9!#$&^_.+-]*/(\*|[a-z0-9][a-z0-9!#$&^_.+-]*)")
+
+
+def share_mime_types(types: Iterable[str]) -> list[str]:
+    """MimeType for the types the app takes shared (ACTION_SEND/SEND_MULTIPLE): it is offered under «Open with»
+    for such files; the default stays what mimeapps.list says. */* is left out (every file)."""
+    out = {t.lower() for t in types if _MIME_RE.fullmatch(t.lower()) and not t.startswith("*")}
+    return sorted(out)
+
+
 def desktop_entry(pkg: str, label: str, mime_types: list[str] = ()) -> str:
     _check_pkg(pkg)
     text = re.sub(r"\r\n|\r|\n", " ", label)

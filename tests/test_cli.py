@@ -7,7 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from apk_starter.portal import desktop_entry as real_desktop_entry, link_mime_types as real_link_mime_types
+from apk_starter.portal import desktop_entry as real_desktop_entry, link_mime_types as real_link_mime_types, \
+    share_mime_types as real_share_mime_types
 
 import apk_starter
 from apk_starter.cli import main, split_diag_option
@@ -45,6 +46,7 @@ def box(tmp_path, monkeypatch):
     fake = types.ModuleType("apk_starter.portal")
     fake.PortalUnavailable = PortalUnavailable
     fake.link_mime_types = real_link_mime_types
+    fake.share_mime_types = real_share_mime_types
     fake.desktop_entry = real_desktop_entry
     fake.launcher_entry = lambda pkg: None
     def install_launcher(pkg, label, icon, mime_types=()):
@@ -591,3 +593,15 @@ def test_starter_update_finds_the_icon_an_older_one_missed(box):
     box.info.write_text("[Instance]\napp-commit=bbbb\n")
     assert refresh_menu_entries(paths, None) == [PKG]
     assert box.calls[0][3] == png_bytes(144, 144) == paths.icon(PKG).read_bytes()
+
+
+def test_menu_entry_offers_the_app_for_files_it_takes_shared(box):
+    """Desktop -> app: «Open with» for the types of its SEND filters; ATL hands the file over as ACTION_SEND."""
+    send = {"actions": ["android.intent.action.SEND"], "categories": ["android.intent.category.DEFAULT"],
+            "data": [{"mimeType": "image/*"}, {"mimeType": "*/*"}]}
+    view = {"actions": ["android.intent.action.VIEW"],
+            "categories": ["android.intent.category.DEFAULT", "android.intent.category.BROWSABLE"],
+            "data": [{"scheme": "demo"}]}
+    apk = make_apk(box.tmp / "share.apk", manifest=axml_manifest(activities=[[send, view]]))
+    assert main(["--install", str(apk)], env=box.env) == 0
+    assert box.links[PKG] == ["x-scheme-handler/demo", "image/*"]

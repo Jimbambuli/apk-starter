@@ -20,10 +20,13 @@ NAME_TO_ID = {
     "versionName": 0x0101021C, "minSdkVersion": 0x0101020C, "targetSdkVersion": 0x01010270,
 }
 # <intent-filter android:autoVerify>, <action|category android:name>, <data android:scheme|host>
-LINK_ATTRS = {0x01010003: "name", 0x01010027: "scheme", 0x01010028: "host", 0x010104EE: "autoVerify"}
+LINK_ATTRS = {0x01010003: "name", 0x01010027: "scheme", 0x01010028: "host", 0x010104EE: "autoVerify",
+              0x01010026: "mimeType"}
 LINK_NAMES = {v: k for k, v in LINK_ATTRS.items()}
 VIEW = "android.intent.action.VIEW"
 BROWSABLE = "android.intent.category.BROWSABLE"
+DEFAULT = "android.intent.category.DEFAULT"
+SEND_ACTIONS = ("android.intent.action.SEND", "android.intent.action.SEND_MULTIPLE")
 
 
 @dataclass(frozen=True)
@@ -53,6 +56,7 @@ class ManifestInfo:
     icon: int | None
     split: str | None = None        # <manifest split="config.x86_64">: a configuration part of a split APK
     link_filters: tuple[LinkFilter, ...] = ()
+    share_types: tuple[str, ...] = ()   # MIME types of SEND/SEND_MULTIPLE filters in CATEGORY_DEFAULT
 
 
 def parse_manifest(data: bytes) -> ManifestInfo:
@@ -72,6 +76,7 @@ def _parse(data: bytes) -> ManifestInfo:
     split = None
     found: dict[tuple[str, str], object] = {}
     links: list[LinkFilter] = []
+    share: list[str] = []
     in_activity = False
     flt: dict | None = None             # the <intent-filter> being read inside an <activity>
     pos = hsize
@@ -92,13 +97,13 @@ def _parse(data: bytes) -> ManifestInfo:
                 attrs = _link_attrs(data, pos, astart, asize, acount, strings, resmap)
                 if tag == "intent-filter":
                     flt = {"auto_verify": attrs.get("autoVerify") is True, "actions": set(), "categories": set(),
-                           "schemes": [], "hosts": []}
+                           "schemes": [], "hosts": [], "types": []}
                 elif flt is not None and tag == "action" and isinstance(attrs.get("name"), str):
                     flt["actions"].add(attrs["name"])
                 elif flt is not None and tag == "category" and isinstance(attrs.get("name"), str):
                     flt["categories"].add(attrs["name"])
                 elif flt is not None and tag == "data":
-                    for key, out in (("scheme", "schemes"), ("host", "hosts")):
+                    for key, out in (("scheme", "schemes"), ("host", "hosts"), ("mimeType", "types")):
                         v = attrs.get(key)
                         if isinstance(v, str) and v not in flt[out]:
                             flt[out].append(v)
@@ -136,6 +141,8 @@ def _parse(data: bytes) -> ManifestInfo:
             elif tag == "intent-filter" and flt is not None:
                 if VIEW in flt["actions"] and BROWSABLE in flt["categories"] and flt["schemes"]:
                     links.append(LinkFilter(tuple(flt["schemes"]), tuple(flt["hosts"]), flt["auto_verify"]))
+                if DEFAULT in flt["categories"] and flt["actions"] & set(SEND_ACTIONS):
+                    share += [t for t in flt["types"] if t not in share]
                 flt = None
         pos += sz
 
@@ -158,6 +165,7 @@ def _parse(data: bytes) -> ManifestInfo:
         icon=icon.id if isinstance(icon, ResRef) else None,
         split=split,
         link_filters=tuple(links),
+        share_types=tuple(share),
     )
 
 

@@ -55,3 +55,18 @@ def test_reads_browsable_view_filters(strip):
 
 def test_no_activities_no_link_filters():
     assert parse_manifest(axml_manifest()).link_filters == ()
+
+
+SEND = "android.intent.action.SEND"
+SEND_MULTIPLE = "android.intent.action.SEND_MULTIPLE"
+SIGNAL_ACTIVITIES = [[
+    {"actions": [SEND], "categories": [DEFAULT], "data": [{"mimeType": "image/*"}, {"mimeType": "text/plain"}]},
+    {"actions": [SEND_MULTIPLE], "categories": [DEFAULT], "data": [{"mimeType": "video/*"}, {"mimeType": "*/*"}]},
+    {"actions": [SEND], "data": [{"mimeType": "audio/*"}]},              # no DEFAULT: never chosen implicitly
+]]
+
+
+@pytest.mark.parametrize("strip", [False, True])
+def test_reads_the_types_the_app_takes_shared(strip):
+    m = parse_manifest(axml_manifest(activities=SIGNAL_ACTIVITIES, strip_names=strip))
+    assert m.share_types == ("image/*", "text/plain", "video/*", "*/*")
