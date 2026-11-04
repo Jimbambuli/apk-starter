@@ -101,6 +101,9 @@ def build_env(paths: Paths, pkg: str, base: Mapping[str, str]) -> dict[str, str]
     # app stores (Aurora Store): ATL finds the installed apps here and hands installs back to the starter
     env["ATL_INSTALLED_APKS_DIR"] = str(paths.apps_dir())
     env["ATL_INSTALL_COMMAND"] = f"{paths.program()} --install-request"
+    # ATL sets LC_ALL=C.UTF-8 for the apps; the starter it calls back speaks the desktop's language (i18n)
+    if locale := next((base[v] for v in ("LC_ALL", "LC_MESSAGES", "LANG") if base.get(v)), None):
+        env["APK_STARTER_LOCALE"] = locale
     env["ATL_LAUNCH_COMMAND"] = str(paths.program())   # "Open" in the store: the starter starts the package
     env.pop("ATL_APP_ICON", None)
     if paths.icon(pkg).is_file():

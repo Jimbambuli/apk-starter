@@ -129,3 +129,23 @@ def test_desktop_and_metainfo_get_all_languages(tmp_path):
         subprocess.run(["desktop-file-validate", str(desktop)], check=True)
     if shutil.which("appstreamcli"):
         subprocess.run(["appstreamcli", "validate", "--no-net", str(metainfo)], check=True, capture_output=True)
+
+
+def test_install_request_from_atl_speaks_the_desktop_language(tmp_path, prefix, monkeypatch, capsys):
+    """ATL sets LC_ALL=C.UTF-8 for the apps; an install from Aurora comes from there (Marcel 4.11.2026)."""
+    from apk_starter import install_request
+    from apk_starter.launch import build_env
+    from apk_starter.paths import Paths
+    from apkgen import axml_manifest, make_apk
+    monkeypatch.delenv("LANGUAGE", raising=False)
+    desktop = {**_env(tmp_path, prefix), "LANG": "de_CH.UTF-8"}
+    app_env = build_env(Paths.from_env(desktop), "com.aurora.store", desktop)
+    for k, v in {**app_env, "LC_ALL": "C.UTF-8", "ATL_INSTALLER_LABEL": "Aurora Store"}.items():
+        monkeypatch.setenv(k, v)                    # what ATL hands to the install command
+    asked = []
+    monkeypatch.setattr(install_request, "ask", lambda info, installer, update, env: asked.append(
+        install_request.question(info, installer, update)) or False)
+    apk = make_apk(tmp_path / "w.apk", manifest=axml_manifest(version_name="2.26.42.74"))
+    assert main(["--install-request", str(apk)]) == 3
+    assert asked == [("Demo installieren?", "Von Aurora Store · Version 2.26.42.74", "Abbrechen", "Installieren")]
+    assert capsys.readouterr().err.strip().endswith("abgebrochen")

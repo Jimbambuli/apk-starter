@@ -383,6 +383,7 @@ def main(argv: list[str] | None = None, env: Mapping[str, str] | None = None) ->
     env = os.environ if env is None else env
     if isinstance(env, MutableMapping):
         apply_profile(env)
+        i18n.follow_desktop(env)
     i18n.setup(Paths.from_env(env).prefix)
     try:
         return _main(argv, env)

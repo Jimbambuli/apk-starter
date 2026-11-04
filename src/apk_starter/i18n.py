@@ -13,6 +13,14 @@ def setup(prefix: Path) -> None:
     gettext.textdomain(DOMAIN)
 
 
+def follow_desktop(env) -> None:
+    """Called back by an app (install from an app store, «Open»): ATL has set LC_ALL=C.UTF-8 for the apps; the
+    desktop's locale came along in APK_STARTER_LOCALE (launch.build_env)."""
+    saved = env.get("APK_STARTER_LOCALE")
+    if saved and env.get("LC_ALL", "").split(".")[0] in ("C", "POSIX"):
+        env["LC_ALL"] = saved
+
+
 def _(message: str) -> str:
     return gettext.dgettext(DOMAIN, message)
 

@@ -22,6 +22,13 @@ def _say(text: str) -> None:
     print(f"apk-starter: {text}", file=sys.stderr, flush=True)
 
 
+def question(info: ApkInfo, installer: str, update: bool) -> tuple[str, str, str, str]:
+    """Heading, line, cancel and confirm text of the question; short, like Android's installer."""
+    heading = (_("Update {app}?") if update else _("Install {app}?")).format(app=info.label)
+    line = _("From {installer} · Version {version}").format(installer=installer, version=info.version_name or "–")
+    return heading, line, _("Cancel"), _("Update") if update else _("Install")
+
+
 def ask(info: ApkInfo, installer: str, update: bool, env: Mapping[str, str]) -> bool:
     """The question in a small window of its own (not the management window: that may be closed, or open in
     another instance). True: install."""
@@ -38,11 +45,8 @@ def ask(info: ApkInfo, installer: str, update: bool, env: Mapping[str, str]) -> 
     def activate(a: Gtk.Application) -> None:
         install_styles(Gtk.Window().get_display())
         owner = Gtk.ApplicationWindow(application=a, title="APK Starter")    # stays hidden: the dialog's parent
-        verb = _("Update") if update else _("Install")
-        heading = (_("Update {app}?") if update else _("Install {app}?")).format(app=info.label)
-        body = _("{installer} wants to install {app} {version}. It gets a menu entry like every installed "
-                 "app.").format(installer=installer, app=info.label, version=info.version_name or "")
-        d = Dialog(owner, heading, body, [("cancel", _("Cancel")), ("install", verb)],
+        heading, line, cancel, verb = question(info, installer, update)
+        d = Dialog(owner, heading, line, [("cancel", cancel), ("install", verb)],
                    then=lambda rid: (answer.append(rid == "install"), a.quit()))
         d.set_application(a)
         d.present()
