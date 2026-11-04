@@ -1,4 +1,6 @@
+import gzip
 import json
+import tarfile
 import time
 import os
 import sys
@@ -143,9 +145,9 @@ def test_version_line(box, capsys):
 
 def test_every_start_writes_a_plain_log(box):
     assert main([str(box.apk)], env=box.env) == 0
-    logs = list((box.data / "logs").glob(f"{PKG}-*.log"))
-    assert len(logs) == 1
-    lines = logs[0].read_text().splitlines()
+    logs = list((box.data / "logs").glob(f"{PKG}-*.log.gz"))      # packed when the app has ended
+    assert len(logs) == 1 and not list((box.data / "logs").glob(f"{PKG}-*.log"))
+    lines = gzip.decompress(logs[0].read_bytes()).decode().splitlines()
     assert lines[0] == "# apk-starter: format=1" and lines[-2].startswith("# apk-starter: exit=0")
 
 
@@ -368,7 +370,7 @@ def test_log_has_no_agent_and_only_the_last_three_are_kept(box):
     for i in range(5):
         assert main([str(box.apk)], env=box.env) == 0
         time.sleep(1.1)                                 # the file name has the second
-    logs = sorted((box.data / "logs").glob(f"{PKG}-*.log"))
+    logs = sorted((box.data / "logs").glob(f"{PKG}-*.log.gz"))
     assert len(logs) == 3
     assert not any(x.startswith("-agentpath") for x in json.loads(box.record.read_text())["argv"])
 
@@ -386,6 +388,14 @@ def test_remembered_debug_applies_to_every_start_of_the_app(box, monkeypatch):
     assert len(seen) == 1 and not list((box.data / "logs").glob("*.log"))     # a recording folder instead of a log
 
 
+def _unpacked(box, archive: Path) -> Path:
+    """A Debug recording is packed when the app has ended: its folder, unpacked for the test."""
+    out = box.tmp / "unpacked"
+    with tarfile.open(archive) as t:
+        t.extractall(out, filter="data")
+    return out / archive.name.removesuffix(".tar.gz")
+
+
 def test_debug_level_records_a_folder_for_atl_doctor(box):
     pytest.importorskip("atl_doctor")
     make_apk(box.apk, manifest=axml_manifest(), files={"classes.dex": DEX})     # atl-doctor reads the code
@@ -396,7 +406,7 @@ def test_debug_level_records_a_folder_for_atl_doctor(box):
     rec = json.loads(box.record.read_text())
     assert rec["log_tags"] == "*:v [bionic_linker]:i" and rec["data_dir"] == str(box.data / "data" / PKG)
     assert rec["argv"][0] == str(box.tmp / "cache/apk-starter/launch" / f"{PKG}.apk")
-    folder = next((box.data / "logs").glob(f"{PKG}-*"))
+    folder = _unpacked(box, next((box.data / "logs").glob(f"{PKG}-*.tar.gz")))
     m = json.loads((folder / "manifest.json").read_text())
     assert m["exit_status"] == 3 and m["package"] == PKG and "fake atl output" in (folder / "atl.log").read_text()
     assert main(["--debug=" + str(box.tmp / "own"), str(box.apk)], env=box.env) == 0
@@ -419,7 +429,7 @@ def test_debug_asks_for_a_view_tree_while_the_app_runs(box, monkeypatch):
     from apk_starter import diag
     monkeypatch.setattr(diag, "TREE_AFTER_S", 0.3)
     assert main(["--debug", str(box.apk)], env={**box.env, "FAKE_ATL_MODE": "sleep:2"}) == 0
-    folder = next((box.data / "logs").glob(f"{PKG}-*"))
+    folder = _unpacked(box, next((box.data / "logs").glob(f"{PKG}-*.tar.gz")))
     assert [l.split("\t")[3] for l in (folder / "marks.tsv").read_text().splitlines()] == ["start", "running"]
 
 

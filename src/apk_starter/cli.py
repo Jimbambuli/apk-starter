@@ -511,6 +511,9 @@ def _start(paths: Paths, args, level: str | None, into: Path | None, tail: list[
             return diag.record_restarting(paths, cmd, child_env, debug_dir, info.package)
         return run_atl(cmd, child_env, log_path, header)
     finally:
+        for rec in (log_path, debug_dir):           # one compressed file each, as soon as the app has ended
+            if rec is not None:
+                diag.pack(paths, rec)
         diag.prune(paths, info.package)
         background.join()       # the Flatpak instance (and every process in it) ends with this one
 

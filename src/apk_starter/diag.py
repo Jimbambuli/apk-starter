@@ -20,7 +20,7 @@ from .paths import Paths
 # (one per symbol it binds, ~550 000 for JW Library) made the start several times slower
 VERBOSE_LOG = {"ANDROID_LOG_TAGS": "*:v [bionic_linker]:i"}
 TREE_AFTER_S = 10.0                     # Debug: one phase mark "running" then (view tree, memory) if the app still runs
-_NAME = re.compile(r"(?P<pkg>.+)-(?P<time>\d{8}-\d{6})(?P<log>\.log)?")
+_NAME = re.compile(r"(?P<pkg>.+)-(?P<time>\d{8}-\d{6})(?P<ext>\.log|\.log\.gz|\.tar\.gz)?")
 
 
 def default_debug_dir(paths: Paths, pkg: str, now: datetime) -> Path:
@@ -111,9 +111,10 @@ def recordings(paths: Paths, pkg: str | None = None) -> list[Recording]:
         m = _NAME.fullmatch(p.name)
         if not m or not PACKAGE_RE.fullmatch(m["pkg"]) or (pkg is not None and m["pkg"] != pkg):
             continue
-        if m["log"] and p.is_file():
+        ext = m["ext"]
+        if ext in (".log", ".log.gz") and p.is_file():
             kind = "log"
-        elif not m["log"] and (p / "manifest.json").is_file():
+        elif (ext == ".tar.gz" and p.is_file()) or (not ext and (p / "manifest.json").is_file()):
             kind = "debug"
         else:
             continue
@@ -123,6 +124,38 @@ def recordings(paths: Paths, pkg: str | None = None) -> list[Recording]:
             continue
         out.append(Recording(p, m["pkg"], started, kind))
     return sorted(out, key=lambda r: (r.started, r.path.name), reverse=True)
+
+
+def pack(paths: Paths, path: Path) -> Path | None:
+    """After the run: a recording in the log folder becomes one compressed file, the plain log <name>.log.gz, a
+    Debug folder <name>.tar.gz (Marcel 4.11.2026). Returns the archive, or None if `path` is not such a
+    recording (e.g. --debug=DIR) or it cannot be packed (it then stays as it is)."""
+    import gzip
+    import tarfile
+    m = _NAME.fullmatch(path.name)
+    if path.parent != paths.logs_dir() or not m or m["ext"] not in (None, ".log"):
+        return None
+    if m["ext"] == ".log" and path.is_file():
+        dest = path.with_name(path.name + ".gz")
+    elif not m["ext"] and (path / "manifest.json").is_file():
+        dest = path.with_name(path.name + ".tar.gz")
+    else:
+        return None
+    tmp = dest.with_name(f".{dest.name}.tmp")
+    try:
+        if dest.name.endswith(".tar.gz"):
+            with tarfile.open(tmp, "w:gz") as t:
+                # files and folders only: not the recorder's control FIFO
+                t.add(path, arcname=path.name, filter=lambda ti: ti if ti.isfile() or ti.isdir() else None)
+        else:
+            with open(path, "rb") as src, gzip.open(tmp, "wb") as out:
+                shutil.copyfileobj(src, out, 1 << 20)
+        tmp.replace(dest)
+    except OSError:
+        tmp.unlink(missing_ok=True)
+        return None
+    _remove(path)
+    return dest
 
 
 KEEP_LOGS = 3                           # plain logs per app

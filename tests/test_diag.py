@@ -118,3 +118,37 @@ def test_debug_restart_is_limited(tmp_path, monkeypatch):
                                   record_once=lambda *a: calls.append(1) or 75) == 75
     from apk_starter.run import MAX_RESTARTS
     assert len(calls) == MAX_RESTARTS + 1
+
+
+# -- packed after the run (Marcel 4.11.2026): <name>.log.gz and <name>.tar.gz ---------------------------------------
+import gzip  # noqa: E402
+import tarfile  # noqa: E402
+
+
+def test_pack_compresses_the_log_and_the_debug_folder(tmp_path):
+    p = _paths(tmp_path)
+    log, debug = _make(p, "org.a", 1, "log", 5000), _make(p, "org.a", 2, "debug", 5000)
+    assert diag.pack(p, log) == log.with_name(log.name + ".gz") and not log.exists()
+    assert gzip.decompress(log.with_name(log.name + ".gz").read_bytes()) == b"x" * 5000
+    packed = diag.pack(p, debug)
+    assert packed == debug.with_name(debug.name + ".tar.gz") and not debug.exists()
+    with tarfile.open(packed) as t:
+        assert sorted(t.getnames()) == [debug.name, f"{debug.name}/atl.log", f"{debug.name}/manifest.json"]
+    assert [(r.path, r.kind) for r in diag.recordings(p, "org.a")] == [(packed, "debug"),
+                                                                      (log.with_name(log.name + ".gz"), "log")]
+
+
+def test_prune_counts_the_archives(tmp_path):
+    p = _paths(tmp_path)
+    logs = [diag.pack(p, _make(p, "org.a", n, "log")) for n in range(5)]
+    debugs = [diag.pack(p, _make(p, "org.a", n + 10, "debug")) for n in range(7)]
+    diag.prune(p, "org.a")
+    assert [f.exists() for f in logs] == [False] * 2 + [True] * 3
+    assert [f.exists() for f in debugs] == [False] * 2 + [True] * 5
+
+
+def test_pack_leaves_what_is_not_a_recording(tmp_path):
+    p = _paths(tmp_path)
+    mine = tmp_path / "chosen-folder"                  # --debug=DIR: the user's folder stays as it is
+    mine.mkdir()
+    assert diag.pack(p, mine) is None and mine.is_dir()
