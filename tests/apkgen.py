@@ -49,7 +49,7 @@ def _end(name: int) -> bytes:
 def axml_manifest(*, package="org.example.demo", version_code=7, version_name="1.2", min_sdk=21,
                   target_sdk=34, label: str | int = "Demo", icon: int | None = None,
                   utf8=True, strip_names=False, split: str | None = None,
-                  activities: list | None = None) -> bytes:
+                  activities: list | None = None, permissions: list | None = None) -> bytes:
     """activities: one list of intent filters per <activity>; a filter is a dict with "actions", "categories",
     "data" (list of {attribute: value}) and optionally "autoVerify": True. Their attribute names are plain
     strings (with strip_names=True empty, found by resource ID like in shrunk APKs)."""
@@ -58,7 +58,7 @@ def axml_manifest(*, package="org.example.demo", version_code=7, version_name="1
     attr_names = ["versionCode", "versionName", "minSdkVersion", "targetSdkVersion", "label"]
     if icon is not None:
         attr_names.append("icon")
-    if activities is not None:
+    if activities is not None or permissions:
         ids.update({"name": 0x01010003, "scheme": 0x01010027, "host": 0x01010028, "pathPrefix": 0x0101002b,
                     "autoVerify": 0x010104ee, "mimeType": 0x01010026})
         attr_names += ["name", "scheme", "host", "pathPrefix", "autoVerify", "mimeType"]
@@ -90,6 +90,10 @@ def axml_manifest(*, package="org.example.demo", version_code=7, version_name="1
     if icon is not None:
         app_attrs.append((A, idx["icon"], 0xFFFFFFFF, 0x01, icon))
     inner = b""
+    perms = b""
+    for perm in permissions or []:
+        n_p, v_p = add("uses-permission"), add(perm)
+        perms += _start(n_p, [(A, idx["name"], v_p, 0x03, v_p)]) + _end(n_p)
     for filters in activities or []:
         n_act = add("activity")
         inner += _start(n_act, [(A, idx["name"], add(".Main"), 0x03, len(strings) - 1)])
@@ -112,7 +116,7 @@ def axml_manifest(*, package="org.example.demo", version_code=7, version_name="1
         inner += _end(n_act)
     body = (_chunk(0x0100, 16, struct.pack("<IIII", 1, 0xFFFFFFFF, 0xFFFFFFFF, ns))
             + _start(n_manifest, manifest_attrs)
-            + _start(n_sdk, sdk_attrs) + _end(n_sdk)
+            + _start(n_sdk, sdk_attrs) + _end(n_sdk) + perms
             + _start(n_app, app_attrs) + inner + _end(n_app)
             + _end(n_manifest))
     pool = string_pool(strings, utf8)

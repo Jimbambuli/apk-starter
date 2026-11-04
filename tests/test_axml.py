@@ -70,3 +70,10 @@ SIGNAL_ACTIVITIES = [[
 def test_reads_the_types_the_app_takes_shared(strip):
     m = parse_manifest(axml_manifest(activities=SIGNAL_ACTIVITIES, strip_names=strip))
     assert m.share_types == ("image/*", "text/plain", "video/*", "*/*")
+
+
+def test_reads_the_requested_permissions():
+    from apkgen import axml_manifest
+    m = parse_manifest(axml_manifest(permissions=["android.permission.CAMERA", "android.permission.INTERNET",
+                                                  "android.permission.CAMERA"]))
+    assert m.permissions == ("android.permission.CAMERA", "android.permission.INTERNET")

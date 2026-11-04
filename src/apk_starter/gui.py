@@ -8,9 +8,11 @@ import threading
 from collections.abc import Callable, Mapping
 from pathlib import Path
 
-from . import aurora, dexopt, diag, microg, theme
+from . import aurora, dexopt, diag, microg, permissions, theme
 from .cli import (APP_ID, ENTRY_PREFIX, clear_data, install_files, lang_from_env, microg_hint, prepare_all, remove_app,
                   setup_microg)
+from .apkinfo import read_apk_info
+from .launch import cached_apk_info
 from .errors import StarterError, describe_error
 from .i18n import _
 from .gui_model import (AppRow, WindowState, crash_meaning, details_layout, filter_rows, group_parts, is_narrow,
@@ -688,6 +690,30 @@ class Window(Gtk.ApplicationWindow):
         self.debug_check, self.debug_hint, self.titlebar_choice = debug, hint, choice
         for w in (debug, hint):
             box.append(w)
+
+        # the dangerous permissions of the manifest, by group: off = ATL answers «denied» (default: all on)
+        self.permission_switches = {}
+        try:
+            asked = cached_apk_info(self.paths, self.paths.apk(r.package), self.lang, read_apk_info).permissions
+        except (StarterError, OSError):
+            asked = ()
+        keys = permissions.groups(asked)
+        if keys:
+            box.append(Gtk.Separator(margin_top=4))
+            box.append(label(_("Permissions"), "section-title"))
+
+        def switched(sw: Gtk.Switch, _param, pkg=r.package, key="") -> None:
+            denied = set(load_settings(self.paths.settings()).app(pkg).denied)
+            denied = denied - {key} if sw.get_active() else denied | {key}
+            self.save_app_setting(pkg, denied=tuple(k for k, _l, _p in permissions.GROUPS if k in denied))
+        for key in keys:
+            row = Gtk.Box(spacing=12)
+            row.append(label(_(permissions.LABELS[key]), hexpand=True))
+            sw = Gtk.Switch(active=key not in app.denied, valign=Gtk.Align.CENTER)
+            sw.connect("notify::active", switched, r.package, key)
+            row.append(sw)
+            box.append(row)
+            self.permission_switches[key] = sw
 
         recs = diag.recordings(self.paths, r.package)
         debugs = [rec for rec in recs if rec.kind == "debug"]       # the plain logs are in the folder only

@@ -17,6 +17,7 @@ src/apk_starter/install_request.py
 src/apk_starter/launch.py
 src/apk_starter/microg.py
 src/apk_starter/paths.py
+src/apk_starter/permissions.py
 src/apk_starter/portal.py
 src/apk_starter/resbin.py
 src/apk_starter/run.py

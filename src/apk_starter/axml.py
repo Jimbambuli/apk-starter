@@ -57,6 +57,7 @@ class ManifestInfo:
     split: str | None = None        # <manifest split="config.x86_64">: a configuration part of a split APK
     link_filters: tuple[LinkFilter, ...] = ()
     share_types: tuple[str, ...] = ()   # MIME types of SEND/SEND_MULTIPLE filters in CATEGORY_DEFAULT
+    permissions: tuple[str, ...] = ()   # <uses-permission android:name>
 
 
 def parse_manifest(data: bytes) -> ManifestInfo:
@@ -77,6 +78,7 @@ def _parse(data: bytes) -> ManifestInfo:
     found: dict[tuple[str, str], object] = {}
     links: list[LinkFilter] = []
     share: list[str] = []
+    permissions: list[str] = []
     in_activity = False
     flt: dict | None = None             # the <intent-filter> being read inside an <activity>
     pos = hsize
@@ -93,6 +95,10 @@ def _parse(data: bytes) -> ManifestInfo:
             astart, asize, acount = struct.unpack_from("<3H", data, pos + 24)
             if tag in ("activity", "activity-alias"):
                 in_activity = True
+            elif tag in ("uses-permission", "uses-permission-sdk-23"):
+                name_ = _link_attrs(data, pos, astart, asize, acount, strings, resmap).get("name")
+                if isinstance(name_, str) and name_ not in permissions:
+                    permissions.append(name_)
             elif tag in ("intent-filter", "action", "category", "data") and in_activity:
                 attrs = _link_attrs(data, pos, astart, asize, acount, strings, resmap)
                 if tag == "intent-filter":
@@ -166,6 +172,7 @@ def _parse(data: bytes) -> ManifestInfo:
         split=split,
         link_filters=tuple(links),
         share_types=tuple(share),
+        permissions=tuple(permissions),
     )
 
 

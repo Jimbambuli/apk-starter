@@ -7,7 +7,7 @@ import re
 from collections.abc import Callable, Mapping
 from pathlib import Path
 
-from . import microg
+from . import microg, permissions
 from .apkinfo import ApkInfo
 from .errors import UsageError
 from .i18n import _
@@ -95,7 +95,11 @@ def build_env(paths: Paths, pkg: str, base: Mapping[str, str]) -> dict[str, str]
     microg.link_into(paths, pkg)                    # microG: Play Services for every app
     env["ATL_UGLY_ENABLE_WEBVIEW"] = "1"
     env.pop("ATL_SYSTEM_TITLEBAR", None)
-    env["ATL_TITLEBAR"] = load_settings(paths.settings()).app(pkg).titlebar     # chosen in the window, per app
+    app = load_settings(paths.settings()).app(pkg)
+    env["ATL_TITLEBAR"] = app.titlebar                 # chosen in the window, per app
+    env.pop("ATL_DENIED_PERMISSIONS", None)
+    if app.denied:                                  # switched off in the window: ATL answers «denied»
+        env["ATL_DENIED_PERMISSIONS"] = ",".join(permissions.denied_permissions(app.denied))
     # the tooltips of ATL's navigation bar ◁ ○ □ in the desktop's language (ATL has no translations)
     env["ATL_NAVIGATION_TOOLTIPS"] = "\n".join((_("Back"), _("Start page of the app"), _("Open pages of the app")))
     # app stores (Aurora Store): ATL finds the installed apps here and hands installs back to the starter
@@ -116,17 +120,21 @@ def build_env(paths: Paths, pkg: str, base: Mapping[str, str]) -> dict[str, str]
     return env
 
 
+CACHE_FORMAT = 2                    # 2: with the permissions; older entries are read again
+
+
 def cached_apk_info(paths: Paths, apk: Path, lang: str | None,
                     read: Callable[[Path, str | None], ApkInfo]) -> ApkInfo:
     """Like Android's package cache: parse an APK once, keyed by path, size, mtime and language (F182).
     The icon, the link filters and share types are not kept: starting does not need them."""
     path = os.path.abspath(apk)
     st = os.stat(path)
-    key = [path, st.st_size, st.st_mtime_ns, lang]
+    key = [path, st.st_size, st.st_mtime_ns, lang, CACHE_FORMAT]
     f = paths.cache_home / "apk-starter" / "apkinfo" / (hashlib.sha256(path.encode()).hexdigest()[:32] + ".json")
     try:
         d = json.loads(f.read_text(encoding="utf-8"))
         if d.pop("key") == key:
+            d["permissions"] = tuple(d.get("permissions", ()))
             return ApkInfo(path=Path(apk), icon=None, **d)
     except (OSError, ValueError, KeyError, TypeError, AttributeError):
         pass

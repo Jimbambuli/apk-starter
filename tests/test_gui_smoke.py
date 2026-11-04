@@ -273,3 +273,18 @@ def test_window_starts_while_an_app_holds_the_flatpak_name(tmp_path):
                 holder.kill()
     finally:
         bus.kill()
+
+
+@needs_broadway
+def test_options_switch_permissions_per_app(tmp_path, monkeypatch):
+    env, _info = _updated_box(tmp_path, monkeypatch)
+    from apk_starter.cli import main
+    main(["--install", str(make_apk(tmp_path / "p.apk", manifest=axml_manifest(permissions=[
+        "android.permission.CAMERA", "android.permission.INTERNET", "android.permission.ACCESS_FINE_LOCATION"])))],
+        env=env)
+    with broadway() as display:
+        out = subprocess.run([sys.executable, str(HERE / "gui_permissions_probe.py")], env={**display, **env},
+                             capture_output=True, text=True, timeout=60)
+    report = json.loads(out.stdout.strip().splitlines()[-1])
+    assert report == {"shown": [["location", True], ["camera", True]], "labels": ["Location", "Camera"],
+                      "saved": ["camera"]}, out.stderr
