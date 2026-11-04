@@ -555,6 +555,15 @@ class Window(Gtk.ApplicationWindow):
             return False
         return True
 
+    def show_package(self, pkg: str) -> None:
+        """The details of one app (also before the list is read: it is kept selected)."""
+        self.selected = pkg
+        self.search.set_text("")
+        if self.narrow:
+            self.page = "details"
+        if self.rows:                               # else the list, when read, keeps it selected
+            self.show_list()
+
     def set_sort(self, key: str) -> None:
         self.sort = key
         self.show_list()
@@ -962,7 +971,9 @@ def default_launcher() -> list[str]:
     return [sys.executable, os.path.realpath(sys.argv[0])]
 
 
-def run(paths: Paths, env: Mapping[str, str], launcher: list[str] | None = None) -> int:
+def run(paths: Paths, env: Mapping[str, str], launcher: list[str] | None = None, show: str | None = None) -> int:
+    """show: open the details of this app (an app's «App info», Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+    a window that is open already shows them."""
     app = Gtk.Application(application_id=ENTRY_PREFIX)     # a test build's window beside the one of stable
     lang = lang_from_env(env)
 
@@ -971,9 +982,25 @@ def run(paths: Paths, env: Mapping[str, str], launcher: list[str] | None = None)
         install_styles(display)
         app.theme = ThemeWatcher(display, env)
 
+    def window(a: Gtk.Application) -> "Window":
+        win = a.get_active_window() or next((w for w in a.get_windows() if isinstance(w, Window)), None)
+        return win or Window(a, paths, lang, launcher or default_launcher(), env)
+
     def activate(a: Gtk.Application) -> None:
-        win = a.get_active_window() or Window(a, paths, lang, launcher or default_launcher(), env)
+        window(a).present()
+
+    def show_app(_action, value: GLib.Variant) -> None:
+        win = window(app)
+        win.show_package(value.get_string())
         win.present()
+    action = Gio.SimpleAction.new("show", GLib.VariantType.new("s"))
+    action.connect("activate", show_app)
+    app.add_action(action)
     app.connect("startup", startup)
     app.connect("activate", activate)
+    if show:
+        app.register(None)
+        app.activate_action("show", GLib.Variant("s", show))     # in the window that runs already, if there is one
+        if app.get_is_remote():
+            return 0
     return app.run([sys.argv[0]])

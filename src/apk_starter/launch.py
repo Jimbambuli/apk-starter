@@ -105,6 +105,8 @@ def build_env(paths: Paths, pkg: str, base: Mapping[str, str]) -> dict[str, str]
     if locale := next((base[v] for v in ("LC_ALL", "LC_MESSAGES", "LANG") if base.get(v)), None):
         env["APK_STARTER_LOCALE"] = locale
     env["ATL_LAUNCH_COMMAND"] = str(paths.program())   # "Open" in the store: the starter starts the package
+    env["ATL_UNINSTALL_COMMAND"] = f"{paths.program()} --uninstall-request"     # ACTION_DELETE (package:)
+    env["ATL_APP_DETAILS_COMMAND"] = f"{paths.program()} --details"   # ACTION_APPLICATION_DETAILS_SETTINGS
     env.pop("ATL_APP_ICON", None)
     if paths.icon(pkg).is_file():
         env["ATL_APP_ICON"] = str(paths.icon(pkg))     # for ATL's title bar; ATL cannot draw adaptive icons

@@ -32,7 +32,7 @@ RUN_REF = f"{APP_ID}//{_PROFILE}" if PROFILE_RE.fullmatch(_PROFILE) else APP_ID 
 # The portal's menu entries run the current branch (no --branch), so a test build makes none: its apps start from
 # its own window.
 MENU_ENTRIES = RUN_REF == APP_ID
-VALUE_OPTIONS = ("--sdk", "--size", "--uri", "--install", "--install-request", "--remove")
+VALUE_OPTIONS = ("--sdk", "--size", "--uri", "--install", "--install-request", "--remove", "--uninstall-request", "--details")
 DISPLAY_VARS = ("WAYLAND_DISPLAY", "DISPLAY")
 
 
@@ -367,6 +367,8 @@ def _parser() -> argparse.ArgumentParser:
     g.add_argument("--install", metavar="APK", help=_("install the APK and add a menu entry; a split APK: the base "
                                                       "and its parts, or one .apks/.xapk file"))
     g.add_argument("--install-request", metavar="APK", help=argparse.SUPPRESS)  # from an app store, via ATL
+    g.add_argument("--uninstall-request", metavar="PACKAGE", help=argparse.SUPPRESS)  # likewise
+    g.add_argument("--details", metavar="PACKAGE", help=argparse.SUPPRESS)  # an app's settings: the window
     g.add_argument("--setup-aurora", action="store_true",
                    help=_("download Aurora Store from F-Droid, check its signature and install it"))
     g.add_argument("--list", action="store_true", help=_("list installed apps"))
@@ -449,6 +451,12 @@ def _main(argv: list[str], env: Mapping[str, str]) -> int:
     if args.install_request:
         from . import install_request
         return install_request.run(paths, env, [Path(args.install_request), *map(Path, more)])
+    if args.uninstall_request:
+        from . import install_request
+        return install_request.run_uninstall(paths, env, args.uninstall_request)
+    if args.details:
+        from . import gui
+        return gui.run(paths, env, show=args.details)
     if not tail and level is None and args.sdk is None and not args.size:
         if not any(env.get(v) for v in DISPLAY_VARS):
             parser.error(_("no APK given and no display for the window"))

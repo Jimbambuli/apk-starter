@@ -58,6 +58,9 @@ def test_command_and_env(tmp_path):
     assert p.data("org.example.demo").is_dir()
     assert "ATL_SYSTEM_TITLEBAR" not in env and env["ATL_TITLEBAR"] == "atl"
     assert env["ATL_NAVIGATION_TOOLTIPS"] == "Back\nStart page of the app\nOpen pages of the app"
+    program = str(p.program())                      # what an app store and «App info» hand back to the starter
+    assert env["ATL_UNINSTALL_COMMAND"] == f"{program} --uninstall-request"
+    assert env["ATL_APP_DETAILS_COMMAND"] == f"{program} --details"
 
 
 def test_titlebar_of_the_app_reaches_atl(tmp_path):

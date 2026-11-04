@@ -111,3 +111,24 @@ def test_install_request_with_another_signer_is_a_conflict_without_asking(box, m
     assert main(["--install-request", *map(str, new)], env=box.env) == 5
     assert capsys.readouterr().err.strip().splitlines()[-1].endswith("Different signature – not installed")
     assert not (box.data / "apps" / f"{PKG}.splits").exists()
+
+
+@pytest.mark.parametrize("answer,purge,code", [(False, False, 3), (True, False, 0), (True, True, 0)])
+def test_uninstall_request_asks_and_reports_like_package_installer(box, monkeypatch, capsys, answer, purge, code):
+    """Aurora's «Uninstall» (ACTION_DELETE, package:<name>) through ATL_UNINSTALL_COMMAND (Marcel 4.11.2026)."""
+    assert main(["--install", str(box.apk)], env=box.env) == 0
+    (box.data / "data" / PKG).mkdir(parents=True, exist_ok=True)
+    asked = []
+    monkeypatch.setattr(install_request, "ask_uninstall", lambda label, env: asked.append(
+        install_request.uninstall_question(label)) or (answer, purge))
+    assert main(["--uninstall-request", PKG], env=dict(box.env, ATL_INSTALLER_LABEL="Aurora Store")) == code
+    assert asked == [("Uninstall Demo?", "Also delete app data", "Cancel", "Uninstall")]
+    assert (box.data / "apps" / f"{PKG}.apk").exists() == (not answer)
+    assert (box.data / "data" / PKG).exists() == (not purge)
+    if not answer:
+        assert capsys.readouterr().err.strip().splitlines()[-1].endswith("cancelled")
+
+
+def test_uninstall_request_for_an_unknown_package_fails_without_asking(box, monkeypatch):
+    monkeypatch.setattr(install_request, "ask_uninstall", lambda *a: pytest.fail("asked"))
+    assert main(["--uninstall-request", "org.example.none"], env=box.env) == 1

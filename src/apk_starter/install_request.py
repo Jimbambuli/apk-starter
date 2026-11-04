@@ -86,3 +86,56 @@ def run(paths: Paths, env: Mapping[str, str], files: list[Path]) -> int:
     except (StarterError, OSError) as e:
         _say(describe_error(e))
         return STATUS_FAILURE
+
+
+def uninstall_question(label: str) -> tuple[str, str, str, str]:
+    """Heading, data option, cancel and confirm text; as in the window."""
+    return _("Uninstall {app}?").format(app=label), _("Also delete app data"), _("Cancel"), _("Uninstall")
+
+
+def ask_uninstall(label: str, env: Mapping[str, str]) -> tuple[bool, bool]:
+    """(uninstall, also the data), asked in a small window of its own like ask()."""
+    if not any(env.get(v) for v in ("WAYLAND_DISPLAY", "DISPLAY")):
+        raise StarterError(_("no display to ask whether to uninstall {app}").format(app=label))
+    import gi
+    gi.require_version("Gtk", "4.0")
+    from gi.repository import Gio, Gtk
+    from .gui import Dialog, install_styles
+    answer: list[tuple[bool, bool]] = []
+    app = Gtk.Application(application_id="io.github.Jimbambuli.ApkStarter.Uninstall",
+                          flags=Gio.ApplicationFlags.NON_UNIQUE)
+
+    def activate(a: Gtk.Application) -> None:
+        install_styles(Gtk.Window().get_display())
+        owner = Gtk.ApplicationWindow(application=a, title="APK Starter")
+        heading, data, cancel, verb = uninstall_question(label)
+        purge = Gtk.CheckButton(label=data)
+        d = Dialog(owner, heading, "", [("cancel", cancel), ("ok", verb)], extra=purge, destructive="ok",
+                   then=lambda rid: (answer.append((rid == "ok", purge.get_active())), a.quit()))
+        d.set_application(a)
+        d.present()
+    app.connect("activate", activate)
+    app.run([sys.argv[0]])
+    return answer[0] if answer else (False, False)
+
+
+def run_uninstall(paths: Paths, env: Mapping[str, str], pkg: str) -> int:
+    """An app store uninstalls an app (ACTION_DELETE / PackageInstaller.uninstall() through ATL_UNINSTALL_COMMAND);
+    exit status as for installs: 0 uninstalled, 3 aborted by the user, 1 failed."""
+    from .cli import list_installed, remove_app
+    try:
+        meta = next((m for m in list_installed(paths) if m["package"] == pkg), None)
+        if meta is None:
+            _say(_("not installed: {package}").format(package=pkg))
+            return STATUS_FAILURE
+        label = str(meta.get("label") or pkg)
+        yes, purge = ask_uninstall(label, env)
+        if not yes:
+            _say(_("Uninstalling {app} cancelled").format(app=label))
+            return STATUS_ABORTED
+        for warning in remove_app(paths, pkg, purge):
+            _say(warning)                       # removed; only the menu entry may be left
+        return STATUS_SUCCESS
+    except (StarterError, OSError) as e:
+        _say(describe_error(e))
+        return STATUS_FAILURE

@@ -211,3 +211,16 @@ def test_window_after_update_shows_work_per_app_and_ends(tmp_path, monkeypatch, 
         assert after["toast"] == after["status"], report
     else:
         assert after["status"] == "Prepared for this computer" and after["toast"] is None, report
+
+
+@needs_broadway
+def test_details_option_opens_the_window_at_that_app(tmp_path, monkeypatch):
+    env, _info = _updated_box(tmp_path, monkeypatch)
+    main_apk = make_apk(tmp_path / "second.apk", manifest=axml_manifest(package="org.example.zweite", label="Zweite"))
+    from apk_starter.cli import main
+    main(["--install", str(main_apk)], env=env)
+    with broadway() as display:
+        out = subprocess.run([sys.executable, str(HERE / "gui_details_probe.py"), "org.example.zweite"],
+                             env={**display, **env}, capture_output=True, text=True, timeout=60)
+    report = json.loads(out.stdout.strip().splitlines()[-1])
+    assert report == {"selected": "org.example.zweite", "title": "Zweite"}, out.stderr
