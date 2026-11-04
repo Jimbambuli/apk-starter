@@ -143,6 +143,11 @@ The system's own themes and icons are not visible in the sandbox. Your icon them
 Flatpak extension (e.g. `flatpak install flathub org.freedesktop.Platform.Icontheme.Paper`); otherwise the icons
 are GTK's Adwaita icons.
 
+To open a file with an app («Open with» in the file manager), APK Starter reads – never writes – the standard
+folders Downloads, Pictures, Documents, Music and Videos (`--filesystem=xdg-download:ro` etc.); a file elsewhere can
+be dropped onto the app. Apps save and export through the desktop's file dialog (portal), which writes only where you
+choose.
+
 For the apps' media in the desktop's media controls and its media keys (MPRIS), APK Starter may own the D-Bus names
 `org.mpris.MediaPlayer2.*` (`--own-name`).
 

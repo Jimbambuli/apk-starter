@@ -24,6 +24,13 @@ finish-args:
   - --own-name=org.mpris.MediaPlayer2.*
   # accounts of microG (ATL's AccountManager) in the desktop's secret store (libsecret)
   - --talk-name=org.freedesktop.secrets
+  # «Open with» an app for a file in the standard folders: the menu entry gets the path, not a portal document (the
+  # DynamicLauncher portal writes no --file-forwarding); read only, saving goes through the file chooser portal
+  - --filesystem=xdg-download:ro
+  - --filesystem=xdg-pictures:ro
+  - --filesystem=xdg-documents:ro
+  - --filesystem=xdg-music:ro
+  - --filesystem=xdg-videos:ro
 build-options:
   append-path: /usr/lib/sdk/openjdk21/bin
   env:
