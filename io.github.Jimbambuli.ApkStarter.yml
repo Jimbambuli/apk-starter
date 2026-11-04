@@ -117,7 +117,8 @@ modules:
     sources:
       - type: git
         url: https://gitlab.com/Jimbambuli/bionic_translation.git
-        commit: f37dc38d7186bbbb423ad8edeb57b2a3c76abd0a
+        branch: apk-starter
+        commit: b21a6b4b639ddbe408dc7d0618f40fb0807f7b63
 
   # ATL project's OpenSL ES (SDL2 + libsndfile from the runtime): native app libraries that open
   # libOpenSLES.so (e.g. WhatsApp's libwhatsapp.so needs slCreateEngine).
@@ -146,7 +147,7 @@ modules:
       - type: git
         url: https://gitlab.com/Jimbambuli/art_standalone.git
         branch: tv6-fix1
-        commit: 6c920286b79bdc3555ad39870d7adbe6a7526bc5
+        commit: 68f858b2d9826c9ed8a916c927298498a7539109
       - type: git
         url: https://github.com/Jimbambuli/atl-doctor.git
         commit: cf285a8ed17bed86251160fe6048d0ed4bf1ac1a
