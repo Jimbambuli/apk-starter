@@ -14,7 +14,7 @@ from datetime import datetime
 from pathlib import Path
 
 from .apkinfo import PACKAGE_RE, ApkInfo, read_apk_info
-from .errors import ApkError, StarterError, UsageError, describe_error
+from .errors import ApkError, SignatureConflict, StarterError, UsageError, describe_error
 from .i18n import _
 from . import dexopt, diag, i18n, splits
 from .launch import (DEFAULT_SIZE, build_command, build_env, cached_apk_info, parse_size, prepare_apk,
@@ -117,6 +117,21 @@ def _install_splits(paths: Paths, pkg: str, parts: tuple[tuple[str, Path], ...])
     shutil.rmtree(old, ignore_errors=True)
 
 
+def check_signer(paths: Paths, info: ApkInfo) -> None:
+    """Like Android: an update must be signed like the installed app, whatever offers it (an app store, a file).
+    An installed app without a readable signature is not compared."""
+    from . import apksig
+    installed = paths.apk(info.package)
+    if not installed.is_file() or os.path.samefile(info.path, installed):
+        return
+    try:
+        old = apksig.signers(installed)
+    except ApkError:
+        return
+    if old and apksig.signers(info.path) != old:
+        raise SignatureConflict(_("Different signature – not installed"))
+
+
 def install_app(paths: Paths, info: ApkInfo, parts: tuple[tuple[str, Path], ...] = ()) -> None:
     dest = paths.apk(info.package)
     paths.apps_dir().mkdir(parents=True, exist_ok=True)
@@ -211,6 +226,7 @@ def install_parts(paths: Paths, info: ApkInfo, parts: tuple[tuple[str, Path], ..
                   warn: Callable[[str], None] = _stderr) -> ApkInfo:
     from . import portal
     with package_lock(paths, info.package):
+        check_signer(paths, info)
         install_app(paths, info, parts)
         with contextlib.suppress(OSError):          # the first start then needs not parse the APK (F182)
             cached_apk_info(paths, paths.apk(info.package), lang, lambda p, _l: dataclasses.replace(info, path=p))

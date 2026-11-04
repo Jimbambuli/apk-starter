@@ -57,3 +57,34 @@ def test_not_a_zip_refused(tmp_path):
     p.write_bytes(b"hello")
     with pytest.raises(ApkError):
         apksig.verify(p)
+
+
+# -- the signer an update is compared by (Android: INSTALL_FAILED_UPDATE_INCOMPATIBLE) ---------------------------
+from apkgen import axml_manifest, fake_cert, make_apk, pkcs7, sign_block  # noqa: E402
+import hashlib  # noqa: E402
+
+
+def _apk(tmp_path, name):
+    return make_apk(tmp_path / f"{name}.apk", manifest=axml_manifest())
+
+
+@pytest.mark.parametrize("scheme", [2, 3])
+def test_signers_from_the_signing_block(tmp_path, scheme):
+    cert = fake_cert("A")
+    p = sign_block(_apk(tmp_path, "a"), cert, scheme)
+    assert apksig.signers(p) == frozenset({hashlib.sha256(cert).hexdigest()})
+
+
+def test_signers_of_a_v1_signature(tmp_path):
+    cert = fake_cert("B")
+    p = make_apk(tmp_path / "b.apk", manifest=axml_manifest(), files={"META-INF/CERT.RSA": pkcs7(cert)})
+    assert apksig.signers(p) == frozenset({hashlib.sha256(cert).hexdigest()})
+
+
+def test_unsigned_has_no_signers(tmp_path):
+    assert apksig.signers(_apk(tmp_path, "u")) == frozenset()
+
+
+@needs_apk
+def test_signers_of_a_real_apk():
+    assert apksig.signers(Path(SIGNED)) == frozenset({AURORA_SIGNER})

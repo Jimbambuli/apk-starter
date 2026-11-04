@@ -2,19 +2,20 @@
 user like Android's PackageInstallerActivity, then install like --install.
 
 The exit status is the PackageInstaller status ATL hands back to the app: 0 installed, 3 aborted by the user,
-4 not a valid APK, 7 incompatible (no x86_64 code), 1 other failure; the last line on stderr is its message."""
+4 not a valid APK, 5 conflict (signed by another certificate than the installed app), 7 incompatible (no x86_64
+code), 1 other failure; the last line on stderr is its message."""
 import os
 import sys
 from collections.abc import Mapping
 from pathlib import Path
 
 from .apkinfo import ApkInfo
-from .errors import ApkError, StarterError, describe_error
+from .errors import ApkError, SignatureConflict, StarterError, describe_error
 from .i18n import _
 from .paths import Paths
 from . import splits
 
-STATUS_SUCCESS, STATUS_FAILURE, STATUS_ABORTED, STATUS_INVALID, STATUS_INCOMPATIBLE = 0, 1, 3, 4, 7
+STATUS_SUCCESS, STATUS_FAILURE, STATUS_ABORTED, STATUS_INVALID, STATUS_CONFLICT, STATUS_INCOMPATIBLE = 0, 1, 3, 4, 5, 7
 
 
 def _say(text: str) -> None:
@@ -51,13 +52,14 @@ def ask(info: ApkInfo, installer: str, update: bool, env: Mapping[str, str]) -> 
 
 
 def run(paths: Paths, env: Mapping[str, str], files: list[Path]) -> int:
-    from .cli import install_parts, lang_from_env, parts_dir, read_parts
+    from .cli import check_signer, install_parts, lang_from_env, parts_dir, read_parts
     installer = env.get("ATL_INSTALLER_LABEL") or env.get("ATL_INSTALLER_PACKAGE") or _("An app")
     lang = lang_from_env(env)
     try:
         with parts_dir(paths) as tmp:
             info, parts = read_parts(paths, files, lang, Path(tmp))
             update = paths.meta(info.package).is_file()
+            check_signer(paths, info)           # refused before asking, like Android's installer
             if not ask(info, installer, update, env):
                 _say(_("Installation of {app} cancelled").format(app=info.label))
                 return STATUS_ABORTED
@@ -68,6 +70,9 @@ def run(paths: Paths, env: Mapping[str, str], files: list[Path]) -> int:
                     raise
                 _say(describe_error(e))         # installed, only the menu entry is missing: the store may open it
         return STATUS_SUCCESS
+    except SignatureConflict as e:
+        _say(describe_error(e))
+        return STATUS_CONFLICT
     except splits.IncompatibleError as e:
         _say(describe_error(e))
         return STATUS_INCOMPATIBLE

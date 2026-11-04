@@ -558,3 +558,18 @@ def test_menu_entry_kept_old_is_a_problem_of_that_app(box):
     box.info.write_text("[Instance]\napp-commit=bbbb\n")
     problems = prepare_all(apk_starter.paths.Paths.from_env(box.env), box.env, lambda _m: None, lambda _w: None)
     assert [p for p, _ in problems] == [PKG]
+
+
+def test_update_with_another_signer_is_refused_like_android(box, capsys):
+    """INSTALL_FAILED_UPDATE_INCOMPATIBLE: e.g. Google Play services from Aurora over microG (Marcel 4.11.2026)."""
+    from apkgen import fake_cert, sign_block
+    a = sign_block(make_apk(box.tmp / "a.apk", manifest=axml_manifest(version_name="1.0")), fake_cert("microG"))
+    b = sign_block(make_apk(box.tmp / "b.apk", manifest=axml_manifest(version_name="2.0")), fake_cert("Google"))
+    assert main(["--install", str(a)], env=box.env) == 0
+    before = (box.data / "apps" / f"{PKG}.apk").read_bytes()
+    capsys.readouterr()
+    assert main(["--install", str(b)], env=box.env) == 1
+    assert "Different signature – not installed" in capsys.readouterr().err
+    assert (box.data / "apps" / f"{PKG}.apk").read_bytes() == before
+    same = sign_block(make_apk(box.tmp / "c.apk", manifest=axml_manifest(version_name="3.0")), fake_cert("microG"))
+    assert main(["--install", str(same)], env=box.env) == 0

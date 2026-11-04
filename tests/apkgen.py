@@ -242,3 +242,44 @@ def make_apk(path: Path, *, manifest: bytes, arsc: bytes | None = None, files: d
         for name, data in (files or {}).items():
             z.writestr(name, data)
     return path
+
+
+def _lp(b: bytes) -> bytes:
+    return struct.pack("<I", len(b)) + b
+
+
+def _der(tag: int, content: bytes) -> bytes:
+    n = len(content)
+    head = bytes([n]) if n < 0x80 else bytes([0x82]) + n.to_bytes(2, "big")
+    return bytes([tag]) + head + content
+
+
+def fake_cert(name: str) -> bytes:
+    """A DER SEQUENCE standing for a certificate (signers are compared by the hash of its bytes)."""
+    return _der(0x30, _der(0x0C, name.encode()))
+
+
+def sign_block(path: Path, cert: bytes, scheme: int = 2) -> Path:
+    """Put an APK signing block with one signer (scheme 2 or 3) before the central directory. Only the layout:
+    the certificate is what the installed app is compared by, the signature is not real."""
+    data = path.read_bytes()
+    eocd = data.rfind(b"PK\x05\x06")
+    cd = struct.unpack_from("<I", data, eocd + 16)[0]
+    signed = _lp(b"") + _lp(_lp(cert)) + (struct.pack("<II", 24, 0x7FFFFFFF) if scheme == 3 else b"") + _lp(b"")
+    signer = _lp(signed) + _lp(b"") + _lp(b"key")
+    value = _lp(_lp(signer))
+    pid = {2: 0x7109871A, 3: 0xF05368C0}[scheme]
+    pair = struct.pack("<QI", len(value) + 4, pid) + value
+    size = len(pair) + 8 + 16
+    block = struct.pack("<Q", size) + pair + struct.pack("<Q", size) + b"APK Sig Block 42"
+    out = bytearray(data[:cd] + block + data[cd:])
+    struct.pack_into("<I", out, eocd + len(block) + 16, cd + len(block))
+    path.write_bytes(bytes(out))
+    return path
+
+
+def pkcs7(cert: bytes) -> bytes:
+    """META-INF/CERT.RSA of a v1 (JAR) signature: ContentInfo { signedData, SignedData { ..., [0] certs } }."""
+    signed_data = _der(0x30, _der(0x02, b"\x01") + _der(0x31, b"") + _der(0x30, _der(0x06, b"\x2a\x86\x48\x86\xf7\x0d\x01\x07\x01"))
+                       + _der(0xA0, cert) + _der(0x31, b""))
+    return _der(0x30, _der(0x06, b"\x2a\x86\x48\x86\xf7\x0d\x01\x07\x02") + _der(0xA0, signed_data))

@@ -14,6 +14,10 @@ class ApkError(StarterError):
     code = 3
 
 
+class SignatureConflict(StarterError):
+    """An update signed by another certificate than the installed app (INSTALL_FAILED_UPDATE_INCOMPATIBLE)."""
+
+
 def describe_error(e: BaseException) -> str:
     """One line for the user (command line and window), never a traceback."""
     if isinstance(e, StarterError):

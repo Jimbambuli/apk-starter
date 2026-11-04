@@ -98,3 +98,16 @@ def test_install_request_without_menu_entry_is_still_installed(box, monkeypatch,
     monkeypatch.setattr(install_request, "ask", lambda *a: True)
     assert main(["--install-request", *map(str, parts(box.tmp))], env=box.env) == 0
     assert "without a menu entry" in capsys.readouterr().err
+
+
+def test_install_request_with_another_signer_is_a_conflict_without_asking(box, monkeypatch, capsys):
+    """Aurora offers Google Play services as an update of microG: refused like Android, STATUS_FAILURE_CONFLICT."""
+    from apkgen import fake_cert, sign_block
+    old = sign_block(make_apk(box.tmp / "old.apk", manifest=axml_manifest()), fake_cert("microG"))
+    assert main(["--install", str(old)], env=box.env) == 0
+    monkeypatch.setattr(install_request, "ask", lambda *a: pytest.fail("asked"))
+    new = parts(box.tmp)
+    sign_block(new[0], fake_cert("Google"))
+    assert main(["--install-request", *map(str, new)], env=box.env) == 5
+    assert capsys.readouterr().err.strip().splitlines()[-1].endswith("Different signature – not installed")
+    assert not (box.data / "apps" / f"{PKG}.splits").exists()

@@ -205,3 +205,89 @@ def verify(path: Path) -> Signer:
     if got != want:
         raise _bad("the contents were changed")
     return Signer(hashlib.sha256(cert).hexdigest())
+
+
+V3_ID, V31_ID = 0xF05368C0, 0x1B93AD61
+
+
+def _signing_block(f) -> dict[int, bytes]:
+    """The id-value pairs of the APK signing block, read by seeking (big APKs are not read whole)."""
+    f.seek(0, 2)
+    end = f.tell()
+    f.seek(max(0, end - 0x10000 - 22))
+    tail = f.read()
+    eocd = tail.rfind(b"PK\x05\x06")
+    if eocd < 0 or eocd + 22 > len(tail):
+        return {}
+    cd_offset = struct.unpack_from("<I", tail, eocd + 16)[0]
+    if cd_offset < 32:
+        return {}
+    f.seek(cd_offset - 24)
+    foot = f.read(24)
+    if foot[8:] != MAGIC:
+        return {}
+    size = struct.unpack_from("<Q", foot, 0)[0]
+    if size > cd_offset or size > MAX_APK:
+        return {}
+    f.seek(cd_offset - size - 8)
+    block = f.read(size - 16)
+    pairs, o = {}, 8
+    while o + 12 <= len(block):
+        n, pid = struct.unpack_from("<QI", block, o)
+        if n < 4 or o + 8 + n > len(block):
+            break
+        pairs[pid] = block[o + 12:o + 8 + n]
+        o += 8 + n
+    return pairs
+
+
+def _block_signers(value: bytes) -> list[bytes]:
+    """The first certificate of each signer of a v2/v3 block (the signer's own; the rest is its chain)."""
+    out = []
+    for signer in _seq(_lp(value, 0)[0]):
+        signed_data = _lp(signer, 0)[0]
+        o = _lp(signed_data, 0)[1]              # digests
+        certs = _seq(_lp(signed_data, o)[0])
+        if certs:
+            out.append(certs[0])
+    return out
+
+
+def _pkcs7_certs(der: bytes) -> list[bytes]:
+    """Certificates of a v1 signature file (PKCS #7 SignedData, [0] certificates)."""
+    _t, s, e = _der(der, 0)
+    content = _children(der, s, e)              # contentType, [0] content
+    if len(content) < 2 or content[1][0] != 0xA0:
+        return []
+    _t, s, e = _der(der, content[1][1])         # SignedData
+    for tag, cs, ce in _children(der, s, e):
+        if tag == 0xA0:
+            out, o = [], cs
+            while o < ce:
+                end = _der(der, o)[2]
+                out.append(der[o:end])
+                o = end
+            return out
+    return []
+
+
+def signers(path: Path) -> frozenset[str]:
+    """SHA-256 of the signing certificates, as Android compares an update with the installed app: from the v3
+    block, else v2, else the v1 signature files; empty if the APK is not signed. Only read, not verified."""
+    import zipfile
+    try:
+        with open(path, "rb") as f:
+            pairs = _signing_block(f)
+        for pid in (V3_ID, V2_ID):
+            if pid in pairs:
+                return frozenset(hashlib.sha256(c).hexdigest() for c in _block_signers(pairs[pid]))
+        with zipfile.ZipFile(path) as z:
+            certs = []
+            for name in z.namelist():
+                up = name.upper()
+                if up.startswith("META-INF/") and up.count("/") == 1 and up.endswith((".RSA", ".DSA", ".EC")):
+                    found = _pkcs7_certs(z.read(name))
+                    certs += found[:1]
+            return frozenset(hashlib.sha256(c).hexdigest() for c in certs)
+    except (ApkError, IndexError, struct.error, ValueError, zipfile.BadZipFile) as e:
+        raise _bad(str(e) or "signing block") from None
