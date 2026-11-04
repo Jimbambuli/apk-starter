@@ -2,6 +2,7 @@
 GTK draws a simple one where the compositor wants none). List of apps on the left, details on the right.
 
 All work is done by the same functions as the command line (cli.py); this module only shows and asks."""
+import dataclasses
 import os
 import sys
 import threading
@@ -236,11 +237,33 @@ class Window(Gtk.ApplicationWindow):
         self.connect("close-request", lambda _w: self.remember() or False)
         self.stack.set_visible_child_name("loading")
         self.refresh()
+        # updates Aurora Store knows, as a notification: now and daily while the window is open (Spec 18 Phase 3)
+        if app.lookup_action("aurora-updates") is None:
+            updates = Gio.SimpleAction.new("aurora-updates", None)      # the notification's click
+            updates.connect("activate", lambda *_a: self.start(aurora.PACKAGE, None))
+            app.add_action(updates)
+        self.check_updates()
+        GLib.timeout_add_seconds(24 * 3600, self.check_updates)
         if not dexopt.runtime_ready(self.paths, self.env) or dexopt.stale_installed(self.paths):
             # after a Flatpak update: rebuild once in the background; apps started meanwhile wait for the runtime
             self.background(lambda: prepare_all(self.paths, self.env, lambda _t: None,
                                                 lambda w: GLib.idle_add(self.set_working, w)),
                             self.prepared, None)
+
+    def check_updates(self) -> bool:
+        """Read Aurora Store's list of updates (see aurora.pending_updates) and tell new ones; never installs."""
+        if load_settings(self.paths.settings()).aurora_updates and self.paths.meta(aurora.PACKAGE).is_file():
+            self.background(lambda: aurora.updates_note(self.paths, aurora.pending_updates(self.paths)),
+                            self.tell_updates, None, job=False)
+        return GLib.SOURCE_CONTINUE
+
+    def tell_updates(self, note: tuple[str, str] | None) -> None:
+        if note is None:
+            return
+        n = Gio.Notification.new(note[0])
+        n.set_body(note[1])
+        n.set_default_action("app.aurora-updates")
+        self.get_application().send_notification("aurora-updates", n)
 
     def make_empty_page(self) -> Gtk.Widget:
         """No app yet: only text, and the «+» button in the accent colour where it stands beside the list."""
@@ -690,6 +713,23 @@ class Window(Gtk.ApplicationWindow):
         self.debug_check, self.debug_hint, self.titlebar_choice = debug, hint, choice
         for w in (debug, hint):
             box.append(w)
+
+        self.aurora_updates_check = None
+        if r.package == aurora.PACKAGE:             # Aurora Store: tell its updates (off by default)
+            updates = Gtk.CheckButton(label=_("Report updates"), active=load_settings(self.paths.settings()).aurora_updates)
+
+            def updates_toggled(b: Gtk.CheckButton) -> None:
+                try:
+                    save_settings(self.paths.settings(), dataclasses.replace(load_settings(self.paths.settings()),
+                                                                             aurora_updates=b.get_active()))
+                except OSError as e:
+                    self.alert(_("Could not save the setting"), describe_error(e))
+                    return
+                if b.get_active():
+                    self.check_updates()
+            updates.connect("toggled", updates_toggled)
+            box.append(updates)
+            self.aurora_updates_check = updates
 
         # the dangerous permissions of the manifest, by group: off = ATL answers «denied» (default: all on)
         self.permission_switches = {}

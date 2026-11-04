@@ -288,3 +288,22 @@ def test_options_switch_permissions_per_app(tmp_path, monkeypatch):
     report = json.loads(out.stdout.strip().splitlines()[-1])
     assert report == {"shown": [["location", True], ["camera", True]], "labels": ["Location", "Camera"],
                       "saved": ["camera"]}, out.stderr
+
+
+@needs_broadway
+def test_window_tells_aurora_updates_and_a_click_starts_aurora(tmp_path, monkeypatch):
+    from dataclasses import replace
+    from apk_starter.paths import Paths
+    from apk_starter.settings import Settings, save_settings
+    from test_aurora import _aurora_db, _installed
+    env, _info = _updated_box(tmp_path, monkeypatch)
+    p = Paths.from_env(env)
+    _installed(p, "com.aurora.store", 76, "Aurora Store")
+    _installed(p, "com.whatsapp", 10, "WhatsApp")
+    _aurora_db(p, [("com.whatsapp", 11, "2.26", "WhatsApp")])
+    save_settings(p.settings(), replace(Settings(), aurora_updates=True))
+    with broadway() as display:
+        out = subprocess.run([sys.executable, str(HERE / "gui_updates_probe.py"), str(tmp_path / "started")],
+                             env={**display, **env}, capture_output=True, text=True, timeout=60)
+    report = json.loads(out.stdout.strip().splitlines()[-1])
+    assert report == {"id": "aurora-updates", "toggle": "Report updates", "started": ["com.aurora.store"]}, out.stderr

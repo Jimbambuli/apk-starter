@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-04 05:40+0000\n"
+"POT-Creation-Date: 2026-11-04 05:46+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -170,9 +170,14 @@ msgstr ""
 msgid "the downloaded file is not Aurora Store {code}"
 msgstr "ダウンロードしたファイルは Aurora Store {code} ではありません"
 
-#: src/apk_starter/aurora.py:75 src/apk_starter/gui.py:832
+#: src/apk_starter/aurora.py:75 src/apk_starter/gui.py:872
 msgid "Downloading Aurora Store from F-Droid…"
 msgstr "F-Droid から Aurora Store をダウンロードしています…"
+
+#: src/apk_starter/aurora.py:137
+#, python-brace-format
+msgid "Updates: {count}"
+msgstr "アップデート: {count}"
 
 #: src/apk_starter/axml.py:67 src/apk_starter/axml.py:73
 msgid "corrupt AndroidManifest.xml"
@@ -389,220 +394,224 @@ msgstr "デバッグには atl-doctor が必要です: {reason}"
 msgid "unexpected error: {error}"
 msgstr "予期しないエラー: {error}"
 
-#: src/apk_starter/gui.py:29
+#: src/apk_starter/gui.py:30
 #, python-brace-format
 msgid "the window needs GTK 4: {reason}"
 msgstr "ウィンドウには GTK 4 が必要です: {reason}"
 
-#: src/apk_starter/gui.py:51
+#: src/apk_starter/gui.py:52
 msgid "never"
 msgstr "なし"
 
-#: src/apk_starter/gui.py:140
+#: src/apk_starter/gui.py:141
 msgid "Search apps"
 msgstr "アプリを検索"
 
-#: src/apk_starter/gui.py:145
+#: src/apk_starter/gui.py:146
 msgid "Name"
 msgstr "名前"
 
-#: src/apk_starter/gui.py:145 src/apk_starter/gui.py:649
+#: src/apk_starter/gui.py:146 src/apk_starter/gui.py:672
 msgid "Last started"
 msgstr "最終起動"
 
-#: src/apk_starter/gui.py:145
+#: src/apk_starter/gui.py:146
 msgid "Last installed"
 msgstr "最終インストール"
 
-#: src/apk_starter/gui.py:146
+#: src/apk_starter/gui.py:147
 msgid "Data size"
 msgstr "データサイズ"
 
-#: src/apk_starter/gui.py:148
+#: src/apk_starter/gui.py:149
 msgid "Sort"
 msgstr "並べ替え"
 
-#: src/apk_starter/gui.py:153 src/apk_starter/gui.py:248
+#: src/apk_starter/gui.py:154 src/apk_starter/gui.py:271
 msgid "Add apps"
 msgstr "アプリを追加"
 
-#: src/apk_starter/gui.py:161
+#: src/apk_starter/gui.py:162
 msgid "No app matches."
 msgstr "一致するアプリはありません。"
 
-#: src/apk_starter/gui.py:169 src/apk_starter/launch.py:104
+#: src/apk_starter/gui.py:170 src/apk_starter/launch.py:104
 msgid "Back"
 msgstr "戻る"
 
-#: src/apk_starter/gui.py:200
+#: src/apk_starter/gui.py:201
 msgid "Drop the APK to install it"
 msgstr "ドロップしてAPKをインストール"
 
-#: src/apk_starter/gui.py:263
+#: src/apk_starter/gui.py:286
 msgid "No apps installed"
 msgstr "インストール済みのアプリはありません"
 
-#: src/apk_starter/gui.py:264
+#: src/apk_starter/gui.py:287
 msgid "Add an app with + or drop an APK here."
 msgstr "+ でアプリを追加するか、APK をここにドロップしてください。"
 
-#: src/apk_starter/gui.py:273 src/apk_starter/gui.py:759
+#: src/apk_starter/gui.py:296 src/apk_starter/gui.py:799
 msgid "Close"
 msgstr "閉じる"
 
-#: src/apk_starter/gui.py:355
+#: src/apk_starter/gui.py:378
 msgid "Prepared for this computer"
 msgstr "このコンピューター向けに準備済み"
 
-#: src/apk_starter/gui.py:355
+#: src/apk_starter/gui.py:378
 msgid "Not prepared yet (done at the next start)"
 msgstr "未準備 (次回起動時に実行)"
 
-#: src/apk_starter/gui.py:439
+#: src/apk_starter/gui.py:462
 msgid "Cannot read the app list"
 msgstr "アプリ一覧を読み込めません"
 
-#: src/apk_starter/gui.py:466
+#: src/apk_starter/gui.py:489
 msgid "Install APK…"
 msgstr "APK をインストール…"
 
-#: src/apk_starter/gui.py:468
+#: src/apk_starter/gui.py:491
 msgid "Set up Aurora Store…"
 msgstr "Aurora Store をセットアップ…"
 
-#: src/apk_starter/gui.py:470
+#: src/apk_starter/gui.py:493
 msgid "Set up microG…"
 msgstr "microG をセットアップ…"
 
-#: src/apk_starter/gui.py:556
+#: src/apk_starter/gui.py:579 src/apk_starter/gui.py:726
 msgid "Could not save the setting"
 msgstr "設定を保存できませんでした"
 
-#: src/apk_starter/gui.py:619 src/apk_starter/gui.py:621
+#: src/apk_starter/gui.py:642 src/apk_starter/gui.py:644
 msgid "Start"
 msgstr "起動"
 
-#: src/apk_starter/gui.py:624
+#: src/apk_starter/gui.py:647
 msgid "Uninstall…"
 msgstr "アンインストール…"
 
-#: src/apk_starter/gui.py:628
+#: src/apk_starter/gui.py:651
 msgid "Options"
 msgstr "オプション"
 
-#: src/apk_starter/gui.py:633
+#: src/apk_starter/gui.py:656
 msgid "Debug is on"
 msgstr "デバッグはオンです"
 
-#: src/apk_starter/gui.py:639
+#: src/apk_starter/gui.py:662
 msgid "Delete data…"
 msgstr "データを削除…"
 
-#: src/apk_starter/gui.py:646
+#: src/apk_starter/gui.py:669
 msgid "Version"
 msgstr "バージョン"
 
-#: src/apk_starter/gui.py:647
+#: src/apk_starter/gui.py:670
 msgid "Target SDK"
 msgstr "ターゲット SDK"
 
-#: src/apk_starter/gui.py:648
+#: src/apk_starter/gui.py:671
 msgid "Installed"
 msgstr "インストール日時"
 
-#: src/apk_starter/gui.py:650
+#: src/apk_starter/gui.py:673
 msgid "Data"
 msgstr "データ"
 
-#: src/apk_starter/gui.py:650
+#: src/apk_starter/gui.py:673
 msgid "no data"
 msgstr "データなし"
 
-#: src/apk_starter/gui.py:651
+#: src/apk_starter/gui.py:674
 msgid "Status"
 msgstr "状態"
 
-#: src/apk_starter/gui.py:668
+#: src/apk_starter/gui.py:691
 msgid "Window bar"
 msgstr "ウィンドウバー"
 
-#: src/apk_starter/gui.py:669
+#: src/apk_starter/gui.py:692
 msgid "With back button"
 msgstr "戻るボタン付き"
 
-#: src/apk_starter/gui.py:669
+#: src/apk_starter/gui.py:692
 msgid "From the system"
 msgstr "システム"
 
-#: src/apk_starter/gui.py:670
+#: src/apk_starter/gui.py:693
 msgid "From the system + navigation bar"
 msgstr "システム + ナビゲーションバー"
 
-#: src/apk_starter/gui.py:679 src/apk_starter/gui.py:726
+#: src/apk_starter/gui.py:702 src/apk_starter/gui.py:766
 msgid "Debug"
 msgstr "デバッグ"
 
-#: src/apk_starter/gui.py:680
+#: src/apk_starter/gui.py:703
 msgid "Slower"
 msgstr "低速"
 
-#: src/apk_starter/gui.py:703
+#: src/apk_starter/gui.py:719
+msgid "Report updates"
+msgstr "アップデートを通知"
+
+#: src/apk_starter/gui.py:743
 msgid "Permissions"
 msgstr "権限"
 
-#: src/apk_starter/gui.py:724
+#: src/apk_starter/gui.py:764
 msgid "Recordings"
 msgstr "記録"
 
-#: src/apk_starter/gui.py:727 src/apk_starter/gui.py:759
+#: src/apk_starter/gui.py:767 src/apk_starter/gui.py:799
 msgid "Open log folder"
 msgstr "ログフォルダーを開く"
 
-#: src/apk_starter/gui.py:741
+#: src/apk_starter/gui.py:781
 #, python-brace-format
 msgid "Cannot start {app}"
 msgstr "{app} を起動できません"
 
-#: src/apk_starter/gui.py:758
+#: src/apk_starter/gui.py:798
 #, python-brace-format
 msgid "{app} ended unexpectedly."
 msgstr "{app} が予期せず終了しました。"
 
-#: src/apk_starter/gui.py:769 src/apk_starter/gui.py:778
+#: src/apk_starter/gui.py:809 src/apk_starter/gui.py:818
 msgid "Cannot open the log folder"
 msgstr "ログフォルダーを開けません"
 
-#: src/apk_starter/gui.py:782
+#: src/apk_starter/gui.py:822
 msgid "Android apps"
 msgstr "Android アプリ"
 
-#: src/apk_starter/gui.py:788
+#: src/apk_starter/gui.py:828
 msgid "Install APK"
 msgstr "APK をインストール"
 
-#: src/apk_starter/gui.py:818 src/apk_starter/gui.py:831
+#: src/apk_starter/gui.py:858 src/apk_starter/gui.py:871
 #, python-brace-format
 msgid "{app} installed"
 msgstr "{app} をインストールしました"
 
-#: src/apk_starter/gui.py:819
+#: src/apk_starter/gui.py:859
 msgid "Installing…"
 msgstr "インストール中…"
 
-#: src/apk_starter/gui.py:821
+#: src/apk_starter/gui.py:861
 #, python-brace-format
 msgid "Cannot install {file}"
 msgstr "{file} をインストールできません"
 
-#: src/apk_starter/gui.py:834
+#: src/apk_starter/gui.py:874
 msgid "Cannot set up Aurora Store"
 msgstr "Aurora Store をセットアップできません"
 
-#: src/apk_starter/gui.py:835
+#: src/apk_starter/gui.py:875
 msgid "Set up Aurora Store?"
 msgstr "Aurora Store をセットアップしますか?"
 
-#: src/apk_starter/gui.py:836
+#: src/apk_starter/gui.py:876
 msgid ""
 "Free apps from Google Play. Downloaded from F-Droid and checked.\n"
 "\n"
@@ -613,33 +622,33 @@ msgstr ""
 "匿名でサインインしてください: Google は自分のアカウントをブロックすることがあ"
 "ります。"
 
-#: src/apk_starter/gui.py:838 src/apk_starter/gui.py:855
-#: src/apk_starter/gui.py:860 src/apk_starter/install_request.py:29
+#: src/apk_starter/gui.py:878 src/apk_starter/gui.py:895
+#: src/apk_starter/gui.py:900 src/apk_starter/install_request.py:29
 #: src/apk_starter/install_request.py:93
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: src/apk_starter/gui.py:838 src/apk_starter/gui.py:855
+#: src/apk_starter/gui.py:878 src/apk_starter/gui.py:895
 msgid "Set up"
 msgstr "セットアップ"
 
-#: src/apk_starter/gui.py:848
+#: src/apk_starter/gui.py:888
 msgid "microG is set up"
 msgstr "microG のセットアップが完了しました"
 
-#: src/apk_starter/gui.py:849 src/apk_starter/microg.py:98
+#: src/apk_starter/gui.py:889 src/apk_starter/microg.py:98
 msgid "Downloading microG…"
 msgstr "microG をダウンロード中…"
 
-#: src/apk_starter/gui.py:851
+#: src/apk_starter/gui.py:891
 msgid "Cannot set up microG"
 msgstr "microG をセットアップできません"
 
-#: src/apk_starter/gui.py:852
+#: src/apk_starter/gui.py:892
 msgid "Set up microG?"
 msgstr "microG をセットアップしますか？"
 
-#: src/apk_starter/gui.py:853
+#: src/apk_starter/gui.py:893
 msgid ""
 "Google services for apps (push messages, sign-in). Downloaded from the "
 "official microG repository and checked."
@@ -647,12 +656,12 @@ msgstr ""
 "アプリ向けの Google サービス(プッシュ通知、サインイン)。microG 公式リポジトリ"
 "からダウンロードして検証済み。"
 
-#: src/apk_starter/gui.py:865
+#: src/apk_starter/gui.py:905
 #, python-brace-format
 msgid "Delete the data of {app}?"
 msgstr "{app} のデータを削除しますか？"
 
-#: src/apk_starter/gui.py:866
+#: src/apk_starter/gui.py:906
 msgid ""
 "The app stays installed. Its settings, accounts and files are deleted. Close "
 "the app first."
@@ -660,46 +669,46 @@ msgstr ""
 "アプリはインストールされたままです。設定、アカウント、ファイルは削除されま"
 "す。先にアプリを閉じてください。"
 
-#: src/apk_starter/gui.py:867
+#: src/apk_starter/gui.py:907
 msgid "Delete Data"
 msgstr "データを削除"
 
-#: src/apk_starter/gui.py:868
+#: src/apk_starter/gui.py:908
 msgid "Deleting data…"
 msgstr "データを削除中…"
 
-#: src/apk_starter/gui.py:869
+#: src/apk_starter/gui.py:909
 #, python-brace-format
 msgid "Cannot delete the data of {app}"
 msgstr "{app} のデータを削除できません"
 
-#: src/apk_starter/gui.py:873 src/apk_starter/install_request.py:93
+#: src/apk_starter/gui.py:913 src/apk_starter/install_request.py:93
 msgid "Also delete app data"
 msgstr "アプリのデータも削除する"
 
-#: src/apk_starter/gui.py:880
+#: src/apk_starter/gui.py:920
 #, python-brace-format
 msgid "{app} uninstalled"
 msgstr "{app} をアンインストールしました"
 
-#: src/apk_starter/gui.py:881 src/apk_starter/install_request.py:93
+#: src/apk_starter/gui.py:921 src/apk_starter/install_request.py:93
 #, python-brace-format
 msgid "Uninstall {app}?"
 msgstr "{app} をアンインストールしますか？"
 
-#: src/apk_starter/gui.py:882
+#: src/apk_starter/gui.py:922
 msgid "The app and its menu entry are removed. Close the app first."
 msgstr "アプリとそのメニュー項目が削除されます。先にアプリを閉じてください。"
 
-#: src/apk_starter/gui.py:882 src/apk_starter/install_request.py:93
+#: src/apk_starter/gui.py:922 src/apk_starter/install_request.py:93
 msgid "Uninstall"
 msgstr "アンインストール"
 
-#: src/apk_starter/gui.py:883
+#: src/apk_starter/gui.py:923
 msgid "Uninstalling…"
 msgstr "アンインストール中…"
 
-#: src/apk_starter/gui.py:885
+#: src/apk_starter/gui.py:925
 #, python-brace-format
 msgid "Cannot uninstall {app}"
 msgstr "{app} をアンインストールできません"

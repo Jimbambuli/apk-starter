@@ -32,3 +32,12 @@ def test_old_global_system_titlebar_becomes_the_default_of_every_app(tmp_path):
     path.write_text('{"system_titlebar": true, "apps": {"org.b": {"titlebar": "atl"}}}')
     s = load_settings(path)
     assert s.app("org.a").titlebar == "system" and s.app("org.b").titlebar == "atl"
+
+
+def test_aurora_updates_is_off_by_default_and_remembered(tmp_path):
+    from dataclasses import replace
+    from apk_starter.settings import Settings, load_settings, save_settings
+    f = tmp_path / "settings.json"
+    assert load_settings(f).aurora_updates is False
+    save_settings(f, replace(Settings(), aurora_updates=True))
+    assert load_settings(f).aurora_updates is True

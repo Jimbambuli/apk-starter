@@ -77,3 +77,61 @@ def setup(paths: Paths, env: Mapping[str, str], report: Callable[[str], None], w
         apk = Path(tmp) / f"{PACKAGE}.apk"
         download(apk, fetch)
         return install_files(paths, [apk], lang_from_env(env), env, report, warn)
+
+
+# -- updates (Spec 18 Phase 3) -------------------------------------------------------------------------------------
+# Aurora Store keeps the updates it found (when it checks: at its start and with its own periodic check) in its
+# database, with the updates the user chose to ignore. The starter reads that list instead of asking Google Play
+# itself: no second Play client, no account data, Aurora's choice (ignored updates, its device profile) counts.
+def _database(paths: Paths) -> Path:
+    return paths.data(PACKAGE) / f"{PACKAGE}.apk_" / "databases" / "aurora_database"
+
+
+def pending_updates(paths: Paths) -> list[tuple[str, str]]:
+    """(package, name) of the installed apps Aurora knows a newer version of, by name; [] without Aurora's data."""
+    import json
+    import sqlite3
+    db = _database(paths)
+    if not db.is_file():
+        return []
+    try:
+        con = sqlite3.connect(f"{db.as_uri()}?mode=ro", uri=True, timeout=2)
+        try:
+            found = con.execute("SELECT packageName, MAX(versionCode) FROM `update` GROUP BY packageName").fetchall()
+            ignored = dict(con.execute("SELECT packageName, ignoredVersionCode FROM ignored_update").fetchall())
+        finally:
+            con.close()
+    except sqlite3.Error:
+        return []
+    out = []
+    for pkg, code in found:
+        if pkg in ignored and (ignored[pkg] is None or ignored[pkg] >= code):
+            continue
+        try:
+            meta = json.loads(paths.meta(pkg).read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue                                # not installed with the starter
+        have = meta.get("version_code")
+        if isinstance(have, int) and isinstance(code, int) and code > have:
+            out.append((pkg, str(meta.get("label") or pkg)))
+    return sorted(out, key=lambda u: u[1].casefold())
+
+
+def updates_note(paths: Paths, updates: list[tuple[str, str]]) -> tuple[str, str] | None:
+    """Title and text of the desktop notification, or None if there is nothing new to tell (the same updates were
+    told already)."""
+    marker = paths.cache_home / "apk-starter" / "aurora-updates"
+    seen = "\n".join(pkg for pkg, _label in updates)
+    try:
+        if marker.read_text(encoding="utf-8") == seen:
+            return None
+    except OSError:
+        pass
+    try:
+        marker.parent.mkdir(parents=True, exist_ok=True)
+        marker.write_text(seen, encoding="utf-8")
+    except OSError:
+        pass
+    if not updates:
+        return None
+    return _("Updates: {count}").format(count=len(updates)), ", ".join(label for _pkg, label in updates)

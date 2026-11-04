@@ -71,3 +71,53 @@ def test_changed_file_is_refused(tmp_path):
 def test_no_version_from_fdroid(answer):
     with pytest.raises(StarterError, match="no version"):
         aurora.latest_version(lambda url, limit, sink: sink(answer))
+
+
+# -- updates Aurora knows (Spec 18 Phase 3): its own update list, against the installed versions -----------------
+import json as _json  # noqa: E402
+import sqlite3  # noqa: E402
+
+from apk_starter.paths import Paths as _Paths  # noqa: E402
+
+
+def _aurora_db(p: _Paths, updates, ignored=()):
+    db = p.data(aurora.PACKAGE) / f"{aurora.PACKAGE}.apk_" / "databases" / "aurora_database"
+    db.parent.mkdir(parents=True)
+    c = sqlite3.connect(db)
+    c.execute("CREATE TABLE `update` (`packageName` TEXT NOT NULL, `versionCode` INTEGER NOT NULL, "
+              "`versionName` TEXT NOT NULL, `displayName` TEXT NOT NULL)")
+    c.execute("CREATE TABLE `ignored_update` (`packageName` TEXT NOT NULL, `ignoredVersionCode` INTEGER)")
+    c.executemany("INSERT INTO `update` VALUES (?, ?, ?, ?)", updates)
+    c.executemany("INSERT INTO `ignored_update` VALUES (?, ?)", ignored)
+    c.commit()
+    c.close()
+
+
+def _installed(p: _Paths, pkg, code, label):
+    p.apps_dir().mkdir(parents=True, exist_ok=True)
+    p.meta(pkg).write_text(_json.dumps({"package": pkg, "label": label, "version_code": code}))
+
+
+def test_updates_are_what_aurora_found_newer_than_installed(tmp_path):
+    p = _Paths(tmp_path / "d", tmp_path / "c", tmp_path / "p")
+    for pkg, code, label in (("com.whatsapp", 10, "WhatsApp"), ("org.mozilla.firefox", 5, "Firefox"),
+                             ("org.done", 9, "Done"), ("org.skip", 1, "Skip"), (aurora.PACKAGE, 76, "Aurora")):
+        _installed(p, pkg, code, label)
+    _aurora_db(p, [("com.whatsapp", 11, "2.26", "WhatsApp"), ("org.mozilla.firefox", 6, "150", "Firefox"),
+                   ("org.done", 9, "1", "Done"), ("org.skip", 2, "2", "Skip"), ("org.gone", 3, "3", "Gone")],
+               ignored=[("org.skip", 2)])
+    assert aurora.pending_updates(p) == [("org.mozilla.firefox", "Firefox"), ("com.whatsapp", "WhatsApp")]
+
+
+def test_no_aurora_data_no_updates(tmp_path):
+    p = _Paths(tmp_path / "d", tmp_path / "c", tmp_path / "p")
+    assert aurora.pending_updates(p) == []
+
+
+def test_note_only_when_the_updates_changed(tmp_path):
+    p = _Paths(tmp_path / "d", tmp_path / "c", tmp_path / "p")
+    ups = [("org.mozilla.firefox", "Firefox"), ("com.whatsapp", "WhatsApp")]
+    assert aurora.updates_note(p, ups) == ("Updates: 2", "Firefox, WhatsApp")
+    assert aurora.updates_note(p, ups) is None                  # told already
+    assert aurora.updates_note(p, ups[:1]) == ("Updates: 1", "Firefox")
+    assert aurora.updates_note(p, []) is None

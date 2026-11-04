@@ -20,6 +20,7 @@ class AppSettings:
 class Settings:
     apps: dict[str, AppSettings] = field(default_factory=dict)
     default_titlebar: str = "atl"       # from the old global «Title bar from the system» (Testversion 2)
+    aurora_updates: bool = False        # the window tells the updates Aurora Store knows (notification)
 
     def app(self, pkg: str) -> AppSettings:
         return self.apps.get(pkg, AppSettings(titlebar=self.default_titlebar))
@@ -47,7 +48,8 @@ def load_settings(path: Path) -> Settings:
         return Settings()
     default = "system" if d.get("system_titlebar") is True else "atl"
     apps = d.get("apps") if isinstance(d.get("apps"), dict) else {}
-    return Settings(apps={str(k): _app(v, default) for k, v in apps.items()}, default_titlebar=default)
+    return Settings(apps={str(k): _app(v, default) for k, v in apps.items()}, default_titlebar=default,
+                    aurora_updates=d.get("aurora_updates") is True)
 
 
 def save_settings(path: Path, settings: Settings) -> None:
@@ -56,6 +58,8 @@ def save_settings(path: Path, settings: Settings) -> None:
                   for k, v in settings.apps.items()}}
     if settings.default_titlebar == "system":
         d["system_titlebar"] = True
+    if settings.aurora_updates:
+        d["aurora_updates"] = True
     tmp = path.with_name(f"{path.name}.{os.getpid()}.tmp")
     tmp.write_text(json.dumps(d), encoding="utf-8")
     os.replace(tmp, path)
