@@ -49,16 +49,18 @@ def test_window_lists_installs_starts_and_uninstalls(tmp_path):
         out = subprocess.run([sys.executable, str(HERE / "gui_probe.py"), str(tmp_path / "d"), str(apk),
                               str(tmp_path / "started")], env=env, capture_output=True, text=True, timeout=60)
         report = json.loads(out.stdout.strip().splitlines()[-1])
+    assert "timeout" not in report and "error" not in report, report
     heading, body = report.pop("install_error")
     assert heading == "Cannot install broken.apk" and body.startswith("not an APK"), (body, out.stderr)
     heading, body = report.pop("install_warning")
     assert heading == "Cannot install demo.apk" and body.startswith("Demo is installed without a menu entry")
     heading, body = report.pop("remove_warning")
     assert heading == "Demo uninstalled" and "menu entry was not removed" in body
+    assert report.pop("busy") == [1, ["demo.apk"], "list"]     # one spinner, in the row of the job
     assert report == {"listed": [], "page": "empty", "drop_accepted": True, "after_install": ["Demo"],
                       "pkg": "org.example.demo", "started": ["org.example.demo"],
                       "clear_dialog": "Delete the data of Demo?", "dialog": "Uninstall Demo?", "after_remove": [],
-                      "page_end": "empty", "data_left": False, "busy_end": False}, out.stderr
+                      "page_end": "empty", "data_left": False, "busy_end": 0}, out.stderr
     assert "CRITICAL" not in out.stderr and "WARNING" not in out.stderr, out.stderr     # e.g. gtk_widget_is_ancestor
 
 
@@ -167,3 +169,45 @@ def test_window_takes_the_system_gtk_theme_live(tmp_path):
                   "user_css": [4, 5, 6], "found": True},
         "changed": {"theme": "Zweites", "icons": "Testsymbole", "font": "Testschrift 13", "theme_css": [10, 20, 30],
                     "user_css": [40, 50, 60], "found": True}}, out.stderr
+
+
+def _updated_box(tmp_path, monkeypatch):
+    """One app installed under an older Flatpak build (fake ART), as the window finds it after an update."""
+    from apk_starter import dexopt
+    from apk_starter.cli import main
+    bindir = tmp_path / "bin"
+    bindir.mkdir()
+    for prog in ("dalvikvm", "dex2oat"):
+        (bindir / prog).symlink_to(HERE / "fake_art.py")
+    prefix = tmp_path / "prefix"
+    (prefix / "share/icons/hicolor/scalable/apps").mkdir(parents=True)
+    (prefix / "share/icons/hicolor/scalable/apps/io.github.Jimbambuli.ApkStarter.svg").write_bytes(b"<svg/>")
+    info = tmp_path / "flatpak-info"
+    info.write_text("[Instance]\napp-commit=old\n")
+    monkeypatch.setattr(dexopt, "FLATPAK_INFO", info)
+    monkeypatch.setenv("DBUS_SESSION_BUS_ADDRESS", "unix:path=/nonexistent")
+    env = {"XDG_DATA_HOME": str(tmp_path / "data"), "XDG_CACHE_HOME": str(tmp_path / "cache"),
+           "APK_STARTER_PREFIX": str(prefix), "PATH": f"{bindir}:{os.environ['PATH']}"}
+    main(["--install", str(make_apk(tmp_path / "demo.apk", manifest=axml_manifest()))], env=env)  # no menu entry
+    assert (tmp_path / "data/apps/org.example.demo.apk").is_file()
+    return env, info
+
+
+@needs_broadway
+@pytest.mark.parametrize("fail", [None, "dex2oat"])
+def test_window_after_update_shows_work_per_app_and_ends(tmp_path, monkeypatch, fail):
+    env, info = _updated_box(tmp_path, monkeypatch)
+    with broadway() as display:
+        run_env = {**display, **env} | ({"FAKE_ART_FAIL": fail} if fail else {})
+        out = subprocess.run([sys.executable, str(HERE / "gui_prepare_probe.py"), str(info)], env=run_env,
+                             capture_output=True, text=True, timeout=60)
+    report = json.loads(out.stdout.strip().splitlines()[-1])
+    assert report["seen"] == [[["org.example.demo", "Preparing…"]]], (report, out.stderr)
+    assert report["during"] == {"spinners": 1, "status": "Preparing…", "start": False}, report
+    after = report["after"]
+    assert after["spinners"] == 0 and after["start"] is True, report
+    if fail:
+        assert after["status"].startswith("the Android runtime could not be prepared"), report
+        assert after["toast"] == after["status"], report
+    else:
+        assert after["status"] == "Prepared for this computer" and after["toast"] is None, report

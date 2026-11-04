@@ -81,9 +81,22 @@ def activate(a) -> None:
     win = gui.Window(a, paths, None, ["sh", "-c", f'echo "$@" > {record}', "sh"])
     win.present()
 
+    def spinners(w) -> int:
+        n, child = isinstance(w, Gtk.Spinner) and w.get_visible(), w.get_first_child()
+        while child is not None:
+            n += spinners(child)
+            child = child.get_next_sibling()
+        return n
+
     def listed():
         report["listed"] = titles(win)
         report["page"] = win.stack.get_visible_child_name()
+        _progress, end = win.begin("demo.apk", "Installing…")      # an install before its app is listed
+        report["busy"] = [spinners(win), titles(win), win.stack.get_visible_child_name()]
+        end()
+        after_busy()
+
+    def after_busy():
         if shot:                                    # let one frame draw the list first
             GLib.timeout_add(700, lambda: (screenshot(win, shot), install())[1])
         else:
@@ -141,7 +154,7 @@ def activate(a) -> None:
         report["remove_warning"] = dialog()
         report["page_end"] = win.stack.get_visible_child_name()
         report["data_left"] = paths.data(report["pkg"]).exists()
-        report["busy_end"] = win.spinner.get_visible()
+        report["busy_end"] = spinners(win)
         app.quit()
 
     wait(lambda: shown and win.get_width() > 0, listed)

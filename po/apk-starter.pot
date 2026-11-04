@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-03 21:18+0000\n"
+"POT-Creation-Date: 2026-11-04 04:58+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -153,7 +153,7 @@ msgstr ""
 msgid "the downloaded file is not Aurora Store {code}"
 msgstr ""
 
-#: src/apk_starter/aurora.py:75 src/apk_starter/gui.py:678
+#: src/apk_starter/aurora.py:75 src/apk_starter/gui.py:797
 msgid "Downloading Aurora Store from F-Droid…"
 msgstr ""
 
@@ -308,16 +308,24 @@ msgstr ""
 msgid "no log: cannot write {file}: {reason}"
 msgstr ""
 
-#: src/apk_starter/cli.py:498 src/apk_starter/cli.py:517
+#: src/apk_starter/cli.py:498 src/apk_starter/cli.py:524
 #, python-brace-format
 msgid "the Android runtime could not be prepared in advance: {reason}"
 msgstr ""
 
-#: src/apk_starter/cli.py:522
+#: src/apk_starter/cli.py:520 src/apk_starter/cli.py:594
+msgid "Preparing…"
+msgstr ""
+
+#: src/apk_starter/cli.py:530
+msgid "Updating the menu entry…"
+msgstr ""
+
+#: src/apk_starter/cli.py:533
 msgid "Preparing apps for this computer…"
 msgstr ""
 
-#: src/apk_starter/cli.py:560
+#: src/apk_starter/cli.py:578
 #, python-brace-format
 msgid "{app} keeps its old menu entry: {reason}"
 msgstr ""
@@ -350,292 +358,295 @@ msgstr ""
 msgid "never"
 msgstr ""
 
-#: src/apk_starter/gui.py:130
+#: src/apk_starter/gui.py:138
 msgid "Search apps"
 msgstr ""
 
-#: src/apk_starter/gui.py:135
+#: src/apk_starter/gui.py:143
 msgid "Name"
 msgstr ""
 
-#: src/apk_starter/gui.py:135 src/apk_starter/gui.py:521
+#: src/apk_starter/gui.py:143 src/apk_starter/gui.py:638
 msgid "Last started"
 msgstr ""
 
-#: src/apk_starter/gui.py:135
+#: src/apk_starter/gui.py:143
 msgid "Last installed"
 msgstr ""
 
-#: src/apk_starter/gui.py:136
+#: src/apk_starter/gui.py:144
 msgid "Data size"
 msgstr ""
 
-#: src/apk_starter/gui.py:138
+#: src/apk_starter/gui.py:146
 msgid "Sort"
 msgstr ""
 
-#: src/apk_starter/gui.py:143 src/apk_starter/gui.py:239
+#: src/apk_starter/gui.py:151 src/apk_starter/gui.py:246
 msgid "Add apps"
 msgstr ""
 
-#: src/apk_starter/gui.py:144
-msgid "Working…"
-msgstr ""
-
-#: src/apk_starter/gui.py:152
+#: src/apk_starter/gui.py:159
 msgid "No app matches."
 msgstr ""
 
-#: src/apk_starter/gui.py:160 src/apk_starter/launch.py:100
+#: src/apk_starter/gui.py:167 src/apk_starter/launch.py:100
 msgid "Back"
 msgstr ""
 
-#: src/apk_starter/gui.py:194
+#: src/apk_starter/gui.py:198
 msgid "Drop the APK to install it"
 msgstr ""
 
-#: src/apk_starter/gui.py:254
+#: src/apk_starter/gui.py:261
 msgid "No apps installed"
 msgstr ""
 
-#: src/apk_starter/gui.py:255
+#: src/apk_starter/gui.py:262
 msgid "Add an app with + or drop an APK here."
 msgstr ""
 
-#: src/apk_starter/gui.py:264 src/apk_starter/gui.py:604
+#: src/apk_starter/gui.py:271 src/apk_starter/gui.py:724
 msgid "Close"
 msgstr ""
 
-#: src/apk_starter/gui.py:351
-msgid "Cannot read the app list"
-msgstr ""
-
-#: src/apk_starter/gui.py:373
-msgid "Install APK…"
-msgstr ""
-
-#: src/apk_starter/gui.py:375
-msgid "Set up Aurora Store…"
-msgstr ""
-
-#: src/apk_starter/gui.py:377
-msgid "Set up microG…"
-msgstr ""
-
-#: src/apk_starter/gui.py:441
-msgid "Could not save the setting"
-msgstr ""
-
-#: src/apk_starter/gui.py:493
-msgid "Start"
-msgstr ""
-
-#: src/apk_starter/gui.py:496
-msgid "Uninstall…"
-msgstr ""
-
-#: src/apk_starter/gui.py:500
-msgid "Options"
-msgstr ""
-
-#: src/apk_starter/gui.py:505
-msgid "Debug is on"
-msgstr ""
-
-#: src/apk_starter/gui.py:511
-msgid "Delete data…"
-msgstr ""
-
-#: src/apk_starter/gui.py:518
-msgid "Version"
-msgstr ""
-
-#: src/apk_starter/gui.py:519
-msgid "Target SDK"
-msgstr ""
-
-#: src/apk_starter/gui.py:520
-msgid "Installed"
-msgstr ""
-
-#: src/apk_starter/gui.py:522
-msgid "Data"
-msgstr ""
-
-#: src/apk_starter/gui.py:522
-msgid "no data"
-msgstr ""
-
-#: src/apk_starter/gui.py:523
-msgid "Status"
-msgstr ""
-
-#: src/apk_starter/gui.py:523
+#: src/apk_starter/gui.py:353
 msgid "Prepared for this computer"
 msgstr ""
 
-#: src/apk_starter/gui.py:524
+#: src/apk_starter/gui.py:353
 msgid "Not prepared yet (done at the next start)"
 msgstr ""
 
-#: src/apk_starter/gui.py:539
+#: src/apk_starter/gui.py:437
+msgid "Cannot read the app list"
+msgstr ""
+
+#: src/apk_starter/gui.py:464
+msgid "Install APK…"
+msgstr ""
+
+#: src/apk_starter/gui.py:466
+msgid "Set up Aurora Store…"
+msgstr ""
+
+#: src/apk_starter/gui.py:468
+msgid "Set up microG…"
+msgstr ""
+
+#: src/apk_starter/gui.py:554
+msgid "Could not save the setting"
+msgstr ""
+
+#: src/apk_starter/gui.py:608 src/apk_starter/gui.py:610
+msgid "Start"
+msgstr ""
+
+#: src/apk_starter/gui.py:613
+msgid "Uninstall…"
+msgstr ""
+
+#: src/apk_starter/gui.py:617
+msgid "Options"
+msgstr ""
+
+#: src/apk_starter/gui.py:622
+msgid "Debug is on"
+msgstr ""
+
+#: src/apk_starter/gui.py:628
+msgid "Delete data…"
+msgstr ""
+
+#: src/apk_starter/gui.py:635
+msgid "Version"
+msgstr ""
+
+#: src/apk_starter/gui.py:636
+msgid "Target SDK"
+msgstr ""
+
+#: src/apk_starter/gui.py:637
+msgid "Installed"
+msgstr ""
+
+#: src/apk_starter/gui.py:639
+msgid "Data"
+msgstr ""
+
+#: src/apk_starter/gui.py:639
+msgid "no data"
+msgstr ""
+
+#: src/apk_starter/gui.py:640
+msgid "Status"
+msgstr ""
+
+#: src/apk_starter/gui.py:657
 msgid "Window bar"
 msgstr ""
 
-#: src/apk_starter/gui.py:540
+#: src/apk_starter/gui.py:658
 msgid "With back button"
 msgstr ""
 
-#: src/apk_starter/gui.py:540
+#: src/apk_starter/gui.py:658
 msgid "From the system"
 msgstr ""
 
-#: src/apk_starter/gui.py:541
+#: src/apk_starter/gui.py:659
 msgid "From the system + navigation bar"
 msgstr ""
 
-#: src/apk_starter/gui.py:550 src/apk_starter/gui.py:573
+#: src/apk_starter/gui.py:668 src/apk_starter/gui.py:691
 msgid "Debug"
 msgstr ""
 
-#: src/apk_starter/gui.py:551
+#: src/apk_starter/gui.py:669
 msgid "Slower"
 msgstr ""
 
-#: src/apk_starter/gui.py:571
+#: src/apk_starter/gui.py:689
 msgid "Recordings"
 msgstr ""
 
-#: src/apk_starter/gui.py:574 src/apk_starter/gui.py:604
+#: src/apk_starter/gui.py:692 src/apk_starter/gui.py:724
 msgid "Open log folder"
 msgstr ""
 
-#: src/apk_starter/gui.py:586
+#: src/apk_starter/gui.py:706
 #, python-brace-format
 msgid "Cannot start {app}"
 msgstr ""
 
-#: src/apk_starter/gui.py:603
+#: src/apk_starter/gui.py:723
 #, python-brace-format
 msgid "{app} ended unexpectedly."
 msgstr ""
 
-#: src/apk_starter/gui.py:614 src/apk_starter/gui.py:623
+#: src/apk_starter/gui.py:734 src/apk_starter/gui.py:743
 msgid "Cannot open the log folder"
 msgstr ""
 
-#: src/apk_starter/gui.py:627
+#: src/apk_starter/gui.py:747
 msgid "Android apps"
 msgstr ""
 
-#: src/apk_starter/gui.py:633
+#: src/apk_starter/gui.py:753
 msgid "Install APK"
 msgstr ""
 
-#: src/apk_starter/gui.py:663 src/apk_starter/gui.py:677
+#: src/apk_starter/gui.py:783 src/apk_starter/gui.py:796
 #, python-brace-format
 msgid "{app} installed"
 msgstr ""
 
-#: src/apk_starter/gui.py:664
-#, python-brace-format
-msgid "Installing {file}…"
+#: src/apk_starter/gui.py:784
+msgid "Installing…"
 msgstr ""
 
-#: src/apk_starter/gui.py:667
+#: src/apk_starter/gui.py:786
 #, python-brace-format
 msgid "Cannot install {file}"
 msgstr ""
 
-#: src/apk_starter/gui.py:680
+#: src/apk_starter/gui.py:799
 msgid "Cannot set up Aurora Store"
 msgstr ""
 
-#: src/apk_starter/gui.py:681
+#: src/apk_starter/gui.py:800
 msgid "Set up Aurora Store?"
 msgstr ""
 
-#: src/apk_starter/gui.py:682
+#: src/apk_starter/gui.py:801
 msgid ""
 "Free apps from Google Play. Downloaded from F-Droid and checked.\n"
 "\n"
 "Sign in anonymously: Google can block your own account."
 msgstr ""
 
-#: src/apk_starter/gui.py:684 src/apk_starter/gui.py:701
-#: src/apk_starter/gui.py:706 src/apk_starter/install_request.py:44
+#: src/apk_starter/gui.py:803 src/apk_starter/gui.py:820
+#: src/apk_starter/gui.py:825 src/apk_starter/install_request.py:44
 msgid "Cancel"
 msgstr ""
 
-#: src/apk_starter/gui.py:684 src/apk_starter/gui.py:701
+#: src/apk_starter/gui.py:803 src/apk_starter/gui.py:820
 msgid "Set up"
 msgstr ""
 
-#: src/apk_starter/gui.py:694
+#: src/apk_starter/gui.py:813
 msgid "microG is set up"
 msgstr ""
 
-#: src/apk_starter/gui.py:695 src/apk_starter/microg.py:98
+#: src/apk_starter/gui.py:814 src/apk_starter/microg.py:98
 msgid "Downloading microG…"
 msgstr ""
 
-#: src/apk_starter/gui.py:697
+#: src/apk_starter/gui.py:816
 msgid "Cannot set up microG"
 msgstr ""
 
-#: src/apk_starter/gui.py:698
+#: src/apk_starter/gui.py:817
 msgid "Set up microG?"
 msgstr ""
 
-#: src/apk_starter/gui.py:699
+#: src/apk_starter/gui.py:818
 msgid ""
 "Google services for apps (push messages, sign-in). Downloaded from the "
 "official microG repository and checked."
 msgstr ""
 
-#: src/apk_starter/gui.py:711
+#: src/apk_starter/gui.py:830
 #, python-brace-format
 msgid "Delete the data of {app}?"
 msgstr ""
 
-#: src/apk_starter/gui.py:712
+#: src/apk_starter/gui.py:831
 msgid ""
 "The app stays installed. Its settings, accounts and files are deleted. Close "
 "the app first."
 msgstr ""
 
-#: src/apk_starter/gui.py:713
+#: src/apk_starter/gui.py:832
 msgid "Delete Data"
 msgstr ""
 
-#: src/apk_starter/gui.py:715
+#: src/apk_starter/gui.py:833
+msgid "Deleting data…"
+msgstr ""
+
+#: src/apk_starter/gui.py:834
 #, python-brace-format
 msgid "Cannot delete the data of {app}"
 msgstr ""
 
-#: src/apk_starter/gui.py:719
+#: src/apk_starter/gui.py:838
 msgid "Also delete app data"
 msgstr ""
 
-#: src/apk_starter/gui.py:726
+#: src/apk_starter/gui.py:845
 #, python-brace-format
 msgid "{app} uninstalled"
 msgstr ""
 
-#: src/apk_starter/gui.py:727
+#: src/apk_starter/gui.py:846
 #, python-brace-format
 msgid "Uninstall {app}?"
 msgstr ""
 
-#: src/apk_starter/gui.py:728
+#: src/apk_starter/gui.py:847
 msgid "The app and its menu entry are removed. Close the app first."
 msgstr ""
 
-#: src/apk_starter/gui.py:728
+#: src/apk_starter/gui.py:847
 msgid "Uninstall"
 msgstr ""
 
-#: src/apk_starter/gui.py:730
+#: src/apk_starter/gui.py:848
+msgid "Uninstalling…"
+msgstr ""
+
+#: src/apk_starter/gui.py:850
 #, python-brace-format
 msgid "Cannot uninstall {app}"
 msgstr ""

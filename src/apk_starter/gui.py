@@ -28,6 +28,7 @@ except (ImportError, ValueError) as e:      # pragma: no cover - depends on the 
 
 APK_MIME = "application/vnd.android.package-archive"
 RECORDINGS_SHOWN = 5
+NOTE_SECONDS = 6                # a short message at the bottom stays this long
 SIDE_WIDTH = 300
 DETAILS_MARGIN = 28
 TEXT_CHARS = 64                 # readable line length of the details' texts
@@ -40,7 +41,6 @@ CSS = """
 .row-name { font-weight: 600; }
 .caption { font-size: 0.85em; }
 .drop-zone { margin: 12px; background-color: @theme_bg_color; }
-.progress-bar { padding: 6px 12px; }
 """
 
 
@@ -120,6 +120,14 @@ class Window(Gtk.ApplicationWindow):
         self.sort = self.state.sort
         self.selected: str | None = self.state.selected
         self.busy = 0                               # running install/remove/clear jobs
+        # what runs for an app, shown as a spinner in its row and in «Status» (Marcel 4.11.2026, no bar):
+        self.working: dict[str, str] = {}           # the rebuild after an update, per app
+        self.jobs: dict[str, str] = {}              # delete data / uninstall
+        self.pending: dict[int, list[str]] = {}     # installs and set-ups, before their app is in the list
+        self.problems: dict[str, str] = {}          # the last failure of the rebuild, per app
+        self.row_spinners: dict[str, Gtk.Spinner] = {}
+        self.next_key = 0
+        self.status_value: Gtk.Label | None = None
         self.generation = 0                         # newest list load; older results are dropped
         self.dialog: Dialog | None = None
         self.narrow = False
@@ -141,9 +149,8 @@ class Window(Gtk.ApplicationWindow):
             ["view-sort-descending-symbolic", "view-sort-descending"])))
         self.add_menu = Gio.Menu()
         install = Gtk.MenuButton(menu_model=self.add_menu, icon_name="list-add-symbolic", tooltip_text=_("Add apps"))
-        self.spinner = Gtk.Spinner(visible=False, spinning=True, tooltip_text=_("Working…"))
         top = Gtk.Box(spacing=6, margin_top=10, margin_bottom=8, margin_start=10, margin_end=10)
-        for w in (self.search, sort, install, self.spinner):
+        for w in (self.search, sort, install):
             top.append(w)
         self.listbox = Gtk.ListBox(selection_mode=Gtk.SelectionMode.SINGLE, activate_on_single_click=False)
         self.listbox.add_css_class("navigation-sidebar")
@@ -176,18 +183,15 @@ class Window(Gtk.ApplicationWindow):
         self.stack.add_named(self.make_empty_page(), "empty")
         self.stack.add_named(apps, "list")
 
-        self.progress_label = label("", hexpand=True, ellipsize=Pango.EllipsizeMode.END)
-        bar = Gtk.Box(spacing=10)
-        bar.add_css_class("progress-bar")
-        bar.append(Gtk.Spinner(spinning=True))
-        bar.append(self.progress_label)
-        banner = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        banner.append(bar)
-        banner.append(Gtk.Separator())
-        self.banner = Gtk.Revealer(child=banner, reveal_child=False)
         body = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        body.append(self.banner)
         body.append(self.stack)
+        self.toast_label = label("", wrap=True, max_width_chars=60)
+        note = Gtk.Box()
+        note.add_css_class("app-notification")
+        note.append(self.toast_label)
+        self.toast = Gtk.Revealer(child=note, reveal_child=False, halign=Gtk.Align.CENTER, valign=Gtk.Align.END,
+                                  margin_bottom=18, can_target=False)
+        self.toast_timer = 0
 
         drop_hint = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12, valign=Gtk.Align.CENTER)
         drop_hint.append(Gtk.Image(icon_name=APP_ID, pixel_size=96))
@@ -199,6 +203,7 @@ class Window(Gtk.ApplicationWindow):
         self.drop_zone = Gtk.Revealer(child=zone, reveal_child=False, can_target=False,
                                       transition_type=Gtk.RevealerTransitionType.CROSSFADE)
         overlay = Gtk.Overlay(child=body)
+        overlay.add_overlay(self.toast)
         overlay.add_overlay(self.drop_zone)
         self.set_child(overlay)
 
@@ -231,7 +236,9 @@ class Window(Gtk.ApplicationWindow):
         self.refresh()
         if not dexopt.runtime_ready(self.paths, self.env) or dexopt.stale_installed(self.paths):
             # after a Flatpak update: rebuild once in the background; apps started meanwhile wait for the runtime
-            self.background(lambda: prepare_all(self.paths, self.env, self.progress), None, "")
+            self.background(lambda: prepare_all(self.paths, self.env, lambda _t: None,
+                                                lambda w: GLib.idle_add(self.set_working, w)),
+                            self.prepared, None)
 
     def make_empty_page(self) -> Gtk.Widget:
         """No app yet: only text, and the «+» button in the accent colour where it stands beside the list."""
@@ -264,8 +271,9 @@ class Window(Gtk.ApplicationWindow):
         Dialog(self, heading, body, [("close", _("Close"))]).present()
 
     def background(self, work: Callable[[], object], done: Callable[[object], None] | None,
-                   failed: str, job: bool = True) -> None:
-        """Run file and portal work off the main loop; show errors as a dialog headed `failed`, then refresh."""
+                   failed: str | None, job: bool = True, end: Callable[[], None] | None = None) -> None:
+        """Run file and portal work off the main loop; show errors as a dialog headed `failed` (None: a short
+        note), then refresh. `end` runs on every way out, also after an error."""
         def thread() -> None:
             try:
                 result, error = work(), None
@@ -274,30 +282,108 @@ class Window(Gtk.ApplicationWindow):
             GLib.idle_add(finish, result, error)
 
         def finish(result, error) -> bool:
-            if job:
-                self.busy -= 1
-                self.spinner.set_visible(self.busy > 0)
-                self.banner.set_reveal_child(self.banner.get_reveal_child() and self.busy > 0)
-            if error is not None:
-                self.alert(failed, describe_error(error))
-            elif done is not None:
-                done(result)
-            if job:
-                self.refresh()
+            try:
+                if job:
+                    self.busy -= 1
+                if end is not None:
+                    end()
+                if error is not None:
+                    if failed is None:
+                        self.note(describe_error(error))
+                    else:
+                        self.alert(failed, describe_error(error))
+                elif done is not None:
+                    done(result)
+            finally:
+                if job:
+                    self.refresh()
             return False
 
         if job:
             self.busy += 1
-            self.spinner.set_visible(True)
         threading.Thread(target=thread, daemon=True).start()
 
-    def progress(self, text: str) -> None:
-        """Called from worker threads."""
-        def show() -> bool:
-            self.progress_label.set_text(text)
-            self.banner.set_reveal_child(self.busy > 0)
+    def note(self, text: str) -> None:
+        """A short message at the bottom of the window that goes by itself."""
+        self.toast_label.set_text(text)
+        self.toast.set_reveal_child(True)
+        if self.toast_timer:
+            GLib.source_remove(self.toast_timer)
+
+        def hide() -> bool:
+            self.toast_timer = 0
+            self.toast.set_reveal_child(False)
             return False
-        GLib.idle_add(show)
+        self.toast_timer = GLib.timeout_add_seconds(NOTE_SECONDS, hide)
+
+    # -- what runs for an app --------------------------------------------------------------------------------
+    def status_of(self, pkg: str) -> str | None:
+        return self.jobs.get(pkg) or self.working.get(pkg)
+
+    def set_working(self, working: dict[str, str]) -> bool:
+        """From the rebuild after an update (worker thread via idle): the apps it works on now."""
+        self.working = dict(working)
+        self.update_busy()
+        return False
+
+    def prepared(self, problems: list[tuple[str | None, str]]) -> None:
+        self.working = {}
+        self.problems = {}
+        for pkg, text in problems:
+            for p in (self.rows if pkg is None else [pkg]):
+                self.problems[p] = text
+        if problems:
+            self.note(problems[0][1])
+        self.update_busy()
+
+    def update_busy(self) -> None:
+        for pkg, spinner in self.row_spinners.items():
+            spinner.set_visible(self.status_of(pkg) is not None)
+        if self.selected in self.rows and self.status_value is not None:
+            if (self.status_of(self.selected) is None) != self.start_button.get_sensitive():
+                self.show_details()                 # «Start» locked or free again
+            else:
+                self.status_value.set_text(self.status_text(self.rows[self.selected]))
+
+    def status_text(self, r: AppRow) -> str:
+        if (text := self.status_of(r.package)) is not None:
+            return text
+        if r.package in self.problems:
+            return self.problems[r.package]
+        return _("Prepared for this computer") if r.prepared else _("Not prepared yet (done at the next start)")
+
+    def begin(self, title: str, text: str) -> tuple[Callable[[str], None], Callable[[], None]]:
+        """A row with a spinner for an install or set-up, until its app is in the list. Returns the progress
+        callback (worker threads) and what ends the row."""
+        self.next_key += 1
+        key = self.next_key
+        self.pending[key] = [title, text]
+
+        def progress(t: str) -> None:
+            def show() -> bool:
+                if key in self.pending:
+                    self.pending[key][1] = t
+                    self.show_list()
+                return False
+            GLib.idle_add(show)
+
+        def end() -> None:
+            self.pending.pop(key, None)
+            self.update_stack()
+            self.show_list()
+        self.update_stack()
+        self.show_list()
+        return progress, end
+
+    def run_for(self, pkg: str, text: str, work: Callable[[], object], done: Callable[[object], None] | None,
+                failed: str) -> None:
+        self.jobs[pkg] = text
+        self.update_busy()
+
+        def end() -> None:
+            self.jobs.pop(pkg, None)
+            self.update_busy()
+        self.background(work, done, failed, end=end)
 
     def remember(self) -> None:
         width, height = self.get_default_size()
@@ -354,10 +440,15 @@ class Window(Gtk.ApplicationWindow):
         self.all_rows = rows
         self.rows = {r.package: r for r in rows}
         self.update_add_menu()
-        self.stack.set_visible_child_name("list" if rows else "empty")
-        if not rows:
+        self.stack.set_visible_child_name("list" if rows or self.pending else "empty")
+        if not rows and not self.pending:
             GLib.idle_add(self.focus_welcome_add)           # nothing else to do here but add an app
         self.show_list()
+
+    def update_stack(self) -> None:
+        """Installs and set-ups show their row also on the empty page; the first list load decides first."""
+        if self.stack.get_visible_child_name() != "loading":
+            self.stack.set_visible_child_name("list" if self.rows or self.pending else "empty")
 
     def focus_welcome_add(self) -> bool:
         """Focused with the focus ring showing (GTK shows it only after a key otherwise): Enter opens the menu."""
@@ -384,6 +475,9 @@ class Window(Gtk.ApplicationWindow):
         keep = self.selected
         self.filling = True
         self.listbox.remove_all()
+        self.row_spinners = {}
+        for title, text in self.pending.values():
+            self.listbox.append(self.make_pending_row(title, text))
         chosen = None
         for r in rows:
             item = self.make_row(r)
@@ -391,7 +485,7 @@ class Window(Gtk.ApplicationWindow):
             if r.package == keep:
                 chosen = item
         if chosen is None and rows:
-            chosen = self.listbox.get_row_at_index(0)
+            chosen = self.listbox.get_row_at_index(len(self.pending))
         self.listbox.select_row(chosen)
         self.filling = False
         self.nothing.set_visible(bool(self.all_rows) and not rows)
@@ -405,20 +499,39 @@ class Window(Gtk.ApplicationWindow):
         text = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, valign=Gtk.Align.CENTER, spacing=2)
         text.append(label(r.label, "row-name", ellipsize=Pango.EllipsizeMode.END))
         text.append(label(r.version or r.package, "dim-label", "caption", ellipsize=Pango.EllipsizeMode.END))
+        text.set_hexpand(True)
         box.append(text)
+        spinner = Gtk.Spinner(spinning=True, visible=self.status_of(r.package) is not None, valign=Gtk.Align.CENTER)
+        self.row_spinners[r.package] = spinner
+        box.append(spinner)
         item = Gtk.ListBoxRow(child=box, tooltip_text=r.package)
         item.package = r.package
         item.title = r.label
         return item
 
+    def make_pending_row(self, title: str, text: str) -> Gtk.ListBoxRow:
+        box = Gtk.Box(spacing=12, margin_top=6, margin_bottom=6, margin_start=6, margin_end=6)
+        box.append(app_image(None, 40))
+        names = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, valign=Gtk.Align.CENTER, spacing=2, hexpand=True)
+        names.append(label(title, "row-name", ellipsize=Pango.EllipsizeMode.END))
+        names.append(label(text, "dim-label", "caption", ellipsize=Pango.EllipsizeMode.END))
+        box.append(names)
+        box.append(Gtk.Spinner(spinning=True, valign=Gtk.Align.CENTER))
+        item = Gtk.ListBoxRow(child=box, selectable=False, activatable=False, tooltip_text=text)
+        item.package = None
+        item.title = title
+        return item
+
     def on_row_selected(self, _box, item) -> None:
-        if getattr(self, "filling", False) or item is None:
+        if getattr(self, "filling", False) or item is None or item.package is None:
             return
         self.selected = item.package
         self.show_details()
 
     def on_row_activated(self, _box, item) -> None:
         """Double click or Enter starts; in a narrow window a click opens the details page."""
+        if item.package is None:
+            return
         if self.narrow:
             self.selected = item.package
             self.page = "details"
@@ -472,6 +585,7 @@ class Window(Gtk.ApplicationWindow):
         if refocus:
             self.set_focus(None)                    # never leave the focus on a widget that goes away
         self.start_button = None
+        self.status_value = None
         while (child := self.details.get_first_child()) is not None:
             self.details.remove(child)
         r = self.rows.get(self.selected or "")
@@ -490,7 +604,10 @@ class Window(Gtk.ApplicationWindow):
         self.details.append(head)
 
         # one row: Start, Delete data, Uninstall, ⚙ (window bar, Debug, recordings) (Marcel 2.11.2026)
-        start = Gtk.Button(label=_("Start"), action_name="win.start", action_target=target)
+        if self.status_of(r.package) is None:
+            start = Gtk.Button(label=_("Start"), action_name="win.start", action_target=target)
+        else:                                       # locked while it is being prepared (an action would free it)
+            start = Gtk.Button(label=_("Start"), sensitive=False)
         start.add_css_class("suggested-action")         # the main action in the theme's accent (KDE/GNOME)
         self.start_button = start
         uninstall = Gtk.Button(label=_("Uninstall…"), action_name="win.uninstall", action_target=target)
@@ -520,11 +637,12 @@ class Window(Gtk.ApplicationWindow):
                  (_("Installed"), when(r.installed)),
                  (_("Last started"), when(r.started)),
                  (_("Data"), GLib.format_size(r.size) if r.size else _("no data")),
-                 (_("Status"), _("Prepared for this computer") if r.prepared
-                  else _("Not prepared yet (done at the next start)")))
+                 (_("Status"), self.status_text(r)))
         for i, (key, value) in enumerate(lines):
             facts.attach(label(key, "dim-label"), 0, i, 1, 1)
-            facts.attach(label(value, wrap=True, selectable=True, hexpand=True, focusable=False), 1, i, 1, 1)
+            value_label = label(value, wrap=True, selectable=True, hexpand=True, focusable=False)
+            facts.attach(value_label, 1, i, 1, 1)
+        self.status_value = value_label
         self.details.append(Gtk.Frame(child=facts))
         if refocus and (not self.narrow or self.page == "details"):
             start.grab_focus()                      # not the name (a focused label shows all of it selected)
@@ -579,6 +697,8 @@ class Window(Gtk.ApplicationWindow):
     def start(self, pkg: str, level: str | None) -> None:
         """level None: as from the menu entry (Debug if it is ticked for the app), or "debug"."""
         label_ = self.rows[pkg].label if pkg in self.rows else pkg
+        if self.status_of(pkg) is not None:
+            return                                  # it is being prepared; the start waits for it
         before = {rec.path for rec in diag.recordings(self.paths, pkg)}
         try:
             proc = Gio.Subprocess.new(start_argv(self.launcher, pkg, level), Gio.SubprocessFlags.NONE)
@@ -661,10 +781,9 @@ class Window(Gtk.ApplicationWindow):
             self.search.set_text("")
             if warnings:
                 self.alert(_("{app} installed").format(app=info.label), "\n".join(warnings))
-        self.progress(_("Installing {file}…").format(file=name))
-        self.background(lambda: install_files(self.paths, files, self.lang, self.env, self.progress,
-                                              warnings.append),
-                        done, _("Cannot install {file}").format(file=name))
+        progress, end = self.begin(name, _("Installing…"))
+        self.background(lambda: install_files(self.paths, files, self.lang, self.env, progress, warnings.append),
+                        done, _("Cannot install {file}").format(file=name), end=end)
 
     def ask_setup_aurora(self) -> None:
         def setup() -> None:
@@ -675,9 +794,9 @@ class Window(Gtk.ApplicationWindow):
                 self.search.set_text("")
                 if warnings:
                     self.alert(_("{app} installed").format(app=info.label), "\n".join(warnings))
-            self.progress(_("Downloading Aurora Store from F-Droid…"))
-            self.background(lambda: aurora.setup(self.paths, self.env, self.progress, warnings.append), done,
-                            _("Cannot set up Aurora Store"))
+            progress, end = self.begin("Aurora Store", _("Downloading Aurora Store from F-Droid…"))
+            self.background(lambda: aurora.setup(self.paths, self.env, progress, warnings.append), done,
+                            _("Cannot set up Aurora Store"), end=end)
         Dialog(self, _("Set up Aurora Store?"),
                _("Free apps from Google Play. Downloaded from F-Droid and checked.\n\n"
                  "Sign in anonymously: Google can block your own account."),
@@ -692,9 +811,9 @@ class Window(Gtk.ApplicationWindow):
                 self.selected = info.package
                 self.search.set_text("")
                 self.alert(_("microG is set up"), "\n".join(warnings + [microg_hint()]))
-            self.progress(_("Downloading microG…"))
-            self.background(lambda: setup_microg(self.paths, self.lang, self.env, self.progress, warnings.append),
-                            done, _("Cannot set up microG"))
+            progress, end = self.begin("microG", _("Downloading microG…"))
+            self.background(lambda: setup_microg(self.paths, self.lang, self.env, progress, warnings.append),
+                            done, _("Cannot set up microG"), end=end)
         Dialog(self, _("Set up microG?"),
                _("Google services for apps (push messages, sign-in). Downloaded from the official microG "
                  "repository and checked."),
@@ -711,8 +830,8 @@ class Window(Gtk.ApplicationWindow):
         self._confirm(_("Delete the data of {app}?").format(app=label_),
                       _("The app stays installed. Its settings, accounts and files are deleted. "
                         "Close the app first."), _("Delete Data"),
-                      lambda: self.background(lambda: clear_data(self.paths, pkg), None,
-                                              _("Cannot delete the data of {app}").format(app=label_)))
+                      lambda: self.run_for(pkg, _("Deleting data…"), lambda: clear_data(self.paths, pkg), None,
+                                           _("Cannot delete the data of {app}").format(app=label_)))
 
     def ask_uninstall(self, pkg: str) -> None:
         label_ = self.rows[pkg].label if pkg in self.rows else pkg
@@ -726,8 +845,9 @@ class Window(Gtk.ApplicationWindow):
                 self.alert(_("{app} uninstalled").format(app=label_), "\n".join(warnings))
         self._confirm(_("Uninstall {app}?").format(app=label_),
                       _("The app and its menu entry are removed. Close the app first."), _("Uninstall"),
-                      lambda: self.background(lambda: remove_app(self.paths, pkg, purge.get_active()), removed,
-                                              _("Cannot uninstall {app}").format(app=label_)),
+                      lambda: self.run_for(pkg, _("Uninstalling…"),
+                                           lambda: remove_app(self.paths, pkg, purge.get_active()), removed,
+                                           _("Cannot uninstall {app}").format(app=label_)),
                       extra=purge)
 
 

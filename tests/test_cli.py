@@ -524,3 +524,37 @@ def test_window_after_update_renews_menu_entries(box):
     box.info.write_text("[Instance]\napp-commit=bbbb\n")
     prepare_all(apk_starter.paths.Paths.from_env(box.env), box.env, lambda _m: None)
     assert [c[:3] for c in box.calls] == [("install", PKG, "Mein Demo")]
+
+
+def test_window_rebuild_names_the_apps_it_works_on_and_always_ends(box):
+    """The window shows a spinner per app (Marcel 4.11.2026): every state reaches {} at the end."""
+    from apk_starter.cli import prepare_all
+    assert main(["--install", str(_links_apk(box))], env=box.env) == 0
+    box.fake.launcher_entry = {PKG: OLD_ENTRY}.get
+    box.info.write_text("[Instance]\napp-commit=bbbb\n")
+    seen = []
+    problems = prepare_all(apk_starter.paths.Paths.from_env(box.env), box.env, lambda _m: None, seen.append)
+    assert seen == [{PKG: "Preparing…"}, {PKG: "Updating the menu entry…"},
+                    {PKG: "Preparing…"}, {}] and problems == []
+
+
+def test_window_rebuild_failure_is_reported_per_app_and_ends(box):
+    from apk_starter.cli import prepare_all
+    assert main(["--install", str(box.apk)], env=box.env) == 0
+    box.info.write_text("[Instance]\napp-commit=bbbb\n")
+    box.env["FAKE_ART_FAIL"] = "dex2oat"
+    seen = []
+    problems = prepare_all(apk_starter.paths.Paths.from_env(box.env), box.env, lambda _m: None, seen.append)
+    assert seen[-1] == {} and len(problems) == 1 and problems[0][0] is None
+
+
+def test_menu_entry_kept_old_is_a_problem_of_that_app(box):
+    from apk_starter.cli import prepare_all
+    assert main(["--install", str(_links_apk(box))], env=box.env) == 0
+    box.fake.launcher_entry = {PKG: OLD_ENTRY}.get
+    def refused(*_a, **_k):
+        raise StarterError("menu entry not created (cancelled)")
+    box.fake.install_launcher = refused
+    box.info.write_text("[Instance]\napp-commit=bbbb\n")
+    problems = prepare_all(apk_starter.paths.Paths.from_env(box.env), box.env, lambda _m: None, lambda _w: None)
+    assert [p for p, _ in problems] == [PKG]

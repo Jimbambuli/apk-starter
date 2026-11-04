@@ -507,27 +507,42 @@ def _prepare_start(paths: Paths, env: Mapping[str, str], pkg: str, apk: Path) ->
     return later + [loc for loc in dexopt.stale_installed(paths) if loc != location]
 
 
-def prepare_all(paths: Paths, env: Mapping[str, str], report: Callable[[str], None]) -> None:
+def prepare_all(paths: Paths, env: Mapping[str, str], report: Callable[[str], None],
+                working: Callable[[dict[str, str]], None] = lambda _w: None) -> list[tuple[str | None, str]]:
     """Window opened after a Flatpak update (or before anything was prepared): runtime and all apps, once;
-    then the menu entries get what this starter writes. A failure is only noted on stderr: ART then compiles
-    at the start, as before."""
+    then the menu entries get what this starter writes. `working` gets the apps worked on with a short text
+    whenever that changes, and {} at the end on every path. Returns the problems (package or None for all,
+    text); they are also noted on stderr: ART then compiles at the start, as before."""
+    problems: list[tuple[str | None, str]] = []
     try:
-        dexopt.ensure_runtime(paths, env, report)
-    except (StarterError, OSError) as e:
-        _stderr(_("the Android runtime could not be prepared in advance: {reason}").format(reason=describe_error(e)))
-        return
-    refresh_menu_entries(paths, lang_from_env(env))
-    stale = dexopt.stale_installed(paths)
-    if stale:
-        report(_("Preparing apps for this computer…"))
-    _compile_later(paths, env, stale)
+        installed = [m["package"] for m in list_installed(paths)]
+        if not dexopt.runtime_ready(paths, env):
+            working(dict.fromkeys(installed, _("Preparing…")))
+        try:
+            dexopt.ensure_runtime(paths, env, report)
+        except (StarterError, OSError) as e:
+            text = _("the Android runtime could not be prepared in advance: {reason}").format(
+                reason=describe_error(e))
+            _stderr(text)
+            problems.append((None, text))
+            return problems
+        refresh_menu_entries(paths, lang_from_env(env),
+                             lambda pkg: working({pkg: _("Updating the menu entry…")}), problems)
+        stale = dexopt.stale_installed(paths)
+        if stale:
+            report(_("Preparing apps for this computer…"))
+        _compile_later(paths, env, stale, working)
+        return problems
+    finally:
+        working({})
 
 
 def _entry_fields(entry: str) -> dict[str, str]:
     return dict(line.split("=", 1) for line in entry.splitlines() if "=" in line and not line.startswith("#"))
 
 
-def refresh_menu_entries(paths: Paths, lang: str | None) -> list[str]:
+def refresh_menu_entries(paths: Paths, lang: str | None, renewing: Callable[[str], None] = lambda _p: None,
+                         problems: list[tuple[str | None, str]] | None = None) -> list[str]:
     """Once per starter build: menu entries made by an older starter get the fields it did not write yet
     (e.g. MimeType). Name (the user may have changed it) and Exec (the portal rewrites it) are kept; removed
     entries stay removed. Each renewed entry is a portal confirmation, like installing."""
@@ -552,22 +567,31 @@ def refresh_menu_entries(paths: Paths, lang: str | None) -> list[str]:
             want = _entry_fields(portal.desktop_entry(pkg, have.get("Name", info.label), mime))
             if all(have.get(k) == v for k, v in want.items() if k not in ("Name", "Exec")):
                 continue
+            renewing(pkg)
             with package_lock(paths, pkg):
                 icon = info.icon if info.icon is not None else paths.default_icon().read_bytes()
                 portal.install_launcher(pkg, want["Name"], icon, mime_types=mime)
             renewed.append(pkg)
+        except portal.PortalUnavailable:
+            return renewed              # no menu entries without the portal; tried again next time
         except (StarterError, OSError) as e:
-            _stderr(_("{app} keeps its old menu entry: {reason}").format(app=meta.get("label", pkg),
-                                                                        reason=describe_error(e)))
+            text = _("{app} keeps its old menu entry: {reason}").format(app=meta.get("label", pkg),
+                                                                       reason=describe_error(e))
+            _stderr(text)
+            if problems is not None:
+                problems.append((pkg, text))
     with contextlib.suppress(OSError):
         marker.parent.mkdir(parents=True, exist_ok=True)
         _write_atomic(marker, key.encode("utf-8"))
     return renewed
 
 
-def _compile_later(paths: Paths, env: Mapping[str, str], locations: list[str]) -> None:
+def _compile_later(paths: Paths, env: Mapping[str, str], locations: list[str],
+                   working: Callable[[dict[str, str]], None] = lambda _w: None) -> None:
     """Like Android's background dexopt: idle priority, renamed into place, a running app keeps its files."""
-    for loc in locations:
+    for i, loc in enumerate(locations):
+        if Path(loc).parent == paths.apps_dir():    # an installed app: its row in the window
+            working({Path(l).stem: _("Preparing…") for l in locations[i:] if Path(l).parent == paths.apps_dir()})
         try:
             dexopt.compile_app(paths, env, loc, dexopt.FULL, idle=True)
         except (StarterError, OSError):
