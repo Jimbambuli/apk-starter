@@ -224,3 +224,52 @@ def test_details_option_opens_the_window_at_that_app(tmp_path, monkeypatch):
                              env={**display, **env}, capture_output=True, text=True, timeout=60)
     report = json.loads(out.stdout.strip().splitlines()[-1])
     assert report == {"selected": "org.example.zweite", "title": "Zweite"}, out.stderr
+
+
+HOLDER = """
+import sys
+from gi.repository import Gio, GLib
+bus = Gio.bus_get_sync(Gio.BusType.SESSION, None)
+# like a running app (ATL, notification clicks): owns the Flatpak's name, lets the window take it, queues
+bus.call_sync("org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus", "RequestName",
+              GLib.Variant("(su)", ("io.github.Jimbambuli.ApkStarter", 1)), None, 0, -1, None)
+print("ready", flush=True)
+GLib.MainLoop().run()
+"""
+
+WINDOW = """
+import sys
+from apk_starter import gui
+app = gui.make_app()
+app.register(None)
+print("remote" if app.get_is_remote() else "primary", flush=True)
+"""
+
+
+@needs_broadway
+def test_window_starts_while_an_app_holds_the_flatpak_name(tmp_path):
+    """An app started from its menu entry owns the Flatpak's bus name (ATL, for notification clicks); the window
+    must still start as the primary instance (Marcel 4.11.2026), a second window goes to the first."""
+    if not shutil.which("dbus-daemon"):
+        pytest.skip("dbus-daemon not installed")
+    bus = subprocess.Popen(["dbus-daemon", "--session", "--nofork", "--print-address"], stdout=subprocess.PIPE,
+                           text=True)
+    try:
+        with broadway() as display:
+            env = {**display, "DBUS_SESSION_BUS_ADDRESS": bus.stdout.readline().strip()}
+            holder = subprocess.Popen([sys.executable, "-c", HOLDER], env=env, stdout=subprocess.PIPE, text=True)
+            try:
+                assert holder.stdout.readline().strip() == "ready"
+                first = subprocess.Popen([sys.executable, "-c", WINDOW + "GLib_loop = __import__('gi.repository.GLib', fromlist=['GLib']).MainLoop().run()"],
+                                         env=env, stdout=subprocess.PIPE, text=True)
+                try:
+                    assert first.stdout.readline().strip() == "primary"
+                    second = subprocess.run([sys.executable, "-c", WINDOW], env=env, capture_output=True, text=True,
+                                            timeout=30)
+                    assert second.stdout.strip() == "remote", second.stderr
+                finally:
+                    first.kill()
+            finally:
+                holder.kill()
+    finally:
+        bus.kill()

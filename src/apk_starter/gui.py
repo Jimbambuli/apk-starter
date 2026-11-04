@@ -971,10 +971,18 @@ def default_launcher() -> list[str]:
     return [sys.executable, os.path.realpath(sys.argv[0])]
 
 
+def make_app() -> Gtk.Application:
+    """The window's application, one per session. A running app (ATL) owns the Flatpak's bus name for notification
+    clicks and lets it be replaced: the window takes it over (REPLACE), the app queues and gets it back. The window
+    itself cannot be replaced: a second start goes to it."""
+    return Gtk.Application(application_id=ENTRY_PREFIX,     # a test build's window beside the one of stable
+                           flags=Gio.ApplicationFlags.REPLACE)
+
+
 def run(paths: Paths, env: Mapping[str, str], launcher: list[str] | None = None, show: str | None = None) -> int:
     """show: open the details of this app (an app's «App info», Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
     a window that is open already shows them."""
-    app = Gtk.Application(application_id=ENTRY_PREFIX)     # a test build's window beside the one of stable
+    app = make_app()
     lang = lang_from_env(env)
 
     def startup(_a: Gtk.Application) -> None:
