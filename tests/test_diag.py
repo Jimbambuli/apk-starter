@@ -120,7 +120,7 @@ def test_debug_restart_is_limited(tmp_path, monkeypatch):
     assert len(calls) == MAX_RESTARTS + 1
 
 
-# -- packed after the run (Marcel 4.11.2026): <name>.log.gz and <name>.tar.gz ---------------------------------------
+# -- packed after the run: <name>.log.gz and <name>.tar.gz ---------------------------------------
 import gzip  # noqa: E402
 import tarfile  # noqa: E402
 

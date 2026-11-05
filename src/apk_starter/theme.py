@@ -1,6 +1,6 @@
 """The look of the desktop (no GTK in this module):
 
-- the GTK configuration of the system (Spec 14, Standardweg A, Marcel 2.11.2026): in the Flatpak, GTK only sees
+- the GTK configuration of the system (Spec 14, Standardweg A): in the Flatpak, GTK only sees
   the runtime's theme (Adwaita, the base) and the app's own configuration. With read access to the host's GTK 4
   configuration (--filesystem=xdg-config/gtk-4.0:ro) the window takes icons, cursor and font from the host's
   settings.ini and loads the host's gtk.css (KDE: the colours of the colour scheme), as GTK does outside the

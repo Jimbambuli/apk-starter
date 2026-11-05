@@ -1,4 +1,4 @@
-"""The window after a Flatpak update (Marcel 4.11.2026): a spinner in the row of each app worked on, the work in
+"""The window after a Flatpak update: a spinner in the row of each app worked on, the work in
 its «Status», «Start» locked meanwhile, and afterwards nothing left over; a failure in «Status» and as a short note.
 
 Usage: gui_prepare_probe.py FLATPAK_INFO (environment as the starter gets it: XDG dirs, PATH with the fake ART;

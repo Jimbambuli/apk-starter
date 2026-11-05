@@ -539,7 +539,7 @@ def test_window_after_update_renews_menu_entries(box):
 
 
 def test_window_rebuild_names_the_apps_it_works_on_and_always_ends(box):
-    """The window shows a spinner per app (Marcel 4.11.2026): every state reaches {} at the end."""
+    """The window shows a spinner per app: every state reaches {} at the end."""
     from apk_starter.cli import prepare_all
     assert main(["--install", str(_links_apk(box))], env=box.env) == 0
     box.fake.launcher_entry = {PKG: OLD_ENTRY}.get
@@ -573,7 +573,7 @@ def test_menu_entry_kept_old_is_a_problem_of_that_app(box):
 
 
 def test_update_with_another_signer_is_refused_like_android(box, capsys):
-    """INSTALL_FAILED_UPDATE_INCOMPATIBLE: e.g. Google Play services from Aurora over microG (Marcel 4.11.2026)."""
+    """INSTALL_FAILED_UPDATE_INCOMPATIBLE: e.g. Google Play services from Aurora over microG."""
     from apkgen import fake_cert, sign_block
     a = sign_block(make_apk(box.tmp / "a.apk", manifest=axml_manifest(version_name="1.0")), fake_cert("microG"))
     b = sign_block(make_apk(box.tmp / "b.apk", manifest=axml_manifest(version_name="2.0")), fake_cert("Google"))

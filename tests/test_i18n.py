@@ -132,7 +132,7 @@ def test_desktop_and_metainfo_get_all_languages(tmp_path):
 
 
 def test_install_request_from_atl_speaks_the_desktop_language(tmp_path, prefix, monkeypatch, capsys):
-    """ATL sets LC_ALL=C.UTF-8 for the apps; an install from Aurora comes from there (Marcel 4.11.2026)."""
+    """ATL sets LC_ALL=C.UTF-8 for the apps; an install from Aurora comes from there."""
     from apk_starter import install_request
     from apk_starter.launch import build_env
     from apk_starter.paths import Paths

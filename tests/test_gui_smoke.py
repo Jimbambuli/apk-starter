@@ -249,7 +249,7 @@ print("remote" if app.get_is_remote() else "primary", flush=True)
 @needs_broadway
 def test_window_starts_while_an_app_holds_the_flatpak_name(tmp_path):
     """An app started from its menu entry owns the Flatpak's bus name (ATL, for notification clicks); the window
-    must still start as the primary instance (Marcel 4.11.2026), a second window goes to the first."""
+    must still start as the primary instance, a second window goes to the first."""
     if not shutil.which("dbus-daemon"):
         pytest.skip("dbus-daemon not installed")
     bus = subprocess.Popen(["dbus-daemon", "--session", "--nofork", "--print-address"], stdout=subprocess.PIPE,

@@ -115,7 +115,7 @@ def test_install_request_with_another_signer_is_a_conflict_without_asking(box, m
 
 @pytest.mark.parametrize("answer,purge,code", [(False, False, 3), (True, False, 0), (True, True, 0)])
 def test_uninstall_request_asks_and_reports_like_package_installer(box, monkeypatch, capsys, answer, purge, code):
-    """Aurora's «Uninstall» (ACTION_DELETE, package:<name>) through ATL_UNINSTALL_COMMAND (Marcel 4.11.2026)."""
+    """Aurora's «Uninstall» (ACTION_DELETE, package:<name>) through ATL_UNINSTALL_COMMAND."""
     assert main(["--install", str(box.apk)], env=box.env) == 0
     (box.data / "data" / PKG).mkdir(parents=True, exist_ok=True)
     asked = []

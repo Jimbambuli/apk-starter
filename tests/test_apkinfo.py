@@ -110,7 +110,7 @@ def test_fuzz_damaged_zip_bytes_never_traceback(tmp_path):
             pass
 
 
-# -- icons of apps from an app store: in the density parts, adaptive icons (Marcel 4.11.2026) ---------------------
+# -- icons of apps from an app store: in the density parts, adaptive icons ---------------------
 import xml.etree.ElementTree as ET  # noqa: E402
 
 from apkgen import axml_doc  # noqa: E402
