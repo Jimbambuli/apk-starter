@@ -46,7 +46,7 @@ def test_finish_args_exact():
                              "--own-name=org.mpris.MediaPlayer2.*",
                              # microG: accounts in the secret store
                              "--talk-name=org.freedesktop.secrets",
-                             # «Open with» an app for a file there (Marcel 4.11.2026: standard folders, read only;
+                             # «Open with» an app for a file there (standard folders, read only;
                              # saving goes through the file chooser portal)
                              "--filesystem=xdg-download:ro", "--filesystem=xdg-pictures:ro",
                              "--filesystem=xdg-documents:ro", "--filesystem=xdg-music:ro",

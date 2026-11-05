@@ -9,7 +9,7 @@ import pytest
 from apk_starter import apksig
 from apk_starter.errors import ApkError
 
-SIGNED = os.environ.get("APK_STARTER_SIGNED_APK", "/home/claude/aurora/dl/com.aurora.store_76.apk")
+SIGNED = os.environ.get("APK_STARTER_SIGNED_APK", "")
 AURORA_SIGNER = "5c83c7672b929955dc0a1db89a5e6ae4389e2eae7ec939956041694e5815f532"
 
 needs_apk = pytest.mark.skipif(not os.path.isfile(SIGNED), reason="no signed APK to check against")

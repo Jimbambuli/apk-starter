@@ -128,7 +128,7 @@ def recordings(paths: Paths, pkg: str | None = None) -> list[Recording]:
 
 def pack(paths: Paths, path: Path) -> Path | None:
     """After the run: a recording in the log folder becomes one compressed file, the plain log <name>.log.gz, a
-    Debug folder <name>.tar.gz (Marcel 4.11.2026). Returns the archive, or None if `path` is not such a
+    Debug folder <name>.tar.gz. Returns the archive, or None if `path` is not such a
     recording (e.g. --debug=DIR) or it cannot be packed (it then stays as it is)."""
     import gzip
     import tarfile

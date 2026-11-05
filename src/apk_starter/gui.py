@@ -36,7 +36,7 @@ SIDE_WIDTH = 300
 DETAILS_MARGIN = 28
 TEXT_CHARS = 64                 # readable line length of the details' texts
 
-# Only spacing and type sizes: the theme draws buttons, frames and every other shape (Marcel 2.11.2026).
+# Only spacing and type sizes: the theme draws buttons, frames and every other shape.
 CSS = """
 .app-name { font-size: 1.7em; font-weight: 700; }
 .welcome-title { font-size: 2em; font-weight: 700; }
@@ -123,7 +123,7 @@ class Window(Gtk.ApplicationWindow):
         self.sort = self.state.sort
         self.selected: str | None = self.state.selected
         self.busy = 0                               # running install/remove/clear jobs
-        # what runs for an app, shown as a spinner in its row and in «Status» (Marcel 4.11.2026, no bar):
+        # what runs for an app, shown as a spinner in its row and in «Status» (no bar):
         self.working: dict[str, str] = {}           # the rebuild after an update, per app
         self.jobs: dict[str, str] = {}              # delete data / uninstall
         self.pending: dict[int, list[str]] = {}     # installs and set-ups, before their app is in the list
@@ -637,7 +637,7 @@ class Window(Gtk.ApplicationWindow):
         head.append(names)
         self.details.append(head)
 
-        # one row: Start, Delete data, Uninstall, ⚙ (window bar, Debug, recordings) (Marcel 2.11.2026)
+        # one row: Start, Delete data, Uninstall, ⚙ (window bar, Debug, recordings)
         if self.status_of(r.package) is None:
             start = Gtk.Button(label=_("Start"), action_name="win.start", action_target=target)
         else:                                       # locked while it is being prepared (an action would free it)
@@ -685,7 +685,7 @@ class Window(Gtk.ApplicationWindow):
         """The ⚙ menu: window bar and Debug (both remembered per app), the Debug recordings.
 
         The window bar is a group of option buttons, not a drop-down: the menu keeps one size and nothing in it
-        opens over the rest (Marcel 2.11.2026)."""
+        opens over the rest."""
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8, margin_top=8, margin_bottom=8, margin_start=8,
                       margin_end=8)
         box.append(label(_("Window bar"), "section-title"))
@@ -736,7 +736,7 @@ class Window(Gtk.ApplicationWindow):
         try:
             asked = cached_apk_info(self.paths, self.paths.apk(r.package), self.lang, read_apk_info).permissions
         except (StarterError, OSError):
-            asked = ()
+            asked =
         keys = permissions.groups(asked)
         if keys:
             box.append(Gtk.Separator(margin_top=4))

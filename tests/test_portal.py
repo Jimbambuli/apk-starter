@@ -92,8 +92,8 @@ def test_install_from_worker_thread_while_main_loop_runs(tmp_path):
 def test_link_mime_types_own_schemes_and_verified_web():
     from apk_starter.axml import LinkFilter
     from apk_starter.portal import link_mime_types
-    jw = (LinkFilter(("jwlibrary",), (), False), LinkFilter(("jwlplaylist",), (), False),
-          LinkFilter(("content", "file"), (), False), LinkFilter(("https",), ("www.jw.org",), True))
+    jw = (LinkFilter(("jwlibrary",),, False), LinkFilter(("jwlplaylist",),, False),
+          LinkFilter(("content", "file"),, False), LinkFilter(("https",), ("www.jw.org",), True))
     assert link_mime_types(jw) == [
         "x-scheme-handler/https", "x-scheme-handler/jwlibrary", "x-scheme-handler/jwlplaylist"]
 
@@ -104,7 +104,7 @@ def test_link_mime_types_web_links_of_any_host():
     from apk_starter.axml import LinkFilter
     from apk_starter.portal import link_mime_types
     newpipe = (LinkFilter(("http", "https"), ("youtube.com", "youtu.be"), False),
-               LinkFilter(("vnd.youtube",), (), False))
+               LinkFilter(("vnd.youtube",),, False))
     assert link_mime_types(newpipe) == [
         "x-scheme-handler/http", "x-scheme-handler/https", "x-scheme-handler/vnd.youtube"]
 
@@ -112,7 +112,7 @@ def test_link_mime_types_web_links_of_any_host():
 def test_link_mime_types_skips_odd_schemes():
     from apk_starter.axml import LinkFilter
     from apk_starter.portal import link_mime_types
-    odd = (LinkFilter(("javascript", "data", "intent", "about", "Bad Scheme", "x;y", "MAILTO"), (), False),)
+    odd = (LinkFilter(("javascript", "data", "intent", "about", "Bad Scheme", "x;y", "MAILTO"),, False),)
     assert link_mime_types(odd) == ["x-scheme-handler/mailto"]
 
 
@@ -159,7 +159,7 @@ def test_launcher_entry_reads_the_entry_or_none(tmp_path):
 
 
 def test_share_mime_types_offer_the_app_under_open_with():
-    """ACTION_SEND/SEND_MULTIPLE: the app is offered for those files (Marcel 4.11.2026); */* would put it on
+    """ACTION_SEND/SEND_MULTIPLE: the app is offered for those files; */* would put it on
     every file, it is left out."""
     from apk_starter.portal import share_mime_types
     assert share_mime_types(("image/*", "text/plain", "video/*", "*/*", "image/*", "bad type", "IMAGE/PNG")) == [
