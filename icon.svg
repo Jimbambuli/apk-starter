@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+<path d="M64 10 116 36v56L64 118 12 92V36z" fill="#3d7a5a"/>
+<path d="M64 10 116 36 64 62 12 36z" fill="#5fa37d"/>
+<path d="M64 62v56L12 92V36z" fill="#2f604a"/>
+<g transform="matrix(1,0.5,0,1,38,77)"><path d="M-10.31 3.74H-15.31L-16.1 6H-19.31L-14.72 -6.39H-10.91L-6.32 6H-9.53ZM-14.51 1.44H-11.12L-12.81 -3.49ZM-4.68 -6.39H0.63Q2.99 -6.39 4.26 -5.34Q5.52 -4.29 5.52 -2.35Q5.52 -0.4 4.26 0.65Q2.99 1.7 0.63 1.7H-1.48V6H-4.68ZM-1.48 -4.08V-0.62H0.29Q1.22 -0.62 1.72 -1.07Q2.23 -1.52 2.23 -2.35Q2.23 -3.18 1.72 -3.63Q1.22 -4.08 0.29 -4.08ZM7.78 -6.39H10.98V-1.87L15.58 -6.39H19.3L13.33 -0.52L19.91 6H15.91L10.98 1.12V6H7.78Z" fill="#fff"/></g>
+<g transform="matrix(1,0,0,0.5,64,36) scale(0.95) translate(0,-6)"><g fill="#fff"><path d="M-14 0a14 14 0 0 1 28 0z"/><rect x="-14" y="2" width="28" height="22" rx="3"/><rect x="-20" y="3" width="5" height="15" rx="2.5"/><rect x="15" y="3" width="5" height="15" rx="2.5"/><rect x="-9" y="22" width="5" height="10" rx="2.5"/><rect x="4" y="22" width="5" height="10" rx="2.5"/></g><path d="M-8-12l-3-5M8-12l3-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/><circle cx="-5" cy="-5" r="1.8" fill="#5fa37d"/><circle cx="5" cy="-5" r="1.8" fill="#5fa37d"/></g>
+<g transform="matrix(1,-0.5,0,1,90,77)"><circle r="17" fill="#fff"/><path d="M-6-10v20l16-10z" fill="#3d7a5a"/></g>
+</svg>

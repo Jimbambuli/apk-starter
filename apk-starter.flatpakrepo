@@ -1,0 +1,7 @@
+[Flatpak Repo]
+Title=APK Starter (preview)
+Url=https://jimbambuli.github.io/apk-starter/repo/
+Homepage=https://github.com/Jimbambuli/apk-starter
+Comment=Run Android apps on the Linux desktop
+Icon=https://jimbambuli.github.io/apk-starter/icon.svg
+GPGKey=mDMEauwEgBYJKwYBBAHaRw8BAQdATlG6NnsC06iOUKRaDbLceO+wBVtaVIySiDd+fBTxguu0I0FQSyBTdGFydGVyIHJlcG9zaXRvcnkgKEppbWJhbWJ1bGkpiJAEExYKADgWIQQfJRiWoNzkipOKcoA+wpnw6mFjrQUCauwEgAIbAwULCQgHAgYVCgkICwIEFgIDAQIeAQIXgAAKCRA+wpnw6mFjrTNBAP4qrdmUC4b2xkCvvfCo3LNMkXjI71+sFS0yzFv7+ujmQAD/c2JEf9Vj25FYETUvSuz9mQEhXc1GbXHk9xls+GinNwQ=
