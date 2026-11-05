@@ -23,7 +23,7 @@ from .paths import PROFILE_RE, Paths, apply_profile
 from .settings import load_settings
 from .run import (default_log_path, header_fields, read_build_info, run_atl, runtime_name)
 
-VERSION = "0.1.0"
+VERSION = "0.8.0"
 APP_ID = "io.github.Jimbambuli.ApkStarter"
 # A test build's menu entries and windows are its own (profile), so they do not replace those of stable.
 _PROFILE = os.environ.get("APK_STARTER_PROFILE", "")

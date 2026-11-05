@@ -172,7 +172,7 @@ xgettext --from-code=UTF-8 --keyword=_ --keyword=N_ --add-comments=Translators -
 for l in $(cat po/LINGUAS); do msgmerge --update --backup=none po/$l.po po/apk-starter.pot; done
 ```
 
-**Status:** pre-release, not yet published.
+**Status:** preview 0.8 (own Flatpak repository, not on Flathub yet).
 
 ## Credits and license
 

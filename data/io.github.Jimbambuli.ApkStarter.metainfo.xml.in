@@ -10,18 +10,26 @@
   </developer>
   <description>
     <p>
-      Runs Android apps from their APK files on the Linux desktop, built on Android Translation Layer (ATL).
+      APK Starter runs a single Android app from its APK file on the Linux desktop. It is built on
+      Android Translation Layer (ATL) and translates the app's calls to GTK, Wayland and the usual
+      Linux libraries instead of running a full Android system.
     </p>
     <ul>
-      <li>Open an APK, double-click it or add it to the application menu.</li>
-      <li>List of installed apps with version and data size; start, uninstall, delete data.</li>
-      <li>Aurora Store and microG can be set up on request from their official sources.</li>
-      <li>Every start keeps a log; Debug records more.</li>
+      <li>Bring your own APK: open it, double-click it, or add it to the application menu.</li>
+      <li>A small window lists your apps with icon, version and data size; start, uninstall or delete
+        their data from there.</li>
+      <li>Each app keeps its own data folder.</li>
+      <li>Every start keeps a log, and Debug records more, to find out why an app does not work.</li>
     </ul>
     <p>
-      No apps are included. Only apps with x86_64 native code (or none) run; ARM-only apps do not.
+      No apps are included and no Google services are provided. Apps that need Google Play
+      services, Jetpack Compose, ARM-only native code, the camera, Bluetooth or telephony may not work.
     </p>
     <p>Android is a trademark of Google LLC.</p>
+    <p>
+      The Android robot in the icon is reproduced or modified from work created and shared by Google and used
+      according to terms described in the Creative Commons 3.0 Attribution License.
+    </p>
   </description>
   <launchable type="desktop-id">io.github.Jimbambuli.ApkStarter.desktop</launchable>
   <url type="homepage">https://github.com/Jimbambuli/apk-starter</url>
@@ -31,14 +39,9 @@
       <image>https://jimbambuli.github.io/apk-starter/screenshot.png</image>
       <caption>The app list with three free apps from F-Droid</caption>
     </screenshot>
-    <!-- Placeholders: add when the images are online (docs/SCREENSHOTS.md)
-    <screenshot><image>https://jimbambuli.github.io/apk-starter/screenshot-details.png</image></screenshot>
-    <screenshot><image>https://jimbambuli.github.io/apk-starter/screenshot-aurora.png</image></screenshot>
-    -->
   </screenshots>
   <content_rating type="oars-1.1"/>
   <releases>
-    <!-- date and notes are set when the release is made -->
-    <release version="0.1.0" date="2026-11-01"/>
+    <release version="0.8.0" date="2026-11-05"/>
   </releases>
 </component>

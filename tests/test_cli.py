@@ -140,7 +140,7 @@ def test_install_without_portal_keeps_apk(box, capsys):
 
 def test_version_line(box, capsys):
     assert main(["--version"], env=box.env) == 0
-    assert capsys.readouterr().out == "apk-starter 0.1.0 (ATL unknown, ART unknown)\n"
+    assert capsys.readouterr().out == "apk-starter 0.8.0 (ATL unknown, ART unknown)\n"
 
 
 def test_every_start_writes_a_plain_log(box):
