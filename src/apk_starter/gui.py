@@ -736,7 +736,7 @@ class Window(Gtk.ApplicationWindow):
         try:
             asked = cached_apk_info(self.paths, self.paths.apk(r.package), self.lang, read_apk_info).permissions
         except (StarterError, OSError):
-            asked =
+            asked = ()
         keys = permissions.groups(asked)
         if keys:
             box.append(Gtk.Separator(margin_top=4))
