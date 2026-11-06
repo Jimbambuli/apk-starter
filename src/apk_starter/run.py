@@ -3,6 +3,7 @@ import configparser
 import os
 import shlex
 import signal
+import select
 import subprocess
 import sys
 import time
@@ -153,6 +154,14 @@ def _run_once(cmd: list[str], env: dict[str, str], log: Path | None, logf) -> tu
         if logf:
             fd = proc.stdout.fileno()
             while True:
+                # EOF comes when every holder of the pipe has closed it: a child of ATL that outlives it
+                # (a leftover helper process) must not keep this process, and with it the Flatpak
+                # instance, alive. So read until ATL has ended, then only what is there.
+                ready, _w, _x = select.select([fd], [], [], 0.5)
+                if not ready:
+                    if proc.poll() is not None:
+                        break
+                    continue
                 chunk = os.read(fd, 65536)
                 if not chunk:
                     break
