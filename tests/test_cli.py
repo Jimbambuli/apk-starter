@@ -140,7 +140,7 @@ def test_install_without_portal_keeps_apk(box, capsys):
 
 def test_version_line(box, capsys):
     assert main(["--version"], env=box.env) == 0
-    assert capsys.readouterr().out == "apk-starter 0.8.1a (ATL unknown, ART unknown)\n"
+    assert capsys.readouterr().out == "apk-starter 0.8.1b (ATL unknown, ART unknown)\n"
 
 
 def test_every_start_writes_a_plain_log(box):
@@ -615,3 +615,12 @@ def test_menu_entry_offers_the_app_for_files_it_takes_shared(box):
     apk = make_apk(box.tmp / "share.apk", manifest=axml_manifest(activities=[[send, view]]))
     assert main(["--install", str(apk)], env=box.env) == 0
     assert box.links[PKG] == ["x-scheme-handler/demo", "image/*"]
+
+
+def test_start_ends_soon_after_the_app_even_when_the_background_compile_is_still_running(box, monkeypatch):
+    import apk_starter.cli as cli
+    monkeypatch.setattr(cli, "COMPILE_GRACE_S", 0.2)
+    monkeypatch.setattr(cli, "_compile_later", lambda paths, env, locations: time.sleep(5))
+    began = time.monotonic()
+    assert main([str(box.apk)], env=box.env) == 0
+    assert time.monotonic() - began < 3

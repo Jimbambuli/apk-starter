@@ -23,7 +23,8 @@ from .paths import PROFILE_RE, Paths, apply_profile
 from .settings import load_settings
 from .run import (default_log_path, header_fields, read_build_info, run_atl, runtime_name)
 
-VERSION = "0.8.1a"
+VERSION = "0.8.1b"
+COMPILE_GRACE_S = 20.0      # how long the end of the app waits for the full compile that runs in the background
 APP_ID = "io.github.Jimbambuli.ApkStarter"
 # A test build's menu entries and windows are its own (profile), so they do not replace those of stable.
 _PROFILE = os.environ.get("APK_STARTER_PROFILE", "")
@@ -504,7 +505,7 @@ def _start(paths: Paths, args, level: str | None, into: Path | None, tail: list[
     if paths.meta(info.package).is_file():         # «last started» in the window
         with contextlib.suppress(OSError):
             paths.started(info.package).touch()
-    background = threading.Thread(target=_compile_later, args=(paths, env, later))
+    background = threading.Thread(target=_compile_later, args=(paths, env, later), daemon=True)
     background.start()
     try:
         if debug_dir is not None:
@@ -515,7 +516,10 @@ def _start(paths: Paths, args, level: str | None, into: Path | None, tail: list[
             if rec is not None:
                 diag.pack(paths, rec)
         diag.prune(paths, info.package)
-        background.join()       # the Flatpak instance (and every process in it) ends with this one
+        # the Flatpak instance (and every process in it) ends with this one: a compile that is nearly done may
+        # finish, a long one is given up (renamed into place only when done, tried again at the next start), so
+        # that closing the last window always ends the Starter
+        background.join(COMPILE_GRACE_S)
 
 
 def _prepare_start(paths: Paths, env: Mapping[str, str], pkg: str, apk: Path) -> list[str]:

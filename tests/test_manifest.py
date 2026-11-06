@@ -75,5 +75,5 @@ def test_atl_from_the_fix_r3_branch():
     text = (ROOT / "io.github.Jimbambuli.ApkStarter.yml").read_text()
     module = text[text.index("- name: android_translation_layer"):text.index("- name: atl-doctor")]
     # apk-starter-tv6 (tv5 + compose-1 + microG + app stores)
-    assert "branch: fix-r3" in module
+    assert "branch: fix-r4" in module
     assert text.count(f"commit: {manifest_commits()['android_translation_layer']}") == 2      # also atl-src
