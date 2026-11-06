@@ -107,7 +107,7 @@ def test_search_sort_keys_narrow_layout_and_remembered_state(tmp_path):
     assert report == {
         "restored": ["org.b.bravo", "Bravo", ["Alpha", "Bravo", "Charlie"]], "opened_focus_on_start": True,
         "empty_page": ["empty", True, True, "Add an app with + or drop an APK here."], "list_page": "list",
-        "add_menu": 3, "add_menu_aurora_installed": 2,
+        "add_menu": 4, "add_menu_aurora_installed": 3,
         "bravo_menu": [1, False], "version_line": ["APK Starter 0.8.0", False], "charlie_menu": [0, False], "dot_with_debug": True,
         "debug_hint": [False, True, "Slower", True],
         "debug_hint_unticked": False,

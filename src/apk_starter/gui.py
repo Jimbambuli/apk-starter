@@ -231,6 +231,9 @@ class Window(Gtk.ApplicationWindow):
             action = Gio.SimpleAction.new(name, None)
             action.connect("activate", lambda _a, _v, h=handler: h())
             self.add_action(action)
+        version = Gio.SimpleAction.new("version", None)
+        version.set_enabled(False)
+        self.add_action(version)
         sort_action = Gio.SimpleAction.new_stateful("sort", GLib.VariantType.new("s"), GLib.Variant("s", self.sort))
         sort_action.connect("activate", lambda a, v: (a.set_state(v), self.set_sort(v.get_string())))
         self.add_action(sort_action)
@@ -491,6 +494,9 @@ class Window(Gtk.ApplicationWindow):
             self.add_menu.append(_("Set up Aurora Store…"), "win.setup-aurora")
         if microg_todo:
             self.add_menu.append(_("Set up microG…"), "win.setup-microg")
+        about = Gio.Menu()
+        about.append(f"APK Starter {VERSION}", "win.version")       # greyed out: the action stays disabled
+        self.add_menu.append_section(None, about)
 
     def visible_rows(self) -> list[AppRow]:
         return filter_rows(sort_rows(self.all_rows, self.sort), self.search.get_text())
@@ -766,10 +772,6 @@ class Window(Gtk.ApplicationWindow):
                 box.append(label(f"{rec.started:%Y-%m-%d %H:%M} · {_('Debug')}"))
             box.append(Gtk.Button(label=_("Open log folder"), action_name="win.open-logs",
                                   action_target=GLib.Variant("s", r.package), halign=Gtk.Align.START))
-        box.append(Gtk.Separator(margin_top=4))
-        about = label(f"APK Starter {VERSION}", "dim-label", sensitive=False)       # the last line, greyed out
-        about.set_name("version-line")
-        box.append(about)
         return Gtk.Popover(child=box)
 
     # -- actions -------------------------------------------------------------------------------------------
