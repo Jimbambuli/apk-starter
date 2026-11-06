@@ -11,7 +11,7 @@ from pathlib import Path
 
 from . import aurora, dexopt, diag, microg, permissions, theme
 from .cli import (APP_ID, ENTRY_PREFIX, clear_data, install_files, lang_from_env, microg_hint, prepare_all, remove_app,
-                  setup_microg)
+                  setup_microg, VERSION)
 from .apkinfo import read_apk_info
 from .launch import cached_apk_info
 from .errors import StarterError, describe_error
@@ -766,6 +766,10 @@ class Window(Gtk.ApplicationWindow):
                 box.append(label(f"{rec.started:%Y-%m-%d %H:%M} · {_('Debug')}"))
             box.append(Gtk.Button(label=_("Open log folder"), action_name="win.open-logs",
                                   action_target=GLib.Variant("s", r.package), halign=Gtk.Align.START))
+        box.append(Gtk.Separator(margin_top=4))
+        about = label(f"APK Starter {VERSION}", "dim-label", sensitive=False)       # the last line, greyed out
+        about.set_name("version-line")
+        box.append(about)
         return Gtk.Popover(child=box)
 
     # -- actions -------------------------------------------------------------------------------------------

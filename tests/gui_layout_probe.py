@@ -71,6 +71,8 @@ def activate(a) -> None:
         win.update_add_menu()
         report["add_menu_aurora_installed"] = win.add_menu.get_n_items()
         report["bravo_menu"] = [win.recordings_shown, win.gear_dot.get_visible()]
+        last = win.gear.get_popover().get_child().get_last_child()      # the greyed-out version line
+        report["version_line"] = [last.get_label(), last.get_sensitive()]
         win.saved_rows = win.all_rows
         win.show_rows([])                                   # no app: only text, «+» accented and focused
         wait(lambda: focused_in(win.welcome_add), empty_checked)
