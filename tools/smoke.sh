@@ -36,7 +36,7 @@ i=0
 while [ ! -S "/tmp/.X11-unix/X${disp#:}" ] && [ "$i" -lt 20 ]; do sleep 0.5; i=$((i + 1)); done
 
 # --nosocket=wayland/--socket=x11: a host with a Wayland socket would otherwise not share X11
-DISPLAY=$disp flatpak run --nosocket=wayland --socket=x11 --env=GDK_BACKEND=x11 --file-forwarding "$app" --log @@ "$apk" @@ >"$work/run.out" 2>&1 &
+DISPLAY=$disp flatpak run --nosocket=wayland --socket=x11 --env=GDK_BACKEND=x11 --file-forwarding "$app" @@ "$apk" @@ >"$work/run.out" 2>&1 &
 apid=$!
 
 if ! DISPLAY=$disp timeout "$secs" xdotool search --sync --onlyvisible --name . >/dev/null 2>&1; then
