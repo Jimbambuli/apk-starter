@@ -285,19 +285,14 @@ def test_installed_app_starts_without_compiling(box):
     assert json.loads(box.record.read_text())["argv"][0] == str(box.data / "apps" / f"{PKG}.apk")
 
 
-def test_direct_start_verifies_first_and_compiles_fully_afterwards(box):
-    link = box.tmp / "cache" / "apk-starter" / "launch" / f"{PKG}.apk"
+def test_apk_file_is_installed_on_the_first_start_then_the_installed_app_starts(box):
     paths = apk_starter.paths.Paths.from_env(box.env)
-    box.env["FAKE_ATL_CHECK"] = str(dexopt.cache_file(paths, str(link)))
-    assert main([str(box.apk)], env=box.env) == 0
-    art = box.art()
-    assert [c["prog"] for c in art] == ["dalvikvm", "dex2oat", "dex2oat", "dex2oat"]
-    assert _dex(art[2]) == str(link) and _flt(art[2]) == "verify" and not art[2]["sched_idle"]
-    assert json.loads(box.record.read_text())["check"]           # compiled code was there when ATL started
-    assert _flt(art[3]) == "speed" and art[3]["sched_idle"]       # full pass in the background
-    assert dexopt.app_filter(paths, str(link)) == "speed"
-    assert main([str(box.apk)], env=box.env) == 0
-    assert len(box.art()) == 4
+    assert main([str(box.apk)], env=box.env) == 0                # e.g. a double click on the file
+    assert paths.meta(PKG).is_file() and paths.started(PKG).is_file()
+    assert json.loads(box.record.read_text())["argv"][0] == str(box.data / "apps" / f"{PKG}.apk")
+    n = len(box.art())
+    assert main([str(box.apk)], env=box.env) == 0                # installed: start only, no new install
+    assert len(box.art()) == n
 
 
 def test_after_a_flatpak_update_runtime_and_apps_are_rebuilt(box):
@@ -317,7 +312,7 @@ def test_after_a_flatpak_update_runtime_and_apps_are_rebuilt(box):
 def test_start_works_when_the_runtime_cannot_be_prepared(box, capsys):
     box.env["FAKE_ART_FAIL"] = "dalvikvm"
     assert main([str(box.apk)], env=box.env) == 0
-    assert [c["prog"] for c in box.art()] == ["dalvikvm"]            # ART does it at the start, as before
+    assert [c["prog"] for c in box.art()] == ["dalvikvm", "dalvikvm"]  # tried at the install and at the start
     assert box.record.exists() and "something went wrong" in capsys.readouterr().err
 
 
@@ -326,12 +321,13 @@ def test_apk_details_are_read_once_per_apk(box, monkeypatch):
     seen = []
     real = cli.read_apk_info
     monkeypatch.setattr(cli, "read_apk_info", lambda p, lang=None: seen.append(p) or real(p, lang))
+    assert main([str(box.apk)], env=box.env) == 0                # first start: read, installed
+    n = len(seen)
     assert main([str(box.apk)], env=box.env) == 0
-    assert main([str(box.apk)], env=box.env) == 0
-    assert len(seen) == 1
+    assert len(seen) == n
     os.utime(box.apk, ns=(0, os.stat(box.apk).st_mtime_ns + 10**9))
     assert main([str(box.apk)], env=box.env) == 0
-    assert len(seen) == 2
+    assert len(seen) == n + 1
     rec = json.loads(box.record.read_text())
     assert rec["argv"][rec["argv"].index("--sdk-int") + 1] == "34"
 
@@ -405,7 +401,7 @@ def test_debug_level_records_a_folder_for_atl_doctor(box):
     assert main(["--debug", str(box.apk)], env={**box.env, "FAKE_ATL_MODE": "exit:3"}) == 3
     rec = json.loads(box.record.read_text())
     assert rec["log_tags"] == "*:v [bionic_linker]:i" and rec["data_dir"] == str(box.data / "data" / PKG)
-    assert rec["argv"][0] == str(box.tmp / "cache/apk-starter/launch" / f"{PKG}.apk")
+    assert rec["argv"][0] == str(box.data / "apps" / f"{PKG}.apk")
     folder = _unpacked(box, next((box.data / "logs").glob(f"{PKG}-*.tar.gz")))
     m = json.loads((folder / "manifest.json").read_text())
     assert m["exit_status"] == 3 and m["package"] == PKG and "fake atl output" in (folder / "atl.log").read_text()
@@ -441,12 +437,6 @@ def test_install_keeps_target_sdk_and_start_notes_the_time(box):
     assert main([PKG], env=box.env) == 0
     assert paths.started(PKG).is_file()
     assert main(["--remove", PKG], env=box.env) == 0
-    assert not paths.started(PKG).exists()
-
-
-def test_direct_start_of_an_app_that_is_not_installed_notes_nothing(box):
-    paths = apk_starter.paths.Paths.from_env(box.env)
-    assert main([str(box.apk)], env=box.env) == 0
     assert not paths.started(PKG).exists()
 
 

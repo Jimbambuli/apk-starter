@@ -475,6 +475,13 @@ def _start(paths: Paths, args, level: str | None, into: Path | None, tail: list[
         atl_args = [f"--uri={args.uri}", *atl_args]
     apk = resolve_target(paths, target)
     info = cached_apk_info(paths, apk, lang_from_env(env), read_apk_info)
+    if apk != paths.apk(info.package):
+        # no start without an install: an APK file (a double click) is installed the first time, after that the
+        # installed app starts
+        if not paths.meta(info.package).is_file():
+            install_files(paths, [apk], lang_from_env(env), env)
+        apk = paths.apk(info.package)
+        info = cached_apk_info(paths, apk, lang_from_env(env), read_apk_info)
     if args.size:
         size = parse_size(args.size)
     else:
