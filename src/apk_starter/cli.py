@@ -476,9 +476,12 @@ def _start(paths: Paths, args, level: str | None, into: Path | None, tail: list[
     apk = resolve_target(paths, target)
     info = cached_apk_info(paths, apk, lang_from_env(env), read_apk_info)
     if apk != paths.apk(info.package):
-        # no start without an install: an APK file (a double click) is installed the first time, after that the
-        # installed app starts
-        if not paths.meta(info.package).is_file():
+        # no start without an install: an APK file (a double click) is installed the first time and again when it
+        # is another version than the installed one; otherwise the installed app starts
+        own = paths.apk(info.package)
+        mine = cached_apk_info(paths, own, lang_from_env(env), read_apk_info) \
+            if paths.meta(info.package).is_file() and own.is_file() else None
+        if mine is None or (mine.version_code, mine.version_name) != (info.version_code, info.version_name):
             install_files(paths, [apk], lang_from_env(env), env)
         apk = paths.apk(info.package)
         info = cached_apk_info(paths, apk, lang_from_env(env), read_apk_info)

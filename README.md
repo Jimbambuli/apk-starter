@@ -118,7 +118,7 @@ atl-doctor report -f html -o report.html org.example.app-20261102-101010   # as 
 
 Like Android, installing compiles an app for your processor (shown as «Preparing …»), so its first start is as
 fast as later ones; the Android runtime itself is prepared once and again after an update of APK Starter. Opening
-an APK file (for example with a double click) installs it the first time; after that the installed app starts. The
+an APK file (for example with a double click) installs it the first time and again when it is another version; otherwise the installed app starts. The
 compiled code lives in `~/.var/app/io.github.Jimbambuli.ApkStarter/cache/art/`; deleting it is safe, it is made
 again.
 

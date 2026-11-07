@@ -293,6 +293,9 @@ def test_apk_file_is_installed_on_the_first_start_then_the_installed_app_starts(
     n = len(box.art())
     assert main([str(box.apk)], env=box.env) == 0                # installed: start only, no new install
     assert len(box.art()) == n
+    newer = make_apk(box.tmp / "newer.apk", manifest=axml_manifest(version_code=8, version_name="1.3"))
+    assert main([str(newer)], env=box.env) == 0                  # another version: installed again
+    assert json.loads(paths.meta(PKG).read_text())["version_name"] == "1.3"
 
 
 def test_after_a_flatpak_update_runtime_and_apps_are_rebuilt(box):
