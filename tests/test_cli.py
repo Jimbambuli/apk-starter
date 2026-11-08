@@ -692,3 +692,19 @@ def test_start_marks_its_app_as_first_while_it_prepares(box, monkeypatch):
     assert seen[dexopt.QUICK] == (True, True, False)
     assert seen[dexopt.FULL][1:] == (False, True)                   # in the background: idle, not first
     assert not dexopt.urgent_active(paths)
+
+
+def test_opening_an_apk_file_compiles_quick_first_and_full_in_the_background(box, monkeypatch):
+    """Double click on an APK: the install makes only what the start needs, with this app first; FULL follows."""
+    from apk_starter import dexopt
+    paths = apk_starter.paths.Paths.from_env(box.env)
+    calls = []
+    real = dexopt.compile_app
+
+    def compile_app(p, e, loc, flt, idle=False, is_urgent=False):
+        calls.append((flt, idle, dexopt.urgent_active(paths)))
+        return real(p, e, loc, flt, idle=idle, is_urgent=is_urgent)
+    monkeypatch.setattr(dexopt, "compile_app", compile_app)
+    assert main([str(box.apk)], env=box.env) == 0
+    assert calls == [(dexopt.QUICK, False, True), (dexopt.FULL, True, False)]
+    assert dexopt.app_filter(paths, str(paths.apk(PKG))) == dexopt.FULL

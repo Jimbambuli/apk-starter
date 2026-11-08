@@ -155,13 +155,13 @@ def _stderr(text: str) -> None:
 
 
 def prepare_installed(paths: Paths, env: Mapping[str, str], info: ApkInfo, report: Callable[[str], None],
-                      warn: Callable[[str], None]) -> None:
+                      warn: Callable[[str], None], flt: str = dexopt.FULL) -> None:
     """Install dexopt: runtime, app code (FULL) and native libraries (in parallel). On failure the app still
     works: ART compiles at the start and ATL unpacks, as before; the reason is reported."""
     try:
         dexopt.ensure_runtime(paths, env, report)
         report(_("Preparing {app} for this computer…").format(app=info.label))
-        _compile_and_unpack(paths, env, info.package, paths.apk(info.package), dexopt.FULL)
+        _compile_and_unpack(paths, env, info.package, paths.apk(info.package), flt)
     except (StarterError, OSError) as e:
         warn(_("{app} could not be prepared in advance: {reason}").format(app=info.label,
                                                                             reason=describe_error(e)))
@@ -217,25 +217,26 @@ def parts_dir(paths: Paths) -> tempfile.TemporaryDirectory:
 
 def install_files(paths: Paths, files: list[Path], lang: str | None, env: Mapping[str, str] | None = None,
                   report: Callable[[str], None] = _stderr, warn: Callable[[str], None] = _stderr,
-                  label: str | None = None) -> ApkInfo:
-    """Install an APK, a split APK (base and parts) or a bundle; `label` replaces the app's own name."""
+                  label: str | None = None, flt: str = dexopt.FULL) -> ApkInfo:
+    """Install an APK, a split APK (base and parts) or a bundle; `label` replaces the app's own name; `flt` is
+    the compiler filter of the install (QUICK when the app is started right after: FULL then follows)."""
     with parts_dir(paths) as tmp:
         info, parts = read_parts(paths, files, lang, Path(tmp))
         if label:
             info = dataclasses.replace(info, label=label)
-        return install_parts(paths, info, parts.splits, lang, env, report, warn)
+        return install_parts(paths, info, parts.splits, lang, env, report, warn, flt)
 
 
 def install_parts(paths: Paths, info: ApkInfo, parts: tuple[tuple[str, Path], ...], lang: str | None,
                   env: Mapping[str, str] | None, report: Callable[[str], None] = _stderr,
-                  warn: Callable[[str], None] = _stderr) -> ApkInfo:
+                  warn: Callable[[str], None] = _stderr, flt: str = dexopt.FULL) -> ApkInfo:
     from . import portal
     with package_lock(paths, info.package):
         check_signer(paths, info)
         install_app(paths, info, parts)
         with contextlib.suppress(OSError):          # the first start then needs not parse the APK (F182)
             cached_apk_info(paths, paths.apk(info.package), lang, lambda p, _l: dataclasses.replace(info, path=p))
-        prepare_installed(paths, os.environ if env is None else env, info, report, warn)
+        prepare_installed(paths, os.environ if env is None else env, info, report, warn, flt)
         if not MENU_ENTRIES:
             return info
         icon = info.icon
@@ -487,8 +488,9 @@ def _start(paths: Paths, args, level: str | None, into: Path | None, tail: list[
         mine = cached_apk_info(paths, own, lang_from_env(env), read_apk_info) \
             if paths.meta(info.package).is_file() and own.is_file() else None
         if mine is None or (mine.version_code, mine.version_name) != (info.version_code, info.version_name):
-            try:
-                install_files(paths, [apk], lang_from_env(env), env)
+            try:                                    # this app first: QUICK is all the start needs, FULL follows
+                with dexopt.urgent(paths, str(paths.apk(info.package))):
+                    install_files(paths, [apk], lang_from_env(env), env, flt=dexopt.QUICK)
             except NoMenuEntry as e:                # installed all the same: start it, the menu entry is optional
                 _stderr(str(e))
         apk = paths.apk(info.package)

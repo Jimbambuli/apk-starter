@@ -141,8 +141,11 @@ def urgent(paths: Paths, location: str) -> Iterator[None]:
         yield
 
 
-def urgent_active(paths: Paths) -> bool:
+def urgent_active(paths: Paths, own: str | None = None) -> bool:
+    """Is an app being started? Not counted: the one at `own` (its compile is the one that is wanted)."""
     for marker in _urgent_dir(paths).glob("*.lock"):
+        if own is not None and marker.name == cache_file(paths, own).name + ".lock":
+            continue
         with contextlib.suppress(OSError), open(marker, "a") as fd:
             try:
                 fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -152,8 +155,8 @@ def urgent_active(paths: Paths) -> bool:
 
 
 def _run(cmd: list[str], env: Mapping[str, str], idle: bool = False,
-         pause_for: Paths | None = None) -> subprocess.CompletedProcess:
-    """`pause_for`: stop the program (SIGSTOP) while an app is being started, see urgent()."""
+         paused: Callable[[], bool] | None = None) -> subprocess.CompletedProcess:
+    """`paused`: asked every PAUSE_POLL_S; while it says yes the program is stopped (SIGSTOP), see urgent()."""
     def lower_priority() -> None:
         with contextlib.suppress(OSError, AttributeError):
             os.sched_setscheduler(0, os.SCHED_IDLE, os.sched_param(0))
@@ -168,10 +171,10 @@ def _run(cmd: list[str], env: Mapping[str, str], idle: bool = False,
     try:
         while True:
             try:
-                _out, err = proc.communicate(timeout=PAUSE_POLL_S if pause_for is not None else None)
+                _out, err = proc.communicate(timeout=PAUSE_POLL_S if paused is not None else None)
                 break
             except subprocess.TimeoutExpired:
-                if (want := urgent_active(pause_for)) != stopped:
+                if (want := paused()) != stopped:
                     with contextlib.suppress(OSError):
                         proc.send_signal(signal.SIGSTOP if want else signal.SIGCONT)
                     stopped = want
@@ -188,7 +191,7 @@ def _failure(proc: subprocess.CompletedProcess) -> str:
 
 
 def _dex2oat(paths: Paths, env: Mapping[str, str], location: str, context: str, flt: str, idle: bool,
-             pausable: bool = False, keep: Callable[[], bool] = lambda: True) -> bool:
+             keep: Callable[[], bool] = lambda: True) -> bool:
     """Compile into a private directory next to the target, then rename: never rewrite a mapped file.
     False if `keep()` said no after the compile (somebody else was faster): nothing is replaced."""
     out = cache_file(paths, location, env)
@@ -199,7 +202,7 @@ def _dex2oat(paths: Paths, env: Mapping[str, str], location: str, context: str, 
         proc = _run(["dex2oat", f"--dex-file={location}", f"--oat-file={tmp / out.name}",
                      f"--instruction-set={ISA}", f"--instruction-set-features={ISA_FEATURES}", "--host",
                      f"--boot-image={boot_image(paths)}", f"--class-loader-context={context}",
-                     f"--compiler-filter={flt}"], env, idle, paths if pausable else None)
+                     f"--compiler-filter={flt}"], env, idle, lambda: urgent_active(paths, own=location))
         if proc.returncode != 0 or not (tmp / out.name).is_file():
             raise DexoptError(_failure(proc))
         if not keep():
@@ -274,13 +277,13 @@ def compile_app(paths: Paths, env: Mapping[str, str], location: str, flt: str, i
                 is_urgent: bool = False) -> None:
     """dex2oat for the APK at `location` (the path ATL is given). Skipped if another process compiles it,
     unless `is_urgent` (the app is being started, inside urgent()): then the app gets its code now if it has
-    none, whoever else works on it, and nothing else compiles meanwhile."""
+    none, whoever else works on it. While an app is being started, the compile of every other app is paused."""
     lock = paths.cache_home / "apk-starter" / "locks" / (cache_file(paths, location).name + ".lock")
     with _flock(lock, blocking=False) as got:
         if not got and (not is_urgent or app_filter(paths, location) is not None):
             return
         apk = _apk_id(location)
-        if _dex2oat(paths, env, location, app_context(paths), flt, idle, pausable=not is_urgent,
+        if _dex2oat(paths, env, location, app_context(paths), flt, idle,
                     keep=(lambda: True) if got else (lambda: app_filter(paths, location) is None)):
             _write(_state_file(paths, location), json.dumps({"key": runtime_key(paths), "apk": apk, "filter": flt}))
 

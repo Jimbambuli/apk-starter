@@ -258,7 +258,7 @@ def test_urgent_compile_keeps_better_code_that_arrived_meanwhile(art, tmp_path, 
     state = {"n": 0}
     keep_real = dexopt._dex2oat
 
-    def dex2oat(paths, env, location, context, flt, idle, pausable=False, keep=lambda: True):
+    def dex2oat(paths, env, location, context, flt, idle, keep=lambda: True):
         def keep_after_full():
             if state["n"] == 0:
                 state["n"] = 1
@@ -266,7 +266,7 @@ def test_urgent_compile_keeps_better_code_that_arrived_meanwhile(art, tmp_path, 
                     {"key": dexopt.runtime_key(paths), "apk": dexopt._apk_id(location), "filter": "speed"}))
                 dexopt.cache_file(paths, location).write_bytes(b"full")
             return keep()
-        return keep_real(paths, env, location, context, flt, idle, pausable, keep_after_full)
+        return keep_real(paths, env, location, context, flt, idle, keep_after_full)
     monkeypatch.setattr(dexopt, "_dex2oat", dex2oat)
     with dexopt._flock(lock):
         dexopt.compile_app(art.paths, art.env, loc, "verify", is_urgent=True)
