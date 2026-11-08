@@ -13,7 +13,8 @@ import gi
 
 gi.require_version("Gtk", "4.0")
 gi.require_version("Gdk", "4.0")
-from gi.repository import Gdk, Gio, GLib, Gtk  # noqa: E402
+gi.require_version("Graphene", "1.0")
+from gi.repository import Gdk, Gio, GLib, Graphene, Gtk  # noqa: E402
 
 from apk_starter import gui  # noqa: E402
 from apk_starter.paths import Paths  # noqa: E402
@@ -66,6 +67,7 @@ def activate(a) -> None:
     def listed():
         report["restored"] = [win.selected, win.details_title.get_text(), titles(win)]
         report["opened_focus_on_start"] = win.get_focus() is win.start_button
+        report["menu_corner"] = {"list": corner(win)}
         report["add_menu"] = win.add_menu.get_n_items()      # APK, Aurora Store and microG: none is set up
         win.paths.meta("com.aurora.store").write_text("{}")
         win.update_add_menu()
@@ -80,11 +82,18 @@ def activate(a) -> None:
         win.show_rows([])                                   # no app: only text, «+» accented and focused
         wait(lambda: focused_in(win.welcome_add), empty_checked)
 
+    def corner(w):
+        """The main-menu button is mapped, at the top right (right edge within 150 px: window buttons stand right of it)."""
+        b = w.main_button
+        ok, p = b.compute_point(w, Graphene.Point())
+        return bool(ok and b.get_mapped() and p.x + b.get_width() >= w.get_width() - 150 and 0 <= p.y < 50)
+
     def focused_in(widget):
         f = win.get_focus()
         return f is not None and (f is widget or f.is_ancestor(widget))
 
     def empty_checked():
+        report["menu_corner"]["empty"] = corner(win)
         report["empty_page"] = [win.stack.get_visible_child_name(), win.welcome_add.get_first_child().has_css_class("suggested-action"),
                                 win.get_focus_visible(), win.welcome_text.get_text()]
         win.show_rows(win.saved_rows)
@@ -158,6 +167,11 @@ def activate(a) -> None:
         w2.listbox.emit("row-activated", w2.listbox.get_row_at_index(0))
         report["narrow_details"] = [w2.side.get_visible(), w2.detail_side.get_visible(), w2.back.get_visible(),
                                     w2.details_title.get_text()]
+        wait(lambda: w2.details_title.get_mapped(), lambda: narrow_corner(w2))
+        return
+
+    def narrow_corner(w2):
+        report["menu_corner"]["narrow_details"] = corner(w2)
         key(w2, "Escape")
         report["narrow_back"] = [w2.side.get_visible(), w2.detail_side.get_visible()]
         app.quit()

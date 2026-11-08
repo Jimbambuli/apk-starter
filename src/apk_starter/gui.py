@@ -138,6 +138,7 @@ class Window(Gtk.ApplicationWindow):
         self.page = "list"                          # narrow window: "list" or "details"
         self.layout = 0                             # extra right margin of the details
         self.start_button: Gtk.Button | None = None
+        self.first_details = True
 
         self.search = Gtk.SearchEntry(placeholder_text=_("Search apps"), hexpand=True)
         self.search.connect("search-changed", lambda _e: self.show_list())
@@ -157,8 +158,13 @@ class Window(Gtk.ApplicationWindow):
         main_menu.append(_("About APK Starter"), "win.about")
         main = Gtk.MenuButton(menu_model=main_menu, icon_name="open-menu-symbolic", tooltip_text=_("Main menu"))
         top = Gtk.Box(spacing=6, margin_top=10, margin_bottom=8, margin_start=10, margin_end=10)
-        for w in (self.search, sort, install, main):
+        for w in (self.search, sort, install):
             top.append(w)
+        # the main menu sits in the title bar: one fixed place at the top right on every page
+        header = Gtk.HeaderBar()
+        header.pack_end(main)
+        self.set_titlebar(header)
+        self.main_button = main
         self.listbox = Gtk.ListBox(selection_mode=Gtk.SelectionMode.SINGLE, activate_on_single_click=False)
         self.listbox.add_css_class("navigation-sidebar")
         self.listbox.connect("row-selected", self.on_row_selected)
@@ -493,7 +499,7 @@ class Window(Gtk.ApplicationWindow):
         dialog = Gtk.AboutDialog(transient_for=self, modal=True, program_name="APK Starter", version=VERSION,
                                  logo_icon_name=APP_ID, comments=_("Run Android apps on the Linux desktop"),
                                  website="https://github.com/Jimbambuli/apk-starter", website_label="GitHub",
-                                 license_type=Gtk.License.GPL_3_0, authors=["Jimbambuli"])
+                                 license_type=Gtk.License.GPL_3_0)
         dialog.add_credit_section(_("Components"), component_lines(info, _("unknown")))
         return dialog
 
@@ -634,7 +640,9 @@ class Window(Gtk.ApplicationWindow):
     # -- details -------------------------------------------------------------------------------------------
     def show_details(self) -> None:
         focus = self.get_focus()
-        refocus = focus is None or focus.is_ancestor(self.details)
+        # the title bar button holds the focus the window gives at the start: that is not the user's choice
+        refocus = focus is None or focus.is_ancestor(self.details) or (self.first_details and focus.is_ancestor(self.main_button))
+        self.first_details = False
         if refocus:
             self.set_focus(None)                    # never leave the focus on a widget that goes away
         self.start_button = None
