@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-08 11:02+0000\n"
+"POT-Creation-Date: 2026-11-08 12:38+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -67,8 +67,9 @@ msgstr "У каждого приложения своя папка данных.
 msgid ""
 "Debug records an app to find out why it does not work; the archive is "
 "cleaned of personal data."
-msgstr "Debug записывает приложение, чтобы выяснить, почему оно не работает; а"
-"рхив очищен от личных данных."
+msgstr ""
+"Debug записывает приложение, чтобы выяснить, почему оно не работает; архив "
+"очищен от личных данных."
 
 #: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:24
 msgid ""
@@ -263,23 +264,27 @@ msgid "Start Android apps (APK) with Android Translation Layer."
 msgstr "Запуск Android-приложений (APK) с помощью Android Translation Layer."
 
 #: src/apk_starter/cli.py:361
+#, fuzzy
 msgid ""
 "record the app for atl-doctor: exceptions, ATL stub calls, time line, view "
-"trees with a screenshot, clicks and typed text, verbose log; a little "
-"slower; afterwards one archive cleaned of personal data (default: logs/"
-"<package>-<time>.tar.gz); use --debug=DIR"
-msgstr "записать приложение для atl-doctor: исключения, вызовы заглушек ATL, ш"
-"кала времени, деревья представлений со снимком экрана, щелчки и введён"
-"ный текст, подробный журнал; чуть медленнее; затем один архив, очищенн"
-"ый от личных данных (по умолчанию: logs/<пакет>-<время>.tar.gz); испол"
-"ьзуйте --debug=ПАПКА"
+"trees, clicks and typed text, verbose log; a little slower; afterwards one "
+"archive cleaned of personal data (default: logs/<package>-<time>.tar.gz); "
+"use --debug=DIR"
+msgstr ""
+"записать приложение для atl-doctor: исключения, вызовы заглушек ATL, шкала "
+"времени, деревья представлений со снимком экрана, щелчки и введённый текст, "
+"подробный журнал; чуть медленнее; затем один архив, очищенный от личных "
+"данных (по умолчанию: logs/<пакет>-<время>.tar.gz); используйте --debug=ПАПКА"
 
 #: src/apk_starter/cli.py:365
+#, fuzzy
 msgid ""
 "like --debug, but the archive keeps everything in plain text, passwords and "
-"personal data included (name ends in -FULL): do not pass it on"
-msgstr "как --debug, но архив хранит всё открытым текстом, включая пароли и ли"
-"чные данные (имя заканчивается на -FULL): не передавать дальше"
+"personal data and screenshots included (name ends in -FULL): do not pass it "
+"on"
+msgstr ""
+"как --debug, но архив хранит всё открытым текстом, включая пароли и личные "
+"данные (имя заканчивается на -FULL): не передавать дальше"
 
 #: src/apk_starter/cli.py:367
 msgid "override the SDK level passed to ATL"
@@ -357,24 +362,24 @@ msgstr "APK не указан, и нет дисплея для окна"
 msgid "no APK given"
 msgstr "APK не указан"
 
-#: src/apk_starter/cli.py:541 src/apk_starter/cli.py:567
+#: src/apk_starter/cli.py:542 src/apk_starter/cli.py:568
 #, python-brace-format
 msgid "the Android runtime could not be prepared in advance: {reason}"
 msgstr "не удалось заранее подготовить среду выполнения Android: {reason}"
 
-#: src/apk_starter/cli.py:563 src/apk_starter/cli.py:647
+#: src/apk_starter/cli.py:564 src/apk_starter/cli.py:648
 msgid "Preparing…"
 msgstr "Подготовка…"
 
-#: src/apk_starter/cli.py:573
+#: src/apk_starter/cli.py:574
 msgid "Updating the menu entry…"
 msgstr "Обновление пункта меню…"
 
-#: src/apk_starter/cli.py:576
+#: src/apk_starter/cli.py:577
 msgid "Preparing apps for this computer…"
 msgstr "Подготовка приложений для этого компьютера…"
 
-#: src/apk_starter/cli.py:631
+#: src/apk_starter/cli.py:632
 #, python-brace-format
 msgid "{app} keeps its old menu entry: {reason}"
 msgstr "{app} сохраняет старый пункт меню: {reason}"
@@ -388,21 +393,21 @@ msgstr "не удалось запустить {program}: {reason}"
 msgid "Preparing the Android runtime for this computer…"
 msgstr "Подготовка среды выполнения Android для этого компьютера…"
 
-#: src/apk_starter/diag.py:89 src/apk_starter/diag.py:184
+#: src/apk_starter/diag.py:52 src/apk_starter/diag.py:146
 #, python-brace-format
 msgid "debug needs atl-doctor: {reason}"
 msgstr "отладке нужен atl-doctor: {reason}"
 
-#: src/apk_starter/diag.py:191
+#: src/apk_starter/diag.py:153
 #, python-brace-format
 msgid "atl-doctor pack did not start: {reason}"
 msgstr "не удалось запустить atl-doctor pack: {reason}"
 
-#: src/apk_starter/diag.py:195
+#: src/apk_starter/diag.py:157
 #, python-brace-format
 msgid "atl-doctor pack failed, the recording stays in {folder}: {reason}"
-msgstr "atl-doctor pack завершился с ошибкой, запись остаётся в {folder}: {rea"
-"son}"
+msgstr ""
+"atl-doctor pack завершился с ошибкой, запись остаётся в {folder}: {reason}"
 
 #: src/apk_starter/errors.py:27
 #, python-brace-format
@@ -570,8 +575,9 @@ msgstr "Debug полный"
 msgid ""
 "The archive contains everything in plain text, also passwords and personal "
 "data – do not pass it on"
-msgstr "Архив содержит всё открытым текстом, включая пароли и личные данные – "
-"не передавать дальше"
+msgstr ""
+"Архив содержит всё открытым текстом, включая пароли и личные данные – не "
+"передавать дальше"
 
 #: src/apk_starter/gui.py:712
 msgid "Slower"

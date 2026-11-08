@@ -358,12 +358,12 @@ def _parser() -> argparse.ArgumentParser:
               "       %(prog)s            " + _("(no arguments: open the management window)"),
         description=_("Start Android apps (APK) with Android Translation Layer."))
     p.add_argument("--debug", nargs="?", const=True, metavar="DIR",
-                   help=_("record the app for atl-doctor: exceptions, ATL stub calls, time line, view trees with a "
-                          "screenshot, clicks and typed text, verbose log; a little slower; afterwards one archive "
+                   help=_("record the app for atl-doctor: exceptions, ATL stub calls, time line, view trees, "
+                          "clicks and typed text, verbose log; a little slower; afterwards one archive "
                           "cleaned of personal data (default: logs/<package>-<time>.tar.gz); use --debug=DIR"))
     p.add_argument("--debug-full", nargs="?", const=True, metavar="DIR",
                    help=_("like --debug, but the archive keeps everything in plain text, passwords and personal "
-                          "data included (name ends in -FULL): do not pass it on"))
+                          "data and screenshots included (name ends in -FULL): do not pass it on"))
     p.add_argument("--sdk", type=int, metavar="N", help=_("override the SDK level passed to ATL"))
     p.add_argument("--size", metavar="WxH", help=_("window size (remembered per app)"))
     p.add_argument("--uri", metavar="URI", help=_("open a link in the app (the menu entry passes it)"))
@@ -515,7 +515,8 @@ def _start(paths: Paths, args, level: str | None, into: Path | None, tail: list[
     background.start()
     try:
         if debug_dir is not None:
-            return diag.record_restarting(paths, cmd, child_env, debug_dir, info.package)
+            return diag.record_restarting(paths, cmd, child_env, debug_dir, info.package,
+                                          shots=level == "debug-full")
         return run_atl(cmd, child_env, None, {})
     finally:
         if debug_dir is not None:                   # one archive, as soon as the app has ended

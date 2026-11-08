@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-08 11:02+0000\n"
+"POT-Creation-Date: 2026-11-08 12:38+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -254,19 +254,26 @@ msgid "Start Android apps (APK) with Android Translation Layer."
 msgstr "使用 Android Translation Layer 启动 Android 应用（APK）。"
 
 #: src/apk_starter/cli.py:361
+#, fuzzy
 msgid ""
 "record the app for atl-doctor: exceptions, ATL stub calls, time line, view "
-"trees with a screenshot, clicks and typed text, verbose log; a little "
-"slower; afterwards one archive cleaned of personal data (default: logs/"
-"<package>-<time>.tar.gz); use --debug=DIR"
-msgstr "为 atl-doctor 记录应用：异常、ATL 桩调用、时间线、带截图的视图树、点击和输入的文字、详细日志；略慢；结束后生成一个已清除个人"
-"数据的归档（默认：logs/<包名>-<时间>.tar.gz）；可用 --debug=文件夹"
+"trees, clicks and typed text, verbose log; a little slower; afterwards one "
+"archive cleaned of personal data (default: logs/<package>-<time>.tar.gz); "
+"use --debug=DIR"
+msgstr ""
+"为 atl-doctor 记录应用：异常、ATL 桩调用、时间线、带截图的视图树、点击和输入"
+"的文字、详细日志；略慢；结束后生成一个已清除个人数据的归档（默认：logs/<包名"
+">-<时间>.tar.gz）；可用 --debug=文件夹"
 
 #: src/apk_starter/cli.py:365
+#, fuzzy
 msgid ""
 "like --debug, but the archive keeps everything in plain text, passwords and "
-"personal data included (name ends in -FULL): do not pass it on"
-msgstr "与 --debug 相同，但归档以明文保存全部内容，包括密码和个人数据（名称以 -FULL 结尾）：请勿转发"
+"personal data and screenshots included (name ends in -FULL): do not pass it "
+"on"
+msgstr ""
+"与 --debug 相同，但归档以明文保存全部内容，包括密码和个人数据（名称以 -FULL "
+"结尾）：请勿转发"
 
 #: src/apk_starter/cli.py:367
 msgid "override the SDK level passed to ATL"
@@ -337,24 +344,24 @@ msgstr "未指定 APK，且没有可用于显示窗口的显示器"
 msgid "no APK given"
 msgstr "未指定 APK"
 
-#: src/apk_starter/cli.py:541 src/apk_starter/cli.py:567
+#: src/apk_starter/cli.py:542 src/apk_starter/cli.py:568
 #, python-brace-format
 msgid "the Android runtime could not be prepared in advance: {reason}"
 msgstr "无法提前准备 Android 运行时：{reason}"
 
-#: src/apk_starter/cli.py:563 src/apk_starter/cli.py:647
+#: src/apk_starter/cli.py:564 src/apk_starter/cli.py:648
 msgid "Preparing…"
 msgstr "正在准备…"
 
-#: src/apk_starter/cli.py:573
+#: src/apk_starter/cli.py:574
 msgid "Updating the menu entry…"
 msgstr "正在更新菜单项…"
 
-#: src/apk_starter/cli.py:576
+#: src/apk_starter/cli.py:577
 msgid "Preparing apps for this computer…"
 msgstr "正在为此计算机准备应用…"
 
-#: src/apk_starter/cli.py:631
+#: src/apk_starter/cli.py:632
 #, python-brace-format
 msgid "{app} keeps its old menu entry: {reason}"
 msgstr "{app} 保留旧的菜单项：{reason}"
@@ -368,17 +375,17 @@ msgstr "无法运行 {program}：{reason}"
 msgid "Preparing the Android runtime for this computer…"
 msgstr "正在为此计算机准备 Android 运行时…"
 
-#: src/apk_starter/diag.py:89 src/apk_starter/diag.py:184
+#: src/apk_starter/diag.py:52 src/apk_starter/diag.py:146
 #, python-brace-format
 msgid "debug needs atl-doctor: {reason}"
 msgstr "调试需要 atl-doctor：{reason}"
 
-#: src/apk_starter/diag.py:191
+#: src/apk_starter/diag.py:153
 #, python-brace-format
 msgid "atl-doctor pack did not start: {reason}"
 msgstr "无法启动 atl-doctor pack：{reason}"
 
-#: src/apk_starter/diag.py:195
+#: src/apk_starter/diag.py:157
 #, python-brace-format
 msgid "atl-doctor pack failed, the recording stays in {folder}: {reason}"
 msgstr "atl-doctor pack 失败，记录保留在 {folder}：{reason}"

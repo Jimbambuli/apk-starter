@@ -1,6 +1,6 @@
 """Recordings (Spec 12). A normal start writes no log. Debug: atl-doctor's light recorder (agent attached when the
-runtime runs, stub calls counted by ATL, time line from ART's sampling profiler, view trees, a screenshot with the
-tree (an image of the app window alone, from ATL), what is clicked, typed and scrolled as input.jsonl, verbose Android log) writes a recording folder; the app
+runtime runs, stub calls counted by ATL, time line from ART's sampling profiler, view trees (only «Debug full»
+asks ATL for an image of the app window alone with them), what is clicked, typed and scrolled as input.jsonl, verbose Android log) writes a recording folder; the app
 keeps nearly its normal speed (no full method trace). After the run `atl-doctor pack` makes one archive of it:
 cleaned of personal data («Debug») or as recorded («Debug full», name ends in -FULL). Reports come from atl-doctor
 itself (`atl-doctor report`). Plain logs of older versions are still listed and pruned."""
@@ -31,17 +31,18 @@ def default_debug_dir(paths: Paths, pkg: str, now: datetime) -> Path:
     return paths.logs_dir() / f"{pkg}-{now:%Y%m%d-%H%M%S}"
 
 
-def record_options(paths: Paths, cmd: list[str], env: Mapping[str, str], out: Path):
-    """atl-doctor's recorder for the ATL command line of launch.build_command (ATL, APK, arguments)."""
+def record_options(paths: Paths, cmd: list[str], env: Mapping[str, str], out: Path, shots: bool = False):
+    """atl-doctor's recorder for the ATL command line of launch.build_command (ATL, APK, arguments). shots: images of
+    the app window (only «Debug full»; otherwise none is requested from ATL, nothing is written)."""
     from atl_doctor.record_atl import RecordOptions
 
     stubs = paths.stub_list()
     return RecordOptions(apk=Path(cmd[1]), out=out, prefix=paths.prefix, atl_src=None, agent=None,
                          atl_args=cmd[2:], env={**env, **VERBOSE_LOG}, stub_list=stubs if stubs.is_file() else None,
-                         light=True)
+                         light=True, shots=shots)
 
 
-def record(paths: Paths, cmd: list[str], env: Mapping[str, str], out: Path) -> int:
+def record(paths: Paths, cmd: list[str], env: Mapping[str, str], out: Path, shots: bool = False) -> int:
     """Run the app under atl-doctor's recorder; returns ATL's exit code like run.run_atl (128+N for a signal)."""
     try:
         from atl_doctor.capture import Capture
@@ -66,7 +67,7 @@ def record(paths: Paths, cmd: list[str], env: Mapping[str, str], out: Path) -> i
     marker = threading.Thread(target=mark, daemon=True)
     marker.start()
     try:
-        record_atl(record_options(paths, cmd, env, out))
+        record_atl(record_options(paths, cmd, env, out, shots))
         m = Capture.open(out).read_manifest()
     except DoctorError as e:
         raise StarterError(str(e)) from None
@@ -81,14 +82,14 @@ def record(paths: Paths, cmd: list[str], env: Mapping[str, str], out: Path) -> i
 
 
 def record_restarting(paths: Paths, cmd: list[str], env: Mapping[str, str], out: Path, pkg: str,
-                      record_once=None) -> int:
+                      record_once=None, shots: bool = False) -> int:
     """record() and, like run.run_atl, again when the app restarts itself (exit 75, at most MAX_RESTARTS
     times); each run is its own recording, the next one under a new default name (a new second)."""
     from .run import EXIT_RESTART, MAX_RESTARTS
     record_once = record_once or record
     restarts = 0
     while True:
-        rc = record_once(paths, cmd, env, out)
+        rc = record_once(paths, cmd, env, out, shots)
         if rc != EXIT_RESTART or restarts == MAX_RESTARTS:
             return rc
         restarts += 1

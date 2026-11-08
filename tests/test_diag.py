@@ -84,6 +84,7 @@ def test_debug_options_for_the_recorder(tmp_path):
     assert opts.env == {"ANDROID_APP_DATA_DIR": "/d", "ANDROID_LOG_TAGS": "*:v [bionic_linker]:i"} and opts.trace
     assert opts.light  # attached agent, stub hits from ATL, sampling: the app keeps its speed
     assert opts.stub_list is None
+    assert opts.shots is False and diag.record_options(p, cmd, {}, tmp_path / "rec", True).shots is True
     p.stub_list().parent.mkdir(parents=True)
     p.stub_list().write_text("x")
     assert diag.record_options(p, cmd, {}, tmp_path / "rec").stub_list == p.stub_list()
@@ -100,7 +101,7 @@ def test_debug_restart_records_again(tmp_path):
     p.logs_dir().mkdir(parents=True, exist_ok=True)
     seen = []
 
-    def once(paths, cmd, env, out):
+    def once(paths, cmd, env, out, shots):
         out.mkdir()
         seen.append(out)
         return 75 if len(seen) == 1 else 3

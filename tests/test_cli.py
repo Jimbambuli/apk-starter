@@ -372,14 +372,14 @@ def test_remembered_debug_applies_to_every_start_of_the_app(box, monkeypatch):
     assert main(["--install", str(box.apk)], env=box.env) == 0
     save_settings(Paths.from_env(box.env).settings(), Settings().with_app(PKG, debug=True))
     seen = []
-    monkeypatch.setattr(cli.diag, "record_restarting", lambda paths, cmd, env, out, pkg: seen.append(out) or 0)
+    monkeypatch.setattr(cli.diag, "record_restarting", lambda paths, cmd, env, out, pkg, shots: seen.append((out, shots)) or 0)
     assert main([PKG], env=box.env) == 0
-    assert len(seen) == 1 and not list((box.data / "logs").glob("*.log"))     # a recording folder instead of a log
+    assert [x[1] for x in seen] == [False] and not list((box.data / "logs").glob("*.log"))     # a recording folder instead of a log
     save_settings(Paths.from_env(box.env).settings(), Settings().with_app(PKG, debug=True, debug_full=True))
     packed = []
     monkeypatch.setattr(cli.diag, "pack", lambda paths, path, full=False: packed.append(full))
     assert main([PKG], env=box.env) == 0
-    assert packed == [True]                                                   # «Debug full» wins
+    assert packed == [True] and [x[1] for x in seen] == [False, True]          # «Debug full» wins, only it takes images
 
 
 def _unpacked(box, archive: Path) -> Path:
@@ -443,7 +443,8 @@ def test_diag_usage_errors_and_no_report_option(box):
     assert main(["--report"], env=box.env) == 2          # reports come from atl-doctor itself
 
 
-def test_debug_asks_for_a_view_tree_while_the_app_runs(box, monkeypatch):
+@pytest.mark.parametrize("level", ["--debug", "--debug-full"])
+def test_debug_asks_for_a_view_tree_while_the_app_runs(box, monkeypatch, level):
     pytest.importorskip("atl_doctor")
     make_apk(box.apk, manifest=axml_manifest(), files={"classes.dex": DEX})
     prefix = Path(box.env["APK_STARTER_PREFIX"])
@@ -458,10 +459,15 @@ def test_debug_asks_for_a_view_tree_while_the_app_runs(box, monkeypatch):
     monkeypatch.setattr(dexopt, "FLATPAK_INFO", box.info)
     from apk_starter import diag
     monkeypatch.setattr(diag, "TREE_AFTER_S", 0.3)
-    assert main(["--debug", str(box.apk)], env={**box.env, "FAKE_ATL_MODE": "viewdump:2"}) == 0
+    assert main([level, str(box.apk)], env={**box.env, "FAKE_ATL_MODE": "viewdump:2"}) == 0
     folder = _unpacked(box, next((box.data / "logs").glob(f"{PKG}-*.tar.gz")))
     assert [l.split("\t")[3] for l in (folder / "marks.tsv").read_text().splitlines()] == ["start", "running"]
-    assert (folder / "shots/01-running.png").read_bytes() == b"png"       # the window image ATL wrote with the tree; no portal
+    assert (folder / "trees/01-running.xml").is_file()                        # the tree is recorded at both levels
+    if level == "--debug-full":
+        assert (folder / "shots/01-running.png").read_bytes() == b"png"       # the window image ATL wrote; no portal
+    else:                                                                      # «Debug»: no image made, none packed
+        assert not (folder / "shots").exists() and not list(folder.rglob("*.png"))
+        assert "screenshots: omitted" in (folder / "SANITIZED.txt").read_text()
 
 
 def test_install_keeps_target_sdk_and_start_notes_the_time(box):
