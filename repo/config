@@ -5,3 +5,4 @@ indexed-deltas=true
 
 [flatpak]
 title=APK Starter (preview)
+default-branch=stable
