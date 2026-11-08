@@ -167,7 +167,8 @@ def prepare_installed(paths: Paths, env: Mapping[str, str], info: ApkInfo, repor
                                                                             reason=describe_error(e)))
 
 
-def _compile_and_unpack(paths: Paths, env: Mapping[str, str], pkg: str, apk: Path, flt: str) -> None:
+def _compile_and_unpack(paths: Paths, env: Mapping[str, str], pkg: str, apk: Path, flt: str,
+                        is_urgent: bool = False) -> None:
     """dex2oat and unpacking the native libraries side by side (F181); raises the first failure."""
     failed: list[Exception] = []
     def natives() -> None:
@@ -179,7 +180,7 @@ def _compile_and_unpack(paths: Paths, env: Mapping[str, str], pkg: str, apk: Pat
     t = threading.Thread(target=natives)
     t.start()
     try:
-        dexopt.compile_app(paths, env, str(apk), flt)
+        dexopt.compile_app(paths, env, str(apk), flt, is_urgent=is_urgent)
     finally:
         t.join()
     if failed:
@@ -537,8 +538,14 @@ def _start(paths: Paths, args, level: str | None, into: Path | None, tail: list[
 def _prepare_start(paths: Paths, env: Mapping[str, str], pkg: str, apk: Path) -> list[str]:
     """Before ATL: runtime if needed (e.g. after a Flatpak update), the app with QUICK if it has no current
     code (direct start, F180), its native libraries meanwhile. Returns the APKs to compile with FULL in the
-    background while the app runs."""
+    background while the app runs. The app being started comes first: every other compile is paused until
+    this is done (dexopt.urgent), and what the start needs is only the runtime and this app."""
     location = str(apk)
+    with dexopt.urgent(paths, location):
+        return _prepare_start_urgent(paths, env, pkg, apk, location)
+
+
+def _prepare_start_urgent(paths: Paths, env: Mapping[str, str], pkg: str, apk: Path, location: str) -> list[str]:
     try:
         dexopt.ensure_runtime(paths, env, _stderr)
     except (StarterError, OSError) as e:
@@ -547,7 +554,7 @@ def _prepare_start(paths: Paths, env: Mapping[str, str], pkg: str, apk: Path) ->
     flt = dexopt.app_filter(paths, location)
     if flt is None:
         try:
-            _compile_and_unpack(paths, env, pkg, apk, dexopt.QUICK)
+            _compile_and_unpack(paths, env, pkg, apk, dexopt.QUICK, is_urgent=True)
         except (StarterError, OSError):
             pass                # ART compiles it at the start and ATL unpacks, as before
     later = [] if flt == dexopt.FULL else [location]

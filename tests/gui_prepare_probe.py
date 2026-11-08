@@ -1,5 +1,5 @@
 """The window after a Flatpak update: a spinner in the row of each app worked on, the work in
-its «Status», «Start» locked meanwhile, and afterwards nothing left over; a failure in «Status» and as a short note.
+its «Status», «Start» free meanwhile (the started app goes first), and afterwards nothing left over; a failure in «Status» and as a short note.
 
 Usage: gui_prepare_probe.py FLATPAK_INFO (environment as the starter gets it: XDG dirs, PATH with the fake ART;
 one app installed under the commit in FLATPAK_INFO, which this probe then changes). Prints JSON.

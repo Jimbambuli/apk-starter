@@ -20,6 +20,7 @@ import hashlib
 import json
 import os
 import shutil
+import signal
 import subprocess
 import time
 import zipfile
@@ -37,6 +38,7 @@ ISA_FEATURES = "-ssse3,-sse4.1,-sse4.2,-avx,-avx2,-popcnt"
 FULL = "speed"          # what ART uses without a filter, i.e. the code quality apps had so far
 QUICK = "verify"        # Android's install filter without a profile: no AOT code, 6x faster to make
 STALE_TMP_S = 3600
+PAUSE_POLL_S = 0.2      # how often a running compile looks whether an app is being started
 
 
 class DexoptError(StarterError):
@@ -127,17 +129,57 @@ def _write(path: Path, text: str) -> None:
     os.replace(tmp, path)
 
 
-def _run(cmd: list[str], env: Mapping[str, str], idle: bool = False) -> subprocess.CompletedProcess:
+def _urgent_dir(paths: Paths) -> Path:
+    return paths.cache_home / "apk-starter" / "locks" / "urgent"
+
+
+@contextlib.contextmanager
+def urgent(paths: Paths, location: str) -> Iterator[None]:
+    """The app at `location` is being started: every other compile (also of other Flatpak instances, which
+    see each other only through files) is paused while this is held, and goes on afterwards."""
+    with _flock(_urgent_dir(paths) / (cache_file(paths, location).name + ".lock"), blocking=False):
+        yield
+
+
+def urgent_active(paths: Paths) -> bool:
+    for marker in _urgent_dir(paths).glob("*.lock"):
+        with contextlib.suppress(OSError), open(marker, "a") as fd:
+            try:
+                fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError:
+                return True
+    return False
+
+
+def _run(cmd: list[str], env: Mapping[str, str], idle: bool = False,
+         pause_for: Paths | None = None) -> subprocess.CompletedProcess:
+    """`pause_for`: stop the program (SIGSTOP) while an app is being started, see urgent()."""
     def lower_priority() -> None:
         with contextlib.suppress(OSError, AttributeError):
             os.sched_setscheduler(0, os.SCHED_IDLE, os.sched_param(0))
         with contextlib.suppress(OSError):
             os.nice(19)
     try:
-        return subprocess.run(cmd, env=dict(env), stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
-                              stderr=subprocess.PIPE, preexec_fn=lower_priority if idle else None)
+        proc = subprocess.Popen(cmd, env=dict(env), stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+                                stderr=subprocess.PIPE, preexec_fn=lower_priority if idle else None)
     except OSError as e:
         raise DexoptError(_("cannot run {program}: {reason}").format(program=cmd[0], reason=e.strerror)) from None
+    stopped = False
+    try:
+        while True:
+            try:
+                _out, err = proc.communicate(timeout=PAUSE_POLL_S if pause_for is not None else None)
+                break
+            except subprocess.TimeoutExpired:
+                if (want := urgent_active(pause_for)) != stopped:
+                    with contextlib.suppress(OSError):
+                        proc.send_signal(signal.SIGSTOP if want else signal.SIGCONT)
+                    stopped = want
+    except BaseException:
+        proc.kill()
+        proc.wait()
+        raise
+    return subprocess.CompletedProcess(cmd, proc.returncode, b"", err)
 
 
 def _failure(proc: subprocess.CompletedProcess) -> str:
@@ -145,8 +187,10 @@ def _failure(proc: subprocess.CompletedProcess) -> str:
     return lines[-1].strip() if lines else f"exit {proc.returncode}"
 
 
-def _dex2oat(paths: Paths, env: Mapping[str, str], location: str, context: str, flt: str, idle: bool) -> None:
-    """Compile into a private directory next to the target, then rename: never rewrite a mapped file."""
+def _dex2oat(paths: Paths, env: Mapping[str, str], location: str, context: str, flt: str, idle: bool,
+             pausable: bool = False, keep: Callable[[], bool] = lambda: True) -> bool:
+    """Compile into a private directory next to the target, then rename: never rewrite a mapped file.
+    False if `keep()` said no after the compile (somebody else was faster): nothing is replaced."""
     out = cache_file(paths, location, env)
     out.parent.mkdir(parents=True, exist_ok=True)
     tmp = out.parent / f".apk-starter-{os.getpid()}-{time.monotonic_ns()}"
@@ -155,12 +199,15 @@ def _dex2oat(paths: Paths, env: Mapping[str, str], location: str, context: str, 
         proc = _run(["dex2oat", f"--dex-file={location}", f"--oat-file={tmp / out.name}",
                      f"--instruction-set={ISA}", f"--instruction-set-features={ISA_FEATURES}", "--host",
                      f"--boot-image={boot_image(paths)}", f"--class-loader-context={context}",
-                     f"--compiler-filter={flt}"], env, idle)
+                     f"--compiler-filter={flt}"], env, idle, paths if pausable else None)
         if proc.returncode != 0 or not (tmp / out.name).is_file():
             raise DexoptError(_failure(proc))
+        if not keep():
+            return False
         if _vdex(tmp / out.name).is_file():
             os.replace(_vdex(tmp / out.name), _vdex(out))
         os.replace(tmp / out.name, out)
+        return True
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
@@ -223,15 +270,19 @@ def app_filter(paths: Paths, location: str) -> str | None:
     return None
 
 
-def compile_app(paths: Paths, env: Mapping[str, str], location: str, flt: str, idle: bool = False) -> None:
-    """dex2oat for the APK at `location` (the path ATL is given). Skipped if another process compiles it."""
+def compile_app(paths: Paths, env: Mapping[str, str], location: str, flt: str, idle: bool = False,
+                is_urgent: bool = False) -> None:
+    """dex2oat for the APK at `location` (the path ATL is given). Skipped if another process compiles it,
+    unless `is_urgent` (the app is being started, inside urgent()): then the app gets its code now if it has
+    none, whoever else works on it, and nothing else compiles meanwhile."""
     lock = paths.cache_home / "apk-starter" / "locks" / (cache_file(paths, location).name + ".lock")
     with _flock(lock, blocking=False) as got:
-        if not got:
+        if not got and (not is_urgent or app_filter(paths, location) is not None):
             return
         apk = _apk_id(location)
-        _dex2oat(paths, env, location, app_context(paths), flt, idle)
-        _write(_state_file(paths, location), json.dumps({"key": runtime_key(paths), "apk": apk, "filter": flt}))
+        if _dex2oat(paths, env, location, app_context(paths), flt, idle, pausable=not is_urgent,
+                    keep=(lambda: True) if got else (lambda: app_filter(paths, location) is None)):
+            _write(_state_file(paths, location), json.dumps({"key": runtime_key(paths), "apk": apk, "filter": flt}))
 
 
 def extract_natives(paths: Paths, pkg: str, apk: Path) -> None:

@@ -193,3 +193,82 @@ def test_stale_installed_apps(art):
     dexopt.ensure_runtime(art.paths, art.env, lambda m: None)
     dexopt.compile_app(art.paths, art.env, str(apps / "org.example.a.apk"), "speed")
     assert dexopt.stale_installed(art.paths) == [str(apps / "org.example.b.apk")]
+
+
+def _in_thread(fn):
+    import threading
+    t = threading.Thread(target=fn)
+    t.start()
+    return t
+
+
+def _wait_for(cond, seconds=5.0):
+    end = time.monotonic() + seconds
+    while not cond() and time.monotonic() < end:
+        time.sleep(0.02)
+    assert cond()
+
+
+def test_a_running_compile_pauses_while_an_app_is_started_and_goes_on_after(art, tmp_path):
+    other = str(make_apk(tmp_path / "other.apk", manifest=axml_manifest()))
+    started = str(make_apk(tmp_path / "started.apk", manifest=axml_manifest(package="org.example.s")))
+    ticks = tmp_path / "ticks"
+    art.env["FAKE_ART_TICKS"] = str(ticks)
+    t = _in_thread(lambda: dexopt.compile_app(art.paths, art.env, other, "speed", idle=True))
+    _wait_for(lambda: ticks.exists() and len(ticks.read_text()) >= 2)
+    with dexopt.urgent(art.paths, started):
+        time.sleep(0.5)                                 # the compile notices within PAUSE_POLL_S and stops
+        frozen = len(ticks.read_text())
+        time.sleep(0.6)
+        assert len(ticks.read_text()) == frozen < 15
+        assert t.is_alive()
+    t.join(10)
+    assert not t.is_alive() and len(ticks.read_text()) == 15
+    assert dexopt.app_filter(art.paths, other) == "speed"
+
+
+def test_the_started_app_is_not_paused_by_its_own_mark(art, tmp_path):
+    loc = str(make_apk(tmp_path / "demo.apk", manifest=axml_manifest()))
+    art.env["FAKE_ART_TICKS"] = str(tmp_path / "ticks")
+    with dexopt.urgent(art.paths, loc):
+        began = time.monotonic()
+        dexopt.compile_app(art.paths, art.env, loc, "verify", is_urgent=True)
+        assert time.monotonic() - began < 4
+    assert dexopt.app_filter(art.paths, loc) == "verify"
+
+
+def test_urgent_compile_does_not_stand_aside_for_another_process_on_the_same_app(art, tmp_path):
+    loc = str(make_apk(tmp_path / "demo.apk", manifest=axml_manifest()))
+    dexopt.ensure_runtime(art.paths, art.env, lambda m: None)
+    with dexopt._flock(art.paths.cache_home / "apk-starter" / "locks" / (dexopt.cache_file(art.paths, loc).name + ".lock")):
+        dexopt.compile_app(art.paths, art.env, loc, "speed", idle=True)         # an ordinary one waits for nobody: skipped
+        assert dexopt.app_filter(art.paths, loc) is None
+        dexopt.compile_app(art.paths, art.env, loc, "verify", is_urgent=True)   # the started one has its code now
+        assert dexopt.app_filter(art.paths, loc) == "verify"
+        n = len(art.calls())
+        dexopt.compile_app(art.paths, art.env, loc, "verify", is_urgent=True)   # code is there: the holder improves it
+        assert len(art.calls()) == n
+
+
+def test_urgent_compile_keeps_better_code_that_arrived_meanwhile(art, tmp_path, monkeypatch):
+    loc = str(make_apk(tmp_path / "demo.apk", manifest=axml_manifest()))
+    dexopt.ensure_runtime(art.paths, art.env, lambda m: None)
+    lock = art.paths.cache_home / "apk-starter" / "locks" / (dexopt.cache_file(art.paths, loc).name + ".lock")
+    # the holder's FULL code arrives between the end of the quick compile and its rename
+    state = {"n": 0}
+    keep_real = dexopt._dex2oat
+
+    def dex2oat(paths, env, location, context, flt, idle, pausable=False, keep=lambda: True):
+        def keep_after_full():
+            if state["n"] == 0:
+                state["n"] = 1
+                dexopt._write(dexopt._state_file(paths, location), json.dumps(
+                    {"key": dexopt.runtime_key(paths), "apk": dexopt._apk_id(location), "filter": "speed"}))
+                dexopt.cache_file(paths, location).write_bytes(b"full")
+            return keep()
+        return keep_real(paths, env, location, context, flt, idle, pausable, keep_after_full)
+    monkeypatch.setattr(dexopt, "_dex2oat", dex2oat)
+    with dexopt._flock(lock):
+        dexopt.compile_app(art.paths, art.env, loc, "verify", is_urgent=True)
+    assert dexopt.app_filter(art.paths, loc) == "speed"
+    assert dexopt.cache_file(art.paths, loc).read_bytes() == b"full"

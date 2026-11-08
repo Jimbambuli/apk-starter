@@ -368,7 +368,7 @@ class Window(Gtk.ApplicationWindow):
         for pkg, spinner in self.row_spinners.items():
             spinner.set_visible(self.status_of(pkg) is not None)
         if self.selected in self.rows and self.status_value is not None:
-            if (self.status_of(self.selected) is None) != self.start_button.get_sensitive():
+            if (self.selected not in self.jobs) != self.start_button.get_sensitive():
                 self.show_details()                 # «Start» locked or free again
             else:
                 self.status_value.set_text(self.status_text(self.rows[self.selected]))
@@ -644,9 +644,9 @@ class Window(Gtk.ApplicationWindow):
         self.details.append(head)
 
         # one row: Start, Delete data, Uninstall, ⚙ (window bar, Debug, recordings)
-        if self.status_of(r.package) is None:
+        if r.package not in self.jobs:              # the rebuild after an update does not hold the start back (it goes first)
             start = Gtk.Button(label=_("Start"), action_name="win.start", action_target=target)
-        else:                                       # locked while it is being prepared (an action would free it)
+        else:                                       # locked while it is deleted or uninstalled (an action would free it)
             start = Gtk.Button(label=_("Start"), sensitive=False)
         start.add_css_class("suggested-action")         # the main action in the theme's accent (KDE/GNOME)
         self.start_button = start
@@ -786,8 +786,8 @@ class Window(Gtk.ApplicationWindow):
     def start(self, pkg: str, level: str | None) -> None:
         """level None: as from the menu entry (Debug if it is ticked for the app), or "debug" / "debug-full"."""
         label_ = self.rows[pkg].label if pkg in self.rows else pkg
-        if self.status_of(pkg) is not None:
-            return                                  # it is being prepared; the start waits for it
+        if pkg in self.jobs:
+            return                                  # being deleted or uninstalled
         before = {rec.path for rec in diag.recordings(self.paths, pkg)}
         try:
             proc = Gio.Subprocess.new(start_argv(self.launcher, pkg, level), Gio.SubprocessFlags.NONE)

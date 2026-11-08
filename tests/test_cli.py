@@ -665,3 +665,30 @@ def test_start_ends_soon_after_the_app_even_when_the_background_compile_is_still
     began = time.monotonic()
     assert main([str(box.apk)], env=box.env) == 0
     assert time.monotonic() - began < 3
+
+
+def test_start_marks_its_app_as_first_while_it_prepares(box, monkeypatch):
+    """The app being started pauses every other compile from before the runtime check until its own code and
+    libraries are there; the background FULL compile afterwards is not part of that."""
+    from apk_starter import dexopt
+    paths = apk_starter.paths.Paths.from_env(box.env)
+    seen = {}
+    real_runtime, real_compile = dexopt.ensure_runtime, dexopt.compile_app
+
+    def runtime(*a, **k):
+        seen["runtime"] = dexopt.urgent_active(paths)
+        return real_runtime(*a, **k)
+
+    def compile_app(p, e, loc, flt, idle=False, is_urgent=False):
+        seen[flt] = (dexopt.urgent_active(paths), is_urgent, idle)
+        return real_compile(p, e, loc, flt, idle=idle, is_urgent=is_urgent)
+    monkeypatch.setattr(dexopt, "ensure_runtime", runtime)
+    monkeypatch.setattr(dexopt, "compile_app", compile_app)
+    assert main(["--install", str(box.apk)], env=box.env) == 0
+    seen.clear()
+    dexopt._state_file(paths, str(paths.apk(PKG))).unlink()         # its code is not current: the start makes it
+    assert main([PKG], env=box.env) == 0
+    assert seen["runtime"] is True
+    assert seen[dexopt.QUICK] == (True, True, False)
+    assert seen[dexopt.FULL][1:] == (False, True)                   # in the background: idle, not first
+    assert not dexopt.urgent_active(paths)

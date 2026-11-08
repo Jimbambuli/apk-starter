@@ -1,7 +1,7 @@
 #!/bin/sh
-# Smoke test: start APP_ID with APK under Xvfb, wait for a window, scan the log.
+# Smoke test: start APP_ID with APK under Xvfb, wait for a window, scan the output.
 # Usage: smoke.sh APP_ID APK [SECONDS=90]
-# Exit 0 = window appeared and the log has no fatal marker, 1 = failure (log path on stderr).
+# Exit 0 = window appeared and the output has no fatal marker, 1 = failure.
 set -u
 
 [ $# -ge 2 ] || { echo "usage: $0 APP_ID APK [SECONDS]" >&2; exit 2; }
@@ -9,7 +9,6 @@ app=$1
 apk=$2
 secs=${3:-90}
 disp=${SMOKE_DISPLAY:-:99}
-logdir=$HOME/.var/app/$app/data/logs
 
 if [ -e "/tmp/.X11-unix/X${disp#:}" ]; then
     echo "smoke: display $disp already in use" >&2
@@ -17,7 +16,6 @@ if [ -e "/tmp/.X11-unix/X${disp#:}" ]; then
 fi
 
 work=$(mktemp -d) || exit 1
-mkdir -p "$logdir"
 touch "$work/start"
 xpid=
 apid=
@@ -47,15 +45,12 @@ fi
 # let the app run a moment so early crashes reach the log
 sleep 5
 
-log=$(find "$logdir" -type f -newer "$work/start" -printf '%T@ %p\n' 2>/dev/null | sort -n | tail -n 1 | cut -d' ' -f2-)
-if [ -z "$log" ]; then
-    echo "smoke: no log written under $logdir" >&2
-    exit 1
-fi
+# a normal start writes no log: the output of the start is what there is to scan
+log=$work/run.out
 if grep -Eq 'FATAL EXCEPTION|Fatal signal|^# apk-starter: signal=' "$log"; then
-    echo "smoke: fatal marker in log: $log" >&2
+    echo "smoke: fatal marker in the output" >&2
     grep -En 'FATAL EXCEPTION|Fatal signal|^# apk-starter: signal=' "$log" | head -n 5 >&2
     exit 1
 fi
-echo "smoke: ok, log: $log" >&2
+echo "smoke: ok" >&2
 exit 0

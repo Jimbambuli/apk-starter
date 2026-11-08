@@ -204,7 +204,7 @@ def test_window_after_update_shows_work_per_app_and_ends(tmp_path, monkeypatch, 
                              capture_output=True, text=True, timeout=60)
     report = json.loads(out.stdout.strip().splitlines()[-1])
     assert report["seen"] == [[["org.example.demo", "Preparing…"]]], (report, out.stderr)
-    assert report["during"] == {"spinners": 1, "status": "Preparing…", "start": False}, report
+    assert report["during"] == {"spinners": 1, "status": "Preparing…", "start": True}, report
     after = report["after"]
     assert after["spinners"] == 0 and after["start"] is True, report
     if fail:
