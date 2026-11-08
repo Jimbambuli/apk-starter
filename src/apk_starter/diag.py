@@ -1,12 +1,18 @@
-"""Recordings (Spec 12). Every start writes a plain log (ATL's text output, run.py), the last KEEP_LOGS per app are
-kept. Debug: atl-doctor's light recorder (agent attached when the runtime runs, stub calls counted by ATL, time line
-from ART's sampling profiler, view trees, verbose Android log) writes a recording folder; the app keeps nearly its
-normal speed (no full method trace). The starter only records: reports come from atl-doctor itself
-(`atl-doctor report`)."""
+"""Recordings (Spec 12). A normal start writes no log. Debug: atl-doctor's light recorder (agent attached when the
+runtime runs, stub calls counted by ATL, time line from ART's sampling profiler, view trees, a screenshot with the
+tree, what is clicked, typed and scrolled as input.jsonl, verbose Android log) writes a recording folder; the app
+keeps nearly its normal speed (no full method trace). After the run `atl-doctor pack` makes one archive of it:
+cleaned of personal data («Debug») or as recorded («Debug full», name ends in -FULL). Reports come from atl-doctor
+itself (`atl-doctor report`). Plain logs of older versions are still listed and pruned."""
+import contextlib
+import os
 import re
 import shutil
+import subprocess
+import sys
 import time
-from collections.abc import Mapping
+import urllib.parse
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -20,7 +26,7 @@ from .paths import Paths
 # (one per symbol it binds, ~550 000 for JW Library) made the start several times slower
 VERBOSE_LOG = {"ANDROID_LOG_TAGS": "*:v [bionic_linker]:i"}
 TREE_AFTER_S = 10.0                     # Debug: one phase mark "running" then (view tree, memory) if the app still runs
-_NAME = re.compile(r"(?P<pkg>.+)-(?P<time>\d{8}-\d{6})(?P<ext>\.log|\.log\.gz|\.tar\.gz)?")
+_NAME = re.compile(r"(?P<pkg>.+)-(?P<time>\d{8}-\d{6})(?P<ext>\.log|\.log\.gz|(?P<full>-FULL)?\.tar\.gz)?")
 
 
 def default_debug_dir(paths: Paths, pkg: str, now: datetime) -> Path:
@@ -37,7 +43,43 @@ def record_options(paths: Paths, cmd: list[str], env: Mapping[str, str], out: Pa
                          light=True)
 
 
-def record(paths: Paths, cmd: list[str], env: Mapping[str, str], out: Path) -> int:
+def portal_screenshot(dest: Path) -> bool:
+    """The screen as the Screenshot portal gives it (the desktop asks the user the first time); no window position
+    is known on Wayland, so there is no .origin file next to it. False when it fails: a recording needs none."""
+    from . import portal
+    try:
+        uri = portal.screenshot()
+        src = Path(urllib.parse.unquote(urllib.parse.urlparse(uri).path))
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(src, dest)
+    except (portal.PortalUnavailable, StarterError, OSError, ValueError):
+        return False
+    with contextlib.suppress(OSError):
+        src.unlink()                        # the portal's copy in Pictures
+    return True
+
+
+def shot_for_mark(out: Path, name: str, screenshot: Callable[[Path], bool], wait_s: float = 5.0) -> Path | None:
+    """The screenshot that belongs to the view tree of mark `name` (shots/NN-name.png, as atl-doctor names it):
+    waits until the recorder has written the mark down. Returns the file, None if there is none."""
+    from atl_doctor.capture import SHOTS, Capture
+    from atl_doctor.record_atl import tree_name
+
+    cap = Capture.open(out)
+    end = time.monotonic() + wait_s
+    while True:
+        mark = next((m for m in cap.read_marks() if m.name == name), None)
+        if mark is not None:
+            break
+        if time.monotonic() >= end:
+            return None
+        time.sleep(0.1)
+    dest = cap.path(SHOTS) / f"{tree_name(mark)}.png"
+    return dest if screenshot(dest) else None
+
+
+def record(paths: Paths, cmd: list[str], env: Mapping[str, str], out: Path,
+           screenshot: Callable[[Path], bool] | None = None) -> int:
     """Run the app under atl-doctor's recorder; returns ATL's exit code like run.run_atl (128+N for a signal)."""
     try:
         from atl_doctor.capture import Capture
@@ -52,10 +94,12 @@ def record(paths: Paths, cmd: list[str], env: Mapping[str, str], out: Path) -> i
     done = threading.Event()
 
     def mark() -> None:
-        """atl-doctor asks for the view tree at a mark; without one a recording has none."""
+        """atl-doctor asks for the view tree at a mark (without one a recording has none); the screenshot of the
+        same moment is taken here: atl-doctor can only take one inside its own headless session."""
         if not done.wait(TREE_AFTER_S):
             try:
                 send_mark(out, "running", timeout_s=2.0)
+                shot_for_mark(out, "running", screenshot or portal_screenshot)
             except (DoctorError, OSError):
                 pass                        # the app has ended meanwhile
     marker = threading.Thread(target=mark, daemon=True)
@@ -98,6 +142,7 @@ class Recording:
     package: str
     started: datetime
     kind: str                               # "log" | "debug"
+    full: bool = False                      # a «Debug full» archive (-FULL): everything in plain text
 
 
 def recordings(paths: Paths, pkg: str | None = None) -> list[Recording]:
@@ -114,7 +159,7 @@ def recordings(paths: Paths, pkg: str | None = None) -> list[Recording]:
         ext = m["ext"]
         if ext in (".log", ".log.gz") and p.is_file():
             kind = "log"
-        elif (ext == ".tar.gz" and p.is_file()) or (not ext and (p / "manifest.json").is_file()):
+        elif (ext in (".tar.gz", "-FULL.tar.gz") and p.is_file()) or (not ext and (p / "manifest.json").is_file()):
             kind = "debug"
         else:
             continue
@@ -122,40 +167,35 @@ def recordings(paths: Paths, pkg: str | None = None) -> list[Recording]:
             started = datetime.strptime(m["time"], "%Y%m%d-%H%M%S")
         except ValueError:
             continue
-        out.append(Recording(p, m["pkg"], started, kind))
+        out.append(Recording(p, m["pkg"], started, kind, m["full"] is not None))
     return sorted(out, key=lambda r: (r.started, r.path.name), reverse=True)
 
 
-def pack(paths: Paths, path: Path) -> Path | None:
-    """After the run: a recording in the log folder becomes one compressed file, the plain log <name>.log.gz, a
-    Debug folder <name>.tar.gz. Returns the archive, or None if `path` is not such a
-    recording (e.g. --debug=DIR) or it cannot be packed (it then stays as it is)."""
-    import gzip
-    import tarfile
+def pack(paths: Paths, path: Path, full: bool = False, run=None) -> Path | None:
+    """After the run: a Debug folder in the log folder becomes one archive through `atl-doctor pack` (full: `--full`,
+    the name then ends in -FULL). Returns the archive and removes the folder; None if `path` is not such a folder
+    (e.g. --debug=DIR). When atl-doctor fails the folder stays and StarterError says why."""
     m = _NAME.fullmatch(path.name)
-    if path.parent != paths.logs_dir() or not m or m["ext"] not in (None, ".log"):
+    if path.parent != paths.logs_dir() or not m or m["ext"] or not (path / "manifest.json").is_file():
         return None
-    if m["ext"] == ".log" and path.is_file():
-        dest = path.with_name(path.name + ".gz")
-    elif not m["ext"] and (path / "manifest.json").is_file():
-        dest = path.with_name(path.name + ".tar.gz")
-    else:
-        return None
-    tmp = dest.with_name(f".{dest.name}.tmp")
     try:
-        if dest.name.endswith(".tar.gz"):
-            with tarfile.open(tmp, "w:gz") as t:
-                # files and folders only: not the recorder's control FIFO
-                t.add(path, arcname=path.name, filter=lambda ti: ti if ti.isfile() or ti.isdir() else None)
-        else:
-            with open(path, "rb") as src, gzip.open(tmp, "wb") as out:
-                shutil.copyfileobj(src, out, 1 << 20)
-        tmp.replace(dest)
-    except OSError:
-        tmp.unlink(missing_ok=True)
-        return None
+        import atl_doctor
+    except ImportError as e:
+        raise StarterError(_("debug needs atl-doctor: {reason}").format(reason=e)) from None
+    root = Path(atl_doctor.__file__).resolve().parent.parent
+    cmd = [sys.executable, "-m", "atl_doctor", "pack", *(["--full"] if full else []), str(path)]
+    try:
+        # cwd: -m finds the package there; the environment as it is (HOME and user are what pack replaces)
+        done = (run or subprocess.run)(cmd, cwd=root, capture_output=True, text=True, env={**os.environ, "PYTHONPATH": str(root)})
+    except OSError as e:
+        raise StarterError(_("atl-doctor pack did not start: {reason}").format(reason=e.strerror)) from None
+    archive = Path(done.stdout.strip().splitlines()[-1]) if done.stdout.strip() else None
+    if done.returncode != 0 or archive is None or not archive.is_file():
+        why = (done.stderr.strip().splitlines() or [f"exit {done.returncode}"])[-1]
+        raise StarterError(_("atl-doctor pack failed, the recording stays in {folder}: {reason}").format(
+            folder=path, reason=why))
     _remove(path)
-    return dest
+    return archive
 
 
 KEEP_LOGS = 3                           # plain logs per app

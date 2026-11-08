@@ -114,8 +114,8 @@ def is_narrow(width: int) -> bool:
 
 
 def start_argv(launcher: list[str], pkg: str, level: str | None) -> list[str]:
-    """Apps run as a separate `apk-starter PACKAGE` process, exactly as from their menu entry; level: None
-    or "debug" (Spec 12)."""
+    """Apps run as a separate `apk-starter PACKAGE` process, exactly as from their menu entry; level: None,
+    "debug" or "debug-full" (Spec 12)."""
     return launcher + ([f"--{level}", "--", pkg] if level else [pkg])
 
 

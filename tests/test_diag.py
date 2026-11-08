@@ -120,31 +120,50 @@ def test_debug_restart_is_limited(tmp_path, monkeypatch):
     assert len(calls) == MAX_RESTARTS + 1
 
 
-# -- packed after the run: <name>.log.gz and <name>.tar.gz ---------------------------------------
-import gzip  # noqa: E402
-import tarfile  # noqa: E402
+# -- packed after the run: <name>.tar.gz or <name>-FULL.tar.gz through atl-doctor pack ----------------
+import subprocess  # noqa: E402
+import sys  # noqa: E402
+
+from apk_starter.errors import StarterError  # noqa: E402
 
 
-def test_pack_compresses_the_log_and_the_debug_folder(tmp_path):
+def _archive(p: Paths, pkg: str, n: int, full: bool = False) -> Path:
+    name = f"{pkg}-20261101-1000{n:02d}" + ("-FULL" if full else "") + ".tar.gz"
+    p.logs_dir().mkdir(parents=True, exist_ok=True)
+    f = p.logs_dir() / name
+    f.write_bytes(b"x")
+    return f
+
+
+def test_full_archives_are_recordings_and_say_so(tmp_path):
     p = _paths(tmp_path)
-    log, debug = _make(p, "org.a", 1, "log", 5000), _make(p, "org.a", 2, "debug", 5000)
-    assert diag.pack(p, log) == log.with_name(log.name + ".gz") and not log.exists()
-    assert gzip.decompress(log.with_name(log.name + ".gz").read_bytes()) == b"x" * 5000
-    packed = diag.pack(p, debug)
-    assert packed == debug.with_name(debug.name + ".tar.gz") and not debug.exists()
-    with tarfile.open(packed) as t:
-        assert sorted(t.getnames()) == [debug.name, f"{debug.name}/atl.log", f"{debug.name}/manifest.json"]
-    assert [(r.path, r.kind) for r in diag.recordings(p, "org.a")] == [(packed, "debug"),
-                                                                      (log.with_name(log.name + ".gz"), "log")]
+    plain, full = _archive(p, "org.a", 1), _archive(p, "org.a", 2, full=True)
+    assert [(r.path, r.kind, r.full) for r in diag.recordings(p, "org.a")] == [(full, "debug", True),
+                                                                              (plain, "debug", False)]
 
 
-def test_prune_counts_the_archives(tmp_path):
+def test_pack_runs_atl_doctor_and_removes_the_folder(tmp_path):
     p = _paths(tmp_path)
-    logs = [diag.pack(p, _make(p, "org.a", n, "log")) for n in range(5)]
-    debugs = [diag.pack(p, _make(p, "org.a", n + 10, "debug")) for n in range(7)]
-    diag.prune(p, "org.a")
-    assert [f.exists() for f in logs] == [False] * 2 + [True] * 3
-    assert [f.exists() for f in debugs] == [False] * 2 + [True] * 5
+    folder, calls = _make(p, "org.a", 3, "debug"), []
+
+    def run(cmd, **kw):
+        calls.append((cmd, kw["cwd"]))
+        out = folder.with_name(folder.name + ("-FULL" if "--full" in cmd else "") + ".tar.gz")
+        out.write_bytes(b"x")
+        return subprocess.CompletedProcess(cmd, 0, stdout=f"{out}\n", stderr="")
+    archive = diag.pack(p, folder, full=True, run=run)
+    assert archive == folder.with_name(folder.name + "-FULL.tar.gz") and not folder.exists()
+    cmd, cwd = calls[0]
+    assert cmd == [sys.executable, "-m", "atl_doctor", "pack", "--full", str(folder)] and (cwd / "atl_doctor").is_dir()
+
+
+def test_pack_failure_keeps_the_folder(tmp_path):
+    p = _paths(tmp_path)
+    folder = _make(p, "org.a", 3, "debug")
+    run = lambda cmd, **kw: subprocess.CompletedProcess(cmd, 3, stdout="", stderr="boom\n")  # noqa: E731
+    with pytest.raises(StarterError, match=r"stays in .*org\.a-20261101-100003: boom"):
+        diag.pack(p, folder, run=run)
+    assert folder.is_dir()
 
 
 def test_pack_leaves_what_is_not_a_recording(tmp_path):
@@ -152,3 +171,39 @@ def test_pack_leaves_what_is_not_a_recording(tmp_path):
     mine = tmp_path / "chosen-folder"                  # --debug=DIR: the user's folder stays as it is
     mine.mkdir()
     assert diag.pack(p, mine) is None and mine.is_dir()
+
+
+def test_prune_counts_the_archives(tmp_path):
+    p = _paths(tmp_path)
+    debugs = [_archive(p, "org.a", n, full=n % 2 == 0) for n in range(7)]
+    diag.prune(p, "org.a")
+    assert [f.exists() for f in debugs] == [False] * 2 + [True] * 5
+
+
+# -- the screenshot of the view tree ----------------------------------------------------------------
+def test_shot_is_named_like_the_tree_of_its_mark(tmp_path):
+    pytest.importorskip("atl_doctor")
+    rec = tmp_path / "rec"
+    rec.mkdir()
+    from atl_doctor.capture import Capture, Manifest
+    Capture(rec).write_manifest(Manifest())
+    (rec / "marks.tsv").write_text("0\t1\t2\tstart\n1\t3\t4\trunning\n")
+    taken = []
+    got = diag.shot_for_mark(rec, "running", lambda dest: taken.append(dest) or dest.parent.mkdir(exist_ok=True) or True)
+    assert got == rec / "shots/01-running.png" and taken == [got]
+    assert diag.shot_for_mark(rec, "nope", lambda d: True, wait_s=0.2) is None
+    assert diag.shot_for_mark(rec, "running", lambda d: False) is None
+
+
+def test_portal_screenshot_copies_the_file_and_fails_quietly(tmp_path, monkeypatch):
+    from apk_starter import portal
+    src = tmp_path / "Screenshot 1.png"
+    src.write_bytes(b"png")
+    monkeypatch.setattr(portal, "screenshot", lambda: src.as_uri())
+    dest = tmp_path / "shots/01-running.png"
+    assert diag.portal_screenshot(dest) is True and dest.read_bytes() == b"png" and not src.exists()
+
+    def unavailable():
+        raise portal.PortalUnavailable("no portal")
+    monkeypatch.setattr(portal, "screenshot", unavailable)
+    assert diag.portal_screenshot(tmp_path / "x.png") is False

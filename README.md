@@ -34,11 +34,12 @@ Next to **Start** stand **Delete data …**, **Uninstall …** and **⚙**. The 
 bar drawn in the desktop's GTK theme with a back button; under KDE it gets the buttons and the height of the KWin
 decoration. **From the system** is the desktop's own title bar (where the compositor draws one, e.g. KDE Plasma),
 without the back button; **From the system + navigation bar** adds Android's navigation bar under the window (◁ back,
-○ the app's first page, □ its open pages). Escape and the back button of the mouse always go back. **Debug** (also
-remembered per app, until you untick it) records every start of the app, also from its menu entry; a dot on ⚙ shows
-that it is on. The menu lists the Debug recordings and offers **Open log folder**. Every start of an app, with or
-without Debug, also keeps a plain log of ATL's output (the last 3 per app).
-When an app crashes, a message says what its exit code means; **Open log folder** shows the log of that start.
+○ the app's first page, □ its open pages). Escape and the back button of the mouse always go back. **Debug** and
+**Debug full** (also remembered per app, until you untick them; one at a time) record every start of the app, also
+from its menu entry; a dot on ⚙ shows that one is on. The archive of **Debug** is cleaned of personal data;
+**Debug full** keeps everything in plain text, also passwords (a tooltip says so): do not pass that archive on. The
+menu lists the recordings and offers **Open log folder**. A normal start writes no log.
+When an app crashes, a message says what its exit code means; **Open log folder** shows the recording of that start.
 
 The same is available on the command line:
 
@@ -54,6 +55,7 @@ apk-starter --remove PACKAGE [--purge]
 apk-starter --remove-all [--purge]   # remove every installed app and its menu entry
 apk-starter --setup-microg           # download microG from its repository, check it, install it
 apk-starter --debug @@ app.apk @@    # record the app for atl-doctor (a little slower), --debug=DIR for a folder
+apk-starter --debug-full @@ app.apk @@  # likewise, the archive keeps everything in plain text (do not pass it on)
 apk-starter --sdk N @@ app.apk @@    # override the SDK level passed to ATL
 apk-starter --size WxH @@ app.apk @@ # window size (remembered per app)
 apk-starter --uri URI PACKAGE        # open a link in the app (in the running app, if it runs)
@@ -94,26 +96,30 @@ Without the alias use `flatpak run --file-forwarding io.github.Jimbambuli.ApkSta
 Double-clicking an APK in the file manager and starting an installed app from the menu work without any command.
 
 Data lives under `~/.var/app/io.github.Jimbambuli.ApkStarter/data/`: `apps/` (installed APKs), `data/<package>/`
-(app data), `logs/` (a plain log of every start, folders from Debug).
+(app data), `logs/` (the archives of Debug).
 
-Logs and recordings, for finding out why an app misbehaves under ATL (with
-[atl-doctor](https://github.com/Jimbambuli/atl-doctor)): every start writes ATL's text output (stdout, stderr, Android
-log) to a plain log in `logs/`, without any extra process; the last 3 per app stay. **Debug** (`--debug`, «Debug»
-ticked) records a folder instead: the agent attached as soon as the
-runtime runs (exceptions with stack, also caught ones, lifecycle), the calls of ATL's stub methods (counted by ATL
-itself), a time line from ART's sampling profiler, the view trees and a verbose Android log; the app runs only a
-little slower (no full method trace, which made apps lose their own start-up races). Of the Debug recordings the last
-5 per app stay, and together at most 200 MB per app (the older go first, the newest always stays).
+Recordings, for finding out why an app misbehaves under ATL (with
+[atl-doctor](https://github.com/Jimbambuli/atl-doctor)): a normal start writes nothing. **Debug** (`--debug`,
+«Debug» ticked) records the agent attached as soon as the runtime runs (exceptions with stack, also caught ones,
+lifecycle), the calls of ATL's stub methods (counted by ATL itself), a time line from ART's sampling profiler, the
+view trees with a screenshot of the screen taken ten seconds after the start (through the Screenshot portal, so the
+desktop may ask once; the screenshot shows the whole screen, not only the app), what is clicked, typed (as a length
+only) and scrolled (`input.jsonl`) and a verbose Android log; the app runs only a little slower (no full method trace,
+which made apps lose their own start-up races). When the app has ended, `atl-doctor pack` makes one archive
+`<package>-<date>-<time>.tar.gz` of it, cleaned of paths, user and host name, network addresses, tokens, passwords
+and e-mail addresses (`SANITIZED.txt` in it says what was done; screenshots are not touched). **Debug full**
+(`--debug-full`) makes `<package>-<date>-<time>-FULL.tar.gz` with everything as recorded. If packing fails, the folder
+stays and a message says why. Of the recordings the last 5 per app stay, and together at most 200 MB per app (the
+older go first, the newest always stays).
 
-APK Starter only records; [atl-doctor](https://github.com/Jimbambuli/atl-doctor) evaluates the recordings (crash
-cause, ATL gaps, exceptions; it compares the stub hits with Android's source so that methods as trivial in Android
-are not counted as gaps). Install it once with `pipx install git+https://github.com/Jimbambuli/atl-doctor`, then:
+APK Starter only records and packs; [atl-doctor](https://github.com/Jimbambuli/atl-doctor) evaluates the recordings
+(crash cause, ATL gaps, exceptions; it compares the stub hits with Android's source so that methods as trivial in
+Android are not counted as gaps). Install it once with `pipx install git+https://github.com/Jimbambuli/atl-doctor`, then:
 
 ```
 cd ~/.var/app/io.github.Jimbambuli.ApkStarter/data/logs
-atl-doctor report --log org.example.app-20261102-101010.log    # a plain log
-atl-doctor report org.example.app-20261102-101010              # a Debug recording (folder)
-atl-doctor report -f html -o report.html org.example.app-20261102-101010   # as a page, e.g. for a bug report
+atl-doctor report org.example.app-20261102-101010.tar.gz          # a Debug archive
+atl-doctor report -f html -o report.html org.example.app-20261102-101010.tar.gz   # as a page, e.g. for a bug report
 ```
 
 Like Android, installing compiles an app for your processor (shown as «Preparing …»), so its first start is as

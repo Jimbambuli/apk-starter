@@ -21,7 +21,7 @@ from .launch import (DEFAULT_SIZE, build_command, build_env, cached_apk_info, pa
                      remember_size, remembered_size, sdk_for)
 from .paths import PROFILE_RE, Paths, apply_profile
 from .settings import load_settings
-from .run import (default_log_path, header_fields, read_build_info, run_atl, runtime_name)
+from .run import (read_build_info, run_atl)
 
 VERSION = "0.8.1b"
 COMPILE_GRACE_S = 20.0      # how long the end of the app waits for the full compile that runs in the background
@@ -38,8 +38,8 @@ DISPLAY_VARS = ("WAYLAND_DISPLAY", "DISPLAY")
 
 
 def _scan(argv: list[str]) -> tuple[list[str], str | None, Path | None, int]:
-    """Options before the first positional (or `--`): returns (kept options, diagnose level "debug" or None,
-    its folder, index of the tail)."""
+    """Options before the first positional (or `--`): returns (kept options, diagnose level "debug", "debug-full" or
+    None, its folder, index of the tail)."""
     kept: list[str] = []
     level: str | None = None
     target: Path | None = None
@@ -49,9 +49,9 @@ def _scan(argv: list[str]) -> tuple[list[str], str | None, Path | None, int]:
         if tok == "--" or not tok.startswith("-"):
             break
         name, eq, value = tok[2:].partition("=")
-        if name == "debug" and tok.startswith("--"):
+        if name in ("debug", "debug-full") and tok.startswith("--"):
             if eq and not value:
-                raise UsageError(_("--debug= needs a folder name"))
+                raise UsageError(_("--{option}= needs a folder name").format(option=name))
             level, target = name, Path(value) if value else None
         elif tok in VALUE_OPTIONS:
             kept += argv[i:i + 2]
@@ -352,14 +352,18 @@ def lang_from_env(env: Mapping[str, str]) -> str | None:
 def _parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="apk-starter", allow_abbrev=False,
-        usage="%(prog)s [--debug[=DIR]] [--sdk N] [--size WxH] [--] [APK|PACKAGE] [ATL-ARGS...]\n"
+        usage="%(prog)s [--debug[=DIR] | --debug-full[=DIR]] [--sdk N] [--size WxH] [--] [APK|PACKAGE] [ATL-ARGS...]\n"
               "       %(prog)s --install APK | --list | --remove PACKAGE [--purge] | --remove-all [--purge]\n"
               "       %(prog)s --version\n"
               "       %(prog)s            " + _("(no arguments: open the management window)"),
         description=_("Start Android apps (APK) with Android Translation Layer."))
     p.add_argument("--debug", nargs="?", const=True, metavar="DIR",
-                   help=_("record the app for atl-doctor: exceptions, ATL stub calls, time line, view trees, verbose "
-                          "log; a little slower (default: logs/<package>-<time>/); use --debug=DIR"))
+                   help=_("record the app for atl-doctor: exceptions, ATL stub calls, time line, view trees with a "
+                          "screenshot, clicks and typed text, verbose log; a little slower; afterwards one archive "
+                          "cleaned of personal data (default: logs/<package>-<time>.tar.gz); use --debug=DIR"))
+    p.add_argument("--debug-full", nargs="?", const=True, metavar="DIR",
+                   help=_("like --debug, but the archive keeps everything in plain text, passwords and personal "
+                          "data included (name ends in -FULL): do not pass it on"))
     p.add_argument("--sdk", type=int, metavar="N", help=_("override the SDK level passed to ATL"))
     p.add_argument("--size", metavar="WxH", help=_("window size (remembered per app)"))
     p.add_argument("--uri", metavar="URI", help=_("open a link in the app (the menu entry passes it)"))
@@ -490,18 +494,12 @@ def _start(paths: Paths, args, level: str | None, into: Path | None, tail: list[
     else:
         size = remembered_size(paths, info.package) or DEFAULT_SIZE
     started = datetime.now().astimezone()
-    if level is None and load_settings(paths.settings()).app(info.package).debug:
-        level = "debug"                             # «Debug» ticked for this app in the window: every start
-    log_path = debug_dir = None
-    if level == "debug":
+    if level is None:                               # «Debug» / «Debug full» ticked for this app in the window: every start
+        mine = load_settings(paths.settings()).app(info.package)
+        level = "debug-full" if mine.debug_full else "debug" if mine.debug else None
+    debug_dir = None
+    if level is not None:                           # a normal start writes no log
         debug_dir = into or diag.default_debug_dir(paths, info.package, started)
-    else:
-        log_path = default_log_path(paths, info.package, started)     # always: ATL's output, the last 3 are kept
-        try:
-            log_path.parent.mkdir(parents=True, exist_ok=True)
-        except OSError as e:                        # no log is no reason not to start the app
-            _stderr(_("no log: cannot write {file}: {reason}").format(file=log_path.parent, reason=e.strerror))
-            log_path = None
     apk_path = prepare_apk(paths, info)
     parts = paths.installed_splits(info.package) if apk_path == paths.apk(info.package) else []
     cmd = build_command(paths, apk_path, size=size, sdk=sdk_for(info, args.sdk), atl_args=atl_args,
@@ -509,8 +507,6 @@ def _start(paths: Paths, args, level: str | None, into: Path | None, tail: list[
     child_env = build_env(paths, info.package, env)
     if args.size:
         remember_size(paths, info.package, size)
-    header = header_fields(info, read_build_info(paths.build_info()), runtime_name(), cmd, started, VERSION) \
-        if log_path else {}
     later = _prepare_start(paths, env, info.package, apk_path)
     if paths.meta(info.package).is_file():         # «last started» in the window
         with contextlib.suppress(OSError):
@@ -520,11 +516,13 @@ def _start(paths: Paths, args, level: str | None, into: Path | None, tail: list[
     try:
         if debug_dir is not None:
             return diag.record_restarting(paths, cmd, child_env, debug_dir, info.package)
-        return run_atl(cmd, child_env, log_path, header)
+        return run_atl(cmd, child_env, None, {})
     finally:
-        for rec in (log_path, debug_dir):           # one compressed file each, as soon as the app has ended
-            if rec is not None:
-                diag.pack(paths, rec)
+        if debug_dir is not None:                   # one archive, as soon as the app has ended
+            try:
+                diag.pack(paths, debug_dir, full=level == "debug-full")
+            except StarterError as e:               # the folder stays
+                _stderr(str(e))
         diag.prune(paths, info.package)
         # the Flatpak instance (and every process in it) ends with this one: a compile that is nearly done may
         # finish, a long one is given up (renamed into place only when done, tried again at the next start), so

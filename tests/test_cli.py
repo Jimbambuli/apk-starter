@@ -3,6 +3,8 @@ import json
 import tarfile
 import time
 import os
+import re
+import subprocess
 import sys
 import types
 from pathlib import Path
@@ -14,7 +16,7 @@ from apk_starter.portal import desktop_entry as real_desktop_entry, link_mime_ty
 
 import apk_starter
 from apk_starter.cli import main, split_diag_option
-from apk_starter import dexopt
+from apk_starter import dexopt, diag
 from apk_starter.errors import StarterError
 from apkgen import axml_manifest, make_apk
 
@@ -76,13 +78,8 @@ def test_debug_flag_does_not_eat_apk():
     assert split_diag_option(["--debug", "app.apk", "--debug=x"]) == (["app.apk", "--debug=x"], "debug", None)
     assert split_diag_option(["--debug=d", "--", "app.apk"]) == (["--", "app.apk"], "debug", Path("d"))
     assert split_diag_option(["app.apk"]) == (["app.apk"], None, None)
-
-
-def test_unwritable_log_folder_does_not_stop_the_app(box, capsys):
-    box.data.mkdir(parents=True, exist_ok=True)
-    (box.data / "logs").write_text("a file, not a folder")
-    assert main([str(box.apk)], env=box.env) == 0
-    assert box.record.exists() and "no log: cannot write" in capsys.readouterr().err
+    assert split_diag_option(["--debug-full", "app.apk"]) == (["app.apk"], "debug-full", None)
+    assert split_diag_option(["--debug-full=d", "--", "app.apk"]) == (["--", "app.apk"], "debug-full", Path("d"))
 
 
 def test_missing_apk_path_exit_3_with_hint(box, capsys):
@@ -143,12 +140,9 @@ def test_version_line(box, capsys):
     assert capsys.readouterr().out == "apk-starter 0.8.1b (ATL unknown, ART unknown)\n"
 
 
-def test_every_start_writes_a_plain_log(box):
+def test_normal_start_writes_no_log(box):
     assert main([str(box.apk)], env=box.env) == 0
-    logs = list((box.data / "logs").glob(f"{PKG}-*.log.gz"))      # packed when the app has ended
-    assert len(logs) == 1 and not list((box.data / "logs").glob(f"{PKG}-*.log"))
-    lines = gzip.decompress(logs[0].read_bytes()).decode().splitlines()
-    assert lines[0] == "# apk-starter: format=1" and lines[-2].startswith("# apk-starter: exit=0")
+    assert box.record.exists() and not (box.data / "logs").exists()
 
 
 def test_file_errors_end_as_one_line_exit_1(box, capsys):
@@ -365,12 +359,8 @@ def test_direct_start_unpacks_native_libraries_before_atl(box):
     assert json.loads(box.record.read_text())["check"]
 
 
-def test_log_has_no_agent_and_only_the_last_three_are_kept(box):
-    for i in range(5):
-        assert main([str(box.apk)], env=box.env) == 0
-        time.sleep(1.1)                                 # the file name has the second
-    logs = sorted((box.data / "logs").glob(f"{PKG}-*.log.gz"))
-    assert len(logs) == 3
+def test_normal_start_has_no_agent(box):
+    assert main([str(box.apk)], env=box.env) == 0
     assert not any(x.startswith("-agentpath") for x in json.loads(box.record.read_text())["argv"])
 
 
@@ -385,6 +375,11 @@ def test_remembered_debug_applies_to_every_start_of_the_app(box, monkeypatch):
     monkeypatch.setattr(cli.diag, "record_restarting", lambda paths, cmd, env, out, pkg: seen.append(out) or 0)
     assert main([PKG], env=box.env) == 0
     assert len(seen) == 1 and not list((box.data / "logs").glob("*.log"))     # a recording folder instead of a log
+    save_settings(Paths.from_env(box.env).settings(), Settings().with_app(PKG, debug=True, debug_full=True))
+    packed = []
+    monkeypatch.setattr(cli.diag, "pack", lambda paths, path, full=False: packed.append(full))
+    assert main([PKG], env=box.env) == 0
+    assert packed == [True]                                                   # «Debug full» wins
 
 
 def _unpacked(box, archive: Path) -> Path:
@@ -392,7 +387,7 @@ def _unpacked(box, archive: Path) -> Path:
     out = box.tmp / "unpacked"
     with tarfile.open(archive) as t:
         t.extractall(out, filter="data")
-    return out / archive.name.removesuffix(".tar.gz")
+    return out / archive.name.removesuffix(".tar.gz").removesuffix("-FULL")
 
 
 def test_debug_level_records_a_folder_for_atl_doctor(box):
@@ -408,8 +403,38 @@ def test_debug_level_records_a_folder_for_atl_doctor(box):
     folder = _unpacked(box, next((box.data / "logs").glob(f"{PKG}-*.tar.gz")))
     m = json.loads((folder / "manifest.json").read_text())
     assert m["exit_status"] == 3 and m["package"] == PKG and "fake atl output" in (folder / "atl.log").read_text()
+    assert "stage: cleaned" in (folder / "SANITIZED.txt").read_text()     # «Debug»: cleaned, and it says so
     assert main(["--debug=" + str(box.tmp / "own"), str(box.apk)], env=box.env) == 0
     assert (box.tmp / "own/manifest.json").is_file()
+
+
+def test_debug_full_archive_is_named_full_and_not_cleaned(box):
+    pytest.importorskip("atl_doctor")
+    make_apk(box.apk, manifest=axml_manifest(), files={"classes.dex": DEX})
+    prefix = Path(box.env["APK_STARTER_PREFIX"])
+    (prefix / "bin").mkdir()
+    (prefix / "bin/android-translation-layer").symlink_to(FAKE)
+    assert main(["--debug-full", str(box.apk)], env=box.env) == 0
+    archives = list((box.data / "logs").iterdir())
+    assert len(archives) == 1 and re.fullmatch(rf"{re.escape(PKG)}-\d{{8}}-\d{{6}}-FULL\.tar\.gz", archives[0].name)
+    folder = _unpacked(box, archives[0])                          # the folder inside has the name without -FULL
+    assert folder.name == archives[0].name.removesuffix("-FULL.tar.gz") and (folder / "manifest.json").is_file()
+    assert "stage: full" in (folder / "SANITIZED.txt").read_text()
+
+
+def test_failed_pack_leaves_the_folder_and_says_so(box, monkeypatch, capsys):
+    pytest.importorskip("atl_doctor")
+    make_apk(box.apk, manifest=axml_manifest(), files={"classes.dex": DEX})
+    prefix = Path(box.env["APK_STARTER_PREFIX"])
+    (prefix / "bin").mkdir()
+    (prefix / "bin/android-translation-layer").symlink_to(FAKE)
+    real = subprocess.run
+    monkeypatch.setattr(diag.subprocess, "run", lambda cmd, **kw: real(
+        [sys.executable, "-c", "import sys; print('no space left', file=sys.stderr); sys.exit(4)"], **kw))
+    assert main(["--debug", str(box.apk)], env=box.env) == 0
+    folders = list((box.data / "logs").iterdir())
+    assert len(folders) == 1 and folders[0].is_dir() and (folders[0] / "manifest.json").is_file()
+    assert f"the recording stays in {folders[0]}: no space left" in capsys.readouterr().err
 
 
 def test_diag_usage_errors_and_no_report_option(box):
@@ -427,9 +452,11 @@ def test_debug_asks_for_a_view_tree_while_the_app_runs(box, monkeypatch):
     monkeypatch.setattr(dexopt, "FLATPAK_INFO", box.info)
     from apk_starter import diag
     monkeypatch.setattr(diag, "TREE_AFTER_S", 0.3)
+    monkeypatch.setattr(diag, "portal_screenshot", lambda dest: dest.parent.mkdir(exist_ok=True) or dest.write_bytes(b"png") or True)
     assert main(["--debug", str(box.apk)], env={**box.env, "FAKE_ATL_MODE": "sleep:2"}) == 0
     folder = _unpacked(box, next((box.data / "logs").glob(f"{PKG}-*.tar.gz")))
     assert [l.split("\t")[3] for l in (folder / "marks.tsv").read_text().splitlines()] == ["start", "running"]
+    assert (folder / "shots/01-running.png").read_bytes() == b"png"       # the screenshot of the tree's moment
 
 
 def test_install_keeps_target_sdk_and_start_notes_the_time(box):

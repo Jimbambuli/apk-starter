@@ -133,6 +133,14 @@ def activate(a) -> None:
         win.debug_check.set_active(False)
         report["debug_hint_unticked"] = win.debug_hint.get_visible()
         win.debug_check.set_active(True)
+        win.debug_full_check.set_active(True)               # the two levels exclude each other
+        saved = json.loads(paths.settings().read_text())["apps"]["org.c.charlie"]
+        report["debug_full"] = [win.debug_check.get_active(), win.debug_full_check.get_active(), saved["debug"],
+                                saved.get("debug_full"), win.debug_full_check.get_tooltip_text(),
+                                win.gear_dot.get_visible()]
+        win.debug_check.set_active(True)
+        saved = json.loads(paths.settings().read_text())["apps"]["org.c.charlie"]
+        report["debug_back"] = [win.debug_full_check.get_active(), saved["debug"], saved.get("debug_full")]
         win.crashed("Charlie", "Exit code 10: crash", None)
         report["crash_dialog"] = [win.dialog.heading, win.dialog.extra.get_text()]
         win.dialog.respond("close")

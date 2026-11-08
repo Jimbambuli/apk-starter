@@ -111,6 +111,9 @@ def test_search_sort_keys_narrow_layout_and_remembered_state(tmp_path):
         "bravo_menu": [1, False], "version_line": ["APK Starter 0.8.1b", False], "charlie_menu": [0, False], "dot_with_debug": True,
         "debug_hint": [False, True, "Slower", True],
         "debug_hint_unticked": False,
+        "debug_full": [False, True, False, True, "The archive contains everything in plain text, also passwords and "
+                                                  "personal data – do not pass it on", True],
+        "debug_back": [False, True, None],
         "crash_dialog": ["Charlie ended unexpectedly.",
                          "Exit code 10: crash"],
         "search": [["Charlie"], "org.c.charlie"], "kept_after_search": "org.c.charlie",

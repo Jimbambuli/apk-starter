@@ -659,7 +659,7 @@ class Window(Gtk.ApplicationWindow):
         icon = Gtk.Overlay(child=Gtk.Image.new_from_gicon(Gio.ThemedIcon.new_from_names(
             ["configure-symbolic", "configure", "emblem-system-symbolic"])))
         self.gear_dot = label("●", "caption", "accent", halign=Gtk.Align.END, valign=Gtk.Align.START,
-                              visible=app.debug, tooltip_text=_("Debug is on"))
+                              visible=app.debug or app.debug_full, tooltip_text=_("Debug is on"))
         icon.add_overlay(self.gear_dot)
         gear.set_child(icon)
         self.gear = gear
@@ -705,19 +705,30 @@ class Window(Gtk.ApplicationWindow):
             choice[key] = b
             box.append(b)
         box.append(Gtk.Separator(margin_top=4))
-        debug = Gtk.CheckButton(label=_("Debug"), active=app.debug)
+        debug = Gtk.CheckButton(label=_("Debug"), active=app.debug and not app.debug_full)
+        debug_full = Gtk.CheckButton(label=_("Debug full"), active=app.debug_full,
+                                     tooltip_text=_("The archive contains everything in plain text, also passwords "
+                                                    "and personal data – do not pass it on"))
         hint = label(_("Slower"), "dim-label", "caption", wrap=True, max_width_chars=40,
-                     visible=app.debug, margin_start=26)
+                     visible=app.debug or app.debug_full, margin_start=26)
 
         def debug_toggled(b: Gtk.CheckButton, pkg=r.package) -> None:
-            """Remembered per app, for every start (also from its menu entry) until it is unticked."""
-            if b.get_active() != load_settings(self.paths.settings()).app(pkg).debug:
-                self.save_app_setting(pkg, debug=b.get_active())
-            hint.set_visible(b.get_active())
-            self.gear_dot.set_visible(b.get_active())
+            """Remembered per app, for every start (also from its menu entry) until it is unticked. The two
+            levels exclude each other."""
+            full = b is debug_full
+            if b.get_active():
+                (debug if full else debug_full).set_active(False)
+            now = load_settings(self.paths.settings()).app(pkg)
+            want = {"debug_full": debug_full.get_active(), "debug": debug.get_active()}
+            if (now.debug_full, now.debug) != (want["debug_full"], want["debug"]):
+                self.save_app_setting(pkg, **want)
+            on = debug.get_active() or debug_full.get_active()
+            hint.set_visible(on)
+            self.gear_dot.set_visible(on)
         debug.connect("toggled", debug_toggled)
-        self.debug_check, self.debug_hint, self.titlebar_choice = debug, hint, choice
-        for w in (debug, hint):
+        debug_full.connect("toggled", debug_toggled)
+        self.debug_check, self.debug_full_check, self.debug_hint, self.titlebar_choice = debug, debug_full, hint, choice
+        for w in (debug, debug_full, hint):
             box.append(w)
 
         self.aurora_updates_check = None
@@ -769,14 +780,14 @@ class Window(Gtk.ApplicationWindow):
             if debugs:
                 box.append(label(_("Recordings"), "section-title"))
             for rec in debugs[:RECORDINGS_SHOWN]:
-                box.append(label(f"{rec.started:%Y-%m-%d %H:%M} · {_('Debug')}"))
+                box.append(label(f"{rec.started:%Y-%m-%d %H:%M} · {_('Debug full') if rec.full else _('Debug')}"))
             box.append(Gtk.Button(label=_("Open log folder"), action_name="win.open-logs",
                                   action_target=GLib.Variant("s", r.package), halign=Gtk.Align.START))
         return Gtk.Popover(child=box)
 
     # -- actions -------------------------------------------------------------------------------------------
     def start(self, pkg: str, level: str | None) -> None:
-        """level None: as from the menu entry (Debug if it is ticked for the app), or "debug"."""
+        """level None: as from the menu entry (Debug if it is ticked for the app), or "debug" / "debug-full"."""
         label_ = self.rows[pkg].label if pkg in self.rows else pkg
         if self.status_of(pkg) is not None:
             return                                  # it is being prepared; the start waits for it
