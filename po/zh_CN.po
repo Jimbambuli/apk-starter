@@ -257,14 +257,13 @@ msgstr "使用 Android Translation Layer 启动 Android 应用（APK）。"
 #: src/apk_starter/cli.py:363
 #, fuzzy
 msgid ""
-"record the app for atl-doctor: exceptions, ATL stub calls, time line, view "
-"trees, clicks and typed text, verbose log; a little slower; afterwards one "
-"archive cleaned of personal data (default: logs/<package>-<time>.tar.gz); "
-"use --debug=DIR"
+"record the app for atl-doctor: exceptions, ATL stub calls, time line, view"
+" trees, clicks and typed text, verbose log; afterwards one archive cleaned"
+" of personal data (default: logs/<package>-<time>.tar.gz); use --debug=DIR"
 msgstr ""
-"为 atl-doctor 记录应用：异常、ATL 桩调用、时间线、带截图的视图树、点击和输入"
-"的文字、详细日志；略慢；结束后生成一个已清除个人数据的归档（默认：logs/<包名"
-">-<时间>.tar.gz）；可用 --debug=文件夹"
+"为 atl-doctor 记录应用：异常、ATL "
+"桩调用、时间线、带截图的视图树、点击和输入的文字、详细日志；结束后生成一个已清除个人数据的归档（默认：logs/<包名>-<时间>.tar.gz）；可用"
+" --debug=文件夹"
 
 #: src/apk_starter/cli.py:367
 #, fuzzy

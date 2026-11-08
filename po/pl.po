@@ -269,15 +269,14 @@ msgstr ""
 #: src/apk_starter/cli.py:363
 #, fuzzy
 msgid ""
-"record the app for atl-doctor: exceptions, ATL stub calls, time line, view "
-"trees, clicks and typed text, verbose log; a little slower; afterwards one "
-"archive cleaned of personal data (default: logs/<package>-<time>.tar.gz); "
-"use --debug=DIR"
+"record the app for atl-doctor: exceptions, ATL stub calls, time line, view"
+" trees, clicks and typed text, verbose log; afterwards one archive cleaned"
+" of personal data (default: logs/<package>-<time>.tar.gz); use --debug=DIR"
 msgstr ""
 "nagrać aplikację dla atl-doctor: wyjątki, wywołania stubów ATL, oś czasu, "
 "drzewa widoków ze zrzutem ekranu, kliknięcia i wpisany tekst, szczegółowy "
-"dziennik; nieco wolniej; potem jedno archiwum oczyszczone z danych osobowych "
-"(domyślnie: logs/<pakiet>-<czas>.tar.gz); użyj --debug=FOLDER"
+"dziennik; potem jedno archiwum oczyszczone z danych osobowych (domyślnie: "
+"logs/<pakiet>-<czas>.tar.gz); użyj --debug=FOLDER"
 
 #: src/apk_starter/cli.py:367
 #, fuzzy

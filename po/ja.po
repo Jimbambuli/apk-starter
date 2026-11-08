@@ -268,15 +268,13 @@ msgstr "Android Translation Layer で Android アプリ (APK) を起動します
 #: src/apk_starter/cli.py:363
 #, fuzzy
 msgid ""
-"record the app for atl-doctor: exceptions, ATL stub calls, time line, view "
-"trees, clicks and typed text, verbose log; a little slower; afterwards one "
-"archive cleaned of personal data (default: logs/<package>-<time>.tar.gz); "
-"use --debug=DIR"
+"record the app for atl-doctor: exceptions, ATL stub calls, time line, view"
+" trees, clicks and typed text, verbose log; afterwards one archive cleaned"
+" of personal data (default: logs/<package>-<time>.tar.gz); use --debug=DIR"
 msgstr ""
-"atl-doctor 用にアプリを記録する: 例外、ATL スタブ呼び出し、タイムライン、スク"
-"リーンショット付きのビューツリー、クリックと入力したテキスト、詳細ログ。少し"
-"遅くなります。終了後、個人情報を取り除いたアーカイブを 1 つ作成します（既定: "
-"logs/<パッケージ>-<時刻>.tar.gz）。--debug=フォルダ も使えます"
+"atl-doctor 用にアプリを記録する: 例外、ATL "
+"スタブ呼び出し、タイムライン、スクリーンショット付きのビューツリー、クリックと入力したテキスト、詳細ログ。。終了後、個人情報を取り除いたアーカイブを"
+" 1 つ作成します（既定: logs/<パッケージ>-<時刻>.tar.gz）。--debug=フォルダ も使えます"
 
 #: src/apk_starter/cli.py:367
 #, fuzzy

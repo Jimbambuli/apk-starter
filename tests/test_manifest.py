@@ -74,6 +74,6 @@ def test_atl_doctor_pinned_with_the_same_atl_source():
 def test_atl_from_the_fix_r5_branch():
     text = (ROOT / "io.github.Jimbambuli.ApkStarter.yml").read_text()
     module = text[text.index("- name: android_translation_layer"):text.index("- name: atl-doctor")]
-    # fix-r4 + android.atl.InputTrace (fix-r5) + ATLViewDump reading "request" and saving the window image on request (612123322), fix-r5 b8a395962
+    # fix-r4 + android.atl.InputTrace (fix-r5) + ATLViewDump reading "request" and saving the window image on request (612123322), fix-r5 4550cdc56
     assert "branch: fix-r5" in module
     assert text.count(f"commit: {manifest_commits()['android_translation_layer']}") == 2      # also atl-src

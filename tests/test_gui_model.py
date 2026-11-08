@@ -126,8 +126,8 @@ def test_group_parts_puts_the_parts_of_an_app_together(tmp_path):
 def test_component_lines_from_build_info_and_without():
     from apk_starter.gui_model import component_lines
     from apk_starter.run import read_build_info
-    assert component_lines({"atl_commit": "b8a395962bd994c245d13520828288018107fa7a", "art_commit": "unknown"}, "?") == [
-        "ATL b8a395962bd9", "art_standalone ?", "bionic_translation ?", "atl-doctor ?"]
+    assert component_lines({"atl_commit": "4550cdc5688b87d3ffff5e92799b2472c59c174c", "art_commit": "unknown"}, "?") == [
+        "ATL 4550cdc5688b", "art_standalone ?", "bionic_translation ?", "atl-doctor ?"]
     real = read_build_info(Path(__file__).parent.parent / "data/build-info")
     assert all(not l.endswith(" unknown") for l in component_lines(real, "unknown"))
     assert component_lines(read_build_info(Path("/nonexistent")), "unknown")[0] == "ATL unknown"

@@ -63,7 +63,7 @@ def test_header_fields_order_and_values():
     info = ApkInfo(Path("/h/e.apk"), "org.example.demo", "Demo", None, 7, 21, 34, None)
     started = datetime(2026, 11, 1, 7, 0, 5, tzinfo=ZoneInfo("Europe/Zurich"))
     h = header_fields(info, {"atl_commit": "a" * 40, "art_commit": "b" * 40}, "runtime/x/y/1",
-                      ["atl", "a b\nc"], started, "0.8.2")
+                      ["atl", "a b\nc"], started, "0.8.3")
     assert list(h) == ["format", "launcher_version", "apk", "package", "version_name", "version_code",
                        "min_sdk", "target_sdk", "atl_commit", "art_commit", "runtime", "started", "args"]
     assert h["format"] == "1" and h["version_name"] == "" and h["started"] == "2026-11-01T07:00:05+01:00"

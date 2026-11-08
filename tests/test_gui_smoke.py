@@ -109,8 +109,11 @@ def test_search_sort_keys_narrow_layout_and_remembered_state(tmp_path):
         "empty_page": ["list", True, True, True, "Add an app with + or drop an APK here."], "list_page": "list",
         "add_menu": 3, "add_menu_aurora_installed": 2,
         "bravo_menu": [1, False], "version_line": [2, True],
-        "about": ["0.8.2", "APK Starter", "io.github.Jimbambuli.ApkStarter", [],
-                  "https://github.com/Jimbambuli/apk-starter", True], "charlie_menu": [0, False], "dot_with_debug": True,
+        "about": ["0.8.3", "APK Starter", "io.github.Jimbambuli.ApkStarter", [],
+                  "https://github.com/Jimbambuli/apk-starter", True],
+        "about_components": [["Components", ["ATL unknown", "art_standalone unknown", "bionic_translation unknown",
+                                              "atl-doctor unknown"]]],
+        "charlie_menu": [0, False], "dot_with_debug": True,
         "debug_full": [False, True, False, True, "The archive contains everything in plain text, also passwords and "
                                                   "personal data – do not pass it on", True],
         "debug_back": [False, True, None],

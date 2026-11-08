@@ -267,15 +267,14 @@ msgstr "Spouští aplikace pro Android (APK) pomocí Android Translation Layer."
 #: src/apk_starter/cli.py:363
 #, fuzzy
 msgid ""
-"record the app for atl-doctor: exceptions, ATL stub calls, time line, view "
-"trees, clicks and typed text, verbose log; a little slower; afterwards one "
-"archive cleaned of personal data (default: logs/<package>-<time>.tar.gz); "
-"use --debug=DIR"
+"record the app for atl-doctor: exceptions, ATL stub calls, time line, view"
+" trees, clicks and typed text, verbose log; afterwards one archive cleaned"
+" of personal data (default: logs/<package>-<time>.tar.gz); use --debug=DIR"
 msgstr ""
 "nahrát aplikaci pro atl-doctor: výjimky, volání stubů ATL, časová osa, "
 "stromy pohledů se snímkem obrazovky, kliknutí a zadaný text, podrobný "
-"protokol; o něco pomalejší; poté jeden archiv očištěný od osobních údajů "
-"(výchozí: logs/<balíček>-<čas>.tar.gz); použijte --debug=SLOŽKA"
+"protokol; poté jeden archiv očištěný od osobních údajů (výchozí: "
+"logs/<balíček>-<čas>.tar.gz); použijte --debug=SLOŽKA"
 
 #: src/apk_starter/cli.py:367
 #, fuzzy

@@ -267,15 +267,14 @@ msgstr "Запуск Android-приложений (APK) с помощью Androi
 #: src/apk_starter/cli.py:363
 #, fuzzy
 msgid ""
-"record the app for atl-doctor: exceptions, ATL stub calls, time line, view "
-"trees, clicks and typed text, verbose log; a little slower; afterwards one "
-"archive cleaned of personal data (default: logs/<package>-<time>.tar.gz); "
-"use --debug=DIR"
+"record the app for atl-doctor: exceptions, ATL stub calls, time line, view"
+" trees, clicks and typed text, verbose log; afterwards one archive cleaned"
+" of personal data (default: logs/<package>-<time>.tar.gz); use --debug=DIR"
 msgstr ""
-"записать приложение для atl-doctor: исключения, вызовы заглушек ATL, шкала "
-"времени, деревья представлений со снимком экрана, щелчки и введённый текст, "
-"подробный журнал; чуть медленнее; затем один архив, очищенный от личных "
-"данных (по умолчанию: logs/<пакет>-<время>.tar.gz); используйте --debug=ПАПКА"
+"записать приложение для atl-doctor: исключения, вызовы заглушек ATL, шкала"
+" времени, деревья представлений со снимком экрана, щелчки и введённый "
+"текст, подробный журнал; затем один архив, очищенный от личных данных (по "
+"умолчанию: logs/<пакет>-<время>.tar.gz); используйте --debug=ПАПКА"
 
 #: src/apk_starter/cli.py:367
 #, fuzzy

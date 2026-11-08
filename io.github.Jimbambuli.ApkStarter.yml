@@ -111,14 +111,14 @@ modules:
       - /share/doc
       - '*.la'
 
-  # Fork branch apk-starter = upstream 6253dec + MR !27 (linker) + !28 (pthread).
+  # Fork branch fix-r6-cleanup = apk-starter (upstream 6253dec + MR !27 linker + !28 pthread) + thread-local pthread cleanup stack.
   - name: bionic_translation
     buildsystem: meson
     sources:
       - type: git
         url: https://gitlab.com/Jimbambuli/bionic_translation.git
-        branch: apk-starter
-        commit: b21a6b4b639ddbe408dc7d0618f40fb0807f7b63
+        branch: fix-r6-cleanup
+        commit: ecb7e75595ce31bb86d88f497f50b4f3c54b82e2
 
   # ATL project's OpenSL ES (SDL2 + libsndfile from the runtime): native app libraries that open
   # libOpenSLES.so (e.g. WhatsApp's libwhatsapp.so needs slCreateEngine).
@@ -187,7 +187,7 @@ modules:
       - type: git
         url: https://gitlab.com/Jimbambuli/android_translation_layer.git
         branch: fix-r5
-        commit: b8a395962bd994c245d13520828288018107fa7a
+        commit: 4550cdc5688b87d3ffff5e92799b2472c59c174c
 
   # atl-doctor (public, fixed commit): JVMTI agent and trace counter for Log/Debug, its Python package for the
   # Debug recorder and packer (`atl-doctor pack`), and the stub list of exactly this ATL (for stub hits). The whole
@@ -212,7 +212,7 @@ modules:
         commit: 763ce7d16ddb4a7b5e23679ac79cdd2ba60b46ad
       - type: git
         url: https://gitlab.com/Jimbambuli/android_translation_layer.git
-        commit: b8a395962bd994c245d13520828288018107fa7a
+        commit: 4550cdc5688b87d3ffff5e92799b2472c59c174c
         dest: atl-src
 
   - name: apk-starter

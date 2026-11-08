@@ -54,7 +54,7 @@ apk-starter --list                   # installed apps
 apk-starter --remove PACKAGE [--purge]
 apk-starter --remove-all [--purge]   # remove every installed app and its menu entry
 apk-starter --setup-microg           # download microG from its repository, check it, install it
-apk-starter --debug @@ app.apk @@    # record the app for atl-doctor (a little slower), --debug=DIR for a folder
+apk-starter --debug @@ app.apk @@    # record the app for atl-doctor, --debug=DIR for a folder
 apk-starter --debug-full @@ app.apk @@  # likewise, the archive keeps everything in plain text (do not pass it on)
 apk-starter --sdk N @@ app.apk @@    # override the SDK level passed to ATL
 apk-starter --size WxH @@ app.apk @@ # window size (remembered per app)
@@ -103,8 +103,8 @@ Recordings, for finding out why an app misbehaves under ATL (with
 «Debug» ticked) records the agent attached as soon as the runtime runs (exceptions with stack, also caught ones,
 lifecycle), the calls of ATL's stub methods (counted by ATL itself), a time line from ART's sampling profiler, the
 view trees (no screenshots: none is made), what is clicked, typed (as a length
-only) and scrolled (`input.jsonl`) and a verbose Android log; the app runs only a little slower (no full method trace,
-which made apps lose their own start-up races). When the app has ended, `atl-doctor pack` makes one archive
+only) and scrolled (`input.jsonl`) and a verbose Android log; the app runs without a full method trace (it
+made apps lose their own start-up races). When the app has ended, `atl-doctor pack` makes one archive
 `<package>-<date>-<time>.tar.gz` of it, cleaned of paths, user and host name, network addresses, tokens, passwords
 and e-mail addresses (`SANITIZED.txt` in it says what was done). **Debug full**
 (`--debug-full`) makes `<package>-<date>-<time>-FULL.tar.gz` with everything as recorded and, only there, an image of
