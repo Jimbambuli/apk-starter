@@ -57,10 +57,10 @@ def test_window_lists_installs_starts_and_uninstalls(tmp_path):
     heading, body = report.pop("remove_warning")
     assert heading == "Demo uninstalled" and "menu entry was not removed" in body
     assert report.pop("busy") == [1, ["demo.apk"], "list"]     # one spinner, in the row of the job
-    assert report == {"listed": [], "page": "empty", "drop_accepted": True, "after_install": ["Demo"],
+    assert report == {"listed": [], "page": "list", "drop_accepted": True, "after_install": ["Demo"],
                       "pkg": "org.example.demo", "started": ["org.example.demo"],
                       "clear_dialog": "Delete the data of Demo?", "dialog": "Uninstall Demo?", "after_remove": [],
-                      "page_end": "empty", "data_left": False, "busy_end": 0}, out.stderr
+                      "page_end": "list", "data_left": False, "busy_end": 0}, out.stderr
     assert "CRITICAL" not in out.stderr and "WARNING" not in out.stderr, out.stderr     # e.g. gtk_widget_is_ancestor
 
 
@@ -106,7 +106,7 @@ def test_search_sort_keys_narrow_layout_and_remembered_state(tmp_path):
     report = json.loads(out.stdout.strip().splitlines()[-1])
     assert report == {
         "restored": ["org.b.bravo", "Bravo", ["Alpha", "Bravo", "Charlie"]], "opened_focus_on_start": True,
-        "empty_page": ["empty", True, True, "Add an app with + or drop an APK here."], "list_page": "list",
+        "empty_page": ["list", True, True, True, "Add an app with + or drop an APK here."], "list_page": "list",
         "add_menu": 3, "add_menu_aurora_installed": 2,
         "bravo_menu": [1, False], "version_line": [2, True],
         "about": ["0.8.2", "APK Starter", "io.github.Jimbambuli.ApkStarter", [],
@@ -122,7 +122,7 @@ def test_search_sort_keys_narrow_layout_and_remembered_state(tmp_path):
         "started": ["org.c.charlie"], "focus_on_start": False,
         "settings": {"apps": {"org.c.charlie": {"titlebar": "system-navigation", "debug": True}}},
         "debug_started": ["org.c.charlie"], "debug_stays_on": [True, True],
-        "menu_corner": {"list": True, "empty": True, "narrow_details": True},
+        "menu_corner": {"list": True, "empty": True, "details": True},
         "saved": {"width": 500, "height": 600, "sort": "started", "selected": "org.c.charlie"},
         "narrow_list": [True, False], "narrow_details": [False, True, True, "Bravo"],
         "narrow_back": [True, False]}, out.stderr

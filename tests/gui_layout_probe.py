@@ -67,7 +67,7 @@ def activate(a) -> None:
     def listed():
         report["restored"] = [win.selected, win.details_title.get_text(), titles(win)]
         report["opened_focus_on_start"] = win.get_focus() is win.start_button
-        report["menu_corner"] = {"list": corner(win)}
+        report["menu_corner"] = {"list": corner(win), "details": win.details_title.get_mapped()}
         report["add_menu"] = win.add_menu.get_n_items()      # APK, Aurora Store and microG: none is set up
         win.paths.meta("com.aurora.store").write_text("{}")
         win.update_add_menu()
@@ -80,13 +80,14 @@ def activate(a) -> None:
         dlg.destroy()
         win.saved_rows = win.all_rows
         win.show_rows([])                                   # no app: only text, «+» accented and focused
-        wait(lambda: focused_in(win.welcome_add), empty_checked)
+        wait(lambda: focused_in(win.add_button), empty_checked)
 
     def corner(w):
-        """The main-menu button is mapped, at the top right (right edge within 150 px: window buttons stand right of it)."""
-        b = w.main_button
-        ok, p = b.compute_point(w, Graphene.Point())
-        return bool(ok and b.get_mapped() and p.x + b.get_width() >= w.get_width() - 150 and 0 <= p.y < 50)
+        """The main-menu button is mapped, in the row of «+» and right behind it (gap under 20 px)."""
+        ok1, a = w.add_button.compute_point(w, Graphene.Point())
+        ok2, b = w.main_button.compute_point(w, Graphene.Point())
+        gap = b.x - (a.x + w.add_button.get_width())
+        return bool(ok1 and ok2 and w.main_button.get_mapped() and abs(a.y - b.y) < 2 and 0 <= gap < 20)
 
     def focused_in(widget):
         f = win.get_focus()
@@ -94,8 +95,8 @@ def activate(a) -> None:
 
     def empty_checked():
         report["menu_corner"]["empty"] = corner(win)
-        report["empty_page"] = [win.stack.get_visible_child_name(), win.welcome_add.get_first_child().has_css_class("suggested-action"),
-                                win.get_focus_visible(), win.welcome_text.get_text()]
+        report["empty_page"] = [win.stack.get_visible_child_name(), win.add_button.get_first_child().has_css_class("suggested-action"),
+                                win.get_focus_visible(), win.welcome.get_mapped(), win.welcome_text.get_text()]
         win.show_rows(win.saved_rows)
         report["list_page"] = win.stack.get_visible_child_name()
         win.paths.meta("com.aurora.store").unlink()      # back to the first state
@@ -167,11 +168,6 @@ def activate(a) -> None:
         w2.listbox.emit("row-activated", w2.listbox.get_row_at_index(0))
         report["narrow_details"] = [w2.side.get_visible(), w2.detail_side.get_visible(), w2.back.get_visible(),
                                     w2.details_title.get_text()]
-        wait(lambda: w2.details_title.get_mapped(), lambda: narrow_corner(w2))
-        return
-
-    def narrow_corner(w2):
-        report["menu_corner"]["narrow_details"] = corner(w2)
         key(w2, "Escape")
         report["narrow_back"] = [w2.side.get_visible(), w2.detail_side.get_visible()]
         app.quit()

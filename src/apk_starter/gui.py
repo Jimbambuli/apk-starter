@@ -138,7 +138,6 @@ class Window(Gtk.ApplicationWindow):
         self.page = "list"                          # narrow window: "list" or "details"
         self.layout = 0                             # extra right margin of the details
         self.start_button: Gtk.Button | None = None
-        self.first_details = True
 
         self.search = Gtk.SearchEntry(placeholder_text=_("Search apps"), hexpand=True)
         self.search.connect("search-changed", lambda _e: self.show_list())
@@ -158,12 +157,9 @@ class Window(Gtk.ApplicationWindow):
         main_menu.append(_("About APK Starter"), "win.about")
         main = Gtk.MenuButton(menu_model=main_menu, icon_name="open-menu-symbolic", tooltip_text=_("Main menu"))
         top = Gtk.Box(spacing=6, margin_top=10, margin_bottom=8, margin_start=10, margin_end=10)
-        for w in (self.search, sort, install):
+        for w in (self.search, sort, install, main):
             top.append(w)
-        # the main menu sits in the title bar: one fixed place at the top right on every page
-        header = Gtk.HeaderBar()
-        header.pack_end(main)
-        self.set_titlebar(header)
+        self.add_button = install
         self.main_button = main
         self.listbox = Gtk.ListBox(selection_mode=Gtk.SelectionMode.SINGLE, activate_on_single_click=False)
         self.listbox.add_css_class("navigation-sidebar")
@@ -180,6 +176,7 @@ class Window(Gtk.ApplicationWindow):
         self.back = Gtk.Button(icon_name="go-previous-symbolic", tooltip_text=_("Back"), visible=False,
                                halign=Gtk.Align.START, margin_top=10, margin_start=10)
         self.back.connect("clicked", lambda _b: self.go_back())
+        self.welcome = self.make_welcome()
         self.details = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=18, margin_top=24, margin_bottom=24,
                                margin_start=DETAILS_MARGIN, margin_end=DETAILS_MARGIN, halign=Gtk.Align.FILL)
         detail_side = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, hexpand=True)
@@ -193,7 +190,6 @@ class Window(Gtk.ApplicationWindow):
 
         self.stack = Gtk.Stack(transition_type=Gtk.StackTransitionType.CROSSFADE, vexpand=True)
         self.stack.add_named(Gtk.Box(), "loading")
-        self.stack.add_named(self.make_empty_page(), "empty")
         self.stack.add_named(apps, "list")
 
         body = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
@@ -278,23 +274,10 @@ class Window(Gtk.ApplicationWindow):
         n.set_default_action("app.aurora-updates")
         self.get_application().send_notification("aurora-updates", n)
 
-    def make_empty_page(self) -> Gtk.Widget:
-        """No app yet: only text, and the «+» button in the accent colour where it stands beside the list."""
-        self.welcome_add = Gtk.MenuButton(menu_model=self.add_menu, icon_name="list-add-symbolic",
-                                          tooltip_text=_("Add apps"), halign=Gtk.Align.START, margin_top=10,
-                                          margin_start=10)
-        # the theme colours the button inside a menu button, not the menu button itself
-        self.welcome_add.get_first_child().add_css_class("suggested-action")
-        page = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        page.append(self.welcome_add)
-        welcome = self.make_welcome()
-        welcome.set_vexpand(True)
-        page.append(welcome)
-        return page
-
     def make_welcome(self) -> Gtk.Widget:
+        """No app yet: the side bar stays, this fills the details area."""
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=14, valign=Gtk.Align.CENTER,
-                      halign=Gtk.Align.CENTER, margin_start=24, margin_end=24)
+                      halign=Gtk.Align.CENTER, vexpand=True, margin_start=24, margin_end=24)
         box.append(Gtk.Image(icon_name=APP_ID, pixel_size=128, margin_bottom=8))
         self.welcome_title = label(_("No apps installed"), "welcome-title", xalign=0.5, wrap=True)
         self.welcome_text = label(_("Add an app with + or drop an APK here."), "dim-label", xalign=0.5, wrap=True,
@@ -458,6 +441,13 @@ class Window(Gtk.ApplicationWindow):
         self.detail_side.set_visible(not self.narrow or details)
         self.side.set_hexpand(self.narrow)
         self.back.set_visible(details)
+        # the details area (with the welcome text) is hidden in a narrow window: the list says it then
+        empty = not self.all_rows and not self.pending
+        self.nothing.set_text(self.welcome_text.get_text() if empty else _("No app matches."))
+        self.nothing.set_visible(empty and self.narrow or bool(self.all_rows) and not self.visible_rows())
+        # «+» is the one thing to do on an empty list: in the accent colour (the theme colours the inner button)
+        (self.add_button.get_first_child().add_css_class if empty else
+         self.add_button.get_first_child().remove_css_class)("suggested-action")
 
     def go_back(self) -> None:
         if self.narrow and self.page == "details":
@@ -478,7 +468,7 @@ class Window(Gtk.ApplicationWindow):
         self.all_rows = rows
         self.rows = {r.package: r for r in rows}
         self.update_add_menu()
-        self.stack.set_visible_child_name("list" if rows or self.pending else "empty")
+        self.stack.set_visible_child_name("list")
         if not rows and not self.pending:
             GLib.idle_add(self.focus_welcome_add)           # nothing else to do here but add an app
         self.show_list()
@@ -486,11 +476,11 @@ class Window(Gtk.ApplicationWindow):
     def update_stack(self) -> None:
         """Installs and set-ups show their row also on the empty page; the first list load decides first."""
         if self.stack.get_visible_child_name() != "loading":
-            self.stack.set_visible_child_name("list" if self.rows or self.pending else "empty")
+            self.stack.set_visible_child_name("list")
 
     def focus_welcome_add(self) -> bool:
         """Focused with the focus ring showing (GTK shows it only after a key otherwise): Enter opens the menu."""
-        self.welcome_add.grab_focus()
+        self.add_button.grab_focus()
         self.set_focus_visible(True)
         return GLib.SOURCE_REMOVE
 
@@ -538,7 +528,6 @@ class Window(Gtk.ApplicationWindow):
             chosen = self.listbox.get_row_at_index(len(self.pending))
         self.listbox.select_row(chosen)
         self.filling = False
-        self.nothing.set_visible(bool(self.all_rows) and not rows)
         self.selected = chosen.package if chosen is not None else (keep if keep in self.rows else None)
         self.show_details()
         self.update_pages()
@@ -640,9 +629,7 @@ class Window(Gtk.ApplicationWindow):
     # -- details -------------------------------------------------------------------------------------------
     def show_details(self) -> None:
         focus = self.get_focus()
-        # the title bar button holds the focus the window gives at the start: that is not the user's choice
-        refocus = focus is None or focus.is_ancestor(self.details) or (self.first_details and focus.is_ancestor(self.main_button))
-        self.first_details = False
+        refocus = focus is None or focus.is_ancestor(self.details)
         if refocus:
             self.set_focus(None)                    # never leave the focus on a widget that goes away
         self.start_button = None
@@ -651,6 +638,8 @@ class Window(Gtk.ApplicationWindow):
             self.details.remove(child)
         r = self.rows.get(self.selected or "")
         if r is None:
+            if not self.all_rows and not self.pending:
+                self.details.append(self.welcome)
             return
         target = GLib.Variant("s", r.package)
         app = load_settings(self.paths.settings()).app(r.package)
