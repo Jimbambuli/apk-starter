@@ -14,10 +14,11 @@ from .cli import (APP_ID, ENTRY_PREFIX, clear_data, install_files, lang_from_env
                   setup_microg, VERSION)
 from .apkinfo import read_apk_info
 from .launch import cached_apk_info
+from .run import read_build_info
 from .errors import StarterError, describe_error
 from .i18n import _
 from .gui_model import (AppRow, WindowState, crash_meaning, details_layout, filter_rows, group_parts, is_narrow,
-                        key_action, load_rows, load_state, save_state, sort_rows, start_argv)
+                        component_lines, key_action, load_rows, load_state, save_state, sort_rows, start_argv)
 from .paths import Paths
 from .settings import TITLEBARS, load_settings, save_settings
 
@@ -152,8 +153,11 @@ class Window(Gtk.ApplicationWindow):
             ["view-sort-descending-symbolic", "view-sort-descending"])))
         self.add_menu = Gio.Menu()
         install = Gtk.MenuButton(menu_model=self.add_menu, icon_name="list-add-symbolic", tooltip_text=_("Add apps"))
+        main_menu = Gio.Menu()
+        main_menu.append(_("About APK Starter"), "win.about")
+        main = Gtk.MenuButton(menu_model=main_menu, icon_name="open-menu-symbolic", tooltip_text=_("Main menu"))
         top = Gtk.Box(spacing=6, margin_top=10, margin_bottom=8, margin_start=10, margin_end=10)
-        for w in (self.search, sort, install):
+        for w in (self.search, sort, install, main):
             top.append(w)
         self.listbox = Gtk.ListBox(selection_mode=Gtk.SelectionMode.SINGLE, activate_on_single_click=False)
         self.listbox.add_css_class("navigation-sidebar")
@@ -231,9 +235,9 @@ class Window(Gtk.ApplicationWindow):
             action = Gio.SimpleAction.new(name, None)
             action.connect("activate", lambda _a, _v, h=handler: h())
             self.add_action(action)
-        version = Gio.SimpleAction.new("version", None)
-        version.set_enabled(False)
-        self.add_action(version)
+        about = Gio.SimpleAction.new("about", None)
+        about.connect("activate", lambda _a, _v: self.show_about())
+        self.add_action(about)
         sort_action = Gio.SimpleAction.new_stateful("sort", GLib.VariantType.new("s"), GLib.Variant("s", self.sort))
         sort_action.connect("activate", lambda a, v: (a.set_state(v), self.set_sort(v.get_string())))
         self.add_action(sort_action)
@@ -484,6 +488,18 @@ class Window(Gtk.ApplicationWindow):
         self.set_focus_visible(True)
         return GLib.SOURCE_REMOVE
 
+    def make_about(self) -> Gtk.AboutDialog:
+        info = read_build_info(self.paths.build_info())
+        dialog = Gtk.AboutDialog(transient_for=self, modal=True, program_name="APK Starter", version=VERSION,
+                                 logo_icon_name=APP_ID, comments=_("Run Android apps on the Linux desktop"),
+                                 website="https://github.com/Jimbambuli/apk-starter", website_label="GitHub",
+                                 license_type=Gtk.License.GPL_3_0, authors=["Jimbambuli"])
+        dialog.add_credit_section(_("Components"), component_lines(info, _("unknown")))
+        return dialog
+
+    def show_about(self) -> None:
+        self.make_about().present()
+
     def update_add_menu(self) -> None:
         """«Add apps» and the empty page offer a service only while it is not installed."""
         aurora_todo = not self.paths.meta(aurora.PACKAGE).is_file()
@@ -494,9 +510,6 @@ class Window(Gtk.ApplicationWindow):
             self.add_menu.append(_("Set up Aurora Store…"), "win.setup-aurora")
         if microg_todo:
             self.add_menu.append(_("Set up microG…"), "win.setup-microg")
-        about = Gio.Menu()
-        about.append(f"APK Starter {VERSION}", "win.version")       # greyed out: the action stays disabled
-        self.add_menu.append_section(None, about)
 
     def visible_rows(self) -> list[AppRow]:
         return filter_rows(sort_rows(self.all_rows, self.sort), self.search.get_text())

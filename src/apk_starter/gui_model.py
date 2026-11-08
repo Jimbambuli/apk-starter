@@ -94,6 +94,19 @@ def save_state(path: Path, state: WindowState) -> None:
     os.replace(tmp, path)
 
 
+COMPONENTS = (("ATL", "atl_commit"), ("art_standalone", "art_commit"), ("bionic_translation", "bionic_commit"),
+              ("atl-doctor", "atl_doctor_commit"))
+
+
+def component_lines(info: dict[str, str], unknown: str) -> list[str]:
+    """«Name commit» per pinned component (build-info); a missing or «unknown» entry shows `unknown`."""
+    lines = []
+    for name, key in COMPONENTS:
+        value = info.get(key, "unknown")
+        lines.append(f"{name} {unknown if value == 'unknown' else value[:12]}")
+    return lines
+
+
 def key_action(key: str, ctrl: bool, in_search: bool) -> str | None:
     """Window keys (GDK key names). Plain typing needs no action: the search captures it."""
     if ctrl and key.lower() == "f":

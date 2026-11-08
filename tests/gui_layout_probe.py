@@ -71,9 +71,11 @@ def activate(a) -> None:
         win.update_add_menu()
         report["add_menu_aurora_installed"] = win.add_menu.get_n_items()
         report["bravo_menu"] = [win.recordings_shown, win.gear_dot.get_visible()]
-        about = win.add_menu.get_item_link(win.add_menu.get_n_items() - 1, "section")    # the greyed-out version line
-        report["version_line"] = [about.get_item_attribute_value(0, "label").get_string(),
-                                  win.lookup_action("version").get_enabled()]
+        report["version_line"] = [win.add_menu.get_n_items(), win.lookup_action("version") is None]
+        dlg = win.make_about()
+        report["about"] = [dlg.get_version(), dlg.get_program_name(), dlg.get_logo_icon_name(), dlg.get_authors(),
+                           dlg.get_website(), dlg.get_license_type() == Gtk.License.GPL_3_0]
+        dlg.destroy()
         win.saved_rows = win.all_rows
         win.show_rows([])                                   # no app: only text, «+» accented and focused
         wait(lambda: focused_in(win.welcome_add), empty_checked)
