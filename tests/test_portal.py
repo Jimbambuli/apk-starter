@@ -164,3 +164,32 @@ def test_share_mime_types_offer_the_app_under_open_with():
     from apk_starter.portal import share_mime_types
     assert share_mime_types(("image/*", "text/plain", "video/*", "*/*", "image/*", "bad type", "IMAGE/PNG")) == [
         "image/*", "image/png", "text/plain", "video/*"]
+
+
+def test_screenshot_returns_the_uri_the_portal_answers(tmp_path):
+    """Screenshot (not interactive) answers through a Request, here with a file the fake names."""
+    import os
+    import shutil
+    import subprocess
+    import sys
+    from pathlib import Path
+    pytest.importorskip("gi")
+    if not shutil.which("dbus-daemon"):
+        pytest.skip("dbus-daemon not installed")
+    here = Path(__file__).parent
+    bus = subprocess.Popen(["dbus-daemon", "--session", "--nofork", "--print-address"], stdout=subprocess.PIPE,
+                           text=True)
+    try:
+        env = {**os.environ, "DBUS_SESSION_BUS_ADDRESS": bus.stdout.readline().strip(),
+               "PYTHONPATH": str(here.parent / "src"), "FAKE_SHOT_URI": "file:///tmp/Screenshot.png"}
+        svc = subprocess.Popen([sys.executable, str(here / "fake_portal.py"), str(tmp_path / "calls")], env=env,
+                               stdout=subprocess.PIPE, text=True)
+        try:
+            assert svc.stdout.readline().strip() == "ready"
+            out = subprocess.run([sys.executable, "-c", "from apk_starter import portal; print(portal.screenshot())"],
+                                 env=env, capture_output=True, text=True, timeout=30)
+            assert out.stdout.strip() == "file:///tmp/Screenshot.png", out.stderr
+        finally:
+            svc.kill()
+    finally:
+        bus.kill()
