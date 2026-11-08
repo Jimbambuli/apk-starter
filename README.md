@@ -102,8 +102,8 @@ Recordings, for finding out why an app misbehaves under ATL (with
 [atl-doctor](https://github.com/Jimbambuli/atl-doctor)): a normal start writes nothing. **Debug** (`--debug`,
 «Debug» ticked) records the agent attached as soon as the runtime runs (exceptions with stack, also caught ones,
 lifecycle), the calls of ATL's stub methods (counted by ATL itself), a time line from ART's sampling profiler, the
-view trees with a screenshot of the screen taken ten seconds after the start (through the Screenshot portal, so the
-desktop may ask once; the screenshot shows the whole screen, not only the app), what is clicked, typed (as a length
+view trees with an image of the app window taken ten seconds after the start (ATL itself renders the window; no
+screen capture, no portal, nothing of other windows; the image is not cleaned, it shows what the app shows), what is clicked, typed (as a length
 only) and scrolled (`input.jsonl`) and a verbose Android log; the app runs only a little slower (no full method trace,
 which made apps lose their own start-up races). When the app has ended, `atl-doctor pack` makes one archive
 `<package>-<date>-<time>.tar.gz` of it, cleaned of paths, user and host name, network addresses, tokens, passwords

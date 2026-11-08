@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Stand-in for android-translation-layer in tests. Mode from FAKE_ATL_MODE: exit:N | signal:N | noeol | sleep:S |
+viewdump:S (like sleep, but answers ATL_VIEWDUMP requests with a tree and shots/NAME.png, as ATLViewDump does) |
 restart:FILE (exit 75 = restart while FILE does not exist yet, creating it; then exit 0).
 FAKE_ATL_CHECK=PATH: records whether PATH existed when ATL started. With -agentpath:LIB=OUT,... it writes one
 exception line of atl-doctor's agent to OUT."""
@@ -35,6 +36,23 @@ sys.stdout.flush()
 if kind == "sleep":
     import time
     time.sleep(float(arg))
+    sys.exit(0)
+if kind == "viewdump":
+    import time
+    d = os.environ["ATL_VIEWDUMP"]
+    end = time.monotonic() + float(arg)
+    while time.monotonic() < end:
+        req = os.path.join(d, "request")
+        if os.path.exists(req):
+            with open(req) as f:
+                name = f.read().strip()
+            os.makedirs(os.path.join(d, "shots"), exist_ok=True)
+            with open(os.path.join(d, "shots", name + ".png"), "wb") as f:
+                f.write(b"png")
+            with open(os.path.join(d, name + ".xml"), "w") as f:
+                f.write("<hierarchy/>\n")
+            os.remove(req)
+        time.sleep(0.05)
     sys.exit(0)
 if kind == "restart":
     if not os.path.exists(arg):

@@ -982,10 +982,6 @@ msgstr "das Portal hat nicht geantwortet"
 msgid "menu entry not created (cancelled)"
 msgstr "Menüeintrag nicht angelegt (abgebrochen)"
 
-#: src/apk_starter/portal.py:197
-msgid "screenshot not taken (cancelled)"
-msgstr "Bildschirmfoto nicht aufgenommen (abgebrochen)"
-
 #: src/apk_starter/resbin.py:13 src/apk_starter/resbin.py:16
 #: src/apk_starter/resbin.py:24 src/apk_starter/resbin.py:34
 #: src/apk_starter/resbin.py:54 src/apk_starter/resbin.py:58

@@ -180,19 +180,3 @@ def uninstall_launcher(pkg: str) -> None:
         not_found = "not found" in str(e).lower() or "NotFound" in str(e)
         if isinstance(e, PortalUnavailable) or not not_found:
             raise
-
-
-
-def screenshot() -> str:
-    """The Screenshot portal, not interactive (the desktop asks for permission the first time); returns the file's URI."""
-    Gio, GLib = _gi()
-    conn = _connect(Gio, GLib)
-
-    def options(token: str):
-        return GLib.Variant("(sa{sv})", ("", {"handle_token": GLib.Variant("s", token),
-                                              "interactive": GLib.Variant("b", False)}))
-
-    response, results = _request(conn, Gio, GLib, "org.freedesktop.portal.Screenshot", "Screenshot", options)
-    if response != 0 or "uri" not in results:
-        raise StarterError(_("screenshot not taken (cancelled)"))
-    return results["uri"]

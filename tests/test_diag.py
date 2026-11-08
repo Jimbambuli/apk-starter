@@ -178,32 +178,3 @@ def test_prune_counts_the_archives(tmp_path):
     debugs = [_archive(p, "org.a", n, full=n % 2 == 0) for n in range(7)]
     diag.prune(p, "org.a")
     assert [f.exists() for f in debugs] == [False] * 2 + [True] * 5
-
-
-# -- the screenshot of the view tree ----------------------------------------------------------------
-def test_shot_is_named_like_the_tree_of_its_mark(tmp_path):
-    pytest.importorskip("atl_doctor")
-    rec = tmp_path / "rec"
-    rec.mkdir()
-    from atl_doctor.capture import Capture, Manifest
-    Capture(rec).write_manifest(Manifest())
-    (rec / "marks.tsv").write_text("0\t1\t2\tstart\n1\t3\t4\trunning\n")
-    taken = []
-    got = diag.shot_for_mark(rec, "running", lambda dest: taken.append(dest) or dest.parent.mkdir(exist_ok=True) or True)
-    assert got == rec / "shots/01-running.png" and taken == [got]
-    assert diag.shot_for_mark(rec, "nope", lambda d: True, wait_s=0.2) is None
-    assert diag.shot_for_mark(rec, "running", lambda d: False) is None
-
-
-def test_portal_screenshot_copies_the_file_and_fails_quietly(tmp_path, monkeypatch):
-    from apk_starter import portal
-    src = tmp_path / "Screenshot 1.png"
-    src.write_bytes(b"png")
-    monkeypatch.setattr(portal, "screenshot", lambda: src.as_uri())
-    dest = tmp_path / "shots/01-running.png"
-    assert diag.portal_screenshot(dest) is True and dest.read_bytes() == b"png" and not src.exists()
-
-    def unavailable():
-        raise portal.PortalUnavailable("no portal")
-    monkeypatch.setattr(portal, "screenshot", unavailable)
-    assert diag.portal_screenshot(tmp_path / "x.png") is False

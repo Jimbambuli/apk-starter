@@ -1,18 +1,16 @@
 """Recordings (Spec 12). A normal start writes no log. Debug: atl-doctor's light recorder (agent attached when the
 runtime runs, stub calls counted by ATL, time line from ART's sampling profiler, view trees, a screenshot with the
-tree, what is clicked, typed and scrolled as input.jsonl, verbose Android log) writes a recording folder; the app
+tree (an image of the app window alone, from ATL), what is clicked, typed and scrolled as input.jsonl, verbose Android log) writes a recording folder; the app
 keeps nearly its normal speed (no full method trace). After the run `atl-doctor pack` makes one archive of it:
 cleaned of personal data («Debug») or as recorded («Debug full», name ends in -FULL). Reports come from atl-doctor
 itself (`atl-doctor report`). Plain logs of older versions are still listed and pruned."""
-import contextlib
 import os
 import re
 import shutil
 import subprocess
 import sys
 import time
-import urllib.parse
-from collections.abc import Callable, Mapping
+from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -43,43 +41,7 @@ def record_options(paths: Paths, cmd: list[str], env: Mapping[str, str], out: Pa
                          light=True)
 
 
-def portal_screenshot(dest: Path) -> bool:
-    """The screen as the Screenshot portal gives it (the desktop asks the user the first time); no window position
-    is known on Wayland, so there is no .origin file next to it. False when it fails: a recording needs none."""
-    from . import portal
-    try:
-        uri = portal.screenshot()
-        src = Path(urllib.parse.unquote(urllib.parse.urlparse(uri).path))
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(src, dest)
-    except (portal.PortalUnavailable, StarterError, OSError, ValueError):
-        return False
-    with contextlib.suppress(OSError):
-        src.unlink()                        # the portal's copy in Pictures
-    return True
-
-
-def shot_for_mark(out: Path, name: str, screenshot: Callable[[Path], bool], wait_s: float = 5.0) -> Path | None:
-    """The screenshot that belongs to the view tree of mark `name` (shots/NN-name.png, as atl-doctor names it):
-    waits until the recorder has written the mark down. Returns the file, None if there is none."""
-    from atl_doctor.capture import SHOTS, Capture
-    from atl_doctor.record_atl import tree_name
-
-    cap = Capture.open(out)
-    end = time.monotonic() + wait_s
-    while True:
-        mark = next((m for m in cap.read_marks() if m.name == name), None)
-        if mark is not None:
-            break
-        if time.monotonic() >= end:
-            return None
-        time.sleep(0.1)
-    dest = cap.path(SHOTS) / f"{tree_name(mark)}.png"
-    return dest if screenshot(dest) else None
-
-
-def record(paths: Paths, cmd: list[str], env: Mapping[str, str], out: Path,
-           screenshot: Callable[[Path], bool] | None = None) -> int:
+def record(paths: Paths, cmd: list[str], env: Mapping[str, str], out: Path) -> int:
     """Run the app under atl-doctor's recorder; returns ATL's exit code like run.run_atl (128+N for a signal)."""
     try:
         from atl_doctor.capture import Capture
@@ -94,12 +56,11 @@ def record(paths: Paths, cmd: list[str], env: Mapping[str, str], out: Path,
     done = threading.Event()
 
     def mark() -> None:
-        """atl-doctor asks for the view tree at a mark (without one a recording has none); the screenshot of the
-        same moment is taken here: atl-doctor can only take one inside its own headless session."""
+        """atl-doctor asks ATL at a mark for the view tree and the image of the app window (without a mark a
+        recording has neither)."""
         if not done.wait(TREE_AFTER_S):
             try:
                 send_mark(out, "running", timeout_s=2.0)
-                shot_for_mark(out, "running", screenshot or portal_screenshot)
             except (DoctorError, OSError):
                 pass                        # the app has ended meanwhile
     marker = threading.Thread(target=mark, daemon=True)

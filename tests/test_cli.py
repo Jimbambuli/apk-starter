@@ -449,14 +449,19 @@ def test_debug_asks_for_a_view_tree_while_the_app_runs(box, monkeypatch):
     prefix = Path(box.env["APK_STARTER_PREFIX"])
     (prefix / "bin").mkdir()
     (prefix / "bin/android-translation-layer").symlink_to(FAKE)
+    import zipfile
+    from atl_doctor.env import lib_dir
+    jars = lib_dir(prefix) / "java/dex/android_translation_layer"
+    jars.mkdir(parents=True)
+    with zipfile.ZipFile(jars / "api-impl.jar", "w") as z:      # ATL with ATLViewDump
+        z.writestr("classes.dex", b"Landroid/atl/ATLViewDump;")
     monkeypatch.setattr(dexopt, "FLATPAK_INFO", box.info)
     from apk_starter import diag
     monkeypatch.setattr(diag, "TREE_AFTER_S", 0.3)
-    monkeypatch.setattr(diag, "portal_screenshot", lambda dest: dest.parent.mkdir(exist_ok=True) or dest.write_bytes(b"png") or True)
-    assert main(["--debug", str(box.apk)], env={**box.env, "FAKE_ATL_MODE": "sleep:2"}) == 0
+    assert main(["--debug", str(box.apk)], env={**box.env, "FAKE_ATL_MODE": "viewdump:2"}) == 0
     folder = _unpacked(box, next((box.data / "logs").glob(f"{PKG}-*.tar.gz")))
     assert [l.split("\t")[3] for l in (folder / "marks.tsv").read_text().splitlines()] == ["start", "running"]
-    assert (folder / "shots/01-running.png").read_bytes() == b"png"       # the screenshot of the tree's moment
+    assert (folder / "shots/01-running.png").read_bytes() == b"png"       # the window image ATL wrote with the tree; no portal
 
 
 def test_install_keeps_target_sdk_and_start_notes_the_time(box):

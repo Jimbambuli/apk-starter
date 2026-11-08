@@ -12,23 +12,13 @@ XML = """<node><interface name="org.freedesktop.portal.DynamicLauncher">
 <arg type="a{sv}" direction="in"/></method>
 <method name="GetDesktopEntry"><arg type="s" direction="in"/><arg type="s" direction="out"/></method>
 </interface>
-<interface name="org.freedesktop.portal.Screenshot">
-<method name="Screenshot"><arg type="s" direction="in"/><arg type="a{sv}" direction="in"/><arg type="o" direction="out"/></method>
-</interface></node>"""
+</node>"""
 ENTRIES = {"io.github.Jimbambuli.ApkStarter.org.x.y.desktop": "[Desktop Entry]\nName=Demo\n"}
 PATH = "/org/freedesktop/portal/desktop"
 
 
 def on_call(conn, sender, _path, _iface, method, params, inv):
-    if method == "Screenshot":                            # answers at once with the file named in the environment
-        opts = params.unpack()[1]
-        assert opts["interactive"] is False
-        req = f"{PATH}/request/{sender.lstrip(':').replace('.', '_')}/{opts['handle_token']}"
-        inv.return_value(GLib.Variant("(o)", (req,)))
-        GLib.timeout_add(100, lambda: conn.emit_signal(
-            sender, req, "org.freedesktop.portal.Request", "Response",
-            GLib.Variant("(ua{sv})", (0, {"uri": GLib.Variant("s", os.environ["FAKE_SHOT_URI"])}))) and False)
-    elif method == "PrepareInstall":
+    if method == "PrepareInstall":
         token = params.unpack()[3]["handle_token"]
         req = f"{PATH}/request/{sender.lstrip(':').replace('.', '_')}/{token}"
         inv.return_value(GLib.Variant("(o)", (req,)))
