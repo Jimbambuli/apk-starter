@@ -583,9 +583,6 @@ msgstr ""
 "O arquivo contém tudo em texto puro, inclusive senhas e dados pessoais – não "
 "repasse"
 
-#: src/apk_starter/gui.py:712
-msgid "Slower"
-msgstr "Mais lento"
 
 #: src/apk_starter/gui.py:736
 msgid "Report updates"

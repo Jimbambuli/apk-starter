@@ -536,9 +536,6 @@ msgid ""
 "data – do not pass it on"
 msgstr ""
 
-#: src/apk_starter/gui.py:712
-msgid "Slower"
-msgstr ""
 
 #: src/apk_starter/gui.py:736
 msgid "Report updates"

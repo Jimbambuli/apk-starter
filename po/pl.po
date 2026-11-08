@@ -584,9 +584,6 @@ msgstr ""
 "Archiwum zawiera wszystko jawnym tekstem, także hasła i dane osobowe – nie "
 "przekazywać dalej"
 
-#: src/apk_starter/gui.py:712
-msgid "Slower"
-msgstr "Wolniej"
 
 #: src/apk_starter/gui.py:736
 msgid "Report updates"

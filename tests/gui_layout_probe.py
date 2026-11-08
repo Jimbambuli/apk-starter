@@ -117,11 +117,8 @@ def activate(a) -> None:
         report["focus_on_start"] = win.get_focus() is win.start_button
         report["charlie_menu"] = [win.recordings_shown, win.gear_dot.get_visible()]
         win.titlebar_choice["system-navigation"].set_active(True)  # From the system + navigation bar
-        hint_before = win.debug_hint.get_visible()
         win.debug_check.set_active(True)
         report["dot_with_debug"] = win.gear_dot.get_visible()
-        report["debug_hint"] = [hint_before, win.debug_hint.get_visible(), win.debug_hint.get_text(),
-                               win.debug_hint.has_css_class("dim-label") and win.debug_hint.has_css_class("caption")]
         report["settings"] = json.loads(paths.settings().read_text())
         Path(record).unlink()
         win.start_button.emit("clicked")
@@ -131,7 +128,6 @@ def activate(a) -> None:
         report["debug_started"] = Path(record).read_text().split()      # the start reads the setting, no option
         report["debug_stays_on"] = [win.debug_check.get_active(), win.gear_dot.get_visible()]
         win.debug_check.set_active(False)
-        report["debug_hint_unticked"] = win.debug_hint.get_visible()
         win.debug_check.set_active(True)
         win.debug_full_check.set_active(True)               # the two levels exclude each other
         saved = json.loads(paths.settings().read_text())["apps"]["org.c.charlie"]

@@ -582,9 +582,6 @@ msgstr ""
 "Het archief bevat alles in leesbare tekst, ook wachtwoorden en persoonlijke "
 "gegevens – niet doorgeven"
 
-#: src/apk_starter/gui.py:712
-msgid "Slower"
-msgstr "Trager"
 
 #: src/apk_starter/gui.py:736
 msgid "Report updates"

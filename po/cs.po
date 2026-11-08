@@ -578,9 +578,6 @@ msgstr ""
 "Archiv obsahuje vše čitelným textem, včetně hesel a osobních údajů – "
 "nepředávat dál"
 
-#: src/apk_starter/gui.py:712
-msgid "Slower"
-msgstr "Pomalejší"
 
 #: src/apk_starter/gui.py:736
 msgid "Report updates"

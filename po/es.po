@@ -583,9 +583,6 @@ msgstr ""
 "El archivo contiene todo en texto claro, también contraseñas y datos "
 "personales – no compartirlo"
 
-#: src/apk_starter/gui.py:712
-msgid "Slower"
-msgstr "Más lento"
 
 #: src/apk_starter/gui.py:736
 msgid "Report updates"

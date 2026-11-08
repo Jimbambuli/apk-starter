@@ -709,8 +709,6 @@ class Window(Gtk.ApplicationWindow):
         debug_full = Gtk.CheckButton(label=_("Debug full"), active=app.debug_full,
                                      tooltip_text=_("The archive contains everything in plain text, also passwords "
                                                     "and personal data – do not pass it on"))
-        hint = label(_("Slower"), "dim-label", "caption", wrap=True, max_width_chars=40,
-                     visible=app.debug or app.debug_full, margin_start=26)
 
         def debug_toggled(b: Gtk.CheckButton, pkg=r.package) -> None:
             """Remembered per app, for every start (also from its menu entry) until it is unticked. The two
@@ -723,12 +721,11 @@ class Window(Gtk.ApplicationWindow):
             if (now.debug_full, now.debug) != (want["debug_full"], want["debug"]):
                 self.save_app_setting(pkg, **want)
             on = debug.get_active() or debug_full.get_active()
-            hint.set_visible(on)
             self.gear_dot.set_visible(on)
         debug.connect("toggled", debug_toggled)
         debug_full.connect("toggled", debug_toggled)
-        self.debug_check, self.debug_full_check, self.debug_hint, self.titlebar_choice = debug, debug_full, hint, choice
-        for w in (debug, debug_full, hint):
+        self.debug_check, self.debug_full_check, self.titlebar_choice = debug, debug_full, choice
+        for w in (debug, debug_full):
             box.append(w)
 
         self.aurora_updates_check = None

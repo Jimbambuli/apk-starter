@@ -579,9 +579,6 @@ msgstr ""
 "Архив содержит всё открытым текстом, включая пароли и личные данные – не "
 "передавать дальше"
 
-#: src/apk_starter/gui.py:712
-msgid "Slower"
-msgstr "Медленнее"
 
 #: src/apk_starter/gui.py:736
 msgid "Report updates"

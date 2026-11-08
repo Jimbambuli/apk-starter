@@ -582,9 +582,6 @@ msgstr ""
 "Das Archiv enthält alles im Klartext, auch Passwörter und persönliche Daten "
 "– nicht weitergeben"
 
-#: src/apk_starter/gui.py:712
-msgid "Slower"
-msgstr "Langsamer"
 
 #: src/apk_starter/gui.py:736
 msgid "Report updates"

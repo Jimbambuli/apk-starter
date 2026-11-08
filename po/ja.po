@@ -578,9 +578,6 @@ msgstr ""
 "アーカイブにはパスワードや個人情報を含むすべてが平文で入っています – 他人に渡"
 "さないでください"
 
-#: src/apk_starter/gui.py:712
-msgid "Slower"
-msgstr "低速"
 
 #: src/apk_starter/gui.py:736
 msgid "Report updates"

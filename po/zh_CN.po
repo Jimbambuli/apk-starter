@@ -558,9 +558,6 @@ msgid ""
 "data – do not pass it on"
 msgstr "归档以明文包含全部内容，包括密码和个人数据 – 请勿转发"
 
-#: src/apk_starter/gui.py:712
-msgid "Slower"
-msgstr "较慢"
 
 #: src/apk_starter/gui.py:736
 msgid "Report updates"
