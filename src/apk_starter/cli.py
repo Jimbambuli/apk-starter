@@ -23,7 +23,7 @@ from .paths import PROFILE_RE, Paths, apply_profile
 from .settings import load_settings
 from .run import (read_build_info, run_atl)
 
-VERSION = "0.8.1b"
+VERSION = "0.8.2"
 COMPILE_GRACE_S = 20.0      # how long the end of the app waits for the full compile that runs in the background
 APP_ID = "io.github.Jimbambuli.ApkStarter"
 # A test build's menu entries and windows are its own (profile), so they do not replace those of stable.

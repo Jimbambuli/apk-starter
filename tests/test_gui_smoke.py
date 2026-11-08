@@ -108,7 +108,7 @@ def test_search_sort_keys_narrow_layout_and_remembered_state(tmp_path):
         "restored": ["org.b.bravo", "Bravo", ["Alpha", "Bravo", "Charlie"]], "opened_focus_on_start": True,
         "empty_page": ["empty", True, True, "Add an app with + or drop an APK here."], "list_page": "list",
         "add_menu": 4, "add_menu_aurora_installed": 3,
-        "bravo_menu": [1, False], "version_line": ["APK Starter 0.8.1b", False], "charlie_menu": [0, False], "dot_with_debug": True,
+        "bravo_menu": [1, False], "version_line": ["APK Starter 0.8.2", False], "charlie_menu": [0, False], "dot_with_debug": True,
         "debug_hint": [False, True, "Slower", True],
         "debug_hint_unticked": False,
         "debug_full": [False, True, False, True, "The archive contains everything in plain text, also passwords and "

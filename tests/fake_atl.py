@@ -45,11 +45,13 @@ if kind == "viewdump":
         req = os.path.join(d, "request")
         if os.path.exists(req):
             with open(req) as f:
-                name = f.read().strip()
-            try:                        # like ATLViewDump: mkdirs and the write fail quietly where shots is a file
-                os.makedirs(os.path.join(d, "shots"), exist_ok=True)
-                with open(os.path.join(d, "shots", name + ".png"), "wb") as f:
-                    f.write(b"png")
+                lines = f.read().split()          # like ATLViewDump: the name, then "shot" if the window image is wanted
+            name = lines[0]
+            try:                        # mkdirs and the write fail quietly where shots is a file
+                if "shot" in lines[1:]:
+                    os.makedirs(os.path.join(d, "shots"), exist_ok=True)
+                    with open(os.path.join(d, "shots", name + ".png"), "wb") as f:
+                        f.write(b"png")
             except OSError:
                 print("ATLViewDump: screenshot failed", file=sys.stderr)
             with open(os.path.join(d, name + ".xml"), "w") as f:
