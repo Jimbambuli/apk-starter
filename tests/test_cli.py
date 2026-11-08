@@ -292,6 +292,16 @@ def test_apk_file_is_installed_on_the_first_start_then_the_installed_app_starts(
     assert json.loads(paths.meta(PKG).read_text())["version_name"] == "1.3"
 
 
+def test_apk_file_starts_although_the_menu_entry_cannot_be_made(box, capsys):
+    def boom(*a, **kw):
+        raise PortalUnavailable("x")
+    box.fake.install_launcher = boom                             # e.g. no DynamicLauncher portal (headless)
+    paths = apk_starter.paths.Paths.from_env(box.env)
+    assert main([str(box.apk)], env=box.env) == 0
+    assert paths.meta(PKG).is_file() and box.record.is_file()      # installed and started
+    assert "installed without a menu entry" in capsys.readouterr().err
+
+
 def test_after_a_flatpak_update_runtime_and_apps_are_rebuilt(box):
     other = make_apk(box.tmp / "other.apk", manifest=axml_manifest(package="org.example.other"))
     assert main(["--install", str(box.apk)], env=box.env) == 0

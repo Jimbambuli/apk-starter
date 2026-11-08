@@ -14,7 +14,7 @@ from datetime import datetime
 from pathlib import Path
 
 from .apkinfo import PACKAGE_RE, ApkInfo, read_apk_info, read_icon
-from .errors import ApkError, SignatureConflict, StarterError, UsageError, describe_error
+from .errors import ApkError, NoMenuEntry, SignatureConflict, StarterError, UsageError, describe_error
 from .i18n import _
 from . import dexopt, diag, i18n, splits
 from .launch import (DEFAULT_SIZE, build_command, build_env, cached_apk_info, parse_size, prepare_apk,
@@ -247,12 +247,12 @@ def install_parts(paths: Paths, info: ApkInfo, parts: tuple[tuple[str, Path], ..
             portal.install_launcher(info.package, info.label, icon,
                                     mime_types=menu_mime_types(portal, info))
         except portal.PortalUnavailable:
-            raise StarterError(
+            raise NoMenuEntry(
                 _("{app} is installed without a menu entry: the DynamicLauncher portal is not available; "
                   "start the app with: {command}").format(app=info.label,
                                                          command=f"flatpak run {RUN_REF} {info.package}")) from None
         except StarterError as e:
-            raise StarterError(_("{app} is installed without a menu entry: {reason}").format(
+            raise NoMenuEntry(_("{app} is installed without a menu entry: {reason}").format(
                 app=info.label, reason=e)) from None
     return info
 
@@ -486,7 +486,10 @@ def _start(paths: Paths, args, level: str | None, into: Path | None, tail: list[
         mine = cached_apk_info(paths, own, lang_from_env(env), read_apk_info) \
             if paths.meta(info.package).is_file() and own.is_file() else None
         if mine is None or (mine.version_code, mine.version_name) != (info.version_code, info.version_name):
-            install_files(paths, [apk], lang_from_env(env), env)
+            try:
+                install_files(paths, [apk], lang_from_env(env), env)
+            except NoMenuEntry as e:                # installed all the same: start it, the menu entry is optional
+                _stderr(str(e))
         apk = paths.apk(info.package)
         info = cached_apk_info(paths, apk, lang_from_env(env), read_apk_info)
     if args.size:
