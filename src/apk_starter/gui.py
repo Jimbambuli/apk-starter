@@ -484,14 +484,37 @@ class Window(Gtk.ApplicationWindow):
         self.set_focus_visible(True)
         return GLib.SOURCE_REMOVE
 
-    def make_about(self) -> Gtk.AboutDialog:
+    def make_about(self) -> Gtk.Window:
+        """One window in the app's own style (no credit tabs): the info first, the components below it."""
         info = read_build_info(self.paths.build_info())
-        dialog = Gtk.AboutDialog(transient_for=self, modal=True, program_name="APK Starter", version=VERSION,
-                                 logo_icon_name=APP_ID, comments=_("Run Android apps on the Linux desktop"),
-                                 website="https://github.com/Jimbambuli/apk-starter", website_label="GitHub",
-                                 license_type=Gtk.License.GPL_3_0)
-        dialog.add_credit_section(_("Components"), component_lines(info, _("unknown")))
-        return dialog
+        website = "https://github.com/Jimbambuli/apk-starter"
+        win = Gtk.Window(transient_for=self, modal=True, resizable=False, title="APK Starter", default_width=380)
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10, margin_top=24, margin_bottom=20,
+                      margin_start=24, margin_end=24)
+        box.append(Gtk.Image(icon_name=APP_ID, pixel_size=96, halign=Gtk.Align.CENTER))
+        box.append(label("APK Starter", "section-title", xalign=0.5, halign=Gtk.Align.CENTER))
+        box.append(label(VERSION, "dim-label", xalign=0.5, halign=Gtk.Align.CENTER))
+        box.append(label(_("Run Android apps on the Linux desktop"), xalign=0.5, halign=Gtk.Align.CENTER,
+                         wrap=True, max_width_chars=40))
+        box.append(Gtk.LinkButton(uri=website, label="GitHub", halign=Gtk.Align.CENTER))
+        box.append(label(_("GPL-3.0-or-later. This program comes with absolutely no warranty."), "dim-label",
+                         "caption", xalign=0.5, halign=Gtk.Align.CENTER, wrap=True, max_width_chars=48))
+        box.append(Gtk.Separator(margin_top=8, margin_bottom=4))
+        box.append(label(_("Components"), "section-title"))
+        lines = component_lines(info, _("unknown"))
+        for line in lines:
+            box.append(label(line, "dim-label", selectable=True))
+        close = Gtk.Button(label=_("Close"), halign=Gtk.Align.END, margin_top=12)
+        close.connect("clicked", lambda _b: win.destroy())
+        box.append(close)
+        win.set_child(box)
+        win.set_default_widget(close)
+        keys = Gtk.EventControllerKey()
+        keys.connect("key-pressed", lambda _c, k, *_a: win.destroy() if k == Gdk.KEY_Escape else False)
+        win.add_controller(keys)
+        win.about_fields = [VERSION, "APK Starter", APP_ID, website, True]      # read by the layout probe
+        win.about_sections = [(_("Components"), lines)]
+        return win
 
     def show_about(self) -> None:
         self.make_about().present()

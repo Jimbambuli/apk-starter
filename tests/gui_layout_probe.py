@@ -74,15 +74,9 @@ def activate(a) -> None:
         report["add_menu_aurora_installed"] = win.add_menu.get_n_items()
         report["bravo_menu"] = [win.recordings_shown, win.gear_dot.get_visible()]
         report["version_line"] = [win.add_menu.get_n_items(), win.lookup_action("version") is None]
-        sections = []                                       # GTK 4 has no getter for credit sections: record them
-        real_add = Gtk.AboutDialog.add_credit_section
-        Gtk.AboutDialog.add_credit_section = lambda d, name, people: (sections.append([name, list(people)]),
-                                                                       real_add(d, name, people))[1]
-        dlg = win.make_about()
-        Gtk.AboutDialog.add_credit_section = real_add
-        report["about"] = [dlg.get_version(), dlg.get_program_name(), dlg.get_logo_icon_name(), dlg.get_authors(),
-                           dlg.get_website(), dlg.get_license_type() == Gtk.License.GPL_3_0]
-        report["about_components"] = sections
+        dlg = win.make_about()                              # a plain window in the app style, no credit tabs
+        report["about"] = dlg.about_fields
+        report["about_components"] = [[name, list(lines)] for name, lines in dlg.about_sections]
         dlg.destroy()
         win.saved_rows = win.all_rows
         win.show_rows([])                                   # no app: only text, «+» accented and focused
