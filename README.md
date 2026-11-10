@@ -25,7 +25,8 @@ Open **APK Starter** from the application menu (or run `apk-starter` without arg
 listed on the left (search with Ctrl+F or by just typing, sort by name, last start, last install or data size), the
 chosen app's details on the right – version, target SDK, dates, data size, whether it is prepared for this computer,
 and its newest log and debug recordings. Double-click or Enter starts an app, Delete asks to uninstall it.
-Install a new APK with **+** or by dropping it anywhere onto the window. The window takes the desktop's GTK theme,
+Install a new APK with **+** or by dropping it anywhere onto the window; while no app is installed, the window
+offers **Get apps** (Aurora Store) and **Open APK…** as big buttons. The window takes the desktop's GTK theme,
 colour scheme and accent colour and keeps the desktop's own title bar (plain GTK 4); it remembers its size, the sort
 order and the chosen app. Every installed app also gets its own menu entry.
 
@@ -75,8 +76,9 @@ which gets it like on Android (`onNewIntent`). Apps installed before this need `
 
 ### App stores (Aurora Store)
 
-**+ → Set up Aurora Store…** (or `--setup-aurora`) downloads the official Aurora Store from F-Droid, checks its APK
-signature against Aurora OSS's certificate and installs it like any app; Aurora Store is not part of the Flatpak.
+**+ → Get apps (Aurora Store)** (or `--setup-aurora`) downloads the official Aurora Store from F-Droid, checks its APK
+signature against Aurora OSS's certificate, installs it like any app and starts it; once it is installed, the entry
+just starts it. Aurora Store is not part of the Flatpak.
 When Aurora Store (or another store using Android's PackageInstaller) installs an app, ATL hands its APKs to APK
 Starter, which asks **Install …?** and installs it with a menu entry; the store then sees it as installed. Split APKs
 from Google Play (base and configuration parts) are kept together; apps with native code only for ARM are refused
@@ -88,8 +90,9 @@ of service.
 **+ → Set up microG…** (or `--setup-microg`) works like Aurora Store: it downloads GmsCore and GsfProxy from the
 official microG repository (microg.org/fdroid), checks the SHA-256 checksums and GmsCore's APK signature against the
 NOGAPPS Project's certificate, and installs GmsCore as the app «microG settings»; GsfProxy goes into the app folder
-for ATL. microG is not part of the Flatpak. Once it is installed, the entry disappears from the menu (Aurora Store's
-too). Every app then shares microG's data. In «microG settings» switch on «Google device registration» and «Cloud
+for ATL. microG is not part of the Flatpak. Once it is installed, the entry disappears from the menu. When a newly
+installed app uses Google Play Services (its manifest has the meta-data `com.google.android.gms.version`) and microG
+is missing, APK Starter asks once whether to set it up. Every app then shares microG's data. In «microG settings» switch on «Google device registration» and «Cloud
 Messaging»; to sign in: Accounts → Add Google account.
 
 Without the alias use `flatpak run --file-forwarding io.github.Jimbambuli.ApkStarter …` instead of `apk-starter`.

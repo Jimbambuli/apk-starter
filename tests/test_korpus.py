@@ -27,12 +27,15 @@ KNOWN_LABELS: dict[str, str] = {
     "org.sufficientlysecure.keychain": "OpenKeychain",
 }
 
+# Apps of the corpus built with Google Play Services (meta-data com.google.android.gms.version), checked 10.11.2026
+KNOWN_GMS = {"app.organicmaps"}
+
 
 @pytest.mark.skipif(not KORPUS, reason="APK_STARTER_KORPUS not set")
 def test_corpus_matches_apps_tsv():
     root = Path(KORPUS).expanduser()
     rows = [l.rstrip("\n").split("\t") for l in (root / "apps.tsv").read_text(encoding="utf-8").splitlines()[1:]]
-    bad, label_diffs, seen = [], [], 0
+    bad, label_diffs, gms, seen = [], [], set(), 0
     for r in rows:
         pkg, name, version, vcode, apk = r[0], r[1], r[3], r[4], r[8]
         f = root / apk
@@ -46,8 +49,11 @@ def test_corpus_matches_apps_tsv():
             continue
         if (i.package, i.version_code, i.version_name) != (pkg, int(vcode), version):
             bad.append(f"{pkg}: {i.package} {i.version_code} {i.version_name} != {vcode} {version}")
+        if i.uses_gms:
+            gms.add(pkg)
         if i.label != name and KNOWN_LABELS.get(pkg) != i.label:
             label_diffs.append(f"{pkg}: label {i.label!r} != corpus {name!r}")
     assert seen > 0
     assert not bad
     assert not label_diffs
+    assert gms == KNOWN_GMS

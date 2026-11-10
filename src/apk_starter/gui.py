@@ -15,6 +15,7 @@ from .cli import (APP_ID, ENTRY_PREFIX, clear_data, install_files, lang_from_env
 from .apkinfo import read_apk_info
 from .launch import cached_apk_info
 from .run import read_build_info
+from .install_request import wants_microg
 from .errors import StarterError, describe_error
 from .i18n import _
 from .gui_model import (AppRow, WindowState, crash_meaning, details_layout, filter_rows, group_parts, is_narrow,
@@ -41,6 +42,7 @@ TEXT_CHARS = 64                 # readable line length of the details' texts
 CSS = """
 .app-name { font-size: 1.7em; font-weight: 700; }
 .welcome-title { font-size: 2em; font-weight: 700; }
+.welcome-button { font-size: 1.2em; min-width: 240px; padding: 10px 24px; }
 .section-title { font-weight: 700; }
 .row-name { font-weight: 600; }
 .caption { font-size: 0.85em; }
@@ -232,7 +234,7 @@ class Window(Gtk.ApplicationWindow):
             action = Gio.SimpleAction.new(name, GLib.VariantType.new("s"))
             action.connect("activate", lambda _a, v, h=handler: h(v.get_string()))
             self.add_action(action)
-        for name, handler in (("choose-apk", self.choose_apk), ("setup-aurora", self.ask_setup_aurora),
+        for name, handler in (("choose-apk", self.choose_apk), ("get-apps", self.get_apps),
                               ("setup-microg", self.ask_setup_microg)):
             action = Gio.SimpleAction.new(name, None)
             action.connect("activate", lambda _a, _v, h=handler: h())
@@ -285,15 +287,28 @@ class Window(Gtk.ApplicationWindow):
         self.get_application().send_notification("aurora-updates", n)
 
     def make_welcome(self) -> Gtk.Widget:
-        """No app yet: the side bar stays, this fills the details area."""
+        """No app yet: the side bar stays, this fills the details area (the whole window when narrow). The two ways
+        to a first app as big buttons: Aurora Store, an APK file."""
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=14, valign=Gtk.Align.CENTER,
                       halign=Gtk.Align.CENTER, vexpand=True, margin_start=24, margin_end=24)
         box.append(Gtk.Image(icon_name=APP_ID, pixel_size=128, margin_bottom=8))
         self.welcome_title = label(_("No apps installed"), "welcome-title", xalign=0.5, wrap=True)
-        self.welcome_text = label(_("Add an app with + or drop an APK here."), "dim-label", xalign=0.5, wrap=True,
-                                  justify=Gtk.Justification.CENTER)
         box.append(self.welcome_title)
-        box.append(self.welcome_text)
+        self.welcome_buttons = []
+        for text, action, hint in (
+                (_("Get apps"), "win.get-apps",
+                 _("Sets up Aurora Store: free apps from Google Play. Sign in anonymously there: Google can block "
+                   "your own account.")),
+                (_("Open APK…"), "win.choose-apk",
+                 _("Or drop an APK file into this window, or double-click it in the file manager."))):
+            button = Gtk.Button(label=text, action_name=action, halign=Gtk.Align.CENTER, margin_top=10)
+            button.add_css_class("welcome-button")
+            box.append(button)
+            box.append(label(hint, "dim-label", "caption", xalign=0.5, wrap=True, max_width_chars=48,
+                             justify=Gtk.Justification.CENTER))
+            self.welcome_buttons.append(button)
+        self.welcome_buttons[0].add_css_class("suggested-action")
+        self.welcome_text = box.get_last_child()
         return box
 
     # -- helpers -----------------------------------------------------------------------------------------
@@ -446,18 +461,14 @@ class Window(Gtk.ApplicationWindow):
 
     def update_pages(self) -> None:
         details = self.narrow and self.page == "details" and self.selected in self.rows
-        self.side.set_visible(not details)
+        # no app yet: the welcome page with its buttons, in a narrow window instead of the (empty) list
+        welcome = self.narrow and not self.all_rows and not self.pending
+        self.side.set_visible(not details and not welcome)
         self.split.set_visible(not self.narrow)
-        self.detail_side.set_visible(not self.narrow or details)
+        self.detail_side.set_visible(not self.narrow or details or welcome)
         self.side.set_hexpand(self.narrow)
         self.back.set_visible(details)
-        # the details area (with the welcome text) is hidden in a narrow window: the list says it then
-        empty = not self.all_rows and not self.pending
-        self.nothing.set_text(self.welcome_text.get_text() if empty else _("No app matches."))
-        self.nothing.set_visible(empty and self.narrow or bool(self.all_rows) and not self.visible_rows())
-        # «+» is the one thing to do on an empty list: in the accent colour (the theme colours the inner button)
-        (self.add_button.get_first_child().add_css_class if empty else
-         self.add_button.get_first_child().remove_css_class)("suggested-action")
+        self.nothing.set_visible(bool(self.all_rows) and not self.visible_rows())
 
     def go_back(self) -> None:
         if self.narrow and self.page == "details":
@@ -494,7 +505,7 @@ class Window(Gtk.ApplicationWindow):
         self.update_add_menu()
         self.stack.set_visible_child_name("list")
         if not rows and not self.pending:
-            GLib.idle_add(self.focus_welcome_add)           # nothing else to do here but add an app
+            GLib.idle_add(self.focus_welcome_add)           # nothing else to do here but get an app
         self.show_list()
 
     def update_stack(self) -> None:
@@ -503,8 +514,8 @@ class Window(Gtk.ApplicationWindow):
             self.stack.set_visible_child_name("list")
 
     def focus_welcome_add(self) -> bool:
-        """Focused with the focus ring showing (GTK shows it only after a key otherwise): Enter opens the menu."""
-        self.add_button.grab_focus()
+        """Focused with the focus ring showing (GTK shows it only after a key otherwise): Enter = «Get apps»."""
+        self.welcome_buttons[0].grab_focus()
         self.set_focus_visible(True)
         return GLib.SOURCE_REMOVE
 
@@ -544,13 +555,11 @@ class Window(Gtk.ApplicationWindow):
         self.make_about().present()
 
     def update_add_menu(self) -> None:
-        """«Add apps» and the empty page offer a service only while it is not installed."""
-        aurora_todo = not self.paths.meta(aurora.PACKAGE).is_file()
+        """«Add apps»: «Get apps» sets Aurora Store up or starts it; microG only while it is not installed."""
         microg_todo = not microg.installed(self.paths)
         self.add_menu.remove_all()
         self.add_menu.append(_("Install APK…"), "win.choose-apk")
-        if aurora_todo:
-            self.add_menu.append(_("Set up Aurora Store…"), "win.setup-aurora")
+        self.add_menu.append(_("Get apps (Aurora Store)"), "win.get-apps")
         if microg_todo:
             self.add_menu.append(_("Set up microG…"), "win.setup-microg")
 
@@ -933,13 +942,23 @@ class Window(Gtk.ApplicationWindow):
         name = files[0].name
 
         def done(info) -> None:
+            new = info.package not in self.rows
             self.selected = info.package
             self.search.set_text("")
             if warnings:
                 self.alert(_("{app} installed").format(app=info.label), "\n".join(warnings))
+            if new and wants_microg(self.paths, info):      # asked once: when the app is new, not on updates
+                self.ask_setup_microg(_("This app uses Google services. Set up microG?"), _("Not now"))
         progress, end = self.begin(name, _("Installing…"))
         self.background(lambda: install_files(self.paths, files, self.lang, self.env, progress, warnings.append),
                         done, _("Cannot install {file}").format(file=name), end=end)
+
+    def get_apps(self) -> None:
+        """Aurora Store: started when it is installed, else set up (asked first) and then started."""
+        if self.paths.meta(aurora.PACKAGE).is_file():
+            self.start(aurora.PACKAGE, None)
+        else:
+            self.ask_setup_aurora()
 
     def ask_setup_aurora(self) -> None:
         def setup() -> None:
@@ -950,6 +969,7 @@ class Window(Gtk.ApplicationWindow):
                 self.search.set_text("")
                 if warnings:
                     self.alert(_("{app} installed").format(app=info.label), "\n".join(warnings))
+                self.start(info.package, None)
             progress, end = self.begin("Aurora Store", _("Downloading Aurora Store from F-Droid…"))
             self.background(lambda: aurora.setup(self.paths, self.env, progress, warnings.append), done,
                             _("Cannot set up Aurora Store"), end=end)
@@ -959,22 +979,24 @@ class Window(Gtk.ApplicationWindow):
                [("cancel", _("Cancel")), ("ok", _("Set up"))],
                lambda resp: setup() if resp == "ok" else None).present()
 
-    def ask_setup_microg(self) -> None:
-        def setup() -> None:
-            warnings: list[str] = []
+    def setup_microg(self) -> None:
+        warnings: list[str] = []
 
-            def done(info) -> None:
-                self.selected = info.package
-                self.search.set_text("")
-                self.alert(_("microG is set up"), "\n".join(warnings + [microg_hint()]))
-            progress, end = self.begin("microG", _("Downloading microG…"))
-            self.background(lambda: setup_microg(self.paths, self.lang, self.env, progress, warnings.append),
-                            done, _("Cannot set up microG"), end=end)
-        Dialog(self, _("Set up microG?"),
+        def done(info) -> None:
+            self.selected = info.package
+            self.search.set_text("")
+            self.alert(_("microG is set up"), "\n".join(warnings + [microg_hint()]))
+        progress, end = self.begin("microG", _("Downloading microG…"))
+        self.background(lambda: setup_microg(self.paths, self.lang, self.env, progress, warnings.append),
+                        done, _("Cannot set up microG"), end=end)
+
+    def ask_setup_microg(self, heading: str | None = None, cancel: str | None = None) -> None:
+        """From the menu, or offered after installing an app that uses Google services (heading, cancel)."""
+        Dialog(self, heading or _("Set up microG?"),
                _("Google services for apps (push messages, sign-in). Downloaded from the official microG "
                  "repository and checked."),
-               [("cancel", _("Cancel")), ("ok", _("Set up"))],
-               lambda resp: setup() if resp == "ok" else None).present()
+               [("cancel", cancel or _("Cancel")), ("ok", _("Set up"))],
+               lambda resp: self.setup_microg() if resp == "ok" else None).present()
 
     def _confirm(self, heading: str, body: str, verb: str, then: Callable[[], None],
                  extra: Gtk.Widget | None = None) -> None:
@@ -1126,9 +1148,11 @@ def make_app() -> Gtk.Application:
                            flags=Gio.ApplicationFlags.REPLACE)
 
 
-def run(paths: Paths, env: Mapping[str, str], launcher: list[str] | None = None, show: str | None = None) -> int:
+def run(paths: Paths, env: Mapping[str, str], launcher: list[str] | None = None, show: str | None = None,
+        setup_microg: bool = False) -> int:
     """show: open the details of this app (an app's «App info», Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-    a window that is open already shows them."""
+    a window that is open already shows them. setup_microg: set microG up there (the user said yes to it after
+    installing an app from an app store)."""
     app = make_app()
     lang = lang_from_env(env)
 
@@ -1151,11 +1175,22 @@ def run(paths: Paths, env: Mapping[str, str], launcher: list[str] | None = None,
     action = Gio.SimpleAction.new("show", GLib.VariantType.new("s"))
     action.connect("activate", show_app)
     app.add_action(action)
+
+    def setup_microg_now(*_a) -> None:
+        win = window(app)
+        win.setup_microg()
+        win.present()
+    microg_action = Gio.SimpleAction.new("setup-microg", None)
+    microg_action.connect("activate", setup_microg_now)
+    app.add_action(microg_action)
     app.connect("startup", startup)
     app.connect("activate", activate)
-    if show:
+    if show or setup_microg:
         app.register(None)
-        app.activate_action("show", GLib.Variant("s", show))     # in the window that runs already, if there is one
+        if show:            # in the window that runs already, if there is one
+            app.activate_action("show", GLib.Variant("s", show))
+        else:
+            app.activate_action("setup-microg", None)
         if app.get_is_remote():
             return 0
     return app.run([sys.argv[0]])

@@ -173,3 +173,13 @@ def test_adaptive_icon_with_a_bitmap_foreground_in_the_density_part(tmp_path):
         {"res/fg.png": png_bytes(162, 162)})
     info, _parts = read_parts(None, [base, part], None, tmp_path)
     assert b"data:image/png;base64," in info.icon and ET.fromstring(info.icon) is not None
+
+
+@pytest.mark.parametrize("strip_names", [False, True])
+def test_play_services_are_found_by_their_meta_data(tmp_path, strip_names):
+    gms = make_apk(tmp_path / "g.apk", manifest=axml_manifest(
+        strip_names=strip_names, meta_data=["com.google.firebase.messaging.default", "com.google.android.gms.version"]))
+    other = make_apk(tmp_path / "o.apk", manifest=axml_manifest(strip_names=strip_names,
+                                                                 meta_data=["com.google.android.gms.games.APP_ID"]))
+    plain = make_apk(tmp_path / "p.apk", manifest=axml_manifest())
+    assert [read_apk_info(f).uses_gms for f in (gms, other, plain)] == [True, False, False]

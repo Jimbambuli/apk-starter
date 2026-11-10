@@ -51,7 +51,7 @@ def test_select_keeps_x86_64_and_drops_other_abis(tmp_path):
 def test_select_refuses_arm_only_apps(tmp_path, base_files, parts):
     s = splits.collect([part(tmp_path, "b.apk", files=base_files)]
                        + [part(tmp_path, f"{n}.apk", n, files=f) for n, f in parts])
-    with pytest.raises(splits.IncompatibleError, match="only available for ARM") as e:
+    with pytest.raises(splits.IncompatibleError, match="only for ARM processors") as e:
         splits.select(s, "Demo")
     assert e.value.code == 7
 
