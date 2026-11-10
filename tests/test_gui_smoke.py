@@ -109,7 +109,7 @@ def test_search_sort_keys_narrow_layout_and_remembered_state(tmp_path):
         "empty_page": ["list", True, True, True, "Add an app with + or drop an APK here."], "list_page": "list",
         "add_menu": 3, "add_menu_aurora_installed": 2,
         "bravo_menu": [1, False], "version_line": [2, True],
-        "about": ["0.8.4", "APK Starter", "io.github.Jimbambuli.ApkStarter",
+        "about": ["0.8.5", "APK Starter", "io.github.Jimbambuli.ApkStarter",
                   "https://github.com/Jimbambuli/apk-starter", True],
         "about_components": [["Components", ["ATL unknown", "art_standalone unknown", "bionic_translation unknown",
                                               "atl-doctor unknown"]]],

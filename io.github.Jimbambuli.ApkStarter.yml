@@ -150,7 +150,7 @@ modules:
         commit: 3b11b5b9132fafe4b42a26369df50672d2146977
       - type: git
         url: https://github.com/Jimbambuli/atl-doctor.git
-        commit: 763ce7d16ddb4a7b5e23679ac79cdd2ba60b46ad
+        commit: 82711d09f7953ebd05dc99104dfd1de430e3635a
         dest: atl-doctor
 
   # ATL's jni_upcall_gen resolves asm/asm-tree/java-getopt via xmvn5-resolve or
@@ -187,7 +187,7 @@ modules:
       - type: git
         url: https://gitlab.com/Jimbambuli/android_translation_layer.git
         branch: fix-r5
-        commit: 87dfd5577bc9c35d4e3c4da982f6b69f8a642acc
+        commit: 63561e4a74db026ef132bf8bf6acc1859974aa83
 
   # atl-doctor (public, fixed commit): JVMTI agent and trace counter for Log/Debug, its Python package for the
   # Debug recorder and packer (`atl-doctor pack`), and the stub list of exactly this ATL (for stub hits). The whole
@@ -209,10 +209,10 @@ modules:
     sources:
       - type: git
         url: https://github.com/Jimbambuli/atl-doctor.git
-        commit: 763ce7d16ddb4a7b5e23679ac79cdd2ba60b46ad
+        commit: 82711d09f7953ebd05dc99104dfd1de430e3635a
       - type: git
         url: https://gitlab.com/Jimbambuli/android_translation_layer.git
-        commit: 87dfd5577bc9c35d4e3c4da982f6b69f8a642acc
+        commit: 63561e4a74db026ef132bf8bf6acc1859974aa83
         dest: atl-src
 
   - name: apk-starter
