@@ -97,7 +97,10 @@ def activate(a) -> None:
         return f is not None and (f is widget or f.is_ancestor(widget))
 
     def empty_checked():
-        report["menu_corner"]["empty"] = corner(win)
+        # no app: no list column, «+» and the main menu in the top corner of the welcome page instead
+        report["empty_columns"] = [win.side.get_visible(), win.split.get_visible(), win.welcome_bar.get_mapped(),
+                                   win.welcome_add.get_mapped(), win.welcome_main.get_mapped(),
+                                   win.welcome_add.get_menu_model() is win.add_menu]
         report["empty_page"] = [win.stack.get_visible_child_name(),
                                 win.welcome_buttons[0].has_css_class("suggested-action"),
                                 win.get_focus_visible(), win.welcome.get_mapped(),
@@ -105,6 +108,7 @@ def activate(a) -> None:
                                 [b.get_action_name() for b in win.welcome_buttons], win.welcome_text.get_text()]
         win.show_rows(win.saved_rows)
         report["list_page"] = win.stack.get_visible_child_name()
+        report["list_columns"] = [win.side.get_visible(), win.split.get_visible(), win.welcome_bar.get_visible()]
         win.paths.meta("com.aurora.store").unlink()      # back to the first state
         win.search.set_text("CHA")
         wait(lambda: titles(win) == ["Charlie"], searched)

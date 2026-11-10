@@ -182,6 +182,15 @@ class Window(Gtk.ApplicationWindow):
         self.details = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=18, margin_top=24, margin_bottom=24,
                                margin_start=DETAILS_MARGIN, margin_end=DETAILS_MARGIN, halign=Gtk.Align.FILL)
         detail_side = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, hexpand=True)
+        # no app yet: the list column is hidden, so «+» and the main menu sit up here (the same menus)
+        self.welcome_bar = Gtk.Box(spacing=6, halign=Gtk.Align.END, margin_top=10, margin_end=10, visible=False)
+        self.welcome_add = Gtk.MenuButton(menu_model=self.add_menu, icon_name="list-add-symbolic",
+                                          tooltip_text=_("Add apps"))
+        self.welcome_main = Gtk.MenuButton(menu_model=main_menu, icon_name="open-menu-symbolic",
+                                           tooltip_text=_("Main menu"))
+        self.welcome_bar.append(self.welcome_add)
+        self.welcome_bar.append(self.welcome_main)
+        detail_side.append(self.welcome_bar)
         detail_side.append(self.back)
         detail_side.append(Gtk.ScrolledWindow(child=self.details, vexpand=True, hscrollbar_policy=Gtk.PolicyType.NEVER))
         self.detail_side = detail_side
@@ -287,13 +296,15 @@ class Window(Gtk.ApplicationWindow):
         self.get_application().send_notification("aurora-updates", n)
 
     def make_welcome(self) -> Gtk.Widget:
-        """No app yet: the side bar stays, this fills the details area (the whole window when narrow). The two ways
+        """No app yet: the list column is hidden, this fills the window. The two ways
         to a first app as big buttons: Aurora Store, an APK file."""
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=14, valign=Gtk.Align.CENTER,
                       halign=Gtk.Align.CENTER, vexpand=True, margin_start=24, margin_end=24)
         box.append(Gtk.Image(icon_name=APP_ID, pixel_size=128, margin_bottom=8))
-        self.welcome_title = label(_("No apps installed"), "welcome-title", xalign=0.5, wrap=True)
+        self.welcome_title = label(_("Android apps on your Linux desktop"), "welcome-title", xalign=0.5, wrap=True)
         box.append(self.welcome_title)
+        box.append(label(_("Get apps with Aurora Store or open an APK file – they start like normal programs."),
+                         "dim-label", xalign=0.5, wrap=True, max_width_chars=48, justify=Gtk.Justification.CENTER))
         self.welcome_buttons = []
         for text, action, hint in (
                 (_("Get apps"), "win.get-apps",
@@ -461,11 +472,12 @@ class Window(Gtk.ApplicationWindow):
 
     def update_pages(self) -> None:
         details = self.narrow and self.page == "details" and self.selected in self.rows
-        # no app yet: the welcome page with its buttons, in a narrow window instead of the (empty) list
-        welcome = self.narrow and not self.all_rows and not self.pending
+        # no app yet: the welcome page with its buttons fills the window instead of the (empty) list
+        welcome = not self.all_rows and not self.pending
         self.side.set_visible(not details and not welcome)
-        self.split.set_visible(not self.narrow)
+        self.split.set_visible(not self.narrow and not welcome)
         self.detail_side.set_visible(not self.narrow or details or welcome)
+        self.welcome_bar.set_visible(welcome)
         self.side.set_hexpand(self.narrow)
         self.back.set_visible(details)
         self.nothing.set_visible(bool(self.all_rows) and not self.visible_rows())

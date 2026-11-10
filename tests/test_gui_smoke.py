@@ -84,8 +84,8 @@ def test_window_follows_installs_and_removals_of_another_starter_process(tmp_pat
 @needs_broadway
 @pytest.mark.skipif(not shutil.which("msgfmt"), reason="no msgfmt (gettext)")
 @pytest.mark.parametrize("lang, title, error", [
-    ("de", "Keine Apps installiert", "broken.apk kann nicht installiert werden"),
-    ("ja", "インストール済みのアプリはありません", "broken.apk をインストールできません"),
+    ("de", "Android-Apps auf deinem Linux-Desktop", "broken.apk kann nicht installiert werden"),
+    ("ja", "Linux デスクトップで Android アプリを使う", "broken.apk をインストールできません"),
 ])
 def test_window_speaks_the_system_language(tmp_path, lang, title, error):
     d = tmp_path / "prefix/share/locale" / lang / "LC_MESSAGES"
@@ -125,7 +125,8 @@ def test_search_sort_keys_narrow_layout_and_remembered_state(tmp_path):
         "restored": ["org.b.bravo", "Bravo", ["Alpha", "Bravo", "Charlie"]], "opened_focus_on_start": True,
         "empty_page": ["list", True, True, True, ["Get apps", "Open APK…"], ["win.get-apps", "win.choose-apk"],
                        "Or drop an APK file into this window, or double-click it in the file manager."],
-        "list_page": "list",
+        "empty_columns": [False, False, True, True, True, True],
+        "list_page": "list", "list_columns": [True, True, False],
         "add_menu": ["Install APK…", "Get apps (Aurora Store)", "Set up microG…"],
         "add_menu_aurora_installed": ["Install APK…", "Get apps (Aurora Store)", "Set up microG…"],
         "bravo_menu": [1, False], "version_line": [3, True],
@@ -145,7 +146,7 @@ def test_search_sort_keys_narrow_layout_and_remembered_state(tmp_path):
         "started": ["org.c.charlie"], "focus_on_start": False,
         "settings": {"apps": {"org.c.charlie": {"titlebar": "system-navigation", "debug": True}}},
         "debug_started": ["org.c.charlie"], "debug_stays_on": [True, True],
-        "menu_corner": {"list": True, "empty": True, "details": True},
+        "menu_corner": {"list": True, "details": True},
         "saved": {"width": 500, "height": 600, "sort": "started", "selected": "org.c.charlie"},
         "narrow_list": [True, False], "narrow_details": [False, True, True, "Bravo"],
         "narrow_back": [True, False], "narrow_empty": [False, True, True]}, out.stderr
