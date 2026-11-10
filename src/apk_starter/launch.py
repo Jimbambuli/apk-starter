@@ -15,7 +15,8 @@ from .paths import Paths
 from .settings import load_settings
 
 ATL_BIN = "android-translation-layer"
-ATL_MAX_SDK = 34
+ATL_MAX_SDK = 36
+SDK_FLOOR = 21
 DEFAULT_SIZE = (1200, 850)
 SIZE_MIN, SIZE_MAX = 200, 10000
 _SIZE_RE = re.compile(r"([0-9]+)x([0-9]+)")
@@ -30,12 +31,13 @@ def parse_size(s: str) -> tuple[int, int]:
     raise UsageError(_("invalid --size, expected WxH: {value}").format(value=s))
 
 
-def sdk_for(info: ApkInfo, override: int | None) -> int | None:
+def sdk_for(info: ApkInfo, override: int | None) -> int:
+    """The override, else the level the app was built for: targetSdk up to ATL_MAX_SDK, not below its minSdk."""
     if override is not None:
         return override
     if info.target_sdk is None:
-        return None
-    return min(info.target_sdk, ATL_MAX_SDK)
+        return ATL_MAX_SDK
+    return max(min(info.target_sdk, ATL_MAX_SDK), info.min_sdk or 0, SDK_FLOOR)
 
 
 def _size_file(paths: Paths, pkg: str) -> Path:

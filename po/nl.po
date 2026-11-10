@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-08 20:33+0000\n"
+"POT-Creation-Date: 2026-11-10 04:30+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -23,7 +23,7 @@ msgstr "APK Starter"
 
 #: data/io.github.Jimbambuli.ApkStarter.desktop.in:3
 #: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:5
-#: src/apk_starter/gui.py:494
+#: src/apk_starter/gui.py:497
 msgid "Run Android apps on the Linux desktop"
 msgstr "Android-apps uitvoeren op de Linux-desktop"
 
@@ -172,7 +172,7 @@ msgstr ""
 msgid "the downloaded file is not Aurora Store {code}"
 msgstr "het gedownloade bestand is niet Aurora Store {code}"
 
-#: src/apk_starter/aurora.py:75 src/apk_starter/gui.py:899
+#: src/apk_starter/aurora.py:75 src/apk_starter/gui.py:929
 msgid "Downloading Aurora Store from F-Droid…"
 msgstr "Aurora Store wordt van F-Droid gedownload…"
 
@@ -269,14 +269,14 @@ msgstr "Android-apps (APK) starten met Android Translation Layer."
 #: src/apk_starter/cli.py:363
 #, fuzzy
 msgid ""
-"record the app for atl-doctor: exceptions, ATL stub calls, time line, view"
-" trees, clicks and typed text, verbose log; afterwards one archive cleaned"
-" of personal data (default: logs/<package>-<time>.tar.gz); use --debug=DIR"
+"record the app for atl-doctor: exceptions, ATL stub calls, time line, view "
+"trees, clicks and typed text, verbose log; afterwards one archive cleaned of "
+"personal data (default: logs/<package>-<time>.tar.gz); use --debug=DIR"
 msgstr ""
-"de app opnemen voor atl-doctor: uitzonderingen, ATL-stubaanroepen, "
-"tijdlijn, weergavebomen met schermafbeelding, kliks en getypte tekst, "
-"uitgebreid logboek; daarna één archief, schoongemaakt van persoonlijke "
-"gegevens (standaard: logs/<pakket>-<tijd>.tar.gz); gebruik --debug=MAP"
+"de app opnemen voor atl-doctor: uitzonderingen, ATL-stubaanroepen, tijdlijn, "
+"weergavebomen met schermafbeelding, kliks en getypte tekst, uitgebreid "
+"logboek; daarna één archief, schoongemaakt van persoonlijke gegevens "
+"(standaard: logs/<pakket>-<tijd>.tar.gz); gebruik --debug=MAP"
 
 #: src/apk_starter/cli.py:367
 #, fuzzy
@@ -434,7 +434,7 @@ msgstr "Apps zoeken"
 msgid "Name"
 msgstr "Naam"
 
-#: src/apk_starter/gui.py:147 src/apk_starter/gui.py:691
+#: src/apk_starter/gui.py:147 src/apk_starter/gui.py:711
 msgid "Last started"
 msgstr "Laatst gestart"
 
@@ -450,7 +450,7 @@ msgstr "Gegevensgrootte"
 msgid "Sort"
 msgstr "Sorteren"
 
-#: src/apk_starter/gui.py:155 src/apk_starter/gui.py:278
+#: src/apk_starter/gui.py:155
 msgid "Add apps"
 msgstr "Apps toevoegen"
 
@@ -462,135 +462,149 @@ msgstr "Over APK Starter"
 msgid "Main menu"
 msgstr "Hoofdmenu"
 
-#: src/apk_starter/gui.py:166
+#: src/apk_starter/gui.py:168 src/apk_starter/gui.py:446
 msgid "No app matches."
 msgstr "Geen app gevonden."
 
-#: src/apk_starter/gui.py:174 src/apk_starter/launch.py:104
+#: src/apk_starter/gui.py:176 src/apk_starter/launch.py:106
 msgid "Back"
 msgstr "Terug"
 
-#: src/apk_starter/gui.py:205
+#: src/apk_starter/gui.py:207
 msgid "Drop the APK to install it"
 msgstr "Laat de APK los om hem te installeren"
 
-#: src/apk_starter/gui.py:293
+#: src/apk_starter/gui.py:282
 msgid "No apps installed"
 msgstr "Geen apps geïnstalleerd"
 
-#: src/apk_starter/gui.py:294
+#: src/apk_starter/gui.py:283
 msgid "Add an app with + or drop an APK here."
 msgstr "Voeg een app toe met + of sleep een APK hierheen."
 
-#: src/apk_starter/gui.py:303 src/apk_starter/gui.py:826
+#: src/apk_starter/gui.py:292 src/apk_starter/gui.py:507
+#: src/apk_starter/gui.py:856
 msgid "Close"
 msgstr "Sluiten"
 
-#: src/apk_starter/gui.py:385
+#: src/apk_starter/gui.py:374
 msgid "Prepared for this computer"
 msgstr "Voorbereid voor deze computer"
 
-#: src/apk_starter/gui.py:385
+#: src/apk_starter/gui.py:374
 msgid "Not prepared yet (done at the next start)"
 msgstr "Nog niet voorbereid (gebeurt bij de volgende start)"
 
-#: src/apk_starter/gui.py:469
+#: src/apk_starter/gui.py:465
 msgid "Cannot read the app list"
 msgstr "Kan de applijst niet lezen"
 
-#: src/apk_starter/gui.py:497
+#: src/apk_starter/gui.py:500
+msgid "GPL-3.0-or-later. This program comes with absolutely no warranty."
+msgstr ""
+
+#: src/apk_starter/gui.py:503 src/apk_starter/gui.py:516
 msgid "Components"
 msgstr "Onderdelen"
 
-#: src/apk_starter/gui.py:497
+#: src/apk_starter/gui.py:504
 msgid "unknown"
 msgstr "onbekend"
 
-#: src/apk_starter/gui.py:508
+#: src/apk_starter/gui.py:527
 msgid "Install APK…"
 msgstr "APK installeren…"
 
-#: src/apk_starter/gui.py:510
+#: src/apk_starter/gui.py:529
 msgid "Set up Aurora Store…"
 msgstr "Aurora Store instellen…"
 
-#: src/apk_starter/gui.py:512
+#: src/apk_starter/gui.py:531
 msgid "Set up microG…"
 msgstr "microG instellen…"
 
-#: src/apk_starter/gui.py:598 src/apk_starter/gui.py:753
+#: src/apk_starter/gui.py:616 src/apk_starter/gui.py:783
 msgid "Could not save the setting"
 msgstr "De instelling kon niet worden opgeslagen"
 
-#: src/apk_starter/gui.py:661 src/apk_starter/gui.py:663
+#: src/apk_starter/gui.py:681 src/apk_starter/gui.py:683
 msgid "Start"
 msgstr "Starten"
 
-#: src/apk_starter/gui.py:666
+#: src/apk_starter/gui.py:686
 msgid "Uninstall…"
 msgstr "Verwijderen…"
 
-#: src/apk_starter/gui.py:670
+#: src/apk_starter/gui.py:690
 msgid "Options"
 msgstr "Opties"
 
-#: src/apk_starter/gui.py:675
+#: src/apk_starter/gui.py:695
 msgid "Debug is on"
 msgstr "Debug staat aan"
 
-#: src/apk_starter/gui.py:681
+#: src/apk_starter/gui.py:701
 msgid "Delete data…"
 msgstr "Gegevens wissen…"
 
-#: src/apk_starter/gui.py:688
+#: src/apk_starter/gui.py:708
 msgid "Version"
 msgstr "Versie"
 
-#: src/apk_starter/gui.py:689
+#: src/apk_starter/gui.py:709
 msgid "Target SDK"
 msgstr "Doel-SDK"
 
-#: src/apk_starter/gui.py:690
+#: src/apk_starter/gui.py:710
 msgid "Installed"
 msgstr "Geïnstalleerd"
 
-#: src/apk_starter/gui.py:692
+#: src/apk_starter/gui.py:712
 msgid "Data"
 msgstr "Gegevens"
 
-#: src/apk_starter/gui.py:692
+#: src/apk_starter/gui.py:712
 msgid "no data"
 msgstr "geen gegevens"
 
-#: src/apk_starter/gui.py:693
+#: src/apk_starter/gui.py:713
 msgid "Status"
 msgstr "Status"
 
-#: src/apk_starter/gui.py:710
+#: src/apk_starter/gui.py:730
 msgid "Window bar"
 msgstr "Vensterbalk"
 
-#: src/apk_starter/gui.py:711
+#: src/apk_starter/gui.py:731
 msgid "With back button"
 msgstr "Met terugknop"
 
-#: src/apk_starter/gui.py:711
+#: src/apk_starter/gui.py:731
 msgid "From the system"
 msgstr "Van het systeem"
 
-#: src/apk_starter/gui.py:712
+#: src/apk_starter/gui.py:732
 msgid "From the system + navigation bar"
 msgstr "Van het systeem + navigatiebalk"
 
-#: src/apk_starter/gui.py:721 src/apk_starter/gui.py:793
+#: src/apk_starter/gui.py:741
+#, fuzzy
+msgid "Android version"
+msgstr "Android-apps"
+
+#: src/apk_starter/gui.py:744
+msgid "Standard (target SDK)"
+msgstr ""
+
+#: src/apk_starter/gui.py:751 src/apk_starter/gui.py:823
 msgid "Debug"
 msgstr "Debug"
 
-#: src/apk_starter/gui.py:722 src/apk_starter/gui.py:793
+#: src/apk_starter/gui.py:752 src/apk_starter/gui.py:823
 msgid "Debug full"
 msgstr "Debug volledig"
 
-#: src/apk_starter/gui.py:723
+#: src/apk_starter/gui.py:753
 msgid ""
 "The archive contains everything in plain text, also passwords and personal "
 "data – do not pass it on"
@@ -598,67 +612,67 @@ msgstr ""
 "Het archief bevat alles in leesbare tekst, ook wachtwoorden en persoonlijke "
 "gegevens – niet doorgeven"
 
-#: src/apk_starter/gui.py:746
+#: src/apk_starter/gui.py:776
 msgid "Report updates"
 msgstr "Updates melden"
 
-#: src/apk_starter/gui.py:770
+#: src/apk_starter/gui.py:800
 msgid "Permissions"
 msgstr "Rechten"
 
-#: src/apk_starter/gui.py:791
+#: src/apk_starter/gui.py:821
 msgid "Recordings"
 msgstr "Opnames"
 
-#: src/apk_starter/gui.py:794 src/apk_starter/gui.py:826
+#: src/apk_starter/gui.py:824 src/apk_starter/gui.py:856
 msgid "Open log folder"
 msgstr "Logboekmap openen"
 
-#: src/apk_starter/gui.py:808
+#: src/apk_starter/gui.py:838
 #, python-brace-format
 msgid "Cannot start {app}"
 msgstr "Kan {app} niet starten"
 
-#: src/apk_starter/gui.py:825
+#: src/apk_starter/gui.py:855
 #, python-brace-format
 msgid "{app} ended unexpectedly."
 msgstr "{app} is onverwacht gestopt."
 
-#: src/apk_starter/gui.py:836 src/apk_starter/gui.py:845
+#: src/apk_starter/gui.py:866 src/apk_starter/gui.py:875
 msgid "Cannot open the log folder"
 msgstr "Kan de logboekmap niet openen"
 
-#: src/apk_starter/gui.py:849
+#: src/apk_starter/gui.py:879
 msgid "Android apps"
 msgstr "Android-apps"
 
-#: src/apk_starter/gui.py:855
+#: src/apk_starter/gui.py:885
 msgid "Install APK"
 msgstr "APK installeren"
 
-#: src/apk_starter/gui.py:885 src/apk_starter/gui.py:898
+#: src/apk_starter/gui.py:915 src/apk_starter/gui.py:928
 #, python-brace-format
 msgid "{app} installed"
 msgstr "{app} geïnstalleerd"
 
-#: src/apk_starter/gui.py:886
+#: src/apk_starter/gui.py:916
 msgid "Installing…"
 msgstr "Installeren…"
 
-#: src/apk_starter/gui.py:888
+#: src/apk_starter/gui.py:918
 #, python-brace-format
 msgid "Cannot install {file}"
 msgstr "Kan {file} niet installeren"
 
-#: src/apk_starter/gui.py:901
+#: src/apk_starter/gui.py:931
 msgid "Cannot set up Aurora Store"
 msgstr "Aurora Store kan niet worden ingesteld"
 
-#: src/apk_starter/gui.py:902
+#: src/apk_starter/gui.py:932
 msgid "Set up Aurora Store?"
 msgstr "Aurora Store instellen?"
 
-#: src/apk_starter/gui.py:903
+#: src/apk_starter/gui.py:933
 msgid ""
 "Free apps from Google Play. Downloaded from F-Droid and checked.\n"
 "\n"
@@ -668,33 +682,33 @@ msgstr ""
 "\n"
 "Meld je anoniem aan: Google kan je eigen account blokkeren."
 
-#: src/apk_starter/gui.py:905 src/apk_starter/gui.py:922
-#: src/apk_starter/gui.py:927 src/apk_starter/install_request.py:29
+#: src/apk_starter/gui.py:935 src/apk_starter/gui.py:952
+#: src/apk_starter/gui.py:957 src/apk_starter/install_request.py:29
 #: src/apk_starter/install_request.py:93
 msgid "Cancel"
 msgstr "Annuleren"
 
-#: src/apk_starter/gui.py:905 src/apk_starter/gui.py:922
+#: src/apk_starter/gui.py:935 src/apk_starter/gui.py:952
 msgid "Set up"
 msgstr "Instellen"
 
-#: src/apk_starter/gui.py:915
+#: src/apk_starter/gui.py:945
 msgid "microG is set up"
 msgstr "microG is ingesteld"
 
-#: src/apk_starter/gui.py:916 src/apk_starter/microg.py:98
+#: src/apk_starter/gui.py:946 src/apk_starter/microg.py:98
 msgid "Downloading microG…"
 msgstr "microG downloaden…"
 
-#: src/apk_starter/gui.py:918
+#: src/apk_starter/gui.py:948
 msgid "Cannot set up microG"
 msgstr "Kan microG niet instellen"
 
-#: src/apk_starter/gui.py:919
+#: src/apk_starter/gui.py:949
 msgid "Set up microG?"
 msgstr "microG instellen?"
 
-#: src/apk_starter/gui.py:920
+#: src/apk_starter/gui.py:950
 msgid ""
 "Google services for apps (push messages, sign-in). Downloaded from the "
 "official microG repository and checked."
@@ -702,12 +716,12 @@ msgstr ""
 "Google-diensten voor apps (pushberichten, aanmelden). Gedownload uit de "
 "officiële microG-repository en gecontroleerd."
 
-#: src/apk_starter/gui.py:932
+#: src/apk_starter/gui.py:962
 #, python-brace-format
 msgid "Delete the data of {app}?"
 msgstr "Gegevens van {app} wissen?"
 
-#: src/apk_starter/gui.py:933
+#: src/apk_starter/gui.py:963
 msgid ""
 "The app stays installed. Its settings, accounts and files are deleted. Close "
 "the app first."
@@ -715,46 +729,46 @@ msgstr ""
 "De app blijft geïnstalleerd. De instellingen, accounts en bestanden worden "
 "gewist. Sluit eerst de app."
 
-#: src/apk_starter/gui.py:934
+#: src/apk_starter/gui.py:964
 msgid "Delete Data"
 msgstr "Gegevens wissen"
 
-#: src/apk_starter/gui.py:935
+#: src/apk_starter/gui.py:965
 msgid "Deleting data…"
 msgstr "Gegevens wissen…"
 
-#: src/apk_starter/gui.py:936
+#: src/apk_starter/gui.py:966
 #, python-brace-format
 msgid "Cannot delete the data of {app}"
 msgstr "Kan de gegevens van {app} niet wissen"
 
-#: src/apk_starter/gui.py:940 src/apk_starter/install_request.py:93
+#: src/apk_starter/gui.py:970 src/apk_starter/install_request.py:93
 msgid "Also delete app data"
 msgstr "Ook appgegevens wissen"
 
-#: src/apk_starter/gui.py:947
+#: src/apk_starter/gui.py:977
 #, python-brace-format
 msgid "{app} uninstalled"
 msgstr "{app} verwijderd"
 
-#: src/apk_starter/gui.py:948 src/apk_starter/install_request.py:93
+#: src/apk_starter/gui.py:978 src/apk_starter/install_request.py:93
 #, python-brace-format
 msgid "Uninstall {app}?"
 msgstr "{app} verwijderen?"
 
-#: src/apk_starter/gui.py:949
+#: src/apk_starter/gui.py:979
 msgid "The app and its menu entry are removed. Close the app first."
 msgstr "De app en het menu-item worden verwijderd. Sluit eerst de app."
 
-#: src/apk_starter/gui.py:949 src/apk_starter/install_request.py:93
+#: src/apk_starter/gui.py:979 src/apk_starter/install_request.py:93
 msgid "Uninstall"
 msgstr "Verwijderen"
 
-#: src/apk_starter/gui.py:950
+#: src/apk_starter/gui.py:980
 msgid "Uninstalling…"
 msgstr "Verwijderen…"
 
-#: src/apk_starter/gui.py:952
+#: src/apk_starter/gui.py:982
 #, python-brace-format
 msgid "Cannot uninstall {app}"
 msgstr "Kan {app} niet verwijderen"
@@ -878,16 +892,16 @@ msgstr "geen scherm om te vragen of {app} verwijderd moet worden"
 msgid "Uninstalling {app} cancelled"
 msgstr "Verwijderen van {app} geannuleerd"
 
-#: src/apk_starter/launch.py:30
+#: src/apk_starter/launch.py:31
 #, python-brace-format
 msgid "invalid --size, expected WxH: {value}"
 msgstr "ongeldige --size, verwacht WxH: {value}"
 
-#: src/apk_starter/launch.py:104
+#: src/apk_starter/launch.py:106
 msgid "Start page of the app"
 msgstr "Startpagina van de app"
 
-#: src/apk_starter/launch.py:104
+#: src/apk_starter/launch.py:106
 msgid "Open pages of the app"
 msgstr "Open pagina’s van de app"
 

@@ -500,15 +500,15 @@ def _start(paths: Paths, args, level: str | None, into: Path | None, tail: list[
     else:
         size = remembered_size(paths, info.package) or DEFAULT_SIZE
     started = datetime.now().astimezone()
+    mine = load_settings(paths.settings()).app(info.package)
     if level is None:                               # «Debug» / «Debug full» ticked for this app in the window: every start
-        mine = load_settings(paths.settings()).app(info.package)
         level = "debug-full" if mine.debug_full else "debug" if mine.debug else None
     debug_dir = None
     if level is not None:                           # a normal start writes no log
         debug_dir = into or diag.default_debug_dir(paths, info.package, started)
     apk_path = prepare_apk(paths, info)
     parts = paths.installed_splits(info.package) if apk_path == paths.apk(info.package) else []
-    cmd = build_command(paths, apk_path, size=size, sdk=sdk_for(info, args.sdk), atl_args=atl_args,
+    cmd = build_command(paths, apk_path, size=size, sdk=sdk_for(info, args.sdk if args.sdk is not None else mine.sdk), atl_args=atl_args,
                         app_id=f"{ENTRY_PREFIX}.{info.package}", splits=parts)
     child_env = build_env(paths, info.package, env)
     if args.size:

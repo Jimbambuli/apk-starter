@@ -16,11 +16,16 @@ def info(path=Path("/x/a.apk"), target_sdk=34):
     return ApkInfo(path, "org.example.demo", "Demo", "1.2", 7, 21, target_sdk, None)
 
 
-def test_sdk_clamped_and_override():
-    assert sdk_for(info(target_sdk=35), None) == 34
+def test_sdk_default_clamped_and_override():
+    assert sdk_for(info(target_sdk=36), None) == 36
+    assert sdk_for(info(target_sdk=40), None) == 36         # above ATL's maximum
     assert sdk_for(info(target_sdk=28), None) == 28
-    assert sdk_for(info(target_sdk=None), None) is None
-    assert sdk_for(info(target_sdk=35), 35) == 35
+    assert sdk_for(info(target_sdk=10), None) == 21         # not below the floor
+    assert sdk_for(info(target_sdk=None), None) == 36       # unknown: ATL's maximum
+    m = ApkInfo(Path("/x/a.apk"), "org.example.demo", "Demo", "1.2", 7, 30, 28, None)
+    assert sdk_for(m, None) == 30                           # not below the app's minSdk
+    assert sdk_for(info(target_sdk=35), 34) == 34           # the override wins
+    assert sdk_for(info(target_sdk=None), 35) == 35
 
 
 @pytest.mark.parametrize("bad", ["1200", "0x0", "12x10", "1200x850x1", "abc"])

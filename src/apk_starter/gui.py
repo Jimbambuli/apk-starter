@@ -20,7 +20,7 @@ from .i18n import _
 from .gui_model import (AppRow, WindowState, crash_meaning, details_layout, filter_rows, group_parts, is_narrow,
                         component_lines, key_action, load_rows, load_state, save_state, sort_rows, start_argv)
 from .paths import Paths
-from .settings import TITLEBARS, load_settings, save_settings
+from .settings import SDK_CHOICES, TITLEBARS, load_settings, save_settings
 
 try:
     import gi
@@ -737,6 +737,16 @@ class Window(Gtk.ApplicationWindow):
             b.connect("toggled", lambda b, p=r.package, k=key: b.get_active() and self.save_app_setting(p, titlebar=k))
             choice[key] = b
             box.append(b)
+        box.append(Gtk.Separator(margin_top=4))
+        box.append(label(_("Android version"), "section-title"))
+        sdk_choice: dict[int | None, Gtk.CheckButton] = {}
+        for key in (None, *SDK_CHOICES):            # the app's target SDK (the default), or a fixed level
+            b = Gtk.CheckButton(label=_("Standard (target SDK)") if key is None else str(key), active=key == app.sdk,
+                                group=next(iter(sdk_choice.values()), None))
+            b.connect("toggled", lambda b, p=r.package, k=key: b.get_active() and self.save_app_setting(p, sdk=k))
+            sdk_choice[key] = b
+            box.append(b)
+        self.sdk_choice = sdk_choice
         box.append(Gtk.Separator(margin_top=4))
         debug = Gtk.CheckButton(label=_("Debug"), active=app.debug and not app.debug_full)
         debug_full = Gtk.CheckButton(label=_("Debug full"), active=app.debug_full,

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-08 20:33+0000\n"
+"POT-Creation-Date: 2026-11-10 04:30+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -23,7 +23,7 @@ msgstr "APK Starter"
 
 #: data/io.github.Jimbambuli.ApkStarter.desktop.in:3
 #: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:5
-#: src/apk_starter/gui.py:494
+#: src/apk_starter/gui.py:497
 msgid "Run Android apps on the Linux desktop"
 msgstr "在 Linux 桌面上运行 Android 应用"
 
@@ -162,7 +162,7 @@ msgstr "下载的 Aurora Store 并非由 Aurora OSS 签名（证书 {found}）�
 msgid "the downloaded file is not Aurora Store {code}"
 msgstr "下载的文件不是 Aurora Store {code}"
 
-#: src/apk_starter/aurora.py:75 src/apk_starter/gui.py:899
+#: src/apk_starter/aurora.py:75 src/apk_starter/gui.py:929
 msgid "Downloading Aurora Store from F-Droid…"
 msgstr "正在从 F-Droid 下载 Aurora Store…"
 
@@ -257,13 +257,13 @@ msgstr "使用 Android Translation Layer 启动 Android 应用（APK）。"
 #: src/apk_starter/cli.py:363
 #, fuzzy
 msgid ""
-"record the app for atl-doctor: exceptions, ATL stub calls, time line, view"
-" trees, clicks and typed text, verbose log; afterwards one archive cleaned"
-" of personal data (default: logs/<package>-<time>.tar.gz); use --debug=DIR"
+"record the app for atl-doctor: exceptions, ATL stub calls, time line, view "
+"trees, clicks and typed text, verbose log; afterwards one archive cleaned of "
+"personal data (default: logs/<package>-<time>.tar.gz); use --debug=DIR"
 msgstr ""
-"为 atl-doctor 记录应用：异常、ATL "
-"桩调用、时间线、带截图的视图树、点击和输入的文字、详细日志；结束后生成一个已清除个人数据的归档（默认：logs/<包名>-<时间>.tar.gz）；可用"
-" --debug=文件夹"
+"为 atl-doctor 记录应用：异常、ATL 桩调用、时间线、带截图的视图树、点击和输入"
+"的文字、详细日志；结束后生成一个已清除个人数据的归档（默认：logs/<包名>-<时间"
+">.tar.gz）；可用 --debug=文件夹"
 
 #: src/apk_starter/cli.py:367
 #, fuzzy
@@ -412,7 +412,7 @@ msgstr "搜索应用"
 msgid "Name"
 msgstr "名称"
 
-#: src/apk_starter/gui.py:147 src/apk_starter/gui.py:691
+#: src/apk_starter/gui.py:147 src/apk_starter/gui.py:711
 msgid "Last started"
 msgstr "最近启动"
 
@@ -428,7 +428,7 @@ msgstr "数据大小"
 msgid "Sort"
 msgstr "排序"
 
-#: src/apk_starter/gui.py:155 src/apk_starter/gui.py:278
+#: src/apk_starter/gui.py:155
 msgid "Add apps"
 msgstr "添加应用"
 
@@ -440,201 +440,215 @@ msgstr "关于 APK Starter"
 msgid "Main menu"
 msgstr "主菜单"
 
-#: src/apk_starter/gui.py:166
+#: src/apk_starter/gui.py:168 src/apk_starter/gui.py:446
 msgid "No app matches."
 msgstr "没有匹配的应用。"
 
-#: src/apk_starter/gui.py:174 src/apk_starter/launch.py:104
+#: src/apk_starter/gui.py:176 src/apk_starter/launch.py:106
 msgid "Back"
 msgstr "返回"
 
-#: src/apk_starter/gui.py:205
+#: src/apk_starter/gui.py:207
 msgid "Drop the APK to install it"
 msgstr "松开以安装 APK"
 
-#: src/apk_starter/gui.py:293
+#: src/apk_starter/gui.py:282
 msgid "No apps installed"
 msgstr "尚未安装应用"
 
-#: src/apk_starter/gui.py:294
+#: src/apk_starter/gui.py:283
 msgid "Add an app with + or drop an APK here."
 msgstr "用 + 添加应用，或将 APK 拖放到此处。"
 
-#: src/apk_starter/gui.py:303 src/apk_starter/gui.py:826
+#: src/apk_starter/gui.py:292 src/apk_starter/gui.py:507
+#: src/apk_starter/gui.py:856
 msgid "Close"
 msgstr "关闭"
 
-#: src/apk_starter/gui.py:385
+#: src/apk_starter/gui.py:374
 msgid "Prepared for this computer"
 msgstr "已为本机准备"
 
-#: src/apk_starter/gui.py:385
+#: src/apk_starter/gui.py:374
 msgid "Not prepared yet (done at the next start)"
 msgstr "尚未准备（下次启动时完成）"
 
-#: src/apk_starter/gui.py:469
+#: src/apk_starter/gui.py:465
 msgid "Cannot read the app list"
 msgstr "无法读取应用列表"
 
-#: src/apk_starter/gui.py:497
+#: src/apk_starter/gui.py:500
+msgid "GPL-3.0-or-later. This program comes with absolutely no warranty."
+msgstr ""
+
+#: src/apk_starter/gui.py:503 src/apk_starter/gui.py:516
 msgid "Components"
 msgstr "组件"
 
-#: src/apk_starter/gui.py:497
+#: src/apk_starter/gui.py:504
 msgid "unknown"
 msgstr "未知"
 
-#: src/apk_starter/gui.py:508
+#: src/apk_starter/gui.py:527
 msgid "Install APK…"
 msgstr "安装 APK…"
 
-#: src/apk_starter/gui.py:510
+#: src/apk_starter/gui.py:529
 msgid "Set up Aurora Store…"
 msgstr "设置 Aurora Store…"
 
-#: src/apk_starter/gui.py:512
+#: src/apk_starter/gui.py:531
 msgid "Set up microG…"
 msgstr "设置 microG…"
 
-#: src/apk_starter/gui.py:598 src/apk_starter/gui.py:753
+#: src/apk_starter/gui.py:616 src/apk_starter/gui.py:783
 msgid "Could not save the setting"
 msgstr "无法保存设置"
 
-#: src/apk_starter/gui.py:661 src/apk_starter/gui.py:663
+#: src/apk_starter/gui.py:681 src/apk_starter/gui.py:683
 msgid "Start"
 msgstr "启动"
 
-#: src/apk_starter/gui.py:666
+#: src/apk_starter/gui.py:686
 msgid "Uninstall…"
 msgstr "卸载…"
 
-#: src/apk_starter/gui.py:670
+#: src/apk_starter/gui.py:690
 msgid "Options"
 msgstr "选项"
 
-#: src/apk_starter/gui.py:675
+#: src/apk_starter/gui.py:695
 msgid "Debug is on"
 msgstr "调试已开启"
 
-#: src/apk_starter/gui.py:681
+#: src/apk_starter/gui.py:701
 msgid "Delete data…"
 msgstr "删除数据…"
 
-#: src/apk_starter/gui.py:688
+#: src/apk_starter/gui.py:708
 msgid "Version"
 msgstr "版本"
 
-#: src/apk_starter/gui.py:689
+#: src/apk_starter/gui.py:709
 msgid "Target SDK"
 msgstr "目标 SDK"
 
-#: src/apk_starter/gui.py:690
+#: src/apk_starter/gui.py:710
 msgid "Installed"
 msgstr "安装时间"
 
-#: src/apk_starter/gui.py:692
+#: src/apk_starter/gui.py:712
 msgid "Data"
 msgstr "数据"
 
-#: src/apk_starter/gui.py:692
+#: src/apk_starter/gui.py:712
 msgid "no data"
 msgstr "无数据"
 
-#: src/apk_starter/gui.py:693
+#: src/apk_starter/gui.py:713
 msgid "Status"
 msgstr "状态"
 
-#: src/apk_starter/gui.py:710
+#: src/apk_starter/gui.py:730
 msgid "Window bar"
 msgstr "窗口栏"
 
-#: src/apk_starter/gui.py:711
+#: src/apk_starter/gui.py:731
 msgid "With back button"
 msgstr "带返回按钮"
 
-#: src/apk_starter/gui.py:711
+#: src/apk_starter/gui.py:731
 msgid "From the system"
 msgstr "系统提供"
 
-#: src/apk_starter/gui.py:712
+#: src/apk_starter/gui.py:732
 msgid "From the system + navigation bar"
 msgstr "系统提供 + 导航栏"
 
-#: src/apk_starter/gui.py:721 src/apk_starter/gui.py:793
+#: src/apk_starter/gui.py:741
+#, fuzzy
+msgid "Android version"
+msgstr "Android 应用"
+
+#: src/apk_starter/gui.py:744
+msgid "Standard (target SDK)"
+msgstr ""
+
+#: src/apk_starter/gui.py:751 src/apk_starter/gui.py:823
 msgid "Debug"
 msgstr "调试"
 
-#: src/apk_starter/gui.py:722 src/apk_starter/gui.py:793
+#: src/apk_starter/gui.py:752 src/apk_starter/gui.py:823
 msgid "Debug full"
 msgstr "Debug 完整"
 
-#: src/apk_starter/gui.py:723
+#: src/apk_starter/gui.py:753
 msgid ""
 "The archive contains everything in plain text, also passwords and personal "
 "data – do not pass it on"
 msgstr "归档以明文包含全部内容，包括密码和个人数据 – 请勿转发"
 
-#: src/apk_starter/gui.py:746
+#: src/apk_starter/gui.py:776
 msgid "Report updates"
 msgstr "提示更新"
 
-#: src/apk_starter/gui.py:770
+#: src/apk_starter/gui.py:800
 msgid "Permissions"
 msgstr "权限"
 
-#: src/apk_starter/gui.py:791
+#: src/apk_starter/gui.py:821
 msgid "Recordings"
 msgstr "记录"
 
-#: src/apk_starter/gui.py:794 src/apk_starter/gui.py:826
+#: src/apk_starter/gui.py:824 src/apk_starter/gui.py:856
 msgid "Open log folder"
 msgstr "打开日志文件夹"
 
-#: src/apk_starter/gui.py:808
+#: src/apk_starter/gui.py:838
 #, python-brace-format
 msgid "Cannot start {app}"
 msgstr "无法启动 {app}"
 
-#: src/apk_starter/gui.py:825
+#: src/apk_starter/gui.py:855
 #, python-brace-format
 msgid "{app} ended unexpectedly."
 msgstr "{app} 意外退出。"
 
-#: src/apk_starter/gui.py:836 src/apk_starter/gui.py:845
+#: src/apk_starter/gui.py:866 src/apk_starter/gui.py:875
 msgid "Cannot open the log folder"
 msgstr "无法打开日志文件夹"
 
-#: src/apk_starter/gui.py:849
+#: src/apk_starter/gui.py:879
 msgid "Android apps"
 msgstr "Android 应用"
 
-#: src/apk_starter/gui.py:855
+#: src/apk_starter/gui.py:885
 msgid "Install APK"
 msgstr "安装 APK"
 
-#: src/apk_starter/gui.py:885 src/apk_starter/gui.py:898
+#: src/apk_starter/gui.py:915 src/apk_starter/gui.py:928
 #, python-brace-format
 msgid "{app} installed"
 msgstr "已安装 {app}"
 
-#: src/apk_starter/gui.py:886
+#: src/apk_starter/gui.py:916
 msgid "Installing…"
 msgstr "正在安装…"
 
-#: src/apk_starter/gui.py:888
+#: src/apk_starter/gui.py:918
 #, python-brace-format
 msgid "Cannot install {file}"
 msgstr "无法安装 {file}"
 
-#: src/apk_starter/gui.py:901
+#: src/apk_starter/gui.py:931
 msgid "Cannot set up Aurora Store"
 msgstr "无法设置 Aurora Store"
 
-#: src/apk_starter/gui.py:902
+#: src/apk_starter/gui.py:932
 msgid "Set up Aurora Store?"
 msgstr "设置 Aurora Store？"
 
-#: src/apk_starter/gui.py:903
+#: src/apk_starter/gui.py:933
 msgid ""
 "Free apps from Google Play. Downloaded from F-Droid and checked.\n"
 "\n"
@@ -644,90 +658,90 @@ msgstr ""
 "\n"
 "请匿名登录:Google 可能会封禁你自己的账号。"
 
-#: src/apk_starter/gui.py:905 src/apk_starter/gui.py:922
-#: src/apk_starter/gui.py:927 src/apk_starter/install_request.py:29
+#: src/apk_starter/gui.py:935 src/apk_starter/gui.py:952
+#: src/apk_starter/gui.py:957 src/apk_starter/install_request.py:29
 #: src/apk_starter/install_request.py:93
 msgid "Cancel"
 msgstr "取消"
 
-#: src/apk_starter/gui.py:905 src/apk_starter/gui.py:922
+#: src/apk_starter/gui.py:935 src/apk_starter/gui.py:952
 msgid "Set up"
 msgstr "设置"
 
-#: src/apk_starter/gui.py:915
+#: src/apk_starter/gui.py:945
 msgid "microG is set up"
 msgstr "microG 已设置完成"
 
-#: src/apk_starter/gui.py:916 src/apk_starter/microg.py:98
+#: src/apk_starter/gui.py:946 src/apk_starter/microg.py:98
 msgid "Downloading microG…"
 msgstr "正在下载 microG…"
 
-#: src/apk_starter/gui.py:918
+#: src/apk_starter/gui.py:948
 msgid "Cannot set up microG"
 msgstr "无法设置 microG"
 
-#: src/apk_starter/gui.py:919
+#: src/apk_starter/gui.py:949
 msgid "Set up microG?"
 msgstr "设置 microG？"
 
-#: src/apk_starter/gui.py:920
+#: src/apk_starter/gui.py:950
 msgid ""
 "Google services for apps (push messages, sign-in). Downloaded from the "
 "official microG repository and checked."
 msgstr ""
 "为应用提供的 Google 服务(推送消息、登录)。从 microG 官方仓库下载并已校验。"
 
-#: src/apk_starter/gui.py:932
+#: src/apk_starter/gui.py:962
 #, python-brace-format
 msgid "Delete the data of {app}?"
 msgstr "删除 {app} 的数据？"
 
-#: src/apk_starter/gui.py:933
+#: src/apk_starter/gui.py:963
 msgid ""
 "The app stays installed. Its settings, accounts and files are deleted. Close "
 "the app first."
 msgstr "应用将保持安装。其设置、账户和文件将被删除。请先关闭应用。"
 
-#: src/apk_starter/gui.py:934
+#: src/apk_starter/gui.py:964
 msgid "Delete Data"
 msgstr "删除数据"
 
-#: src/apk_starter/gui.py:935
+#: src/apk_starter/gui.py:965
 msgid "Deleting data…"
 msgstr "正在删除数据…"
 
-#: src/apk_starter/gui.py:936
+#: src/apk_starter/gui.py:966
 #, python-brace-format
 msgid "Cannot delete the data of {app}"
 msgstr "无法删除 {app} 的数据"
 
-#: src/apk_starter/gui.py:940 src/apk_starter/install_request.py:93
+#: src/apk_starter/gui.py:970 src/apk_starter/install_request.py:93
 msgid "Also delete app data"
 msgstr "同时删除应用数据"
 
-#: src/apk_starter/gui.py:947
+#: src/apk_starter/gui.py:977
 #, python-brace-format
 msgid "{app} uninstalled"
 msgstr "已卸载 {app}"
 
-#: src/apk_starter/gui.py:948 src/apk_starter/install_request.py:93
+#: src/apk_starter/gui.py:978 src/apk_starter/install_request.py:93
 #, python-brace-format
 msgid "Uninstall {app}?"
 msgstr "卸载 {app}？"
 
-#: src/apk_starter/gui.py:949
+#: src/apk_starter/gui.py:979
 msgid "The app and its menu entry are removed. Close the app first."
 msgstr "应用及其菜单项将被删除。请先关闭应用。"
 
-#: src/apk_starter/gui.py:949 src/apk_starter/install_request.py:93
+#: src/apk_starter/gui.py:979 src/apk_starter/install_request.py:93
 msgid "Uninstall"
 msgstr "卸载"
 
-#: src/apk_starter/gui.py:950
+#: src/apk_starter/gui.py:980
 msgid "Uninstalling…"
 msgstr "正在卸载…"
 
-#: src/apk_starter/gui.py:952
+#: src/apk_starter/gui.py:982
 #, python-brace-format
 msgid "Cannot uninstall {app}"
 msgstr "无法卸载 {app}"
@@ -850,16 +864,16 @@ msgstr "没有可用于询问是否卸载 {app} 的显示器"
 msgid "Uninstalling {app} cancelled"
 msgstr "已取消卸载 {app}"
 
-#: src/apk_starter/launch.py:30
+#: src/apk_starter/launch.py:31
 #, python-brace-format
 msgid "invalid --size, expected WxH: {value}"
 msgstr "--size 无效，应为 WxH：{value}"
 
-#: src/apk_starter/launch.py:104
+#: src/apk_starter/launch.py:106
 msgid "Start page of the app"
 msgstr "应用的起始页"
 
-#: src/apk_starter/launch.py:104
+#: src/apk_starter/launch.py:106
 msgid "Open pages of the app"
 msgstr "应用已打开的页面"
 

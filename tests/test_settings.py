@@ -41,3 +41,14 @@ def test_aurora_updates_is_off_by_default_and_remembered(tmp_path):
     assert load_settings(f).aurora_updates is False
     save_settings(f, replace(Settings(), aurora_updates=True))
     assert load_settings(f).aurora_updates is True
+
+
+def test_sdk_override_is_kept_and_unknown_values_are_dropped(tmp_path):
+    path = tmp_path / "settings.json"
+    save_settings(path, Settings().with_app("org.a", sdk=35))
+    assert load_settings(path).app("org.a").sdk == 35
+    assert load_settings(path).app("org.b").sdk is None
+    save_settings(path, load_settings(path).with_app("org.a", sdk=None))
+    assert "sdk" not in path.read_text()
+    path.write_text('{"apps": {"org.a": {"sdk": 12}, "org.b": {"sdk": true}, "org.c": {"sdk": "36"}}}')
+    assert [load_settings(path).app(k).sdk for k in ("org.a", "org.b", "org.c")] == [None, None, None]

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-08 20:33+0000\n"
+"POT-Creation-Date: 2026-11-10 04:30+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -23,7 +23,7 @@ msgstr "APK Starter"
 
 #: data/io.github.Jimbambuli.ApkStarter.desktop.in:3
 #: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:5
-#: src/apk_starter/gui.py:494
+#: src/apk_starter/gui.py:497
 msgid "Run Android apps on the Linux desktop"
 msgstr "Spouštění aplikací pro Android na linuxové ploše"
 
@@ -171,7 +171,7 @@ msgstr ""
 msgid "the downloaded file is not Aurora Store {code}"
 msgstr "stažený soubor není Aurora Store {code}"
 
-#: src/apk_starter/aurora.py:75 src/apk_starter/gui.py:899
+#: src/apk_starter/aurora.py:75 src/apk_starter/gui.py:929
 msgid "Downloading Aurora Store from F-Droid…"
 msgstr "Stahování Aurora Store z F-Droid…"
 
@@ -267,14 +267,14 @@ msgstr "Spouští aplikace pro Android (APK) pomocí Android Translation Layer."
 #: src/apk_starter/cli.py:363
 #, fuzzy
 msgid ""
-"record the app for atl-doctor: exceptions, ATL stub calls, time line, view"
-" trees, clicks and typed text, verbose log; afterwards one archive cleaned"
-" of personal data (default: logs/<package>-<time>.tar.gz); use --debug=DIR"
+"record the app for atl-doctor: exceptions, ATL stub calls, time line, view "
+"trees, clicks and typed text, verbose log; afterwards one archive cleaned of "
+"personal data (default: logs/<package>-<time>.tar.gz); use --debug=DIR"
 msgstr ""
 "nahrát aplikaci pro atl-doctor: výjimky, volání stubů ATL, časová osa, "
 "stromy pohledů se snímkem obrazovky, kliknutí a zadaný text, podrobný "
-"protokol; poté jeden archiv očištěný od osobních údajů (výchozí: "
-"logs/<balíček>-<čas>.tar.gz); použijte --debug=SLOŽKA"
+"protokol; poté jeden archiv očištěný od osobních údajů (výchozí: logs/"
+"<balíček>-<čas>.tar.gz); použijte --debug=SLOŽKA"
 
 #: src/apk_starter/cli.py:367
 #, fuzzy
@@ -430,7 +430,7 @@ msgstr "Hledat aplikace"
 msgid "Name"
 msgstr "Název"
 
-#: src/apk_starter/gui.py:147 src/apk_starter/gui.py:691
+#: src/apk_starter/gui.py:147 src/apk_starter/gui.py:711
 msgid "Last started"
 msgstr "Naposledy spuštěno"
 
@@ -446,7 +446,7 @@ msgstr "Velikost dat"
 msgid "Sort"
 msgstr "Řadit"
 
-#: src/apk_starter/gui.py:155 src/apk_starter/gui.py:278
+#: src/apk_starter/gui.py:155
 msgid "Add apps"
 msgstr "Přidat aplikace"
 
@@ -458,135 +458,149 @@ msgstr "O aplikaci APK Starter"
 msgid "Main menu"
 msgstr "Hlavní nabídka"
 
-#: src/apk_starter/gui.py:166
+#: src/apk_starter/gui.py:168 src/apk_starter/gui.py:446
 msgid "No app matches."
 msgstr "Žádná aplikace neodpovídá."
 
-#: src/apk_starter/gui.py:174 src/apk_starter/launch.py:104
+#: src/apk_starter/gui.py:176 src/apk_starter/launch.py:106
 msgid "Back"
 msgstr "Zpět"
 
-#: src/apk_starter/gui.py:205
+#: src/apk_starter/gui.py:207
 msgid "Drop the APK to install it"
 msgstr "Pusťte APK pro instalaci"
 
-#: src/apk_starter/gui.py:293
+#: src/apk_starter/gui.py:282
 msgid "No apps installed"
 msgstr "Nejsou nainstalovány žádné aplikace"
 
-#: src/apk_starter/gui.py:294
+#: src/apk_starter/gui.py:283
 msgid "Add an app with + or drop an APK here."
 msgstr "Přidejte aplikaci tlačítkem + nebo sem přetáhněte APK."
 
-#: src/apk_starter/gui.py:303 src/apk_starter/gui.py:826
+#: src/apk_starter/gui.py:292 src/apk_starter/gui.py:507
+#: src/apk_starter/gui.py:856
 msgid "Close"
 msgstr "Zavřít"
 
-#: src/apk_starter/gui.py:385
+#: src/apk_starter/gui.py:374
 msgid "Prepared for this computer"
 msgstr "Připraveno pro tento počítač"
 
-#: src/apk_starter/gui.py:385
+#: src/apk_starter/gui.py:374
 msgid "Not prepared yet (done at the next start)"
 msgstr "Zatím nepřipraveno (proběhne při příštím spuštění)"
 
-#: src/apk_starter/gui.py:469
+#: src/apk_starter/gui.py:465
 msgid "Cannot read the app list"
 msgstr "Nelze načíst seznam aplikací"
 
-#: src/apk_starter/gui.py:497
+#: src/apk_starter/gui.py:500
+msgid "GPL-3.0-or-later. This program comes with absolutely no warranty."
+msgstr ""
+
+#: src/apk_starter/gui.py:503 src/apk_starter/gui.py:516
 msgid "Components"
 msgstr "Komponenty"
 
-#: src/apk_starter/gui.py:497
+#: src/apk_starter/gui.py:504
 msgid "unknown"
 msgstr "neznámý"
 
-#: src/apk_starter/gui.py:508
+#: src/apk_starter/gui.py:527
 msgid "Install APK…"
 msgstr "Instalovat APK…"
 
-#: src/apk_starter/gui.py:510
+#: src/apk_starter/gui.py:529
 msgid "Set up Aurora Store…"
 msgstr "Nastavit Aurora Store…"
 
-#: src/apk_starter/gui.py:512
+#: src/apk_starter/gui.py:531
 msgid "Set up microG…"
 msgstr "Nastavit microG…"
 
-#: src/apk_starter/gui.py:598 src/apk_starter/gui.py:753
+#: src/apk_starter/gui.py:616 src/apk_starter/gui.py:783
 msgid "Could not save the setting"
 msgstr "Nastavení nelze uložit"
 
-#: src/apk_starter/gui.py:661 src/apk_starter/gui.py:663
+#: src/apk_starter/gui.py:681 src/apk_starter/gui.py:683
 msgid "Start"
 msgstr "Spustit"
 
-#: src/apk_starter/gui.py:666
+#: src/apk_starter/gui.py:686
 msgid "Uninstall…"
 msgstr "Odinstalovat…"
 
-#: src/apk_starter/gui.py:670
+#: src/apk_starter/gui.py:690
 msgid "Options"
 msgstr "Možnosti"
 
-#: src/apk_starter/gui.py:675
+#: src/apk_starter/gui.py:695
 msgid "Debug is on"
 msgstr "Ladění je zapnuto"
 
-#: src/apk_starter/gui.py:681
+#: src/apk_starter/gui.py:701
 msgid "Delete data…"
 msgstr "Smazat data…"
 
-#: src/apk_starter/gui.py:688
+#: src/apk_starter/gui.py:708
 msgid "Version"
 msgstr "Verze"
 
-#: src/apk_starter/gui.py:689
+#: src/apk_starter/gui.py:709
 msgid "Target SDK"
 msgstr "Cílové SDK"
 
-#: src/apk_starter/gui.py:690
+#: src/apk_starter/gui.py:710
 msgid "Installed"
 msgstr "Nainstalováno"
 
-#: src/apk_starter/gui.py:692
+#: src/apk_starter/gui.py:712
 msgid "Data"
 msgstr "Data"
 
-#: src/apk_starter/gui.py:692
+#: src/apk_starter/gui.py:712
 msgid "no data"
 msgstr "žádná data"
 
-#: src/apk_starter/gui.py:693
+#: src/apk_starter/gui.py:713
 msgid "Status"
 msgstr "Stav"
 
-#: src/apk_starter/gui.py:710
+#: src/apk_starter/gui.py:730
 msgid "Window bar"
 msgstr "Lišta okna"
 
-#: src/apk_starter/gui.py:711
+#: src/apk_starter/gui.py:731
 msgid "With back button"
 msgstr "S tlačítkem Zpět"
 
-#: src/apk_starter/gui.py:711
+#: src/apk_starter/gui.py:731
 msgid "From the system"
 msgstr "Ze systému"
 
-#: src/apk_starter/gui.py:712
+#: src/apk_starter/gui.py:732
 msgid "From the system + navigation bar"
 msgstr "Ze systému + navigační lišta"
 
-#: src/apk_starter/gui.py:721 src/apk_starter/gui.py:793
+#: src/apk_starter/gui.py:741
+#, fuzzy
+msgid "Android version"
+msgstr "Aplikace pro Android"
+
+#: src/apk_starter/gui.py:744
+msgid "Standard (target SDK)"
+msgstr ""
+
+#: src/apk_starter/gui.py:751 src/apk_starter/gui.py:823
 msgid "Debug"
 msgstr "Ladění"
 
-#: src/apk_starter/gui.py:722 src/apk_starter/gui.py:793
+#: src/apk_starter/gui.py:752 src/apk_starter/gui.py:823
 msgid "Debug full"
 msgstr "Debug úplný"
 
-#: src/apk_starter/gui.py:723
+#: src/apk_starter/gui.py:753
 msgid ""
 "The archive contains everything in plain text, also passwords and personal "
 "data – do not pass it on"
@@ -594,67 +608,67 @@ msgstr ""
 "Archiv obsahuje vše čitelným textem, včetně hesel a osobních údajů – "
 "nepředávat dál"
 
-#: src/apk_starter/gui.py:746
+#: src/apk_starter/gui.py:776
 msgid "Report updates"
 msgstr "Hlásit aktualizace"
 
-#: src/apk_starter/gui.py:770
+#: src/apk_starter/gui.py:800
 msgid "Permissions"
 msgstr "Oprávnění"
 
-#: src/apk_starter/gui.py:791
+#: src/apk_starter/gui.py:821
 msgid "Recordings"
 msgstr "Záznamy"
 
-#: src/apk_starter/gui.py:794 src/apk_starter/gui.py:826
+#: src/apk_starter/gui.py:824 src/apk_starter/gui.py:856
 msgid "Open log folder"
 msgstr "Otevřít složku protokolů"
 
-#: src/apk_starter/gui.py:808
+#: src/apk_starter/gui.py:838
 #, python-brace-format
 msgid "Cannot start {app}"
 msgstr "Aplikaci {app} nelze spustit"
 
-#: src/apk_starter/gui.py:825
+#: src/apk_starter/gui.py:855
 #, python-brace-format
 msgid "{app} ended unexpectedly."
 msgstr "{app} neočekávaně skončila."
 
-#: src/apk_starter/gui.py:836 src/apk_starter/gui.py:845
+#: src/apk_starter/gui.py:866 src/apk_starter/gui.py:875
 msgid "Cannot open the log folder"
 msgstr "Nelze otevřít složku protokolů"
 
-#: src/apk_starter/gui.py:849
+#: src/apk_starter/gui.py:879
 msgid "Android apps"
 msgstr "Aplikace pro Android"
 
-#: src/apk_starter/gui.py:855
+#: src/apk_starter/gui.py:885
 msgid "Install APK"
 msgstr "Instalovat APK"
 
-#: src/apk_starter/gui.py:885 src/apk_starter/gui.py:898
+#: src/apk_starter/gui.py:915 src/apk_starter/gui.py:928
 #, python-brace-format
 msgid "{app} installed"
 msgstr "Aplikace {app} nainstalována"
 
-#: src/apk_starter/gui.py:886
+#: src/apk_starter/gui.py:916
 msgid "Installing…"
 msgstr "Instalace…"
 
-#: src/apk_starter/gui.py:888
+#: src/apk_starter/gui.py:918
 #, python-brace-format
 msgid "Cannot install {file}"
 msgstr "{file} nelze nainstalovat"
 
-#: src/apk_starter/gui.py:901
+#: src/apk_starter/gui.py:931
 msgid "Cannot set up Aurora Store"
 msgstr "Aurora Store nelze nastavit"
 
-#: src/apk_starter/gui.py:902
+#: src/apk_starter/gui.py:932
 msgid "Set up Aurora Store?"
 msgstr "Nastavit Aurora Store?"
 
-#: src/apk_starter/gui.py:903
+#: src/apk_starter/gui.py:933
 msgid ""
 "Free apps from Google Play. Downloaded from F-Droid and checked.\n"
 "\n"
@@ -664,33 +678,33 @@ msgstr ""
 "\n"
 "Přihlaste se anonymně: Google může váš vlastní účet zablokovat."
 
-#: src/apk_starter/gui.py:905 src/apk_starter/gui.py:922
-#: src/apk_starter/gui.py:927 src/apk_starter/install_request.py:29
+#: src/apk_starter/gui.py:935 src/apk_starter/gui.py:952
+#: src/apk_starter/gui.py:957 src/apk_starter/install_request.py:29
 #: src/apk_starter/install_request.py:93
 msgid "Cancel"
 msgstr "Zrušit"
 
-#: src/apk_starter/gui.py:905 src/apk_starter/gui.py:922
+#: src/apk_starter/gui.py:935 src/apk_starter/gui.py:952
 msgid "Set up"
 msgstr "Nastavit"
 
-#: src/apk_starter/gui.py:915
+#: src/apk_starter/gui.py:945
 msgid "microG is set up"
 msgstr "microG je nastaven"
 
-#: src/apk_starter/gui.py:916 src/apk_starter/microg.py:98
+#: src/apk_starter/gui.py:946 src/apk_starter/microg.py:98
 msgid "Downloading microG…"
 msgstr "Stahování microG…"
 
-#: src/apk_starter/gui.py:918
+#: src/apk_starter/gui.py:948
 msgid "Cannot set up microG"
 msgstr "microG nelze nastavit"
 
-#: src/apk_starter/gui.py:919
+#: src/apk_starter/gui.py:949
 msgid "Set up microG?"
 msgstr "Nastavit microG?"
 
-#: src/apk_starter/gui.py:920
+#: src/apk_starter/gui.py:950
 msgid ""
 "Google services for apps (push messages, sign-in). Downloaded from the "
 "official microG repository and checked."
@@ -698,12 +712,12 @@ msgstr ""
 "Služby Google pro aplikace (push oznámení, přihlášení). Staženo z "
 "oficiálního repozitáře microG a ověřeno."
 
-#: src/apk_starter/gui.py:932
+#: src/apk_starter/gui.py:962
 #, python-brace-format
 msgid "Delete the data of {app}?"
 msgstr "Smazat data aplikace {app}?"
 
-#: src/apk_starter/gui.py:933
+#: src/apk_starter/gui.py:963
 msgid ""
 "The app stays installed. Its settings, accounts and files are deleted. Close "
 "the app first."
@@ -711,47 +725,47 @@ msgstr ""
 "Aplikace zůstane nainstalována. Její nastavení, účty a soubory budou "
 "smazány. Nejprve aplikaci zavřete."
 
-#: src/apk_starter/gui.py:934
+#: src/apk_starter/gui.py:964
 msgid "Delete Data"
 msgstr "Smazat data"
 
-#: src/apk_starter/gui.py:935
+#: src/apk_starter/gui.py:965
 msgid "Deleting data…"
 msgstr "Mazání dat…"
 
-#: src/apk_starter/gui.py:936
+#: src/apk_starter/gui.py:966
 #, python-brace-format
 msgid "Cannot delete the data of {app}"
 msgstr "Data aplikace {app} nelze smazat"
 
-#: src/apk_starter/gui.py:940 src/apk_starter/install_request.py:93
+#: src/apk_starter/gui.py:970 src/apk_starter/install_request.py:93
 msgid "Also delete app data"
 msgstr "Smazat i data aplikace"
 
-#: src/apk_starter/gui.py:947
+#: src/apk_starter/gui.py:977
 #, python-brace-format
 msgid "{app} uninstalled"
 msgstr "Aplikace {app} odinstalována"
 
-#: src/apk_starter/gui.py:948 src/apk_starter/install_request.py:93
+#: src/apk_starter/gui.py:978 src/apk_starter/install_request.py:93
 #, python-brace-format
 msgid "Uninstall {app}?"
 msgstr "Odinstalovat aplikaci {app}?"
 
-#: src/apk_starter/gui.py:949
+#: src/apk_starter/gui.py:979
 msgid "The app and its menu entry are removed. Close the app first."
 msgstr ""
 "Aplikace a její položka v nabídce budou odstraněny. Nejprve aplikaci zavřete."
 
-#: src/apk_starter/gui.py:949 src/apk_starter/install_request.py:93
+#: src/apk_starter/gui.py:979 src/apk_starter/install_request.py:93
 msgid "Uninstall"
 msgstr "Odinstalovat"
 
-#: src/apk_starter/gui.py:950
+#: src/apk_starter/gui.py:980
 msgid "Uninstalling…"
 msgstr "Odinstalace…"
 
-#: src/apk_starter/gui.py:952
+#: src/apk_starter/gui.py:982
 #, python-brace-format
 msgid "Cannot uninstall {app}"
 msgstr "Aplikaci {app} nelze odinstalovat"
@@ -874,16 +888,16 @@ msgstr "žádná obrazovka pro dotaz na odinstalaci {app}"
 msgid "Uninstalling {app} cancelled"
 msgstr "Odinstalace {app} zrušena"
 
-#: src/apk_starter/launch.py:30
+#: src/apk_starter/launch.py:31
 #, python-brace-format
 msgid "invalid --size, expected WxH: {value}"
 msgstr "neplatná hodnota --size, očekáváno WxH: {value}"
 
-#: src/apk_starter/launch.py:104
+#: src/apk_starter/launch.py:106
 msgid "Start page of the app"
 msgstr "Úvodní stránka aplikace"
 
-#: src/apk_starter/launch.py:104
+#: src/apk_starter/launch.py:106
 msgid "Open pages of the app"
 msgstr "Otevřené stránky aplikace"
 
