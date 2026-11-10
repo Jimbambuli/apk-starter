@@ -34,6 +34,7 @@ class ApkInfo:
     link_filters: tuple[LinkFilter, ...] = ()      # for the menu entry's MimeType (links opened in the app)
     share_types: tuple[str, ...] = ()               # likewise: files it takes shared (ACTION_SEND)
     permissions: tuple[str, ...] = ()               # <uses-permission>, for the switches in the window
+    uses_gms: bool = False                          # built with Google Play Services (microG offered)
 
 
 def _read(z: zipfile.ZipFile, name: str, limit: int) -> bytes:
@@ -118,6 +119,7 @@ def read_apk_info(path: Path, lang: str | None = None) -> ApkInfo:
                 link_filters=m.link_filters,
                 share_types=m.share_types,
                 permissions=m.permissions,
+                uses_gms=m.uses_gms,
             )
     except zipfile.BadZipFile:
         raise ApkError(_("not an APK (no AndroidManifest.xml): {file}").format(file=path)) from None

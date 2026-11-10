@@ -131,8 +131,8 @@ def select(s: SplitSet, label: str) -> SplitSet:
     for x86_64 (Android would refuse it with INSTALL_FAILED_NO_MATCHING_ABIS)."""
     native = abis(s)
     if native and ISA not in native:
-        raise IncompatibleError(_("{app} is only available for ARM devices: it has no code for this computer "
-                                  "({abis}).").format(app=label, abis=", ".join(sorted(native))))
+        raise IncompatibleError(_("{app} contains program code only for ARM processors and does not run on this "
+                                  "computer.").format(app=label))
     keep = tuple((n, p) for n, p in s.splits if n not in ABI_SPLITS or ABI_SPLITS[n] == ISA)
     return SplitSet(s.package, s.base, keep)
 

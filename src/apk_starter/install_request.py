@@ -55,6 +55,46 @@ def ask(info: ApkInfo, installer: str, update: bool, env: Mapping[str, str]) -> 
     return bool(answer and answer[0])
 
 
+def _dialog(env: Mapping[str, str], heading: str, body: str, buttons: list[tuple[str, str]]) -> str | None:
+    """A message or question in a small window of its own, like ask(); the button chosen, None without a display."""
+    if not any(env.get(v) for v in ("WAYLAND_DISPLAY", "DISPLAY")):
+        return None
+    import gi
+    gi.require_version("Gtk", "4.0")
+    from gi.repository import Gio, Gtk
+    from .gui import Dialog, install_styles
+    answer: list[str] = []
+    app = Gtk.Application(application_id="io.github.Jimbambuli.ApkStarter.Message",
+                          flags=Gio.ApplicationFlags.NON_UNIQUE)
+
+    def activate(a: Gtk.Application) -> None:
+        install_styles(Gtk.Window().get_display())
+        owner = Gtk.ApplicationWindow(application=a, title="APK Starter")
+        d = Dialog(owner, heading, body, buttons, then=lambda rid: (answer.append(rid), a.quit()))
+        d.set_application(a)
+        d.present()
+    app.connect("activate", activate)
+    app.run([sys.argv[0]])
+    return answer[0] if answer else None
+
+
+def tell(text: str, env: Mapping[str, str]) -> None:
+    """Why an install was refused, visible (a double click or an app store would otherwise end silently)."""
+    _dialog(env, text, "", [("close", _("Close"))])
+
+
+def offer_microg(env: Mapping[str, str]) -> bool:
+    """Asked once, after a new app built with Google Play Services was installed and microG is missing."""
+    return _dialog(env, _("This app uses Google services. Set up microG?"),
+                   _("Google services for apps (push messages, sign-in). Downloaded from the official microG "
+                     "repository and checked."), [("cancel", _("Not now")), ("ok", _("Set up"))]) == "ok"
+
+
+def wants_microg(paths: Paths, info: ApkInfo) -> bool:
+    from . import microg
+    return info.uses_gms and info.package not in microg.SERVICES and not microg.installed(paths)
+
+
 def run(paths: Paths, env: Mapping[str, str], files: list[Path]) -> int:
     from .cli import check_signer, install_parts, lang_from_env, parts_dir, read_parts
     installer = env.get("ATL_INSTALLER_LABEL") or env.get("ATL_INSTALLER_PACKAGE") or _("An app")
@@ -73,12 +113,15 @@ def run(paths: Paths, env: Mapping[str, str], files: list[Path]) -> int:
                 if not paths.meta(info.package).is_file():
                     raise
                 _say(describe_error(e))         # installed, only the menu entry is missing: the store may open it
+        if not update and wants_microg(paths, info) and offer_microg(env):
+            setup_microg_in_window()
         return STATUS_SUCCESS
     except SignatureConflict as e:
         _say(describe_error(e))
         return STATUS_CONFLICT
     except splits.IncompatibleError as e:
         _say(describe_error(e))
+        tell(describe_error(e), env)
         return STATUS_INCOMPATIBLE
     except ApkError as e:
         _say(describe_error(e))
@@ -86,6 +129,14 @@ def run(paths: Paths, env: Mapping[str, str], files: list[Path]) -> int:
     except (StarterError, OSError) as e:
         _say(describe_error(e))
         return STATUS_FAILURE
+
+
+def setup_microg_in_window() -> None:
+    """The management window sets microG up, with its progress (open already or started for it); not waited for."""
+    import subprocess
+    from .gui import default_launcher
+    subprocess.Popen([*default_launcher(), "--setup-microg-window"], stdin=subprocess.DEVNULL,
+                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
 
 
 def uninstall_question(label: str) -> tuple[str, str, str, str]:

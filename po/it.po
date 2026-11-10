@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-10 04:30+0000\n"
+"POT-Creation-Date: 2026-11-10 17:02+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -23,7 +23,7 @@ msgstr "APK Starter"
 
 #: data/io.github.Jimbambuli.ApkStarter.desktop.in:3
 #: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:5
-#: src/apk_starter/gui.py:497
+#: src/apk_starter/gui.py:532
 msgid "Run Android apps on the Linux desktop"
 msgstr "Esegui app Android sul desktop Linux"
 
@@ -99,29 +99,29 @@ msgstr ""
 msgid "The app list with three free apps from F-Droid"
 msgstr "L’elenco delle app con tre app libere da F-Droid"
 
-#: src/apk_starter/apkinfo.py:42 src/apk_starter/splits.py:77
+#: src/apk_starter/apkinfo.py:43 src/apk_starter/splits.py:77
 #, python-brace-format
 msgid "{file} is too large ({size} bytes)"
 msgstr "{file} è troppo grande ({size} byte)"
 
-#: src/apk_starter/apkinfo.py:90
+#: src/apk_starter/apkinfo.py:91
 #, python-brace-format
 msgid "split APK bundles (.apks/.xapk) are not supported yet: {file}"
 msgstr ""
 "i pacchetti APK suddivisi (.apks/.xapk) non sono ancora supportati: {file}"
 
-#: src/apk_starter/apkinfo.py:96 src/apk_starter/apkinfo.py:123
+#: src/apk_starter/apkinfo.py:97 src/apk_starter/apkinfo.py:125
 #: src/apk_starter/splits.py:75 src/apk_starter/splits.py:82
 #, python-brace-format
 msgid "not an APK (no AndroidManifest.xml): {file}"
 msgstr "non è un APK (manca AndroidManifest.xml): {file}"
 
-#: src/apk_starter/apkinfo.py:100 src/apk_starter/splits.py:89
+#: src/apk_starter/apkinfo.py:101 src/apk_starter/splits.py:89
 #, python-brace-format
 msgid "invalid package name in manifest: {package}"
 msgstr "nome del pacchetto non valido nel manifest: {package}"
 
-#: src/apk_starter/apkinfo.py:125 src/apk_starter/apkinfo.py:127
+#: src/apk_starter/apkinfo.py:127 src/apk_starter/apkinfo.py:129
 #: src/apk_starter/splits.py:62 src/apk_starter/splits.py:64
 #: src/apk_starter/splits.py:84 src/apk_starter/splits.py:86
 #, python-brace-format
@@ -172,7 +172,7 @@ msgstr ""
 msgid "the downloaded file is not Aurora Store {code}"
 msgstr "il file scaricato non è Aurora Store {code}"
 
-#: src/apk_starter/aurora.py:75 src/apk_starter/gui.py:929
+#: src/apk_starter/aurora.py:75 src/apk_starter/gui.py:973
 msgid "Downloading Aurora Store from F-Droid…"
 msgstr "Download di Aurora Store da F-Droid…"
 
@@ -181,7 +181,7 @@ msgstr "Download di Aurora Store da F-Droid…"
 msgid "Updates: {count}"
 msgstr "Aggiornamenti: {count}"
 
-#: src/apk_starter/axml.py:67 src/apk_starter/axml.py:73
+#: src/apk_starter/axml.py:69 src/apk_starter/axml.py:75
 msgid "corrupt AndroidManifest.xml"
 msgstr "AndroidManifest.xml danneggiato"
 
@@ -200,7 +200,7 @@ msgstr ""
 "visibili solo i percorsi passati con --file-forwarding: {command})"
 
 #: src/apk_starter/cli.py:80 src/apk_starter/cli.py:319
-#: src/apk_starter/install_request.py:129
+#: src/apk_starter/install_request.py:180
 #, python-brace-format
 msgid "not installed: {package}"
 msgstr "non installato: {package}"
@@ -312,19 +312,19 @@ msgstr ""
 "installa l’APK e aggiunge una voce di menu; un APK diviso: la base e le sue "
 "parti, oppure un file .apks/.xapk"
 
-#: src/apk_starter/cli.py:380
+#: src/apk_starter/cli.py:381
 msgid "download Aurora Store from F-Droid, check its signature and install it"
 msgstr "scarica Aurora Store da F-Droid, ne verifica la firma e lo installa"
 
-#: src/apk_starter/cli.py:381
+#: src/apk_starter/cli.py:382
 msgid "list installed apps"
 msgstr "elenca le app installate"
 
-#: src/apk_starter/cli.py:382
+#: src/apk_starter/cli.py:383
 msgid "remove an installed app"
 msgstr "disinstalla un’app installata"
 
-#: src/apk_starter/cli.py:384
+#: src/apk_starter/cli.py:385
 msgid ""
 "remove all installed apps and their menu entries (before uninstalling the "
 "Flatpak)"
@@ -332,11 +332,11 @@ msgstr ""
 "rimuove tutte le app installate e le loro voci di menu (prima di "
 "disinstallare il Flatpak)"
 
-#: src/apk_starter/cli.py:385
+#: src/apk_starter/cli.py:386
 msgid "show the version and exit"
 msgstr "mostra la versione ed esce"
 
-#: src/apk_starter/cli.py:386
+#: src/apk_starter/cli.py:387
 msgid ""
 "download microG from its repository, check it and install it (Google "
 "services for the apps)"
@@ -344,7 +344,7 @@ msgstr ""
 "scarica microG dal suo repository, lo controlla e lo installa (servizi "
 "Google per le app)"
 
-#: src/apk_starter/cli.py:425
+#: src/apk_starter/cli.py:426
 msgid ""
 "--install, --list, --remove, --remove-all and --version take no other "
 "arguments"
@@ -352,37 +352,37 @@ msgstr ""
 "--install, --list, --remove, --remove-all e --version non accettano altri "
 "argomenti"
 
-#: src/apk_starter/cli.py:427
+#: src/apk_starter/cli.py:428
 msgid "--purge only works with --remove or --remove-all"
 msgstr "--purge funziona solo con --remove o --remove-all"
 
-#: src/apk_starter/cli.py:469
+#: src/apk_starter/cli.py:473
 msgid "no APK given and no display for the window"
 msgstr "nessun APK indicato e nessuno schermo per la finestra"
 
-#: src/apk_starter/cli.py:473
+#: src/apk_starter/cli.py:477
 msgid "no APK given"
 msgstr "nessun APK indicato"
 
-#: src/apk_starter/cli.py:554 src/apk_starter/cli.py:580
+#: src/apk_starter/cli.py:562 src/apk_starter/cli.py:588
 #, python-brace-format
 msgid "the Android runtime could not be prepared in advance: {reason}"
 msgstr ""
 "non è stato possibile preparare in anticipo il runtime Android: {reason}"
 
-#: src/apk_starter/cli.py:576 src/apk_starter/cli.py:660
+#: src/apk_starter/cli.py:584 src/apk_starter/cli.py:668
 msgid "Preparing…"
 msgstr "Preparazione…"
 
-#: src/apk_starter/cli.py:586
+#: src/apk_starter/cli.py:594
 msgid "Updating the menu entry…"
 msgstr "Aggiornamento della voce di menu…"
 
-#: src/apk_starter/cli.py:589
+#: src/apk_starter/cli.py:597
 msgid "Preparing apps for this computer…"
 msgstr "Preparazione delle app per questo computer…"
 
-#: src/apk_starter/cli.py:644
+#: src/apk_starter/cli.py:652
 #, python-brace-format
 msgid "{app} keeps its old menu entry: {reason}"
 msgstr "{app} mantiene la vecchia voce di menu: {reason}"
@@ -417,193 +417,213 @@ msgstr ""
 msgid "unexpected error: {error}"
 msgstr "errore imprevisto: {error}"
 
-#: src/apk_starter/gui.py:31
+#: src/apk_starter/gui.py:32
 #, python-brace-format
 msgid "the window needs GTK 4: {reason}"
 msgstr "la finestra richiede GTK 4: {reason}"
 
-#: src/apk_starter/gui.py:53
+#: src/apk_starter/gui.py:55
 msgid "never"
 msgstr "mai"
 
-#: src/apk_starter/gui.py:142
+#: src/apk_starter/gui.py:144
 msgid "Search apps"
 msgstr "Cerca app"
 
-#: src/apk_starter/gui.py:147
+#: src/apk_starter/gui.py:149
 msgid "Name"
 msgstr "Nome"
 
-#: src/apk_starter/gui.py:147 src/apk_starter/gui.py:711
+#: src/apk_starter/gui.py:149 src/apk_starter/gui.py:744
 msgid "Last started"
 msgstr "Ultimo avvio"
 
-#: src/apk_starter/gui.py:147
+#: src/apk_starter/gui.py:149
 msgid "Last installed"
 msgstr "Ultima installazione"
 
-#: src/apk_starter/gui.py:148
+#: src/apk_starter/gui.py:150
 msgid "Data size"
 msgstr "Dimensione dati"
 
-#: src/apk_starter/gui.py:150
+#: src/apk_starter/gui.py:152
 msgid "Sort"
 msgstr "Ordina"
 
-#: src/apk_starter/gui.py:155
+#: src/apk_starter/gui.py:157
 msgid "Add apps"
 msgstr "Aggiungi app"
 
-#: src/apk_starter/gui.py:157
+#: src/apk_starter/gui.py:159
 msgid "About APK Starter"
 msgstr "Informazioni su APK Starter"
 
-#: src/apk_starter/gui.py:158
+#: src/apk_starter/gui.py:160
 msgid "Main menu"
 msgstr "Menu principale"
 
-#: src/apk_starter/gui.py:168 src/apk_starter/gui.py:446
+#: src/apk_starter/gui.py:170
 msgid "No app matches."
 msgstr "Nessuna app corrisponde."
 
-#: src/apk_starter/gui.py:176 src/apk_starter/launch.py:106
+#: src/apk_starter/gui.py:178 src/apk_starter/launch.py:106
 msgid "Back"
 msgstr "Indietro"
 
-#: src/apk_starter/gui.py:207
+#: src/apk_starter/gui.py:209
 msgid "Drop the APK to install it"
 msgstr "Rilascia l’APK per installarlo"
 
-#: src/apk_starter/gui.py:282
+#: src/apk_starter/gui.py:295
 msgid "No apps installed"
 msgstr "Nessuna app installata"
 
-#: src/apk_starter/gui.py:283
-msgid "Add an app with + or drop an APK here."
-msgstr "Aggiungi un'app con + o trascina qui un APK."
+#: src/apk_starter/gui.py:299
+msgid "Get apps"
+msgstr "Ottieni app"
 
-#: src/apk_starter/gui.py:292 src/apk_starter/gui.py:507
-#: src/apk_starter/gui.py:856
+#: src/apk_starter/gui.py:300
+msgid ""
+"Sets up Aurora Store: free apps from Google Play. Sign in anonymously there: "
+"Google can block your own account."
+msgstr ""
+"Configura Aurora Store: app gratuite da Google Play. Lì accedi in modo "
+"anonimo: Google può bloccare il tuo account."
+
+#: src/apk_starter/gui.py:302
+msgid "Open APK…"
+msgstr "Apri APK…"
+
+#: src/apk_starter/gui.py:303
+msgid ""
+"Or drop an APK file into this window, or double-click it in the file manager."
+msgstr ""
+"Oppure trascina un file APK in questa finestra o fai doppio clic su di esso "
+"nel file manager."
+
+#: src/apk_starter/gui.py:317 src/apk_starter/gui.py:542
+#: src/apk_starter/gui.py:889 src/apk_starter/install_request.py:83
 msgid "Close"
 msgstr "Chiudi"
 
-#: src/apk_starter/gui.py:374
+#: src/apk_starter/gui.py:399
 msgid "Prepared for this computer"
 msgstr "Preparata per questo computer"
 
-#: src/apk_starter/gui.py:374
+#: src/apk_starter/gui.py:399
 msgid "Not prepared yet (done at the next start)"
 msgstr "Non ancora preparata (al prossimo avvio)"
 
-#: src/apk_starter/gui.py:465
+#: src/apk_starter/gui.py:486
 msgid "Cannot read the app list"
 msgstr "Impossibile leggere l’elenco delle app"
 
-#: src/apk_starter/gui.py:500
+#: src/apk_starter/gui.py:535
 msgid "GPL-3.0-or-later. This program comes with absolutely no warranty."
-msgstr "GPL-3.0 o successiva. Questo programma è fornito senza alcuna garanzia."
+msgstr ""
+"GPL-3.0 o successiva. Questo programma è fornito senza alcuna garanzia."
 
-#: src/apk_starter/gui.py:503 src/apk_starter/gui.py:516
+#: src/apk_starter/gui.py:538 src/apk_starter/gui.py:551
 msgid "Components"
 msgstr "Componenti"
 
-#: src/apk_starter/gui.py:504
+#: src/apk_starter/gui.py:539
 msgid "unknown"
 msgstr "sconosciuto"
 
-#: src/apk_starter/gui.py:527
+#: src/apk_starter/gui.py:561
 msgid "Install APK…"
 msgstr "Installa APK…"
 
-#: src/apk_starter/gui.py:529
-msgid "Set up Aurora Store…"
-msgstr "Configura Aurora Store…"
+#: src/apk_starter/gui.py:562
+msgid "Get apps (Aurora Store)"
+msgstr "Ottieni app (Aurora Store)"
 
-#: src/apk_starter/gui.py:531
+#: src/apk_starter/gui.py:564
 msgid "Set up microG…"
 msgstr "Configura microG…"
 
-#: src/apk_starter/gui.py:616 src/apk_starter/gui.py:783
+#: src/apk_starter/gui.py:649 src/apk_starter/gui.py:816
 msgid "Could not save the setting"
 msgstr "Impossibile salvare l’impostazione"
 
-#: src/apk_starter/gui.py:681 src/apk_starter/gui.py:683
+#: src/apk_starter/gui.py:714 src/apk_starter/gui.py:716
 msgid "Start"
 msgstr "Avvia"
 
-#: src/apk_starter/gui.py:686
+#: src/apk_starter/gui.py:719
 msgid "Uninstall…"
 msgstr "Disinstalla…"
 
-#: src/apk_starter/gui.py:690
+#: src/apk_starter/gui.py:723
 msgid "Options"
 msgstr "Opzioni"
 
-#: src/apk_starter/gui.py:695
+#: src/apk_starter/gui.py:728
 msgid "Debug is on"
 msgstr "Il debug è attivo"
 
-#: src/apk_starter/gui.py:701
+#: src/apk_starter/gui.py:734
 msgid "Delete data…"
 msgstr "Elimina dati…"
 
-#: src/apk_starter/gui.py:708
+#: src/apk_starter/gui.py:741
 msgid "Version"
 msgstr "Versione"
 
-#: src/apk_starter/gui.py:709
+#: src/apk_starter/gui.py:742
 msgid "Target SDK"
 msgstr "SDK di destinazione"
 
-#: src/apk_starter/gui.py:710
+#: src/apk_starter/gui.py:743
 msgid "Installed"
 msgstr "Installata"
 
-#: src/apk_starter/gui.py:712
+#: src/apk_starter/gui.py:745
 msgid "Data"
 msgstr "Dati"
 
-#: src/apk_starter/gui.py:712
+#: src/apk_starter/gui.py:745
 msgid "no data"
 msgstr "nessun dato"
 
-#: src/apk_starter/gui.py:713
+#: src/apk_starter/gui.py:746
 msgid "Status"
 msgstr "Stato"
 
-#: src/apk_starter/gui.py:730
+#: src/apk_starter/gui.py:763
 msgid "Window bar"
 msgstr "Barra della finestra"
 
-#: src/apk_starter/gui.py:731
+#: src/apk_starter/gui.py:764
 msgid "With back button"
 msgstr "Con pulsante Indietro"
 
-#: src/apk_starter/gui.py:731
+#: src/apk_starter/gui.py:764
 msgid "From the system"
 msgstr "Dal sistema"
 
-#: src/apk_starter/gui.py:732
+#: src/apk_starter/gui.py:765
 msgid "From the system + navigation bar"
 msgstr "Dal sistema + barra di navigazione"
 
-#: src/apk_starter/gui.py:741
+#: src/apk_starter/gui.py:774
 msgid "Android version"
 msgstr "Versione Android"
 
-#: src/apk_starter/gui.py:744
+#: src/apk_starter/gui.py:777
 msgid "Standard (target SDK)"
 msgstr "Predefinito (SDK target)"
 
-#: src/apk_starter/gui.py:751 src/apk_starter/gui.py:823
+#: src/apk_starter/gui.py:784 src/apk_starter/gui.py:856
 msgid "Debug"
 msgstr "Debug"
 
-#: src/apk_starter/gui.py:752 src/apk_starter/gui.py:823
+#: src/apk_starter/gui.py:785 src/apk_starter/gui.py:856
 msgid "Debug full"
 msgstr "Debug completo"
 
-#: src/apk_starter/gui.py:753
+#: src/apk_starter/gui.py:786
 msgid ""
 "The archive contains everything in plain text, also passwords and personal "
 "data – do not pass it on"
@@ -611,67 +631,75 @@ msgstr ""
 "L'archivio contiene tutto in chiaro, anche password e dati personali – non "
 "inoltrarlo"
 
-#: src/apk_starter/gui.py:776
+#: src/apk_starter/gui.py:809
 msgid "Report updates"
 msgstr "Segnala aggiornamenti"
 
-#: src/apk_starter/gui.py:800
+#: src/apk_starter/gui.py:833
 msgid "Permissions"
 msgstr "Autorizzazioni"
 
-#: src/apk_starter/gui.py:821
+#: src/apk_starter/gui.py:854
 msgid "Recordings"
 msgstr "Registrazioni"
 
-#: src/apk_starter/gui.py:824 src/apk_starter/gui.py:856
+#: src/apk_starter/gui.py:857 src/apk_starter/gui.py:889
 msgid "Open log folder"
 msgstr "Apri cartella dei registri"
 
-#: src/apk_starter/gui.py:838
+#: src/apk_starter/gui.py:871
 #, python-brace-format
 msgid "Cannot start {app}"
 msgstr "Impossibile avviare {app}"
 
-#: src/apk_starter/gui.py:855
+#: src/apk_starter/gui.py:888
 #, python-brace-format
 msgid "{app} ended unexpectedly."
 msgstr "{app} si è chiusa in modo imprevisto."
 
-#: src/apk_starter/gui.py:866 src/apk_starter/gui.py:875
+#: src/apk_starter/gui.py:899 src/apk_starter/gui.py:908
 msgid "Cannot open the log folder"
 msgstr "Impossibile aprire la cartella dei registri"
 
-#: src/apk_starter/gui.py:879
+#: src/apk_starter/gui.py:912
 msgid "Android apps"
 msgstr "App Android"
 
-#: src/apk_starter/gui.py:885
+#: src/apk_starter/gui.py:918
 msgid "Install APK"
 msgstr "Installa APK"
 
-#: src/apk_starter/gui.py:915 src/apk_starter/gui.py:928
+#: src/apk_starter/gui.py:949 src/apk_starter/gui.py:971
 #, python-brace-format
 msgid "{app} installed"
 msgstr "{app} installata"
 
-#: src/apk_starter/gui.py:916
+#: src/apk_starter/gui.py:951 src/apk_starter/install_request.py:88
+msgid "This app uses Google services. Set up microG?"
+msgstr "Questa app usa i servizi Google. Configurare microG?"
+
+#: src/apk_starter/gui.py:951 src/apk_starter/install_request.py:90
+msgid "Not now"
+msgstr "Non ora"
+
+#: src/apk_starter/gui.py:952
 msgid "Installing…"
 msgstr "Installazione…"
 
-#: src/apk_starter/gui.py:918
+#: src/apk_starter/gui.py:954
 #, python-brace-format
 msgid "Cannot install {file}"
 msgstr "Impossibile installare {file}"
 
-#: src/apk_starter/gui.py:931
+#: src/apk_starter/gui.py:975
 msgid "Cannot set up Aurora Store"
 msgstr "Impossibile configurare Aurora Store"
 
-#: src/apk_starter/gui.py:932
+#: src/apk_starter/gui.py:976
 msgid "Set up Aurora Store?"
 msgstr "Configurare Aurora Store?"
 
-#: src/apk_starter/gui.py:933
+#: src/apk_starter/gui.py:977
 msgid ""
 "Free apps from Google Play. Downloaded from F-Droid and checked.\n"
 "\n"
@@ -681,33 +709,34 @@ msgstr ""
 "\n"
 "Accedi in modo anonimo: Google può bloccare il tuo account."
 
-#: src/apk_starter/gui.py:935 src/apk_starter/gui.py:952
-#: src/apk_starter/gui.py:957 src/apk_starter/install_request.py:29
-#: src/apk_starter/install_request.py:93
+#: src/apk_starter/gui.py:979 src/apk_starter/gui.py:998
+#: src/apk_starter/gui.py:1003 src/apk_starter/install_request.py:29
+#: src/apk_starter/install_request.py:144
 msgid "Cancel"
 msgstr "Annulla"
 
-#: src/apk_starter/gui.py:935 src/apk_starter/gui.py:952
+#: src/apk_starter/gui.py:979 src/apk_starter/gui.py:998
+#: src/apk_starter/install_request.py:90
 msgid "Set up"
 msgstr "Configura"
 
-#: src/apk_starter/gui.py:945
+#: src/apk_starter/gui.py:988
 msgid "microG is set up"
 msgstr "microG è configurato"
 
-#: src/apk_starter/gui.py:946 src/apk_starter/microg.py:98
+#: src/apk_starter/gui.py:989 src/apk_starter/microg.py:98
 msgid "Downloading microG…"
 msgstr "Download di microG…"
 
-#: src/apk_starter/gui.py:948
+#: src/apk_starter/gui.py:991
 msgid "Cannot set up microG"
 msgstr "Impossibile configurare microG"
 
-#: src/apk_starter/gui.py:949
+#: src/apk_starter/gui.py:995
 msgid "Set up microG?"
 msgstr "Configurare microG?"
 
-#: src/apk_starter/gui.py:950
+#: src/apk_starter/gui.py:996 src/apk_starter/install_request.py:89
 msgid ""
 "Google services for apps (push messages, sign-in). Downloaded from the "
 "official microG repository and checked."
@@ -715,12 +744,12 @@ msgstr ""
 "Servizi Google per le app (notifiche push, accesso). Scaricato dal "
 "repository ufficiale di microG e verificato."
 
-#: src/apk_starter/gui.py:962
+#: src/apk_starter/gui.py:1008
 #, python-brace-format
 msgid "Delete the data of {app}?"
 msgstr "Eliminare i dati di {app}?"
 
-#: src/apk_starter/gui.py:963
+#: src/apk_starter/gui.py:1009
 msgid ""
 "The app stays installed. Its settings, accounts and files are deleted. Close "
 "the app first."
@@ -728,46 +757,46 @@ msgstr ""
 "L’app resta installata. Le sue impostazioni, gli account e i file vengono "
 "eliminati. Chiudi prima l’app."
 
-#: src/apk_starter/gui.py:964
+#: src/apk_starter/gui.py:1010
 msgid "Delete Data"
 msgstr "Elimina dati"
 
-#: src/apk_starter/gui.py:965
+#: src/apk_starter/gui.py:1011
 msgid "Deleting data…"
 msgstr "Eliminazione dei dati…"
 
-#: src/apk_starter/gui.py:966
+#: src/apk_starter/gui.py:1012
 #, python-brace-format
 msgid "Cannot delete the data of {app}"
 msgstr "Impossibile eliminare i dati di {app}"
 
-#: src/apk_starter/gui.py:970 src/apk_starter/install_request.py:93
+#: src/apk_starter/gui.py:1016 src/apk_starter/install_request.py:144
 msgid "Also delete app data"
 msgstr "Elimina anche i dati dell’app"
 
-#: src/apk_starter/gui.py:977
+#: src/apk_starter/gui.py:1023
 #, python-brace-format
 msgid "{app} uninstalled"
 msgstr "{app} disinstallata"
 
-#: src/apk_starter/gui.py:978 src/apk_starter/install_request.py:93
+#: src/apk_starter/gui.py:1024 src/apk_starter/install_request.py:144
 #, python-brace-format
 msgid "Uninstall {app}?"
 msgstr "Disinstallare {app}?"
 
-#: src/apk_starter/gui.py:979
+#: src/apk_starter/gui.py:1025
 msgid "The app and its menu entry are removed. Close the app first."
 msgstr "L’app e la sua voce di menu vengono rimosse. Chiudi prima l’app."
 
-#: src/apk_starter/gui.py:979 src/apk_starter/install_request.py:93
+#: src/apk_starter/gui.py:1025 src/apk_starter/install_request.py:144
 msgid "Uninstall"
 msgstr "Disinstalla"
 
-#: src/apk_starter/gui.py:980
+#: src/apk_starter/gui.py:1026
 msgid "Uninstalling…"
 msgstr "Disinstallazione…"
 
-#: src/apk_starter/gui.py:982
+#: src/apk_starter/gui.py:1028
 #, python-brace-format
 msgid "Cannot uninstall {app}"
 msgstr "Impossibile disinstallare {app}"
@@ -872,21 +901,21 @@ msgstr "Installa"
 msgid "no display to ask whether to install {app}"
 msgstr "nessuno schermo per chiedere se installare {app}"
 
-#: src/apk_starter/install_request.py:60
+#: src/apk_starter/install_request.py:100
 msgid "An app"
 msgstr "Un’app"
 
-#: src/apk_starter/install_request.py:68
+#: src/apk_starter/install_request.py:108
 #, python-brace-format
 msgid "Installation of {app} cancelled"
 msgstr "Installazione di {app} annullata"
 
-#: src/apk_starter/install_request.py:99
+#: src/apk_starter/install_request.py:150
 #, python-brace-format
 msgid "no display to ask whether to uninstall {app}"
 msgstr "nessuno schermo per chiedere se disinstallare {app}"
 
-#: src/apk_starter/install_request.py:134
+#: src/apk_starter/install_request.py:185
 #, python-brace-format
 msgid "Uninstalling {app} cancelled"
 msgstr "Disinstallazione di {app} annullata"
@@ -1073,11 +1102,25 @@ msgstr "nessun APK base tra i file (solo parti di configurazione)"
 #: src/apk_starter/splits.py:134
 #, python-brace-format
 msgid ""
-"{app} is only available for ARM devices: it has no code for this computer "
-"({abis})."
+"{app} contains program code only for ARM processors and does not run on this "
+"computer."
 msgstr ""
-"{app} è disponibile solo per dispositivi ARM: non ha codice per questo "
-"computer ({abis})."
+"{app} contiene codice solo per processori ARM e non funziona su questo "
+"computer."
+
+#~ msgid "Add an app with + or drop an APK here."
+#~ msgstr "Aggiungi un'app con + o trascina qui un APK."
+
+#~ msgid "Set up Aurora Store…"
+#~ msgstr "Configura Aurora Store…"
+
+#, python-brace-format
+#~ msgid ""
+#~ "{app} is only available for ARM devices: it has no code for this computer "
+#~ "({abis})."
+#~ msgstr ""
+#~ "{app} è disponibile solo per dispositivi ARM: non ha codice per questo "
+#~ "computer ({abis})."
 
 #~ msgid ""
 #~ "Every start keeps a log, and Debug records more, to find out why an app "

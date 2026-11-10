@@ -123,9 +123,12 @@ def test_search_sort_keys_narrow_layout_and_remembered_state(tmp_path):
     report = json.loads(out.stdout.strip().splitlines()[-1])
     assert report == {
         "restored": ["org.b.bravo", "Bravo", ["Alpha", "Bravo", "Charlie"]], "opened_focus_on_start": True,
-        "empty_page": ["list", True, True, True, "Add an app with + or drop an APK here."], "list_page": "list",
-        "add_menu": 3, "add_menu_aurora_installed": 2,
-        "bravo_menu": [1, False], "version_line": [2, True],
+        "empty_page": ["list", True, True, True, ["Get apps", "Open APK…"], ["win.get-apps", "win.choose-apk"],
+                       "Or drop an APK file into this window, or double-click it in the file manager."],
+        "list_page": "list",
+        "add_menu": ["Install APK…", "Get apps (Aurora Store)", "Set up microG…"],
+        "add_menu_aurora_installed": ["Install APK…", "Get apps (Aurora Store)", "Set up microG…"],
+        "bravo_menu": [1, False], "version_line": [3, True],
         "about": ["0.8.5", "APK Starter", "io.github.Jimbambuli.ApkStarter",
                   "https://github.com/Jimbambuli/apk-starter", True],
         "about_components": [["Components", ["ATL unknown", "art_standalone unknown", "bionic_translation unknown",
@@ -145,7 +148,7 @@ def test_search_sort_keys_narrow_layout_and_remembered_state(tmp_path):
         "menu_corner": {"list": True, "empty": True, "details": True},
         "saved": {"width": 500, "height": 600, "sort": "started", "selected": "org.c.charlie"},
         "narrow_list": [True, False], "narrow_details": [False, True, True, "Bravo"],
-        "narrow_back": [True, False]}, out.stderr
+        "narrow_back": [True, False], "narrow_empty": [False, True, True]}, out.stderr
 
 
 @needs_broadway
@@ -331,3 +334,22 @@ def test_window_tells_aurora_updates_and_a_click_starts_aurora(tmp_path, monkeyp
                              env={**display, **env}, capture_output=True, text=True, timeout=60)
     report = json.loads(out.stdout.strip().splitlines()[-1])
     assert report == {"id": "aurora-updates", "toggle": "Report updates", "started": ["com.aurora.store"]}, out.stderr
+
+
+@needs_broadway
+def test_first_run_welcome_offers_microg_once_and_get_apps_starts_aurora(tmp_path):
+    bindir = tmp_path / "bin"
+    bindir.mkdir()
+    for prog in ("dalvikvm", "dex2oat"):
+        (bindir / prog).symlink_to(HERE / "fake_art.py")
+    with broadway() as env:
+        env |= {"PATH": f"{bindir}:{env['PATH']}", "XDG_CACHE_HOME": str(tmp_path / "d/cache")}
+        apk = make_apk(tmp_path / "demo.apk", manifest=axml_manifest(meta_data=["com.google.android.gms.version"]))
+        out = subprocess.run([sys.executable, str(HERE / "gui_welcome_probe.py"), str(tmp_path / "d"), str(apk),
+                              str(tmp_path / "started")],
+                             env=env, capture_output=True, text=True, timeout=60)
+    report = json.loads(out.stdout.strip().splitlines()[-1])
+    assert report == {"welcome": [True, ["Get apps", "Open APK…"]],
+                      "offered": ["This app uses Google services. Set up microG?", ["Not now", "Set up"]],
+                      "asked_on_update": False,
+                      "get_apps": [["com.aurora.store"], False]}, out.stderr

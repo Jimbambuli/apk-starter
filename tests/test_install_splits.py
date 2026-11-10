@@ -50,7 +50,7 @@ def test_reinstall_without_parts_removes_old_parts(box):
 
 def test_arm_only_app_is_refused_with_exit_7(box, capsys):
     assert main(["--install", *map(str, parts(box.tmp, arm_only=True))], env=box.env) == 7
-    assert "only available for ARM" in capsys.readouterr().err
+    assert "only for ARM processors" in capsys.readouterr().err
     assert not (box.data / "apps" / f"{PKG}.apk").exists()
 
 
@@ -78,7 +78,65 @@ def test_install_request_asks_first(box, monkeypatch, capsys, answer, code):
 
 def test_install_request_for_arm_only_app_does_not_ask(box, monkeypatch):
     monkeypatch.setattr(install_request, "ask", lambda *a: pytest.fail("asked"))
+    told = []
+    monkeypatch.setattr(install_request, "_dialog", lambda env, heading, body, buttons: told.append(heading))
     assert main(["--install-request", *map(str, parts(box.tmp, arm_only=True))], env=box.env) == 7
+    # said in a window, not only on stderr (the app store would end silently)
+    assert told == ["Demo contains program code only for ARM processors and does not run on this computer."]
+
+
+def test_double_click_on_arm_only_apk_says_why_in_a_window(box, monkeypatch, capsys):
+    told = []
+    monkeypatch.setattr(install_request, "_dialog", lambda env, heading, body, buttons: told.append(heading))
+    arm = make_apk(box.tmp / "arm.apk", manifest=axml_manifest(), files={"lib/armeabi-v7a/l.so": b"a"})
+    assert main([str(arm)], env=box.env) == 7
+    assert told == ["Demo contains program code only for ARM processors and does not run on this computer."]
+    assert "only for ARM processors" in capsys.readouterr().err
+    assert not (box.data / "apps" / f"{PKG}.apk").exists()
+
+
+def test_without_display_the_refusal_needs_no_window(box):
+    assert install_request._dialog(box.env, "x", "", [("close", "Close")]) is None     # box.env has no display
+
+
+@pytest.mark.parametrize("gms,microg_there,update,offered", [
+    (True, False, False, True),
+    (True, False, True, False),         # asked once: not again on an update
+    (True, True, False, False),         # microG is there already
+    (False, False, False, False),       # the app does not use Google services
+])
+def test_install_request_offers_microg_once_to_apps_with_play_services(box, monkeypatch, gms, microg_there, update,
+                                                                         offered):
+    from apk_starter import microg
+    monkeypatch.setattr(install_request, "ask", lambda *a: True)
+    meta = ["com.google.android.gms.version"] if gms else []
+    apk = make_apk(box.tmp / "g.apk", manifest=axml_manifest(meta_data=meta))
+    if update:
+        assert main(["--install", str(apk)], env=box.env) == 0
+    if microg_there:
+        monkeypatch.setattr(microg, "installed", lambda paths: True)
+    asked, opened = [], []
+    monkeypatch.setattr(install_request, "_dialog", lambda env, heading, body, buttons: asked.append(heading) or "ok")
+    monkeypatch.setattr(install_request, "setup_microg_in_window", lambda: opened.append(True))
+    assert main(["--install-request", str(apk)], env=box.env) == 0
+    assert asked == (["This app uses Google services. Set up microG?"] if offered else [])
+    assert opened == ([True] if offered else [])
+
+
+def test_microg_offer_declined_opens_nothing(box, monkeypatch):
+    monkeypatch.setattr(install_request, "ask", lambda *a: True)
+    monkeypatch.setattr(install_request, "_dialog", lambda *a: "cancel")
+    monkeypatch.setattr(install_request, "setup_microg_in_window", lambda: pytest.fail("opened"))
+    apk = make_apk(box.tmp / "g.apk", manifest=axml_manifest(meta_data=["com.google.android.gms.version"]))
+    assert main(["--install-request", str(apk)], env=box.env) == 0
+
+
+def test_setup_microg_in_window_starts_the_window_detached(monkeypatch):
+    import subprocess
+    started = []
+    monkeypatch.setattr(subprocess, "Popen", lambda argv, **kw: started.append((argv[-1], kw["start_new_session"])))
+    install_request.setup_microg_in_window()
+    assert started == [("--setup-microg-window", True)]
 
 
 def test_install_request_failure_is_status_failure(box, monkeypatch, capsys):
@@ -132,3 +190,11 @@ def test_uninstall_request_asks_and_reports_like_package_installer(box, monkeypa
 def test_uninstall_request_for_an_unknown_package_fails_without_asking(box, monkeypatch):
     monkeypatch.setattr(install_request, "ask_uninstall", lambda *a: pytest.fail("asked"))
     assert main(["--uninstall-request", "org.example.none"], env=box.env) == 1
+
+
+def test_setup_microg_window_option_opens_the_window_for_it(box, monkeypatch):
+    from apk_starter import gui
+    calls = []
+    monkeypatch.setattr(gui, "run", lambda paths, env, **kw: calls.append(kw) or 0)
+    assert main(["--setup-microg-window"], env=box.env) == 0
+    assert calls == [{"setup_microg": True}]

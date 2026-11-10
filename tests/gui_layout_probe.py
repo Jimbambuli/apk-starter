@@ -68,10 +68,10 @@ def activate(a) -> None:
         report["restored"] = [win.selected, win.details_title.get_text(), titles(win)]
         report["opened_focus_on_start"] = win.get_focus() is win.start_button
         report["menu_corner"] = {"list": corner(win), "details": win.details_title.get_mapped()}
-        report["add_menu"] = win.add_menu.get_n_items()      # APK, Aurora Store and microG: none is set up
+        report["add_menu"] = menu_labels(win)               # APK, Aurora Store and microG: none is set up
         win.paths.meta("com.aurora.store").write_text("{}")
         win.update_add_menu()
-        report["add_menu_aurora_installed"] = win.add_menu.get_n_items()
+        report["add_menu_aurora_installed"] = menu_labels(win)     # «Get apps» stays: it starts Aurora Store
         report["bravo_menu"] = [win.recordings_shown, win.gear_dot.get_visible()]
         report["version_line"] = [win.add_menu.get_n_items(), win.lookup_action("version") is None]
         dlg = win.make_about()                              # a plain window in the app style, no credit tabs
@@ -79,8 +79,8 @@ def activate(a) -> None:
         report["about_components"] = [[name, list(lines)] for name, lines in dlg.about_sections]
         dlg.destroy()
         win.saved_rows = win.all_rows
-        win.show_rows([])                                   # no app: only text, «+» accented and focused
-        wait(lambda: focused_in(win.add_button), empty_checked)
+        win.show_rows([])                                   # no app: the welcome page, «Get apps» accented and focused
+        wait(lambda: focused_in(win.welcome_buttons[0]), empty_checked)
 
     def corner(w):
         """The main-menu button is mapped, in the row of «+» and right behind it (gap under 20 px)."""
@@ -89,14 +89,20 @@ def activate(a) -> None:
         gap = b.x - (a.x + w.add_button.get_width())
         return bool(ok1 and ok2 and w.main_button.get_mapped() and abs(a.y - b.y) < 2 and 0 <= gap < 20)
 
+    def menu_labels(w):
+        return [w.add_menu.get_item_attribute_value(i, "label").get_string() for i in range(w.add_menu.get_n_items())]
+
     def focused_in(widget):
         f = win.get_focus()
         return f is not None and (f is widget or f.is_ancestor(widget))
 
     def empty_checked():
         report["menu_corner"]["empty"] = corner(win)
-        report["empty_page"] = [win.stack.get_visible_child_name(), win.add_button.get_first_child().has_css_class("suggested-action"),
-                                win.get_focus_visible(), win.welcome.get_mapped(), win.welcome_text.get_text()]
+        report["empty_page"] = [win.stack.get_visible_child_name(),
+                                win.welcome_buttons[0].has_css_class("suggested-action"),
+                                win.get_focus_visible(), win.welcome.get_mapped(),
+                                [b.get_label() for b in win.welcome_buttons],
+                                [b.get_action_name() for b in win.welcome_buttons], win.welcome_text.get_text()]
         win.show_rows(win.saved_rows)
         report["list_page"] = win.stack.get_visible_child_name()
         win.paths.meta("com.aurora.store").unlink()      # back to the first state
@@ -170,6 +176,8 @@ def activate(a) -> None:
                                     w2.details_title.get_text()]
         key(w2, "Escape")
         report["narrow_back"] = [w2.side.get_visible(), w2.detail_side.get_visible()]
+        w2.show_rows([])                                    # no app in a narrow window: the welcome page, not the list
+        report["narrow_empty"] = [w2.side.get_visible(), w2.detail_side.get_visible(), w2.welcome.get_mapped()]
         app.quit()
 
     wait(lambda: win.rows and win.get_width() > 0, listed)
