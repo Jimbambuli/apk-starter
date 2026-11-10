@@ -245,6 +245,16 @@ class Window(Gtk.ApplicationWindow):
         self.add_action(sort_action)
         self.connect("close-request", lambda _w: self.remember() or False)
         self.stack.set_visible_child_name("loading")
+        # installs and removals by another starter process (Aurora Store, the command line) show up here too
+        self.apps_changed = 0
+        self.apps_monitor: Gio.FileMonitor | None = None
+        try:
+            paths.apps_dir().mkdir(parents=True, exist_ok=True)
+            self.apps_monitor = Gio.File.new_for_path(str(paths.apps_dir())).monitor_directory(
+                Gio.FileMonitorFlags.WATCH_MOVES, None)
+            self.apps_monitor.connect("changed", self.on_apps_changed)
+        except (OSError, GLib.Error):
+            pass                                    # the list then follows this window's own jobs only
         self.refresh()
         # updates Aurora Store knows, as a notification: now and daily while the window is open (Spec 18 Phase 3)
         if app.lookup_action("aurora-updates") is None:
@@ -463,6 +473,20 @@ class Window(Gtk.ApplicationWindow):
         self.background(lambda: load_rows(self.paths),
                         lambda rows: generation == self.generation and self.show_rows(rows),
                         _("Cannot read the app list"), job=False)
+
+    def on_apps_changed(self, _monitor, file: Gio.File, other: Gio.File | None, event: Gio.FileMonitorEvent) -> None:
+        """An app's <pkg>.json is written last on install and removed on uninstall: reload the list once."""
+        names = [f.get_basename() for f in (file, other) if f is not None]
+        if event == Gio.FileMonitorEvent.ATTRIBUTE_CHANGED or not any(n.endswith(".json") for n in names):
+            return
+        if self.apps_changed:
+            GLib.source_remove(self.apps_changed)
+        self.apps_changed = GLib.timeout_add(300, self.reload_apps)
+
+    def reload_apps(self) -> bool:
+        self.apps_changed = 0
+        self.refresh()
+        return False
 
     def show_rows(self, rows: list[AppRow]) -> None:
         self.all_rows = rows

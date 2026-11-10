@@ -65,6 +65,23 @@ def test_window_lists_installs_starts_and_uninstalls(tmp_path):
 
 
 @needs_broadway
+def test_window_follows_installs_and_removals_of_another_starter_process(tmp_path):
+    bindir = tmp_path / "bin"
+    bindir.mkdir()
+    for prog in ("dalvikvm", "dex2oat"):
+        (bindir / prog).symlink_to(HERE / "fake_art.py")
+    with broadway() as env:
+        env |= {"PATH": f"{bindir}:{env['PATH']}", "XDG_CACHE_HOME": str(tmp_path / "d/cache")}
+        apk = make_apk(tmp_path / "demo.apk", manifest=axml_manifest())
+        out = subprocess.run([sys.executable, str(HERE / "gui_external_probe.py"), str(tmp_path / "d"), str(apk)],
+                             env=env, capture_output=True, text=True, timeout=60)
+    report = json.loads(out.stdout.strip().splitlines()[-1])
+    # install_rc 1: installed, but without a menu entry (no portal on the bus)
+    assert report == {"before": [], "install_rc": 1, "after_install": ["org.example.demo"], "remove_rc": 0,
+                      "after_remove": []}, out.stderr
+
+
+@needs_broadway
 @pytest.mark.skipif(not shutil.which("msgfmt"), reason="no msgfmt (gettext)")
 @pytest.mark.parametrize("lang, title, error", [
     ("de", "Keine Apps installiert", "broken.apk kann nicht installiert werden"),
