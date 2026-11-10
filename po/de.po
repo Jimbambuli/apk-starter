@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-10 21:31+0000\n"
+"POT-Creation-Date: 2026-11-10 23:14+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -66,13 +66,19 @@ msgstr "Jede App hat ihren eigenen Datenordner."
 
 #: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:22
 msgid ""
+"Apps can read, but not change, your Pictures, Music, Videos and Downloads "
+"folders, for example for their own gallery or music player."
+msgstr "Apps können deine Ordner Bilder, Musik, Videos und Downloads lesen, aber nicht verändern, zum Beispiel für ihre eigene Galerie oder ihren Musikplayer."
+
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:24
+msgid ""
 "Debug records an app to find out why it does not work; the archive is "
 "cleaned of personal data."
 msgstr ""
 "Debug zeichnet eine App auf, um herauszufinden, warum sie nicht "
 "funktioniert; das Archiv ist von persönlichen Daten gesäubert."
 
-#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:24
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:26
 msgid ""
 "No apps are included and no Google services are provided. Apps that need "
 "Google Play services, Jetpack Compose, ARM-only native code, the camera, "
@@ -82,11 +88,11 @@ msgstr ""
 "Google-Play-Dienste, Jetpack Compose, nativen Code nur für ARM, die Kamera, "
 "Bluetooth oder Telefonie brauchen, funktionieren möglicherweise nicht."
 
-#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:28
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:30
 msgid "Android is a trademark of Google LLC."
 msgstr "Android ist eine Marke von Google LLC."
 
-#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:29
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:31
 msgid ""
 "The Android robot in the icon is reproduced or modified from work created "
 "and shared by Google and used according to terms described in the Creative "
@@ -96,7 +102,7 @@ msgstr ""
 "geteilten Werk übernommen oder abgewandelt und wird gemäss den Bedingungen "
 "der Creative-Commons-Lizenz Namensnennung 3.0 verwendet."
 
-#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:40
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:42
 msgid "The app list with three free apps from F-Droid"
 msgstr "Die App-Liste mit drei freien Apps aus F-Droid"
 
@@ -480,8 +486,12 @@ msgid "Android apps on your Linux desktop"
 msgstr "Android-Apps auf deinem Linux-Desktop"
 
 #: src/apk_starter/gui.py:306
-msgid "Get apps with Aurora Store or open an APK file – they start like normal programs."
-msgstr "Hole Apps mit Aurora Store oder öffne eine APK-Datei – sie starten wie normale Programme."
+msgid ""
+"Get apps with Aurora Store or open an APK file – they start like normal "
+"programs."
+msgstr ""
+"Hole Apps mit Aurora Store oder öffne eine APK-Datei – sie starten wie "
+"normale Programme."
 
 #: src/apk_starter/gui.py:310
 msgid "Get apps"

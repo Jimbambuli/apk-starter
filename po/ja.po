@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-10 21:31+0000\n"
+"POT-Creation-Date: 2026-11-10 23:14+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -65,13 +65,19 @@ msgstr "アプリごとに専用のデータフォルダーがあります。"
 
 #: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:22
 msgid ""
+"Apps can read, but not change, your Pictures, Music, Videos and Downloads "
+"folders, for example for their own gallery or music player."
+msgstr "アプリはピクチャ、ミュージック、ビデオ、ダウンロードの各フォルダーを読み取れますが、変更はできません。たとえばアプリ独自のギャラリーや音楽プレーヤーで使われます。"
+
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:24
+msgid ""
 "Debug records an app to find out why it does not work; the archive is "
 "cleaned of personal data."
 msgstr ""
 "Debug は、アプリが動かない理由を調べるために記録します。アーカイブは個人情報"
 "を取り除いてあります。"
 
-#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:24
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:26
 msgid ""
 "No apps are included and no Google services are provided. Apps that need "
 "Google Play services, Jetpack Compose, ARM-only native code, the camera, "
@@ -81,11 +87,11 @@ msgstr ""
 "者サービス、Jetpack Compose、ARM 専用のネイティブコード、カメラ、Bluetooth、"
 "電話機能を必要とするアプリは動作しない場合があります。"
 
-#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:28
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:30
 msgid "Android is a trademark of Google LLC."
 msgstr "Android は Google LLC の商標です。"
 
-#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:29
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:31
 msgid ""
 "The Android robot in the icon is reproduced or modified from work created "
 "and shared by Google and used according to terms described in the Creative "
@@ -95,7 +101,7 @@ msgstr ""
 "たは改変したもので、クリエイティブ・コモンズ表示 3.0 ライセンスに記載された条"
 "件に従って使用しています。"
 
-#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:40
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:42
 msgid "The app list with three free apps from F-Droid"
 msgstr "F-Droid の 3 つの自由なアプリが並んだアプリ一覧"
 
@@ -475,8 +481,12 @@ msgid "Android apps on your Linux desktop"
 msgstr "Linux デスクトップで Android アプリを使う"
 
 #: src/apk_starter/gui.py:306
-msgid "Get apps with Aurora Store or open an APK file – they start like normal programs."
-msgstr "Aurora Store でアプリを入手するか、APK ファイルを開いてください。通常のプログラムと同じように起動します。"
+msgid ""
+"Get apps with Aurora Store or open an APK file – they start like normal "
+"programs."
+msgstr ""
+"Aurora Store でアプリを入手するか、APK ファイルを開いてください。通常のプログ"
+"ラムと同じように起動します。"
 
 #: src/apk_starter/gui.py:310
 msgid "Get apps"

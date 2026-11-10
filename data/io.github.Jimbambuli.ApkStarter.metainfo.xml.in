@@ -19,6 +19,8 @@
       <li>A small window lists your apps with icon, version and data size; start, uninstall or delete
         their data from there.</li>
       <li>Each app keeps its own data folder.</li>
+      <li>Apps can read, but not change, your Pictures, Music, Videos and Downloads folders, for example for
+        their own gallery or music player.</li>
       <li>Debug records an app to find out why it does not work; the archive is cleaned of personal data.</li>
     </ul>
     <p>

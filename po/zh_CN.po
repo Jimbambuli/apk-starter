@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-10 21:31+0000\n"
+"POT-Creation-Date: 2026-11-10 23:14+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -62,11 +62,17 @@ msgstr "每个应用都有自己的数据文件夹。"
 
 #: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:22
 msgid ""
+"Apps can read, but not change, your Pictures, Music, Videos and Downloads "
+"folders, for example for their own gallery or music player."
+msgstr "应用可以读取但不能更改你的图片、音乐、视频和下载文件夹，例如用于其自带的图库或音乐播放器。"
+
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:24
+msgid ""
 "Debug records an app to find out why it does not work; the archive is "
 "cleaned of personal data."
 msgstr "Debug 会记录应用，以查明它无法运行的原因；归档已清除个人数据。"
 
-#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:24
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:26
 msgid ""
 "No apps are included and no Google services are provided. Apps that need "
 "Google Play services, Jetpack Compose, ARM-only native code, the camera, "
@@ -75,11 +81,11 @@ msgstr ""
 "不包含任何应用，也不提供 Google 服务。需要 Google Play 服务、Jetpack "
 "Compose、仅限 ARM 的原生代码、摄像头、蓝牙或电话功能的应用可能无法运行。"
 
-#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:28
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:30
 msgid "Android is a trademark of Google LLC."
 msgstr "Android 是 Google LLC 的商标。"
 
-#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:29
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:31
 msgid ""
 "The Android robot in the icon is reproduced or modified from work created "
 "and shared by Google and used according to terms described in the Creative "
@@ -88,7 +94,7 @@ msgstr ""
 "图标中的 Android 机器人是根据 Google 创作和分享的作品复制或修改而成，并依照知"
 "识共享署名 3.0 许可协议中所述的条款使用。"
 
-#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:40
+#: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:42
 msgid "The app list with three free apps from F-Droid"
 msgstr "应用列表，其中有三个来自 F-Droid 的自由应用"
 
@@ -457,8 +463,11 @@ msgid "Android apps on your Linux desktop"
 msgstr "在你的 Linux 桌面上使用 Android 应用"
 
 #: src/apk_starter/gui.py:306
-msgid "Get apps with Aurora Store or open an APK file – they start like normal programs."
-msgstr "通过 Aurora Store 获取应用，或打开 APK 文件——它们会像普通程序一样启动。"
+msgid ""
+"Get apps with Aurora Store or open an APK file – they start like normal "
+"programs."
+msgstr ""
+"通过 Aurora Store 获取应用，或打开 APK 文件——它们会像普通程序一样启动。"
 
 #: src/apk_starter/gui.py:310
 msgid "Get apps"

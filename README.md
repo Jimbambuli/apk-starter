@@ -161,6 +161,11 @@ folders Downloads, Pictures, Documents, Music and Videos (`--filesystem=xdg-down
 be dropped onto the app. Apps save and export through the desktop's file dialog (portal), which writes only where you
 choose.
 
+The apps see Pictures, Music, Videos and Downloads the way Android apps see the phone's shared storage: a gallery or
+music player lists your pictures, songs and videos (Android's MediaStore), read only. Apps cannot write there: a
+picture an app saves through MediaStore lands in the app's data folder, saving music, videos or downloads that way
+fails (the file dialog saves where you choose). Documents is not listed.
+
 For the apps' media in the desktop's media controls and its media keys (MPRIS), APK Starter may own the D-Bus names
 `org.mpris.MediaPlayer2.*` (`--own-name`).
 
