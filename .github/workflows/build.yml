@@ -122,6 +122,8 @@ jobs:
           mkdir site
           cp pages/* site/
           cp data/icons/io.github.Jimbambuli.ApkStarter.svg site/icon.svg
+          # alias published on the old gh-pages branch; keep the URL working
+          cp site/io.github.Jimbambuli.ApkStarter.flatpakref site/apk-starter.flatpakref
           cp -r repo site/repo
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
         with:
