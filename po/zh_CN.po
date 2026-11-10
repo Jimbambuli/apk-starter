@@ -479,7 +479,7 @@ msgstr "无法读取应用列表"
 
 #: src/apk_starter/gui.py:500
 msgid "GPL-3.0-or-later. This program comes with absolutely no warranty."
-msgstr ""
+msgstr "GPL-3.0 或更新版本。本程序不提供任何担保。"
 
 #: src/apk_starter/gui.py:503 src/apk_starter/gui.py:516
 msgid "Components"
@@ -566,13 +566,12 @@ msgid "From the system + navigation bar"
 msgstr "系统提供 + 导航栏"
 
 #: src/apk_starter/gui.py:741
-#, fuzzy
 msgid "Android version"
-msgstr "Android 应用"
+msgstr "Android 版本"
 
 #: src/apk_starter/gui.py:744
 msgid "Standard (target SDK)"
-msgstr ""
+msgstr "默认 (目标 SDK)"
 
 #: src/apk_starter/gui.py:751 src/apk_starter/gui.py:823
 msgid "Debug"

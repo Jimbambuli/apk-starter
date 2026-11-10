@@ -497,7 +497,7 @@ msgstr "Nelze načíst seznam aplikací"
 
 #: src/apk_starter/gui.py:500
 msgid "GPL-3.0-or-later. This program comes with absolutely no warranty."
-msgstr ""
+msgstr "GPL-3.0 nebo novější. Tento program je poskytován bez jakékoli záruky."
 
 #: src/apk_starter/gui.py:503 src/apk_starter/gui.py:516
 msgid "Components"
@@ -584,13 +584,12 @@ msgid "From the system + navigation bar"
 msgstr "Ze systému + navigační lišta"
 
 #: src/apk_starter/gui.py:741
-#, fuzzy
 msgid "Android version"
-msgstr "Aplikace pro Android"
+msgstr "Verze systému Android"
 
 #: src/apk_starter/gui.py:744
 msgid "Standard (target SDK)"
-msgstr ""
+msgstr "Výchozí (cílové SDK)"
 
 #: src/apk_starter/gui.py:751 src/apk_starter/gui.py:823
 msgid "Debug"

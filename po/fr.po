@@ -510,7 +510,7 @@ msgstr "Impossible de lire la liste des applications"
 
 #: src/apk_starter/gui.py:500
 msgid "GPL-3.0-or-later. This program comes with absolutely no warranty."
-msgstr ""
+msgstr "GPL-3.0 ou ultérieure. Ce programme est fourni sans aucune garantie."
 
 #: src/apk_starter/gui.py:503 src/apk_starter/gui.py:516
 msgid "Components"
@@ -597,13 +597,12 @@ msgid "From the system + navigation bar"
 msgstr "Du système + barre de navigation"
 
 #: src/apk_starter/gui.py:741
-#, fuzzy
 msgid "Android version"
-msgstr "Applications Android"
+msgstr "Version Android"
 
 #: src/apk_starter/gui.py:744
 msgid "Standard (target SDK)"
-msgstr ""
+msgstr "Par défaut (SDK cible)"
 
 #: src/apk_starter/gui.py:751 src/apk_starter/gui.py:823
 msgid "Debug"

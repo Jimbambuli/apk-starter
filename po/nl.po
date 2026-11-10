@@ -501,7 +501,7 @@ msgstr "Kan de applijst niet lezen"
 
 #: src/apk_starter/gui.py:500
 msgid "GPL-3.0-or-later. This program comes with absolutely no warranty."
-msgstr ""
+msgstr "GPL-3.0 of later. Dit programma wordt geleverd zonder enige garantie."
 
 #: src/apk_starter/gui.py:503 src/apk_starter/gui.py:516
 msgid "Components"
@@ -588,13 +588,12 @@ msgid "From the system + navigation bar"
 msgstr "Van het systeem + navigatiebalk"
 
 #: src/apk_starter/gui.py:741
-#, fuzzy
 msgid "Android version"
-msgstr "Android-apps"
+msgstr "Android-versie"
 
 #: src/apk_starter/gui.py:744
 msgid "Standard (target SDK)"
-msgstr ""
+msgstr "Standaard (doel-SDK)"
 
 #: src/apk_starter/gui.py:751 src/apk_starter/gui.py:823
 msgid "Debug"
