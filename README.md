@@ -156,15 +156,17 @@ The system's own themes and icons are not visible in the sandbox. Your icon them
 Flatpak extension (e.g. `flatpak install flathub org.freedesktop.Platform.Icontheme.Paper`); otherwise the icons
 are GTK's Adwaita icons.
 
-To open a file with an app («Open with» in the file manager), APK Starter reads – never writes – the standard
-folders Downloads, Pictures, Documents, Music and Videos (`--filesystem=xdg-download:ro` etc.); a file elsewhere can
-be dropped onto the app. Apps save and export through the desktop's file dialog (portal), which writes only where you
-choose.
+To open a file with an app («Open with» in the file manager), APK Starter reads the standard folders Downloads,
+Pictures, Documents, Music and Videos (`--filesystem=xdg-pictures:ro` etc.); a file elsewhere can be dropped onto the
+app. Of these, only Downloads is writable (`--filesystem=xdg-download`). Apps save and export through the desktop's
+file dialog (portal), which writes only where you choose.
 
 The apps see Pictures, Music, Videos and Downloads the way Android apps see the phone's shared storage: a gallery or
-music player lists your pictures, songs and videos (Android's MediaStore), read only. Apps cannot write there: a
-picture an app saves through MediaStore lands in the app's data folder, saving music, videos or downloads that way
-fails (the file dialog saves where you choose). Documents is not listed.
+music player lists your pictures, songs and videos (Android's MediaStore). Downloads is read and written: a file an
+app saves as a download through MediaStore lands in your Downloads folder, and the app may change or delete its own
+files there, not yours. Pictures, Music and Videos are read only: a picture an app saves through MediaStore lands in
+the app's data folder, saving music or videos that way fails (the file dialog saves where you choose). Documents is
+not listed.
 
 For the apps' media in the desktop's media controls and its media keys (MPRIS), APK Starter may own the D-Bus names
 `org.mpris.MediaPlayer2.*` (`--own-name`).

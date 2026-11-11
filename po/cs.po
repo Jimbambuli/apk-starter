@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-10 23:14+0000\n"
+"POT-Creation-Date: 2026-11-11 05:43+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -65,9 +65,10 @@ msgstr "Každá aplikace má vlastní složku s daty."
 
 #: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:22
 msgid ""
-"Apps can read, but not change, your Pictures, Music, Videos and Downloads "
-"folders, for example for their own gallery or music player."
-msgstr "Aplikace mohou číst, ale ne měnit, vaše složky Obrázky, Hudba, Videa a Stažené, například pro vlastní galerii nebo hudební přehrávač."
+"Apps can read and write your Downloads folder and read, but not change, your "
+"Pictures, Music and Videos folders, for example for their own gallery or "
+"music player."
+msgstr "Aplikace mohou číst a zapisovat vaši složku Stažené a číst, ale ne měnit, vaše složky Obrázky, Hudba a Videa, například pro vlastní galerii nebo hudební přehrávač."
 
 #: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:24
 msgid ""

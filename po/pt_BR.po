@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-10 23:14+0000\n"
+"POT-Creation-Date: 2026-11-11 05:43+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -66,9 +66,10 @@ msgstr "Cada aplicativo tem sua própria pasta de dados."
 
 #: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:22
 msgid ""
-"Apps can read, but not change, your Pictures, Music, Videos and Downloads "
-"folders, for example for their own gallery or music player."
-msgstr "Os apps podem ler, mas não alterar, suas pastas Imagens, Músicas, Vídeos e Downloads, por exemplo para a própria galeria ou o próprio player de música."
+"Apps can read and write your Downloads folder and read, but not change, your "
+"Pictures, Music and Videos folders, for example for their own gallery or "
+"music player."
+msgstr "Os apps podem ler e gravar sua pasta Downloads e ler, mas não alterar, suas pastas Imagens, Músicas e Vídeos, por exemplo para a própria galeria ou o próprio player de música."
 
 #: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:24
 msgid ""

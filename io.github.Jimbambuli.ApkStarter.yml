@@ -25,8 +25,9 @@ finish-args:
   # accounts of microG (ATL's AccountManager) in the desktop's secret store (libsecret)
   - --talk-name=org.freedesktop.secrets
   # «Open with» an app for a file in the standard folders: the menu entry gets the path, not a portal document (the
-  # DynamicLauncher portal writes no --file-forwarding); read only, saving goes through the file chooser portal
-  - --filesystem=xdg-download:ro
+  # DynamicLauncher portal writes no --file-forwarding); read only, saving goes through the file chooser portal.
+  # Downloads is writable: apps save there through MediaStore.Downloads as on Android
+  - --filesystem=xdg-download
   - --filesystem=xdg-pictures:ro
   - --filesystem=xdg-documents:ro
   - --filesystem=xdg-music:ro

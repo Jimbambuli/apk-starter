@@ -47,8 +47,9 @@ def test_finish_args_exact():
                              # microG: accounts in the secret store
                              "--talk-name=org.freedesktop.secrets",
                              # «Open with» an app for a file there (standard folders, read only;
-                             # saving goes through the file chooser portal)
-                             "--filesystem=xdg-download:ro", "--filesystem=xdg-pictures:ro",
+                             # saving goes through the file chooser portal); Downloads writable for
+                             # MediaStore.Downloads
+                             "--filesystem=xdg-download", "--filesystem=xdg-pictures:ro",
                              "--filesystem=xdg-documents:ro", "--filesystem=xdg-music:ro",
                              "--filesystem=xdg-videos:ro"}
 
