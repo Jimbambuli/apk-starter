@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-11 05:43+0000\n"
+"POT-Creation-Date: 2026-11-12 14:55+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -65,7 +65,9 @@ msgid ""
 "Apps can read and write your Downloads folder and read, but not change, your "
 "Pictures, Music and Videos folders, for example for their own gallery or "
 "music player."
-msgstr "应用可以读写你的下载文件夹，并可以读取但不能更改你的图片、音乐和视频文件夹，例如用于其自带的图库或音乐播放器。"
+msgstr ""
+"应用可以读写你的下载文件夹，并可以读取但不能更改你的图片、音乐和视频文件夹，"
+"例如用于其自带的图库或音乐播放器。"
 
 #: data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in:24
 msgid ""
@@ -99,28 +101,28 @@ msgstr ""
 msgid "The app list with three free apps from F-Droid"
 msgstr "应用列表，其中有三个来自 F-Droid 的自由应用"
 
-#: src/apk_starter/apkinfo.py:43 src/apk_starter/splits.py:77
+#: src/apk_starter/apkinfo.py:44 src/apk_starter/splits.py:77
 #, python-brace-format
 msgid "{file} is too large ({size} bytes)"
 msgstr "{file} 过大（{size} 字节）"
 
-#: src/apk_starter/apkinfo.py:91
+#: src/apk_starter/apkinfo.py:92
 #, python-brace-format
 msgid "split APK bundles (.apks/.xapk) are not supported yet: {file}"
 msgstr "尚不支持拆分 APK 包（.apks/.xapk）：{file}"
 
-#: src/apk_starter/apkinfo.py:97 src/apk_starter/apkinfo.py:125
+#: src/apk_starter/apkinfo.py:98 src/apk_starter/apkinfo.py:127
 #: src/apk_starter/splits.py:75 src/apk_starter/splits.py:82
 #, python-brace-format
 msgid "not an APK (no AndroidManifest.xml): {file}"
 msgstr "不是 APK（缺少 AndroidManifest.xml）：{file}"
 
-#: src/apk_starter/apkinfo.py:101 src/apk_starter/splits.py:89
+#: src/apk_starter/apkinfo.py:102 src/apk_starter/splits.py:89
 #, python-brace-format
 msgid "invalid package name in manifest: {package}"
 msgstr "清单中的包名无效：{package}"
 
-#: src/apk_starter/apkinfo.py:127 src/apk_starter/apkinfo.py:129
+#: src/apk_starter/apkinfo.py:129 src/apk_starter/apkinfo.py:131
 #: src/apk_starter/splits.py:62 src/apk_starter/splits.py:64
 #: src/apk_starter/splits.py:84 src/apk_starter/splits.py:86
 #, python-brace-format
@@ -178,7 +180,7 @@ msgstr "正在从 F-Droid 下载 Aurora Store…"
 msgid "Updates: {count}"
 msgstr "更新：{count}"
 
-#: src/apk_starter/axml.py:69 src/apk_starter/axml.py:75
+#: src/apk_starter/axml.py:71 src/apk_starter/axml.py:77
 msgid "corrupt AndroidManifest.xml"
 msgstr "AndroidManifest.xml 已损坏"
 
@@ -351,24 +353,29 @@ msgstr "未指定 APK，且没有可用于显示窗口的显示器"
 msgid "no APK given"
 msgstr "未指定 APK"
 
-#: src/apk_starter/cli.py:562 src/apk_starter/cli.py:588
+#: src/apk_starter/cli.py:527
+#, python-brace-format
+msgid "cannot write {file}: {reason}"
+msgstr "无法写入 {file}：{reason}"
+
+#: src/apk_starter/cli.py:568 src/apk_starter/cli.py:594
 #, python-brace-format
 msgid "the Android runtime could not be prepared in advance: {reason}"
 msgstr "无法提前准备 Android 运行时：{reason}"
 
-#: src/apk_starter/cli.py:584 src/apk_starter/cli.py:668
+#: src/apk_starter/cli.py:590 src/apk_starter/cli.py:674
 msgid "Preparing…"
 msgstr "正在准备…"
 
-#: src/apk_starter/cli.py:594
+#: src/apk_starter/cli.py:600
 msgid "Updating the menu entry…"
 msgstr "正在更新菜单项…"
 
-#: src/apk_starter/cli.py:597
+#: src/apk_starter/cli.py:603
 msgid "Preparing apps for this computer…"
 msgstr "正在为此计算机准备应用…"
 
-#: src/apk_starter/cli.py:652
+#: src/apk_starter/cli.py:658
 #, python-brace-format
 msgid "{app} keeps its old menu entry: {reason}"
 msgstr "{app} 保留旧的菜单项：{reason}"

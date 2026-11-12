@@ -28,6 +28,7 @@ BROWSABLE = "android.intent.category.BROWSABLE"
 DEFAULT = "android.intent.category.DEFAULT"
 SEND_ACTIONS = ("android.intent.action.SEND", "android.intent.action.SEND_MULTIPLE")
 GMS_VERSION = "com.google.android.gms.version"     # meta-data of every app built with Google Play Services
+GECKO_GPU = "org.mozilla.gecko.process.GeckoChildProcessServices$gpu"  # <service> of GeckoView's GPU process
 
 
 @dataclass(frozen=True)
@@ -60,6 +61,7 @@ class ManifestInfo:
     share_types: tuple[str, ...] = ()   # MIME types of SEND/SEND_MULTIPLE filters in CATEGORY_DEFAULT
     permissions: tuple[str, ...] = ()   # <uses-permission android:name>
     uses_gms: bool = False              # <meta-data android:name="com.google.android.gms.version">: Play Services
+    gecko_gpu: bool = False             # <service android:name="…GeckoChildProcessServices$gpu">: GeckoView (Firefox)
 
 
 def parse_manifest(data: bytes) -> ManifestInfo:
@@ -82,6 +84,7 @@ def _parse(data: bytes) -> ManifestInfo:
     share: list[str] = []
     permissions: list[str] = []
     uses_gms = False
+    gecko_gpu = False
     in_activity = False
     flt: dict | None = None             # the <intent-filter> being read inside an <activity>
     pos = hsize
@@ -105,6 +108,9 @@ def _parse(data: bytes) -> ManifestInfo:
             elif tag == "meta-data":
                 name_ = _link_attrs(data, pos, astart, asize, acount, strings, resmap).get("name")
                 uses_gms = uses_gms or name_ == GMS_VERSION
+            elif tag == "service":
+                name_ = _link_attrs(data, pos, astart, asize, acount, strings, resmap).get("name")
+                gecko_gpu = gecko_gpu or name_ == GECKO_GPU
             elif tag in ("intent-filter", "action", "category", "data") and in_activity:
                 attrs = _link_attrs(data, pos, astart, asize, acount, strings, resmap)
                 if tag == "intent-filter":
@@ -180,6 +186,7 @@ def _parse(data: bytes) -> ManifestInfo:
         share_types=tuple(share),
         permissions=tuple(permissions),
         uses_gms=uses_gms,
+        gecko_gpu=gecko_gpu,
     )
 
 

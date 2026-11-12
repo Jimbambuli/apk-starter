@@ -50,17 +50,17 @@ def axml_manifest(*, package="org.example.demo", version_code=7, version_name="1
                   target_sdk=34, label: str | int = "Demo", icon: int | None = None,
                   utf8=True, strip_names=False, split: str | None = None,
                   activities: list | None = None, permissions: list | None = None,
-                  meta_data: list | None = None) -> bytes:
+                  meta_data: list | None = None, services: list | None = None) -> bytes:
     """activities: one list of intent filters per <activity>; a filter is a dict with "actions", "categories",
     "data" (list of {attribute: value}) and optionally "autoVerify": True. Their attribute names are plain
     strings (with strip_names=True empty, found by resource ID like in shrunk APKs). meta_data: android:name of
-    <meta-data> elements in <application>."""
+    <meta-data> elements in <application>; services: android:name of <service> elements."""
     ids = {"label": 0x01010001, "icon": 0x01010002, "versionCode": 0x0101021B,
            "versionName": 0x0101021C, "minSdkVersion": 0x0101020C, "targetSdkVersion": 0x01010270}
     attr_names = ["versionCode", "versionName", "minSdkVersion", "targetSdkVersion", "label"]
     if icon is not None:
         attr_names.append("icon")
-    if activities is not None or permissions or meta_data:
+    if activities is not None or permissions or meta_data or services:
         ids.update({"name": 0x01010003, "scheme": 0x01010027, "host": 0x01010028, "pathPrefix": 0x0101002b,
                     "autoVerify": 0x010104ee, "mimeType": 0x01010026})
         attr_names += ["name", "scheme", "host", "pathPrefix", "autoVerify", "mimeType"]
@@ -96,9 +96,10 @@ def axml_manifest(*, package="org.example.demo", version_code=7, version_name="1
     for perm in permissions or []:
         n_p, v_p = add("uses-permission"), add(perm)
         perms += _start(n_p, [(A, idx["name"], v_p, 0x03, v_p)]) + _end(n_p)
-    for name in meta_data or []:
-        n_m, v_m = add("meta-data"), add(name)
-        inner += _start(n_m, [(A, idx["name"], v_m, 0x03, v_m)]) + _end(n_m)
+    for tag, names in (("meta-data", meta_data), ("service", services)):
+        for name in names or []:
+            n_m, v_m = add(tag), add(name)
+            inner += _start(n_m, [(A, idx["name"], v_m, 0x03, v_m)]) + _end(n_m)
     for filters in activities or []:
         n_act = add("activity")
         inner += _start(n_act, [(A, idx["name"], add(".Main"), 0x03, len(strings) - 1)])

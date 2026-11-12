@@ -519,6 +519,12 @@ def _start(paths: Paths, args, level: str | None, into: Path | None, tail: list[
     cmd = build_command(paths, apk_path, size=size, sdk=sdk_for(info, args.sdk if args.sdk is not None else mine.sdk), atl_args=atl_args,
                         app_id=f"{ENTRY_PREFIX}.{info.package}", splits=parts)
     child_env = build_env(paths, info.package, env)
+    if info.gecko_gpu:                              # Firefox & Co.: pages only without Gecko's GPU process
+        from . import gecko
+        try:
+            gecko.no_gpu_process(paths.data(info.package) / f"{info.package}.apk_")
+        except OSError as e:
+            _stderr(_("cannot write {file}: {reason}").format(file=e.filename, reason=e.strerror or e))
     if args.size:
         remember_size(paths, info.package, size)
     later = _prepare_start(paths, env, info.package, apk_path)
