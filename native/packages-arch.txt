@@ -1,0 +1,7 @@
+# Arch Linux: pacman -S --needed $(grep -v '^#' native/packages-arch.txt)
+base-devel git meson ninja pkgconf patch autoconf automake libtool gettext zip unzip
+python python-gobject gtk4 glib2-devel jdk21-openjdk valgrind
+libglvnd libelf libunwind libbsd sdl2-compat libsndfile
+icu openssl expat lz4 xz libcap zlib
+vulkan-icd-loader vulkan-headers openxr fontconfig wayland wayland-protocols libportal libportal-gtk4 sqlite ffmpeg
+libdrm libgudev webkitgtk-6.0 libsecret pango libwebp alsa-lib librsvg

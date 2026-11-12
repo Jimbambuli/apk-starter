@@ -1,0 +1,7 @@
+# Fedora 45: dnf install $(grep -v '^#' native/packages-fedora.txt)
+git meson ninja-build gcc gcc-c++ make patch autoconf automake libtool gettext zip unzip python3-gobject gtk4 java-25-openjdk-devel valgrind-devel wayland-devel
+pkgconfig(egl) pkgconfig(libelf) pkgconfig(libunwind) pkgconfig(libbsd) pkgconfig(sdl2) pkgconfig(sndfile)
+pkgconfig(icu-uc) pkgconfig(icu-i18n) pkgconfig(libcrypto) pkgconfig(expat) pkgconfig(liblz4) pkgconfig(liblzma) pkgconfig(libcap) pkgconfig(zlib)
+pkgconfig(gtk4) pkgconfig(vulkan) pkgconfig(openxr) pkgconfig(fontconfig) pkgconfig(gl) pkgconfig(wayland-client) pkgconfig(wayland-protocols)
+pkgconfig(libportal) pkgconfig(sqlite3) pkgconfig(libavcodec) pkgconfig(libavfilter) pkgconfig(libavformat) pkgconfig(libavutil) pkgconfig(libswscale)
+pkgconfig(libdrm) pkgconfig(gudev-1.0) pkgconfig(webkitgtk-6.0) pkgconfig(libsecret-1) pkgconfig(pangoft2) pkgconfig(libwebp) pkgconfig(alsa) pkgconfig(librsvg-2.0)

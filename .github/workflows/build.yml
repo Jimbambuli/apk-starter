@@ -26,6 +26,24 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y gettext
       - run: python -m pytest -q
 
+  # The native build without Flatpak (native/, README «Native build»): Debian's packages, the documented commands.
+  native:
+    needs: tests
+    runs-on: ubuntu-latest
+    container:
+      image: debian:trixie
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Install the packages the README lists for Debian
+        run: apt-get update && apt-get install -y --no-install-recommends $(grep -v '^#' native/packages-debian.txt)
+      - name: Build and install
+        run: |
+          meson setup _native native --prefix "$PWD/_prefix"
+          meson install -C _native
+      - run: _prefix/bin/apk-starter --version
+
   flatpak:
     needs: tests
     runs-on: ubuntu-latest

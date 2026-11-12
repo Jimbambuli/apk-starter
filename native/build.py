@@ -151,7 +151,10 @@ def build(a: argparse.Namespace) -> None:
         for name, url, sha in read_jars(source):
             jars[name] = bld / "jars" / name
             fetch_jar(url, sha, jars[name])
-        meson_component(atl, bld / "atl", prefix, stage, env, [
+        # inside its source tree, as flatpak-builder does: ninja runs a javac command line with every source file,
+        # and with paths relative to a build directory elsewhere it passes the kernel's 128 KiB limit (E2BIG)
+        bdir = atl / f"_build-{hashlib.sha256(str(bld).encode()).hexdigest()[:8]}"
+        meson_component(atl, bdir, prefix, stage, env, [
             "-Ddownload_tool_deps=false", f"-Dasm_jar_path={jars['asm.jar']}",
             f"-Dasm_tree_jar_path={jars['asm-tree.jar']}", f"-Dgetopt_jar_path={jars['java-getopt.jar']}"])
 
@@ -221,7 +224,18 @@ def install(a: argparse.Namespace) -> None:
     sp = Path(a.stage) / a.prefix.lstrip("/")
     dest = Path(os.environ.get("MESON_INSTALL_DESTDIR_PREFIX", a.prefix))
     log(f"install {sp} -> {dest}")
-    shutil.copytree(sp, dest, symlinks=True, dirs_exist_ok=True)
+    # over an earlier install: each file and link is replaced (copytree cannot overwrite a symlink)
+    for root, _dirs, files in os.walk(sp):
+        out = dest / Path(root).relative_to(sp)
+        out.mkdir(parents=True, exist_ok=True)
+        for f in files:
+            src, dst = Path(root) / f, out / f
+            if dst.is_symlink() or src.is_symlink():
+                dst.unlink(missing_ok=True)
+            if src.is_symlink():
+                os.symlink(os.readlink(src), dst)
+            else:
+                shutil.copy2(src, dst)
 
 
 def main() -> None:

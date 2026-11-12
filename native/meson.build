@@ -35,7 +35,7 @@ foreach d, v : versioned
 endforeach
 
 foreach p : ['git', 'make', 'patch', 'autoreconf', 'libtoolize', 'javac', 'java', 'jar', 'ninja', 'wayland-scanner',
-             'msgfmt', 'zip']
+             'msgfmt', 'zip', 'glib-genmarshal', 'gdbus-codegen', 'glib-compile-resources']
   find_program(p)
 endforeach
 

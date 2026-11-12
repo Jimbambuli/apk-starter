@@ -3,3 +3,4 @@ directory = wolfssl
 url = https://github.com/wolfSSL/wolfssl.git
 revision = 3c5eead44904df64e6a5a1f4ebdce377d35a849a
 depth = 1
+patch_directory = wolfssl

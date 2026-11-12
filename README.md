@@ -174,6 +174,44 @@ For the apps' media in the desktop's media controls and its media keys (MPRIS), 
 Without them (e.g. `flatpak override --user --nofilesystem=xdg-config/gtk-4.0 io.github.Jimbambuli.ApkStarter`) everything
 works with GTK's default theme in the desktop's light or dark variant.
 
+## Native build (without sandbox)
+
+APK Starter can also be built and installed without Flatpak, from the same sources at the same commits as the
+Flatpak (the manifest is the one place where they are set; `tools/check-native-pins.py` keeps `native/` equal to it).
+
+> **Warning: without the Flatpak sandbox the apps run with all the rights of your user account** – they can read and
+> change all your files, use the network and the devices. None of the limits in «Permissions» above apply. Install
+> only apps you trust. The starter says so once when it starts.
+
+Install the build dependencies of your distribution (the lists are tested on Debian 13, Fedora 45 and Arch Linux):
+
+```
+sudo apt install --no-install-recommends $(grep -v '^#' native/packages-debian.txt)   # Debian 13
+sudo dnf install $(grep -v '^#' native/packages-fedora.txt)                           # Fedora 45
+sudo pacman -S --needed $(grep -v '^#' native/packages-arch.txt)                      # Arch Linux
+```
+
+Then build and install into a folder of your own (no root needed; the build takes a while, ART alone is large):
+
+```
+cd native
+meson setup build --prefix ~/.local/opt/apk-starter
+meson install -C build
+```
+
+`meson setup` names a missing package (by its pkg-config name) before the long part starts, and fetches the
+components (`subprojects/*.wrap`). Start the starter with `~/.local/opt/apk-starter/bin/apk-starter`; for the
+application menu link its entry:
+
+```
+ln -s ~/.local/opt/apk-starter/share/applications/io.github.Jimbambuli.ApkStarter.desktop ~/.local/share/applications/
+```
+
+Differences to the Flatpak: the data of the starter and the apps lives in `~/.local/share/io.github.Jimbambuli.ApkStarter`
+and `~/.cache/io.github.Jimbambuli.ApkStarter` (instead of `~/.var/app/…`); the apps' menu entries are written
+directly into `~/.local/share/applications` (no portal); the system's own themes and icons are used. After new
+commits in the manifest: `meson subprojects update --reset` in `native/`, then `meson install -C build` again.
+
 ## Translations
 
 The window, `--help`, the messages and the menu/AppStream texts follow the system language. Included: German,
