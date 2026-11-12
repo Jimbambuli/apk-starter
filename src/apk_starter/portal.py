@@ -1,6 +1,9 @@
-"""XDG desktop portal DynamicLauncher (menu entries). `gi` is imported only inside functions."""
+"""XDG desktop portal DynamicLauncher (menu entries). `gi` is imported only inside functions.
+A native build (native/, no Flatpak) has no portal for itself: it writes the entries into APK_STARTER_MENU_DIR."""
+import os
 import re
 import uuid
+from pathlib import Path
 from collections.abc import Iterable
 
 from .apkinfo import PACKAGE_RE
@@ -135,8 +138,35 @@ def _request(conn, Gio, GLib, iface: str, method: str, make_params):
         conn.signal_unsubscribe(sub)
 
 
+def _native_menu_dir() -> Path | None:
+    d = os.environ.get("APK_STARTER_MENU_DIR")
+    return Path(d) if d else None
+
+
+def _native_icon(pkg: str) -> Path:
+    """The entry's icon, a copy in the starter's data: the desktop finds it by its path."""
+    return Path(os.environ["XDG_DATA_HOME"]) / "menu-icons" / f"{ENTRY_PREFIX}.{pkg}"
+
+
+def _native_install(menu: Path, pkg: str, label: str, icon: bytes, mime_types: list[str]) -> None:
+    program = str(Path(os.environ["APK_STARTER_PREFIX"]) / "bin/apk-starter")
+    # an Exec argument quoted as the Desktop Entry spec says
+    program = '"' + re.sub(r'([\\"`$])', r'\\\1', program).replace("\\", "\\\\").replace("%", "%%") + '"'
+    icon_file = _native_icon(pkg)
+    icon_file.parent.mkdir(parents=True, exist_ok=True)
+    icon_file.write_bytes(icon)
+    entry = desktop_entry(pkg, label, mime_types).replace("Exec=apk-starter ", f"Exec={program} ", 1)
+    menu.mkdir(parents=True, exist_ok=True)
+    dest = menu / desktop_file_id(pkg)
+    tmp = dest.with_name(f"{dest.name}.{os.getpid()}.tmp")
+    tmp.write_text(entry + f"Icon={icon_file}\n", encoding="utf-8")
+    os.replace(tmp, dest)
+
+
 def install_launcher(pkg: str, label: str, icon: bytes, mime_types: list[str] = ()) -> None:
     _check_pkg(pkg)
+    if (menu := _native_menu_dir()) is not None:
+        return _native_install(menu, pkg, label, icon, mime_types)
     Gio, GLib = _gi()
     conn = _connect(Gio, GLib)
     iface = "org.freedesktop.portal.DynamicLauncher"
@@ -157,6 +187,11 @@ def install_launcher(pkg: str, label: str, icon: bytes, mime_types: list[str] = 
 def launcher_entry(pkg: str) -> str | None:
     """The menu entry as the portal keeps it (its Exec and Icon rewritten), None when there is none."""
     _check_pkg(pkg)
+    if (menu := _native_menu_dir()) is not None:
+        try:
+            return (menu / desktop_file_id(pkg)).read_text(encoding="utf-8")
+        except FileNotFoundError:
+            return None
     Gio, GLib = _gi()
     conn = _connect(Gio, GLib)
     try:
@@ -171,6 +206,10 @@ def launcher_entry(pkg: str) -> str | None:
 
 def uninstall_launcher(pkg: str) -> None:
     _check_pkg(pkg)
+    if (menu := _native_menu_dir()) is not None:
+        (menu / desktop_file_id(pkg)).unlink(missing_ok=True)
+        _native_icon(pkg).unlink(missing_ok=True)
+        return
     Gio, GLib = _gi()
     conn = _connect(Gio, GLib)
     try:

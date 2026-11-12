@@ -212,6 +212,10 @@ msgstr ""
 msgid "not installed: {package}"
 msgstr "не установлено: {package}"
 
+#: src/apk_starter/cli.py:91
+msgid "This APK Starter is not a Flatpak: apps run without a sandbox, with all the rights of your user account (your files, the network, the devices). Install only apps you trust."
+msgstr "Этот APK Starter не является Flatpak: приложения работают без песочницы, со всеми правами вашей учётной записи (ваши файлы, сеть, устройства). Устанавливайте только приложения, которым доверяете."
+
 #: src/apk_starter/cli.py:133
 msgid "Different signature – not installed"
 msgstr "Другая подпись – не установлено"
@@ -812,6 +816,10 @@ msgstr "Удаление приложения…"
 #, python-brace-format
 msgid "Cannot uninstall {app}"
 msgstr "Не удалось удалить {app}"
+
+#: src/apk_starter/gui.py:1184
+msgid "Without a sandbox"
+msgstr "Без песочницы"
 
 #: src/apk_starter/gui_model.py:157
 msgid "Exit code 10: crash (an exception the app did not catch)"

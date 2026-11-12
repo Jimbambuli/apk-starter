@@ -1,0 +1,1 @@
+option('jdk', type: 'string', value: '', description: 'JDK directory (default: JAVA_HOME, else the one of javac in PATH)')

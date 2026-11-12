@@ -1,0 +1,5 @@
+[wrap-git]
+directory = atl-doctor
+url = https://github.com/Jimbambuli/atl-doctor.git
+revision = 91c67b71fde21c6650a45a33923c05aaf211596e
+depth = 1

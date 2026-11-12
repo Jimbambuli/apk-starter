@@ -213,6 +213,10 @@ msgstr ""
 msgid "not installed: {package}"
 msgstr "no instalado: {package}"
 
+#: src/apk_starter/cli.py:91
+msgid "This APK Starter is not a Flatpak: apps run without a sandbox, with all the rights of your user account (your files, the network, the devices). Install only apps you trust."
+msgstr "Este APK Starter no es un Flatpak: las aplicaciones se ejecutan sin entorno aislado, con todos los permisos de su cuenta de usuario (sus archivos, la red, los dispositivos). Instale solo aplicaciones de confianza."
+
 #: src/apk_starter/cli.py:133
 msgid "Different signature – not installed"
 msgstr "Firma distinta – no instalado"
@@ -816,6 +820,10 @@ msgstr "Desinstalando…"
 #, python-brace-format
 msgid "Cannot uninstall {app}"
 msgstr "No se puede desinstalar {app}"
+
+#: src/apk_starter/gui.py:1184
+msgid "Without a sandbox"
+msgstr "Sin entorno aislado"
 
 #: src/apk_starter/gui_model.py:157
 msgid "Exit code 10: crash (an exception the app did not catch)"

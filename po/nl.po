@@ -212,6 +212,10 @@ msgstr ""
 msgid "not installed: {package}"
 msgstr "niet geïnstalleerd: {package}"
 
+#: src/apk_starter/cli.py:91
+msgid "This APK Starter is not a Flatpak: apps run without a sandbox, with all the rights of your user account (your files, the network, the devices). Install only apps you trust."
+msgstr "Deze APK Starter is geen Flatpak: apps draaien zonder sandbox, met alle rechten van je gebruikersaccount (je bestanden, het netwerk, de apparaten). Installeer alleen apps die je vertrouwt."
+
 #: src/apk_starter/cli.py:133
 msgid "Different signature – not installed"
 msgstr "Andere handtekening – niet geïnstalleerd"
@@ -814,6 +818,10 @@ msgstr "Verwijderen…"
 #, python-brace-format
 msgid "Cannot uninstall {app}"
 msgstr "Kan {app} niet verwijderen"
+
+#: src/apk_starter/gui.py:1184
+msgid "Without a sandbox"
+msgstr "Zonder sandbox"
 
 #: src/apk_starter/gui_model.py:157
 msgid "Exit code 10: crash (an exception the app did not catch)"

@@ -1,0 +1,4 @@
+# Jars for ATL's jni_upcall_gen (the manifest's module jni-upcall-deps): NAME URL SHA256
+asm.jar https://repo1.maven.org/maven2/org/ow2/asm/asm/9.8/asm-9.8.jar 876eab6a83daecad5ca67eb9fcabb063c97b5aeb8cf1fca7a989ecde17522051
+asm-tree.jar https://repo1.maven.org/maven2/org/ow2/asm/asm-tree/9.8/asm-tree-9.8.jar 14b7880cb7c85eed101e2710432fc3ffb83275532a6a894dc4c4095d49ad59f1
+java-getopt.jar https://repo1.maven.org/maven2/gnu/getopt/java-getopt/1.0.13/java-getopt-1.0.13.jar f09dc6369ffc4fe4362cbd49b6ac6c4a7471375ac5d884c71b0a625a889c38c4

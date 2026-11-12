@@ -1,0 +1,5 @@
+[wrap-git]
+directory = art_standalone
+url = https://gitlab.com/Jimbambuli/art_standalone.git
+revision = 07263d9a01852e803e3074263ae97f220719cc76
+depth = 1

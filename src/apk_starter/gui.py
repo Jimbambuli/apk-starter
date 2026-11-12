@@ -10,8 +10,8 @@ from collections.abc import Callable, Mapping
 from pathlib import Path
 
 from . import aurora, dexopt, diag, microg, permissions, theme
-from .cli import (APP_ID, ENTRY_PREFIX, clear_data, install_files, lang_from_env, microg_hint, prepare_all, remove_app,
-                  setup_microg, VERSION)
+from .cli import (APP_ID, ENTRY_PREFIX, clear_data, install_files, lang_from_env, microg_hint, native_notice,
+                  prepare_all, remove_app, setup_microg, VERSION)
 from .apkinfo import read_apk_info
 from .launch import cached_apk_info
 from .run import read_build_info
@@ -1178,7 +1178,10 @@ def run(paths: Paths, env: Mapping[str, str], launcher: list[str] | None = None,
         return win or Window(a, paths, lang, launcher or default_launcher(), env)
 
     def activate(a: Gtk.Application) -> None:
-        window(a).present()
+        win = window(a)
+        win.present()
+        if notice := native_notice(paths, env):
+            win.alert(_("Without a sandbox"), notice)
 
     def show_app(_action, value: GLib.Variant) -> None:
         win = window(app)

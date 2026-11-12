@@ -4,7 +4,24 @@ import os
 import sys
 
 HERE = os.path.dirname(os.path.realpath(__file__))
-for d in ("/app/share/apk-starter", os.path.join(HERE, "src")):
+PREFIX = os.path.dirname(HERE)
+NATIVE_SHARE = os.path.join(PREFIX, "share/apk-starter")
+if (not os.path.exists("/.flatpak-info") and os.path.isdir(os.path.join(NATIVE_SHARE, "apk_starter"))
+        and os.environ.get("APK_STARTER_NATIVE") != "1"):
+    # Installed by native/meson.build, without Flatpak: ATL and its libraries from this prefix, the starter's data
+    # in folders of its own (the Flatpak has ~/.var/app/<id>), the menu entries written by the starter itself.
+    env = os.environ
+    home = os.path.expanduser("~")
+    data = env.get("XDG_DATA_HOME") or os.path.join(home, ".local/share")
+    cache = env.get("XDG_CACHE_HOME") or os.path.join(home, ".cache")
+    env["APK_STARTER_NATIVE"] = "1"
+    env["APK_STARTER_PREFIX"] = PREFIX
+    env["APK_STARTER_MENU_DIR"] = os.path.join(data, "applications")
+    env["XDG_DATA_HOME"] = os.path.join(data, "io.github.Jimbambuli.ApkStarter")
+    env["XDG_CACHE_HOME"] = os.path.join(cache, "io.github.Jimbambuli.ApkStarter")
+    env["PATH"] = os.pathsep.join(filter(None, [os.path.join(PREFIX, "bin"), env.get("PATH")]))
+    env["LD_LIBRARY_PATH"] = os.pathsep.join(filter(None, [os.path.join(PREFIX, "lib"), env.get("LD_LIBRARY_PATH")]))
+for d in ("/app/share/apk-starter", NATIVE_SHARE, os.path.join(HERE, "src")):
     if os.path.isdir(os.path.join(d, "apk_starter")):
         sys.path.insert(0, d)
         break

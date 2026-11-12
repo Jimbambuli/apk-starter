@@ -211,6 +211,10 @@ msgstr ""
 msgid "not installed: {package}"
 msgstr "インストールされていません: {package}"
 
+#: src/apk_starter/cli.py:91
+msgid "This APK Starter is not a Flatpak: apps run without a sandbox, with all the rights of your user account (your files, the network, the devices). Install only apps you trust."
+msgstr "この APK Starter は Flatpak ではありません: アプリはサンドボックスなしで、ユーザーアカウントのすべての権限 (ファイル、ネットワーク、デバイス) で動作します。信頼できるアプリだけをインストールしてください。"
+
 #: src/apk_starter/cli.py:133
 msgid "Different signature – not installed"
 msgstr "署名が異なります – インストールされません"
@@ -812,6 +816,10 @@ msgstr "アンインストール中…"
 #, python-brace-format
 msgid "Cannot uninstall {app}"
 msgstr "{app} をアンインストールできません"
+
+#: src/apk_starter/gui.py:1184
+msgid "Without a sandbox"
+msgstr "サンドボックスなし"
 
 #: src/apk_starter/gui_model.py:157
 msgid "Exit code 10: crash (an exception the app did not catch)"
