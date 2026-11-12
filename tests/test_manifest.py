@@ -72,9 +72,9 @@ def test_atl_doctor_pinned_with_the_same_atl_source():
     assert f"commit: {pins['atl-doctor']}" in art and "libopenjdkjvmti.so" in art   # JVMTI plugin, same atl-doctor
 
 
-def test_atl_from_the_fix_r5_branch():
+def test_atl_from_the_fix_r6_branch():
     text = (ROOT / "io.github.Jimbambuli.ApkStarter.yml").read_text()
     module = text[text.index("- name: android_translation_layer"):text.index("- name: atl-doctor")]
-    # fix-r4 + android.atl.InputTrace (fix-r5) + ATLViewDump reading "request" and saving the window image on request (612123322), fix-r5 87dfd5577
-    assert "branch: fix-r5" in module
+    # fix-r5 + merges medien-m, api-luecken, mehrprozess, compose-api34, bitmap-fehler (fix-r6 0f37cc5f3)
+    assert "branch: fix-r6" in module
     assert text.count(f"commit: {manifest_commits()['android_translation_layer']}") == 2      # also atl-src
