@@ -132,6 +132,7 @@ def test_microg_offer_declined_opens_nothing(box, monkeypatch):
 
 
 def test_setup_microg_in_window_starts_the_window_detached(monkeypatch):
+    pytest.importorskip("gi")                       # the window's module (gui) imports GTK
     import subprocess
     started = []
     monkeypatch.setattr(subprocess, "Popen", lambda argv, **kw: started.append((argv[-1], kw["start_new_session"])))
@@ -193,6 +194,7 @@ def test_uninstall_request_for_an_unknown_package_fails_without_asking(box, monk
 
 
 def test_setup_microg_window_option_opens_the_window_for_it(box, monkeypatch):
+    pytest.importorskip("gi")
     from apk_starter import gui
     calls = []
     monkeypatch.setattr(gui, "run", lambda paths, env, **kw: calls.append(kw) or 0)
