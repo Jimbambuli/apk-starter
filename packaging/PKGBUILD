@@ -9,10 +9,10 @@ arch=(x86_64)
 url=https://github.com/Jimbambuli/apk-starter
 license=(GPL-3.0-or-later)
 depends=(python python-gobject gtk4 webkitgtk-6.0 libportal-gtk4 ffmpeg mesa vulkan-icd-loader openxr fontconfig
-         sqlite libdrm libgudev libsecret pango libwebp alsa-lib sdl2 sndfile icu openssl expat lz4 xz libcap
-         zlib libunwind libelf libbsd wayland libegl libgl)
+         sqlite libdrm libgudev libsecret pango libwebp alsa-lib sdl2-compat libsndfile icu openssl expat lz4 xz libcap
+         zlib libunwind libelf libbsd wayland libglvnd)
 makedepends=(git meson ninja patch autoconf automake libtool gettext zip unzip patchelf python-gobject valgrind
-             wayland-protocols glib2-devel jdk21-openjdk)
+             wayland-protocols glib2-devel jdk21-openjdk vulkan-headers)
 # stripping would break ART's .oat boot image (the build strips the ELF files itself)
 options=(!strip !debug !lto)
 source=("https://github.com/Jimbambuli/apk-starter/releases/download/v$pkgver/apk-starter-$pkgver.tar.xz")

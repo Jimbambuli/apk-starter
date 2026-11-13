@@ -37,6 +37,7 @@ rpm)
   cp "$top"/RPMS/*/*.rpm "$out"/
   rpmlint "$top"/RPMS/*/*.rpm > "$out/lint-rpm.txt" 2>&1 || true ;;
 arch)
+  pacman-key --init >/dev/null 2>&1; pacman-key --populate archlinux >/dev/null 2>&1
   pacman -Sy --noconfirm --needed --disable-sandbox base-devel namcap >/dev/null 2>&1
   id builder >/dev/null 2>&1 || useradd -m builder
   b=/build/pkg; rm -rf $b; mkdir -p $b; cp "$tar" "$b/apk-starter-$version.tar.xz"; tar -xJOf "$tar" \
