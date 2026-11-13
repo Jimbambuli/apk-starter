@@ -146,7 +146,8 @@ def install_app(paths: Paths, info: ApkInfo, parts: tuple[tuple[str, Path], ...]
     else:
         paths.icon(info.package).unlink(missing_ok=True)
     meta = {"package": info.package, "label": info.label, "version_name": info.version_name,
-            "version_code": info.version_code, "target_sdk": info.target_sdk, "desktop_id": _desktop_id(info.package)}
+            "version_code": info.version_code, "target_sdk": info.target_sdk, "desktop_id": _desktop_id(info.package),
+            "share_types": list(info.share_types)}  # ATL's share sheet offers the app for these (ATLLoadedAppManager)
     _write_atomic(paths.meta(info.package), json.dumps(meta).encode("utf-8"))
 
 

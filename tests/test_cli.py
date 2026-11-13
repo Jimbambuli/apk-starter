@@ -656,6 +656,9 @@ def test_menu_entry_offers_the_app_for_files_it_takes_shared(box):
     apk = make_apk(box.tmp / "share.apk", manifest=axml_manifest(activities=[[send, view]]))
     assert main(["--install", str(apk)], env=box.env) == 0
     assert box.links[PKG] == ["x-scheme-handler/demo", "image/*"]
+    # for ATL's share sheet: every type, */* included (Android offers such an app for anything)
+    meta = json.loads((box.data / "apps" / f"{PKG}.json").read_text())
+    assert meta["share_types"] == ["image/*", "*/*"]
 
 
 def test_start_ends_soon_after_the_app_even_when_the_background_compile_is_still_running(box, monkeypatch):
