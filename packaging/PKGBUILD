@@ -1,4 +1,6 @@
-# pkgver comes from src/apk_starter/cli.py through packaging/ct-build.sh (exported as APK_STARTER_VERSION).
+# Template of the AUR package: pkgver comes from src/apk_starter/cli.py through packaging/ct-build.sh (exported as
+# APK_STARTER_VERSION), @SHA256@ is replaced by the sum of the release tarball (build-all.sh writes the finished
+# PKGBUILD and .SRCINFO to the release folder).
 pkgname=apk-starter
 pkgver=${APK_STARTER_VERSION:?}
 pkgrel=1
@@ -13,8 +15,8 @@ makedepends=(git meson ninja patch autoconf automake libtool gettext zip unzip p
              wayland-protocols glib2-devel jdk21-openjdk)
 # stripping would break ART's .oat boot image (the build strips the ELF files itself)
 options=(!strip !debug !lto)
-source=("apk-starter-$pkgver.tar.xz")
-sha256sums=(SKIP)
+source=("https://github.com/Jimbambuli/apk-starter/releases/download/v$pkgver/apk-starter-$pkgver.tar.xz")
+sha256sums=(@SHA256@)
 
 build() {
   cd "apk-starter-$pkgver"

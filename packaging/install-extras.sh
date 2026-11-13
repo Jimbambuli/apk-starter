@@ -10,5 +10,9 @@ sed -e 's|^Exec=.*|Exec=apk-starter %f|' -e "s|^Icon=.*|Icon=$app|" "$d$p/share/
   > "$d/usr/share/applications/$app.desktop"
 cp "$d$p/share/icons/hicolor/scalable/apps/$app.svg" "$d/usr/share/icons/hicolor/scalable/apps/"
 cp "$d$p/share/metainfo/$app.metainfo.xml" "$d/usr/share/metainfo/"
+# what lintian and rpmlint reject: executable jars/headers, libtool's .la file, bytecode written while building
+find "$d$p" -type f \( -name '*.jar' -o -name '*.h' \) -exec chmod 644 {} +
+find "$d$p" -name '*.la' -delete
+find "$d$p" -name __pycache__ -type d -prune -exec rm -r {} +
 # no second copy of the same files inside the private tree
 rm -r "$d$p/share/applications" "$d$p/share/icons" "$d$p/share/metainfo"

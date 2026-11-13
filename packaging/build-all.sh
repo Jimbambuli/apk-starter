@@ -6,6 +6,7 @@
 # the package into OUT, container destroyed; with TEST=1 also a second, fresh container that installs the package,
 # starts an app headless and removes it again (ct-test.sh; needs APK=, a test .apk).
 # Environment: NODE (default root@pve2), JUMP (ssh jump host, default root@pve1), OUT, BUNDLE (a ready bundle),
+# FLATPAK_HOST/FLATPAK_REPO: where the Flatpak build's repository is (adds the .flatpak bundles); no upload here.
 # KEEP=1 keeps the containers, CTBASE (first container id, default 180).
 set -eu
 here=$(cd "$(dirname "$0")" && pwd)
@@ -55,4 +56,30 @@ for d in $want; do
   fi
   sshn "rm -rf --one-file-system $dir"
 done
-echo "packages in $OUT"
+
+# The assets of the GitHub release: one folder, names that tell the distributions apart, SHA256SUMS.
+version=$(sed -n 's/^VERSION = "\(.*\)"$/\1/p' "$here/../src/apk_starter/cli.py")
+rel=$OUT/release; mkdir -p "$rel"
+for d in $want; do
+  for f in "$OUT/$d"/*.deb "$OUT/$d"/*.rpm "$OUT/$d"/*.pkg.tar.zst; do
+    [ -f "$f" ] || continue
+    b=$(basename "$f")
+    case $d in
+    debian13|ubuntu2404) b=apk-starter_${version}_${d}_amd64.deb;;           # same file name from both builds
+    opensuse) b=$(echo "$b" | sed 's/\(-[0-9]*\)\.x86_64/\1.opensuse-tumbleweed.x86_64/');;
+    esac                                                                      # fedora: .fc44 from %{?dist}; arch: unique
+    cp "$f" "$rel/$b"
+  done
+done
+# Flatpak bundle (the existing way: flatpak build-bundle from the repository of the Flatpak build, runtime from
+# Flathub): FLATPAK_REPO=PATH on FLATPAK_HOST (ssh), e.g. claude@172.22.22.61 and ~/bau/r088/repo.
+if [ -n "${FLATPAK_REPO:-}" ]; then
+  app=io.github.Jimbambuli.ApkStarter; fr=https://dl.flathub.org/repo/flathub.flatpakrepo
+  ssh -o BatchMode=yes "$FLATPAK_HOST" "cd /tmp && rm -f ApkStarter-$version.flatpak ApkStarter-$version.Locale.flatpak &&
+    flatpak build-bundle $FLATPAK_REPO ApkStarter-$version.flatpak $app stable --runtime-repo=$fr &&
+    flatpak build-bundle --runtime $FLATPAK_REPO ApkStarter-$version.Locale.flatpak $app.Locale stable &&
+    tar -C /tmp -cf - ApkStarter-$version.flatpak ApkStarter-$version.Locale.flatpak &&
+    rm -f /tmp/ApkStarter-$version.flatpak /tmp/ApkStarter-$version.Locale.flatpak" | tar -x -C "$rel"
+fi
+(cd "$rel" && rm -f SHA256SUMS && sha256sum -- * > SHA256SUMS && cat SHA256SUMS)
+echo "release assets in $rel; upload (not done here): gh release create v$version --repo Jimbambuli/apk-starter $rel/*"

@@ -10,9 +10,8 @@ tar -xJf "$tar" -C "$work"
 src=$(echo "$work"/apk-starter-*); version=${src##*/apk-starter-}
 sde=$(cat "$src/.source-date-epoch"); who='Jimbambuli <30672094+Jimbambuli@users.noreply.github.com>'
 export APK_STARTER_VERSION=$version SOURCE_DATE_EPOCH=$sde
-# $NETWORK_OFF: command that cuts the network once the dependencies are installed (proof of the offline build)
-off() { [ -z "${NETWORK_OFF:-}" ] || sh -c "$NETWORK_OFF"; }
-on() { [ -z "${NETWORK_ON:-}" ] || sh -c "$NETWORK_ON"; }
+# the build runs in a network namespace without any interface: the proof that it needs no network (NONET= to allow it)
+NONET=${NONET-unshare -n}
 case $fmt in
 deb)
   export DEBIAN_FRONTEND=noninteractive
@@ -21,7 +20,7 @@ deb)
     "$(LC_ALL=C date -u -R -d @"$sde")" > "$src/packaging/debian/changelog"
   cp -a "$src/packaging/debian" "$src/debian"
   (cd "$src" && mk-build-deps -i -r -t 'apt-get -y -qq --no-install-recommends' debian/control >/dev/null)
-  off; (cd "$src" && dpkg-buildpackage -b -uc -us); on
+  (cd "$src" && $NONET dpkg-buildpackage -b -uc -us)
   cp "$work"/*.deb "$out"/
   lintian --no-tag-display-limit "$work"/*.changes > "$out/lint-deb.txt" 2>&1 || true ;;
 rpm)
@@ -34,17 +33,18 @@ rpm)
   printf '\n%%changelog\n* %s %s - %s-1\n- Release %s\n' "$(LC_ALL=C date -u -d @"$sde" '+%a %b %d %Y')" "$who" \
     "$version" "$version" >> "$spec"
   rpmspec -q --define "apkver $version" --buildrequires "$spec" | sed 's/ .*//' | sort -u | xargs $pm >/dev/null
-  off; rpmbuild -bb --define "_topdir $top" --define "apkver $version" "$spec"; on
+  $NONET rpmbuild -bb --define "_topdir $top" --define "apkver $version" "$spec"
   cp "$top"/RPMS/*/*.rpm "$out"/
   rpmlint "$top"/RPMS/*/*.rpm > "$out/lint-rpm.txt" 2>&1 || true ;;
 arch)
   pacman -Sy --noconfirm --needed --disable-sandbox base-devel namcap >/dev/null 2>&1
   id builder >/dev/null 2>&1 || useradd -m builder
   b=/build/pkg; rm -rf $b; mkdir -p $b; cp "$tar" "$b/apk-starter-$version.tar.xz"; tar -xJOf "$tar" \
-    "apk-starter-$version/packaging/PKGBUILD" > $b/PKGBUILD; chown -R builder $b /build/work
+    "apk-starter-$version/packaging/PKGBUILD" | sed "s/@SHA256@/$(sha256sum "$tar" | cut -d' ' -f1)/" > $b/PKGBUILD; chown -R builder $b /build/work
   (. $b/PKGBUILD; pacman -S --noconfirm --needed --disable-sandbox $(echo "${makedepends[@]}" "${depends[@]}") >/dev/null)
-  off; (cd $b && runuser -u builder -- env APK_STARTER_VERSION="$version" SOURCE_DATE_EPOCH="$sde" makepkg -f); on
+  (cd $b && $NONET runuser -u builder -- env APK_STARTER_VERSION="$version" SOURCE_DATE_EPOCH="$sde" makepkg -f)
   cp $b/*.pkg.tar.zst "$out"/
+  (cd $b && runuser -u builder -- makepkg --printsrcinfo > "$out/.SRCINFO"; cp PKGBUILD "$out/PKGBUILD")
   namcap $b/PKGBUILD $b/*.pkg.tar.zst > "$out/lint-arch.txt" 2>&1 || true ;;
 esac
 # test helper (not part of the package): atl-doctor's fake-input client for the headless run in ct-test.sh

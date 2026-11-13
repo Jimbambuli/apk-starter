@@ -10,17 +10,17 @@ P=/usr/lib/apk-starter
 case $pkg in
 *.deb) export DEBIAN_FRONTEND=noninteractive; apt-get update -qq
   apt-get install -y -qq --no-install-recommends "$pkg" kwin-wayland dbus-daemon dbus-user-session mesa-vulkan-drivers \
-    libgl1-mesa-dri fonts-dejavu-core xauth >/dev/null
+    libgl1-mesa-dri fonts-dejavu-core xauth libglib2.0-bin >/dev/null
   files() { dpkg -L apk-starter; }; remove() { apt-get remove -y -qq apk-starter >/dev/null; } ;;
 *.rpm) if command -v zypper >/dev/null; then
     zypper -q --non-interactive --no-gpg-checks install --no-recommends "$pkg" kwin6 dbus-1-daemon Mesa-dri \
-      dejavu-fonts >/dev/null; remove() { zypper -q --non-interactive remove apk-starter; }
-  else dnf -q -y install "$pkg" kwin-wayland dbus-daemon mesa-dri-drivers dejavu-sans-fonts >/dev/null
+      dejavu-fonts glib2-tools >/dev/null; remove() { zypper -q --non-interactive remove apk-starter; }
+  else dnf -q -y install "$pkg" kwin-wayland dbus-daemon mesa-dri-drivers dejavu-sans-fonts glib2 >/dev/null
     remove() { dnf -q -y remove apk-starter; }; fi
   files() { rpm -ql apk-starter; } ;;
 *.pkg.tar.zst) pacman -Sy --noconfirm --disable-sandbox >/dev/null 2>&1
   pacman -U --noconfirm --disable-sandbox "$pkg" >/dev/null 2>&1
-  pacman -S --noconfirm --needed --disable-sandbox kwin dbus mesa ttf-dejavu xorg-xauth >/dev/null 2>&1
+  pacman -S --noconfirm --needed --disable-sandbox kwin dbus mesa ttf-dejavu xorg-xauth glib2 >/dev/null 2>&1
   files() { pacman -Qlq apk-starter; }; remove() { pacman -R --noconfirm apk-starter >/dev/null; } ;;
 esac
 echo "system: $PRETTY_NAME"
