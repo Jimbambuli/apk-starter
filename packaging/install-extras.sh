@@ -15,7 +15,7 @@ find "$d$p" -type f \( -name '*.jar' -o -name '*.h' \) -exec chmod 644 {} +
 find "$d$p" -name '*.la' -delete
 find "$d$p" -name __pycache__ -type d -prune -exec rm -r {} +
 # ART's Makefiles write the rpath as ${ORIGIN}; rpm's check-rpaths only accepts $ORIGIN (the same thing)
-find "$d$p" -type f \( -name '*.so' -o -name '*.so.*' \) | while read -r f; do
+find "$d$p" -type f | while read -r f; do
   r=$(patchelf --print-rpath "$f" 2>/dev/null || true)
   case $r in *'${ORIGIN}'*) patchelf --set-rpath "$(echo "$r" | sed 's/\${ORIGIN}/$ORIGIN/g')" "$f";; esac
 done

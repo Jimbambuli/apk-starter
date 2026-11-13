@@ -18,7 +18,8 @@ case $pkg in
   else dnf -q -y install "$pkg" kwin-wayland dbus-daemon mesa-dri-drivers dejavu-sans-fonts glib2 >/dev/null
     remove() { dnf -q -y remove apk-starter; }; fi
   files() { rpm -ql apk-starter; } ;;
-*.pkg.tar.zst) pacman -Syu --noconfirm --disable-sandbox >/dev/null 2>&1
+*.pkg.tar.zst) pacman-key --init >/dev/null 2>&1; pacman-key --populate archlinux >/dev/null 2>&1
+  pacman -Syu --noconfirm --disable-sandbox >/dev/null 2>&1
   pacman -U --noconfirm --disable-sandbox "$pkg" >/dev/null 2>&1
   pacman -S --noconfirm --needed --disable-sandbox kwin dbus mesa ttf-dejavu xorg-xauth glib2 >/dev/null 2>&1
   files() { pacman -Qlq apk-starter; }; remove() { pacman -R --noconfirm apk-starter >/dev/null; } ;;
@@ -36,9 +37,6 @@ runuser -u nutzer -- env XDG_DATA_HOME=$w/xdg/data XDG_CACHE_HOME=$w/xdg/cache X
   --steps $w/$(basename "$steps") -o $w/rec $w/$(basename "$apk") > $w/record.log 2>&1 && echo "record rc=0" || echo "record rc=$?"
 tail -6 $w/record.log; ls $w/xdg/data/applications 2>/dev/null
 remove
-left=$(while read -r f; do [ -e "$f" ] || [ -L "$f" ] && echo "$f"; done < /tmp/files.list | grep -v '^/usr/share/\(doc\|man\)' \
-  | grep -vx -e / -e /usr -e /usr/bin -e /usr/lib -e /usr/share -e /usr/share/applications -e /usr/share/icons \
-  -e /usr/share/icons/hicolor -e /usr/share/icons/hicolor/scalable -e /usr/share/icons/hicolor/scalable/apps \
-  -e /usr/share/metainfo -e /usr/share/licenses || true)
+left=$(while read -r f; do { [ -f "$f" ] || [ -L "$f" ]; } && echo "$f"; done < /tmp/files.list | grep -v '^/usr/share/\(doc\|man\)' || true)
 echo "left after removal (files of the package): ${left:-none}"
 [ -e $P ] && echo "$P still there: $(find $P | wc -l) entries" || echo "$P gone"

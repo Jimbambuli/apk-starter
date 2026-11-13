@@ -46,7 +46,7 @@ arch)
   (cd $b && $NONET runuser -u builder -- env APK_STARTER_VERSION="$version" SOURCE_DATE_EPOCH="$sde" makepkg -f)
   cp $b/*.pkg.tar.zst "$out"/
   (cd $b && runuser -u builder -- makepkg --printsrcinfo > "$out/.SRCINFO"; cp PKGBUILD "$out/PKGBUILD")
-  namcap $b/PKGBUILD $b/*.pkg.tar.zst > "$out/lint-arch.txt" 2>&1 || true ;;
+  APK_STARTER_VERSION=$version namcap $b/PKGBUILD $b/*.pkg.tar.zst > "$out/lint-arch.txt" 2>&1 || true ;;
 esac
 # test helper (not part of the package): atl-doctor's fake-input client for the headless run in ct-test.sh
 case $fmt in deb) h='libxkbcommon-dev';; rpm) h='pkgconfig(xkbcommon)';; arch) h=libxkbcommon;; esac
