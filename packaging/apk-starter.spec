@@ -56,6 +56,9 @@ their libraries) is built from source and installed in /usr/lib/apk-starter.
 
 %build
 %if 0%{?suse_version}
+# ART compiles with -no-canonical-prefixes: a g++ found as /bin/g++ (/bin -> usr/bin, first in a root PATH)
+# then looks for the C++ headers under /bin/../include and takes GCC's C <stdatomic.h> ('_Atomic' errors)
+export PATH=/usr/bin:$PATH
 x=$PWD/packaging/openxr; mkdir -p $x/pc
 printf 'prefix=%%s\nName: openxr\nDescription: OpenXR headers\nVersion: 1.1.65\nCflags: -I${prefix}/include\n' "$x" > $x/pc/openxr.pc
 export PKG_CONFIG_PATH=$x/pc${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}
