@@ -22,6 +22,7 @@ ExclusiveArch:  x86_64
 BuildRequires:  ninja
 BuildRequires:  java-21-openjdk-devel
 BuildRequires:  libxkbcommon-devel
+BuildRequires:  pkgconfig(glesv2)
 # (no pkgconfig(openxr) in Tumbleweed: the headers from the bundle, see build below)
 %else
 BuildRequires:  ninja-build
@@ -62,6 +63,10 @@ export PATH=/usr/bin:$PATH
 x=$PWD/packaging/openxr; mkdir -p $x/pc
 printf 'prefix=%%s\nName: openxr\nDescription: OpenXR headers\nVersion: 1.1.65\nCflags: -I${prefix}/include\n' "$x" > $x/pc/openxr.pc
 export PKG_CONFIG_PATH=$x/pc${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}
+# ATL takes openxr with partial_dependency(includes: true), which drops the -I of a pkg-config dependency (meson
+# keeps no compile args then): the headers have to be on the compiler's own path (only C files include them;
+# native/build.py sets CPATH itself)
+export C_INCLUDE_PATH=$x/include${C_INCLUDE_PATH:+:$C_INCLUDE_PATH}
 # /usr/bin/javac is a link into /etc/alternatives here: the JDK directory itself
 export JAVA_HOME=$(dirname $(dirname $(readlink -f $(rpm -ql java-21-openjdk-devel | grep '/jvm/.*/bin/javac$' | head -1))))
 %endif
