@@ -81,6 +81,11 @@ modules:
       - /share/doc
 
   - name: wolfssl
+    # The server of stream.srg-ssr.ch (SRF 3 in RadioDroid) sends the root "Go Daddy Root CA - G2", whose serial is 0.
+    # wolfSSL accepts serial 0 only when a root is loaded as trust anchor and fails the handshake with -140 otherwise;
+    # Android's TLS stack accepts the chain. Signature and chain checks stay on.
+    build-options:
+      cppflags: -DWOLFSSL_ASN_ALLOW_0_SERIAL
     config-opts:
       - --enable-shared
       - --disable-opensslall
