@@ -878,7 +878,9 @@ class Window(Gtk.ApplicationWindow):
             return                                  # being deleted or uninstalled
         before = {rec.path for rec in diag.recordings(self.paths, pkg)}
         try:
-            proc = Gio.Subprocess.new(start_argv(self.launcher, pkg, level), Gio.SubprocessFlags.NONE)
+            launcher = Gio.SubprocessLauncher.new(Gio.SubprocessFlags.NONE)
+            launcher.setenv("APK_STARTER_FROM_WINDOW", "1", True)   # this window says a crash itself (crashed())
+            proc = launcher.spawnv(start_argv(self.launcher, pkg, level))
         except GLib.Error as e:
             self.alert(_("Cannot start {app}").format(app=label_), e.message)
             return
