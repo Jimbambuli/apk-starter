@@ -146,12 +146,13 @@ modules:
       - install -Dm755 jvmti-out/libopenjdkjvmti.so /app/lib/art/libopenjdkjvmti.so
     sources:
       - type: git
-        url: https://gitlab.com/Jimbambuli/art_standalone.git
-        branch: fix-r2
-        commit: 07263d9a01852e803e3074263ae97f220719cc76
+        url: file:///home/claude/bau/r088/repos/art.git
+        branch: fix-r3
+        commit: 54b41f8545e61e3a9b5596aa5cf368e18426f999
       - type: git
-        url: https://github.com/Jimbambuli/atl-doctor.git
-        commit: 91c67b71fde21c6650a45a33923c05aaf211596e
+        url: file:///home/claude/bau/r088/repos/adoc.git
+        branch: popups
+        commit: 2f91d3a54f075592352de22a7c7417dcdbe6fa3f
         dest: atl-doctor
 
   # ATL's jni_upcall_gen resolves asm/asm-tree/java-getopt via xmvn5-resolve or
@@ -186,9 +187,9 @@ modules:
       - -Ddownload_tool_deps=false
     sources:
       - type: git
-        url: https://gitlab.com/Jimbambuli/android_translation_layer.git
-        branch: fix-r6
-        commit: 0f37cc5f32d3e82aa01fe1fbb643e9178efafd55
+        url: file:///home/claude/bau/r088/repos/atl.git
+        branch: fix-r7
+        commit: 4e932390c16627c2c34e317c8a71827ffa11d508
 
   # atl-doctor (public, fixed commit): JVMTI agent and trace counter for Log/Debug, its Python package for the
   # Debug recorder and packer (`atl-doctor pack`), and the stub list of exactly this ATL (for stub hits). The whole
@@ -209,11 +210,12 @@ modules:
       - find /app/share/apk-starter/atl_doctor -name __pycache__ -prune -exec rm -rf {} +
     sources:
       - type: git
-        url: https://github.com/Jimbambuli/atl-doctor.git
-        commit: 91c67b71fde21c6650a45a33923c05aaf211596e
+        url: file:///home/claude/bau/r088/repos/adoc.git
+        branch: popups
+        commit: 2f91d3a54f075592352de22a7c7417dcdbe6fa3f
       - type: git
-        url: https://gitlab.com/Jimbambuli/android_translation_layer.git
-        commit: 0f37cc5f32d3e82aa01fe1fbb643e9178efafd55
+        url: file:///home/claude/bau/r088/repos/atl.git
+        commit: 4e932390c16627c2c34e317c8a71827ffa11d508
         dest: atl-src
 
   - name: apk-starter
