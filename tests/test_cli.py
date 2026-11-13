@@ -708,3 +708,17 @@ def test_opening_an_apk_file_compiles_quick_first_and_full_in_the_background(box
     assert main([str(box.apk)], env=box.env) == 0
     assert calls == [(dexopt.QUICK, False, True), (dexopt.FULL, True, False)]
     assert dexopt.app_filter(paths, str(paths.apk(PKG))) == dexopt.FULL
+
+
+def test_crash_from_the_menu_entry_is_said_in_a_window(box, monkeypatch):
+    """Started from the menu entry, nobody sees the exit code: a crash is said in a small window, as the starter's
+    window does for the apps it starts (it sets APK_STARTER_FROM_WINDOW and says it itself)."""
+    from apk_starter import install_request
+    said = []
+    monkeypatch.setattr(install_request, "_dialog", lambda env, heading, body, buttons: said.append((heading, body)))
+    env = {**box.env, "FAKE_ATL_MODE": "exit:10"}
+    assert main([str(box.apk)], env=env) == 10
+    assert len(said) == 1 and "Demo" in said[0][0] and "10" in said[0][1]
+    assert main([str(box.apk)], env={**env, "APK_STARTER_FROM_WINDOW": "1"}) == 10
+    assert main([str(box.apk)], env={**box.env, "FAKE_ATL_MODE": "exit:0"}) == 0
+    assert len(said) == 1

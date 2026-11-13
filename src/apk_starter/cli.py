@@ -529,9 +529,12 @@ def _start(paths: Paths, args, level: str | None, into: Path | None, tail: list[
     background.start()
     try:
         if debug_dir is not None:
-            return diag.record_restarting(paths, cmd, child_env, debug_dir, info.package,
-                                          shots=level == "debug-full")
-        return run_atl(cmd, child_env, None, {})
+            rc = diag.record_restarting(paths, cmd, child_env, debug_dir, info.package,
+                                        shots=level == "debug-full")
+        else:
+            rc = run_atl(cmd, child_env, None, {})
+        _tell_crash(env, info.label, rc)
+        return rc
     finally:
         if debug_dir is not None:                   # one archive, as soon as the app has ended
             try:
@@ -658,6 +661,17 @@ def refresh_menu_entries(paths: Paths, lang: str | None, renewing: Callable[[str
         marker.parent.mkdir(parents=True, exist_ok=True)
         _write_atomic(marker, key.encode("utf-8"))
     return renewed
+
+
+def _tell_crash(env: Mapping[str, str], label: str, rc: int) -> None:
+    """Started from the menu entry, a crash ends the window without a word: say it in a small window. The
+    starter's window says it itself for the apps it starts (APK_STARTER_FROM_WINDOW)."""
+    from .gui_model import crash_meaning
+    meaning = crash_meaning(True, rc)
+    if meaning is None or env.get("APK_STARTER_FROM_WINDOW"):
+        return
+    from . import install_request
+    install_request._dialog(env, _("{app} ended unexpectedly.").format(app=label), meaning, [("close", _("Close"))])
 
 
 def _compile_later(paths: Paths, env: Mapping[str, str], locations: list[str],
