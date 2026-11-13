@@ -42,12 +42,12 @@ arch)
   pacman -Syu --noconfirm --needed --disable-sandbox base-devel namcap >/dev/null 2>&1
   id builder >/dev/null 2>&1 || useradd -m builder
   b=/build/pkg; rm -rf $b; mkdir -p $b; cp "$tar" "$b/apk-starter-$version.tar.xz"; tar -xJOf "$tar" \
-    "apk-starter-$version/packaging/PKGBUILD" | sed "s/@SHA256@/$(sha256sum "$tar" | cut -d' ' -f1)/" > $b/PKGBUILD; chown -R builder $b /build/work
+    "apk-starter-$version/packaging/PKGBUILD" | sed -e "s/@SHA256@/$(sha256sum "$tar" | cut -d' ' -f1)/" -e "s/@VERSION@/$version/" > $b/PKGBUILD; chown -R builder $b /build/work
   (. $b/PKGBUILD; pacman -S --noconfirm --needed --disable-sandbox $(echo "${makedepends[@]}" "${depends[@]}") >/dev/null)
-  (cd $b && $NONET runuser -u builder -- env APK_STARTER_VERSION="$version" SOURCE_DATE_EPOCH="$sde" makepkg -f)
+  (cd $b && $NONET runuser -u builder -- env SOURCE_DATE_EPOCH="$sde" makepkg -f)
   cp $b/*.pkg.tar.zst "$out"/
   (cd $b && runuser -u builder -- makepkg --printsrcinfo > "$out/.SRCINFO"; cp PKGBUILD "$out/PKGBUILD")
-  APK_STARTER_VERSION=$version namcap $b/PKGBUILD $b/*.pkg.tar.zst > "$out/lint-arch.txt" 2>&1 || true ;;
+  namcap $b/PKGBUILD $b/*.pkg.tar.zst > "$out/lint-arch.txt" 2>&1 || true ;;
 esac
 # test helper (not part of the package): atl-doctor's fake-input client for the headless run in ct-test.sh
 case $fmt in deb) h='libxkbcommon-dev';; rpm) h='pkgconfig(xkbcommon)';; arch) h=libxkbcommon;; esac
