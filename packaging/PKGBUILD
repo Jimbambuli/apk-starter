@@ -1,0 +1,31 @@
+# Template of the AUR package: ct-build.sh replaces @VERSION@ (from src/apk_starter/cli.py) and @SHA256@ (the sum of
+# the release tarball); build-all.sh writes the finished PKGBUILD and .SRCINFO to the release folder.
+pkgname=apk-starter
+pkgver=@VERSION@
+pkgrel=1
+pkgdesc='Run Android apps on the Linux desktop'
+arch=(x86_64)
+url=https://github.com/Jimbambuli/apk-starter
+license=(GPL-3.0-or-later)
+depends=(python python-gobject gtk4 webkitgtk-6.0 libportal-gtk4 ffmpeg mesa vulkan-icd-loader openxr fontconfig
+         sqlite libdrm libgudev libsecret pango libwebp alsa-lib sdl2-compat libsndfile icu openssl expat lz4 xz libcap
+         zlib libunwind libelf libbsd wayland libglvnd)
+makedepends=(git meson ninja patch autoconf automake libtool gettext zip unzip patchelf python-gobject valgrind
+             wayland-protocols glib2-devel jdk21-openjdk vulkan-headers)
+# stripping would break ART's .oat boot image (the build strips the ELF files itself)
+options=(!strip !debug !lto)
+source=("https://github.com/Jimbambuli/apk-starter/releases/download/v$pkgver/apk-starter-$pkgver.tar.xz")
+sha256sums=(@SHA256@)
+
+build() {
+  cd "apk-starter-$pkgver"
+  meson setup build native --prefix=/usr/lib/apk-starter --libdir=lib -Ddownload=false
+  meson compile -C build
+}
+
+package() {
+  cd "apk-starter-$pkgver"
+  meson install -C build --no-rebuild --destdir "$pkgdir"
+  packaging/install-extras.sh "$pkgdir"
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

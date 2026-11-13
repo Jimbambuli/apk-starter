@@ -1,0 +1,5 @@
+[wrap-git]
+directory = android_translation_layer
+url = file:///home/claude/bau/r088/repos/atl.git
+revision = 4e932390c16627c2c34e317c8a71827ffa11d508
+depth = 1

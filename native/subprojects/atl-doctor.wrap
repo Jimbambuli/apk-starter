@@ -1,0 +1,6 @@
+[wrap-git]
+directory = atl-doctor
+url = file:///home/claude/bau/r088/repos/adoc.git
+revision = 2f91d3a54f075592352de22a7c7417dcdbe6fa3f
+depth = 1
+patch_directory = atl-doctor

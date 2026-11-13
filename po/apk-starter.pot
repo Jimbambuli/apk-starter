@@ -186,182 +186,189 @@ msgid ""
 "passed with --file-forwarding are visible: {command})"
 msgstr ""
 
-#: src/apk_starter/cli.py:80 src/apk_starter/cli.py:320
+#: src/apk_starter/cli.py:80 src/apk_starter/cli.py:332
 #: src/apk_starter/install_request.py:180
 #, python-brace-format
 msgid "not installed: {package}"
 msgstr ""
 
-#: src/apk_starter/cli.py:133
+#: src/apk_starter/cli.py:91
+msgid ""
+"This APK Starter is not a Flatpak: apps run without a sandbox, with all the "
+"rights of your user account (your files, the network, the devices). Install "
+"only apps you trust."
+msgstr ""
+
+#: src/apk_starter/cli.py:145
 msgid "Different signature – not installed"
 msgstr ""
 
-#: src/apk_starter/cli.py:164
+#: src/apk_starter/cli.py:176
 #, python-brace-format
 msgid "Preparing {app} for this computer…"
 msgstr ""
 
-#: src/apk_starter/cli.py:167
+#: src/apk_starter/cli.py:179
 #, python-brace-format
 msgid "{app} could not be prepared in advance: {reason}"
 msgstr ""
 
-#: src/apk_starter/cli.py:254
+#: src/apk_starter/cli.py:266
 #, python-brace-format
 msgid ""
 "{app} is installed without a menu entry: the DynamicLauncher portal is not "
 "available; start the app with: {command}"
 msgstr ""
 
-#: src/apk_starter/cli.py:258
+#: src/apk_starter/cli.py:270
 #, python-brace-format
 msgid "{app} is installed without a menu entry: {reason}"
 msgstr ""
 
-#: src/apk_starter/cli.py:264
+#: src/apk_starter/cli.py:276
 msgid ""
 "In «microG settings» switch on «Google device registration» and «Cloud "
 "Messaging». To sign in: Accounts → Add Google account."
 msgstr ""
 
-#: src/apk_starter/cli.py:304
+#: src/apk_starter/cli.py:316
 #, python-brace-format
 msgid "cannot remove {folder}: {reason}"
 msgstr ""
 
-#: src/apk_starter/cli.py:325
+#: src/apk_starter/cli.py:337
 msgid ""
 "the DynamicLauncher portal is not available; the menu entry was not removed"
 msgstr ""
 
-#: src/apk_starter/cli.py:327
+#: src/apk_starter/cli.py:339
 #, python-brace-format
 msgid "the menu entry was not removed: {reason}"
 msgstr ""
 
-#: src/apk_starter/cli.py:361
+#: src/apk_starter/cli.py:373
 msgid "(no arguments: open the management window)"
 msgstr ""
 
-#: src/apk_starter/cli.py:362
+#: src/apk_starter/cli.py:374
 msgid "Start Android apps (APK) with Android Translation Layer."
 msgstr ""
 
-#: src/apk_starter/cli.py:364
+#: src/apk_starter/cli.py:376
 msgid ""
 "record the app for atl-doctor: exceptions, ATL stub calls, time line, view "
 "trees, clicks and typed text, verbose log; afterwards one archive cleaned of "
 "personal data (default: logs/<package>-<time>.tar.gz); use --debug=DIR"
 msgstr ""
 
-#: src/apk_starter/cli.py:368
+#: src/apk_starter/cli.py:380
 msgid ""
 "like --debug, but the archive keeps everything in plain text, passwords and "
 "personal data and screenshots included (name ends in -FULL): do not pass it "
 "on"
 msgstr ""
 
-#: src/apk_starter/cli.py:370
+#: src/apk_starter/cli.py:382
 msgid "override the SDK level passed to ATL"
 msgstr ""
 
-#: src/apk_starter/cli.py:371
+#: src/apk_starter/cli.py:383
 msgid "window size (remembered per app)"
 msgstr ""
 
-#: src/apk_starter/cli.py:372
+#: src/apk_starter/cli.py:384
 msgid "open a link in the app (the menu entry passes it)"
 msgstr ""
 
-#: src/apk_starter/cli.py:373
+#: src/apk_starter/cli.py:385
 msgid "with --remove/--remove-all: also delete the app data"
 msgstr ""
 
-#: src/apk_starter/cli.py:375
+#: src/apk_starter/cli.py:387
 msgid ""
 "install the APK and add a menu entry; a split APK: the base and its parts, "
 "or one .apks/.xapk file"
 msgstr ""
 
-#: src/apk_starter/cli.py:382
+#: src/apk_starter/cli.py:394
 msgid "download Aurora Store from F-Droid, check its signature and install it"
 msgstr ""
 
-#: src/apk_starter/cli.py:383
+#: src/apk_starter/cli.py:395
 msgid "list installed apps"
 msgstr ""
 
-#: src/apk_starter/cli.py:384
+#: src/apk_starter/cli.py:396
 msgid "remove an installed app"
 msgstr ""
 
-#: src/apk_starter/cli.py:386
+#: src/apk_starter/cli.py:398
 msgid ""
 "remove all installed apps and their menu entries (before uninstalling the "
 "Flatpak)"
 msgstr ""
 
-#: src/apk_starter/cli.py:387
+#: src/apk_starter/cli.py:399
 msgid "show the version and exit"
 msgstr ""
 
-#: src/apk_starter/cli.py:388
+#: src/apk_starter/cli.py:400
 msgid ""
 "download microG from its repository, check it and install it (Google "
 "services for the apps)"
 msgstr ""
 
-#: src/apk_starter/cli.py:427
+#: src/apk_starter/cli.py:439
 msgid ""
 "--install, --list, --remove, --remove-all and --version take no other "
 "arguments"
 msgstr ""
 
-#: src/apk_starter/cli.py:429
+#: src/apk_starter/cli.py:441
 msgid "--purge only works with --remove or --remove-all"
 msgstr ""
 
-#: src/apk_starter/cli.py:474
+#: src/apk_starter/cli.py:486
 msgid "no APK given and no display for the window"
 msgstr ""
 
-#: src/apk_starter/cli.py:478
+#: src/apk_starter/cli.py:490
 msgid "no APK given"
 msgstr ""
 
-#: src/apk_starter/cli.py:528
+#: src/apk_starter/cli.py:542
 #, python-brace-format
 msgid "cannot write {file}: {reason}"
 msgstr ""
 
-#: src/apk_starter/cli.py:572 src/apk_starter/cli.py:598
+#: src/apk_starter/cli.py:586 src/apk_starter/cli.py:612
 #, python-brace-format
 msgid "the Android runtime could not be prepared in advance: {reason}"
 msgstr ""
 
-#: src/apk_starter/cli.py:594 src/apk_starter/cli.py:689
+#: src/apk_starter/cli.py:608 src/apk_starter/cli.py:703
 msgid "Preparing…"
 msgstr ""
 
-#: src/apk_starter/cli.py:604
+#: src/apk_starter/cli.py:618
 msgid "Updating the menu entry…"
 msgstr ""
 
-#: src/apk_starter/cli.py:607
+#: src/apk_starter/cli.py:621
 msgid "Preparing apps for this computer…"
 msgstr ""
 
-#: src/apk_starter/cli.py:662
+#: src/apk_starter/cli.py:676
 #, python-brace-format
 msgid "{app} keeps its old menu entry: {reason}"
 msgstr ""
 
-#: src/apk_starter/cli.py:681 src/apk_starter/gui.py:902
+#: src/apk_starter/cli.py:695 src/apk_starter/gui.py:902
 #, python-brace-format
 msgid "{app} ended unexpectedly."
 msgstr ""
 
-#: src/apk_starter/cli.py:681 src/apk_starter/gui.py:328
+#: src/apk_starter/cli.py:695 src/apk_starter/gui.py:328
 #: src/apk_starter/gui.py:554 src/apk_starter/gui.py:903
 #: src/apk_starter/install_request.py:83
 msgid "Close"
@@ -762,6 +769,10 @@ msgstr ""
 msgid "Cannot uninstall {app}"
 msgstr ""
 
+#: src/apk_starter/gui.py:1186
+msgid "Without a sandbox"
+msgstr ""
+
 #: src/apk_starter/gui_model.py:157
 msgid "Exit code 10: crash (an exception the app did not catch)"
 msgstr ""
@@ -925,7 +936,7 @@ msgstr ""
 msgid "microG settings"
 msgstr ""
 
-#: src/apk_starter/paths.py:30 src/apk_starter/portal.py:28
+#: src/apk_starter/paths.py:30 src/apk_starter/portal.py:31
 #, python-brace-format
 msgid "invalid package name: {package}"
 msgstr ""
@@ -982,16 +993,16 @@ msgstr ""
 msgid "Notifications"
 msgstr ""
 
-#: src/apk_starter/portal.py:107
+#: src/apk_starter/portal.py:110
 #, python-brace-format
 msgid "portal call {method} failed: {reason}"
 msgstr ""
 
-#: src/apk_starter/portal.py:132
+#: src/apk_starter/portal.py:135
 msgid "portal did not answer"
 msgstr ""
 
-#: src/apk_starter/portal.py:152
+#: src/apk_starter/portal.py:182
 msgid "menu entry not created (cancelled)"
 msgstr ""
 

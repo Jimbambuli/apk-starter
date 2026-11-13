@@ -209,27 +209,37 @@ msgstr ""
 "nie można odczytać {file}: plik nie istnieje (w piaskownicy Flatpak widoczne "
 "są tylko ścieżki przekazane przez --file-forwarding: {command})"
 
-#: src/apk_starter/cli.py:80 src/apk_starter/cli.py:320
+#: src/apk_starter/cli.py:80 src/apk_starter/cli.py:332
 #: src/apk_starter/install_request.py:180
 #, python-brace-format
 msgid "not installed: {package}"
 msgstr "nie zainstalowano: {package}"
 
-#: src/apk_starter/cli.py:133
+#: src/apk_starter/cli.py:91
+msgid ""
+"This APK Starter is not a Flatpak: apps run without a sandbox, with all the "
+"rights of your user account (your files, the network, the devices). Install "
+"only apps you trust."
+msgstr ""
+"Ten APK Starter nie jest Flatpakiem: aplikacje działają bez piaskownicy, ze "
+"wszystkimi uprawnieniami twojego konta użytkownika (twoje pliki, sieć, "
+"urządzenia). Instaluj tylko aplikacje, którym ufasz."
+
+#: src/apk_starter/cli.py:145
 msgid "Different signature – not installed"
 msgstr "Inny podpis – nie zainstalowano"
 
-#: src/apk_starter/cli.py:164
+#: src/apk_starter/cli.py:176
 #, python-brace-format
 msgid "Preparing {app} for this computer…"
 msgstr "Przygotowywanie {app} dla tego komputera…"
 
-#: src/apk_starter/cli.py:167
+#: src/apk_starter/cli.py:179
 #, python-brace-format
 msgid "{app} could not be prepared in advance: {reason}"
 msgstr "nie udało się wcześniej przygotować {app}: {reason}"
 
-#: src/apk_starter/cli.py:254
+#: src/apk_starter/cli.py:266
 #, python-brace-format
 msgid ""
 "{app} is installed without a menu entry: the DynamicLauncher portal is not "
@@ -238,12 +248,12 @@ msgstr ""
 "Aplikację {app} zainstalowano bez pozycji w menu: portal DynamicLauncher "
 "jest niedostępny; uruchom aplikację poleceniem: {command}"
 
-#: src/apk_starter/cli.py:258
+#: src/apk_starter/cli.py:270
 #, python-brace-format
 msgid "{app} is installed without a menu entry: {reason}"
 msgstr "Aplikację {app} zainstalowano bez pozycji w menu: {reason}"
 
-#: src/apk_starter/cli.py:264
+#: src/apk_starter/cli.py:276
 msgid ""
 "In «microG settings» switch on «Google device registration» and «Cloud "
 "Messaging». To sign in: Accounts → Add Google account."
@@ -251,32 +261,32 @@ msgstr ""
 "W «Ustawieniach microG» włącz «Rejestracja urządzenia Google» i «Cloud "
 "Messaging». Logowanie: Konta → Dodaj konto Google."
 
-#: src/apk_starter/cli.py:304
+#: src/apk_starter/cli.py:316
 #, python-brace-format
 msgid "cannot remove {folder}: {reason}"
 msgstr "nie można usunąć {folder}: {reason}"
 
-#: src/apk_starter/cli.py:325
+#: src/apk_starter/cli.py:337
 msgid ""
 "the DynamicLauncher portal is not available; the menu entry was not removed"
 msgstr ""
 "portal DynamicLauncher jest niedostępny; pozycja w menu nie została usunięta"
 
-#: src/apk_starter/cli.py:327
+#: src/apk_starter/cli.py:339
 #, python-brace-format
 msgid "the menu entry was not removed: {reason}"
 msgstr "pozycja w menu nie została usunięta: {reason}"
 
-#: src/apk_starter/cli.py:361
+#: src/apk_starter/cli.py:373
 msgid "(no arguments: open the management window)"
 msgstr "(bez argumentów: otwiera okno zarządzania)"
 
-#: src/apk_starter/cli.py:362
+#: src/apk_starter/cli.py:374
 msgid "Start Android apps (APK) with Android Translation Layer."
 msgstr ""
 "Uruchamia aplikacje na Androida (APK) za pomocą Android Translation Layer."
 
-#: src/apk_starter/cli.py:364
+#: src/apk_starter/cli.py:376
 #, fuzzy
 msgid ""
 "record the app for atl-doctor: exceptions, ATL stub calls, time line, view "
@@ -288,7 +298,7 @@ msgstr ""
 "dziennik; potem jedno archiwum oczyszczone z danych osobowych (domyślnie: "
 "logs/<pakiet>-<czas>.tar.gz); użyj --debug=FOLDER"
 
-#: src/apk_starter/cli.py:368
+#: src/apk_starter/cli.py:380
 #, fuzzy
 msgid ""
 "like --debug, but the archive keeps everything in plain text, passwords and "
@@ -298,23 +308,23 @@ msgstr ""
 "jak --debug, ale archiwum zachowuje wszystko jawnym tekstem, także hasła i "
 "dane osobowe (nazwa kończy się na -FULL): nie przekazywać dalej"
 
-#: src/apk_starter/cli.py:370
+#: src/apk_starter/cli.py:382
 msgid "override the SDK level passed to ATL"
 msgstr "zastępuje poziom SDK przekazywany do ATL"
 
-#: src/apk_starter/cli.py:371
+#: src/apk_starter/cli.py:383
 msgid "window size (remembered per app)"
 msgstr "rozmiar okna (zapamiętywany dla każdej aplikacji)"
 
-#: src/apk_starter/cli.py:372
+#: src/apk_starter/cli.py:384
 msgid "open a link in the app (the menu entry passes it)"
 msgstr "otwórz link w aplikacji (przekazuje go pozycja menu)"
 
-#: src/apk_starter/cli.py:373
+#: src/apk_starter/cli.py:385
 msgid "with --remove/--remove-all: also delete the app data"
 msgstr "z --remove/--remove-all: usuwa także dane aplikacji"
 
-#: src/apk_starter/cli.py:375
+#: src/apk_starter/cli.py:387
 msgid ""
 "install the APK and add a menu entry; a split APK: the base and its parts, "
 "or one .apks/.xapk file"
@@ -322,19 +332,19 @@ msgstr ""
 "zainstaluj APK i dodaj pozycję menu; dzielony APK: baza i jej części albo "
 "jeden plik .apks/.xapk"
 
-#: src/apk_starter/cli.py:382
+#: src/apk_starter/cli.py:394
 msgid "download Aurora Store from F-Droid, check its signature and install it"
 msgstr "pobierz Aurora Store z F-Droid, sprawdź podpis i zainstaluj"
 
-#: src/apk_starter/cli.py:383
+#: src/apk_starter/cli.py:395
 msgid "list installed apps"
 msgstr "wyświetla zainstalowane aplikacje"
 
-#: src/apk_starter/cli.py:384
+#: src/apk_starter/cli.py:396
 msgid "remove an installed app"
 msgstr "odinstalowuje zainstalowaną aplikację"
 
-#: src/apk_starter/cli.py:386
+#: src/apk_starter/cli.py:398
 msgid ""
 "remove all installed apps and their menu entries (before uninstalling the "
 "Flatpak)"
@@ -342,11 +352,11 @@ msgstr ""
 "usuwa wszystkie zainstalowane aplikacje i ich pozycje w menu (przed "
 "odinstalowaniem Flatpaka)"
 
-#: src/apk_starter/cli.py:387
+#: src/apk_starter/cli.py:399
 msgid "show the version and exit"
 msgstr "wyświetla wersję i kończy działanie"
 
-#: src/apk_starter/cli.py:388
+#: src/apk_starter/cli.py:400
 msgid ""
 "download microG from its repository, check it and install it (Google "
 "services for the apps)"
@@ -354,7 +364,7 @@ msgstr ""
 "pobierz microG z jego repozytorium, sprawdź i zainstaluj (usługi Google dla "
 "aplikacji)"
 
-#: src/apk_starter/cli.py:427
+#: src/apk_starter/cli.py:439
 msgid ""
 "--install, --list, --remove, --remove-all and --version take no other "
 "arguments"
@@ -362,53 +372,53 @@ msgstr ""
 "--install, --list, --remove, --remove-all i --version nie przyjmują innych "
 "argumentów"
 
-#: src/apk_starter/cli.py:429
+#: src/apk_starter/cli.py:441
 msgid "--purge only works with --remove or --remove-all"
 msgstr "--purge działa tylko z --remove lub --remove-all"
 
-#: src/apk_starter/cli.py:474
+#: src/apk_starter/cli.py:486
 msgid "no APK given and no display for the window"
 msgstr "nie podano pliku APK i brak ekranu dla okna"
 
-#: src/apk_starter/cli.py:478
+#: src/apk_starter/cli.py:490
 msgid "no APK given"
 msgstr "nie podano pliku APK"
 
-#: src/apk_starter/cli.py:528
+#: src/apk_starter/cli.py:542
 #, python-brace-format
 msgid "cannot write {file}: {reason}"
 msgstr "nie można zapisać {file}: {reason}"
 
-#: src/apk_starter/cli.py:572 src/apk_starter/cli.py:598
+#: src/apk_starter/cli.py:586 src/apk_starter/cli.py:612
 #, python-brace-format
 msgid "the Android runtime could not be prepared in advance: {reason}"
 msgstr ""
 "nie udało się wcześniej przygotować środowiska uruchomieniowego Androida: "
 "{reason}"
 
-#: src/apk_starter/cli.py:594 src/apk_starter/cli.py:689
+#: src/apk_starter/cli.py:608 src/apk_starter/cli.py:703
 msgid "Preparing…"
 msgstr "Przygotowywanie…"
 
-#: src/apk_starter/cli.py:604
+#: src/apk_starter/cli.py:618
 msgid "Updating the menu entry…"
 msgstr "Aktualizowanie pozycji menu…"
 
-#: src/apk_starter/cli.py:607
+#: src/apk_starter/cli.py:621
 msgid "Preparing apps for this computer…"
 msgstr "Przygotowywanie aplikacji dla tego komputera…"
 
-#: src/apk_starter/cli.py:662
+#: src/apk_starter/cli.py:676
 #, python-brace-format
 msgid "{app} keeps its old menu entry: {reason}"
 msgstr "{app} zachowuje stary wpis w menu: {reason}"
 
-#: src/apk_starter/cli.py:681 src/apk_starter/gui.py:902
+#: src/apk_starter/cli.py:695 src/apk_starter/gui.py:902
 #, python-brace-format
 msgid "{app} ended unexpectedly."
 msgstr "{app} nieoczekiwanie zakończyła działanie."
 
-#: src/apk_starter/cli.py:681 src/apk_starter/gui.py:328
+#: src/apk_starter/cli.py:695 src/apk_starter/gui.py:328
 #: src/apk_starter/gui.py:554 src/apk_starter/gui.py:903
 #: src/apk_starter/install_request.py:83
 msgid "Close"
@@ -827,6 +837,10 @@ msgstr "Odinstalowywanie…"
 msgid "Cannot uninstall {app}"
 msgstr "Nie można odinstalować aplikacji {app}"
 
+#: src/apk_starter/gui.py:1186
+msgid "Without a sandbox"
+msgstr "Bez piaskownicy"
+
 #: src/apk_starter/gui_model.py:157
 msgid "Exit code 10: crash (an exception the app did not catch)"
 msgstr "Kod wyjścia 10: awaria (wyjątek nieprzechwycony przez aplikację)"
@@ -994,7 +1008,7 @@ msgstr "pobrany plik to nie {package} {code}"
 msgid "microG settings"
 msgstr "Ustawienia microG"
 
-#: src/apk_starter/paths.py:30 src/apk_starter/portal.py:28
+#: src/apk_starter/paths.py:30 src/apk_starter/portal.py:31
 #, python-brace-format
 msgid "invalid package name: {package}"
 msgstr "nieprawidłowa nazwa pakietu: {package}"
@@ -1051,16 +1065,16 @@ msgstr "Aktywność fizyczna"
 msgid "Notifications"
 msgstr "Powiadomienia"
 
-#: src/apk_starter/portal.py:107
+#: src/apk_starter/portal.py:110
 #, python-brace-format
 msgid "portal call {method} failed: {reason}"
 msgstr "wywołanie portalu {method} nie powiodło się: {reason}"
 
-#: src/apk_starter/portal.py:132
+#: src/apk_starter/portal.py:135
 msgid "portal did not answer"
 msgstr "portal nie odpowiedział"
 
-#: src/apk_starter/portal.py:152
+#: src/apk_starter/portal.py:182
 msgid "menu entry not created (cancelled)"
 msgstr "nie utworzono pozycji w menu (anulowano)"
 

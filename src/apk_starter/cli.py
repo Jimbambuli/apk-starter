@@ -80,6 +80,18 @@ def resolve_target(paths: Paths, target: str) -> Path:
     raise UsageError(_("not installed: {package}").format(package=target))
 
 
+def native_notice(paths: Paths, env: Mapping[str, str]) -> str | None:
+    """Once: a native build (native/, no Flatpak) says that the apps run without a sandbox."""
+    marker = paths.data_home / "native-notice-shown"
+    if env.get("APK_STARTER_NATIVE") != "1" or marker.exists():
+        return None
+    with contextlib.suppress(OSError):
+        marker.parent.mkdir(parents=True, exist_ok=True)
+        marker.touch()
+    return _("This APK Starter is not a Flatpak: apps run without a sandbox, with all the rights of your user "
+             "account (your files, the network, the devices). Install only apps you trust.")
+
+
 def _desktop_id(pkg: str) -> str:
     return f"{ENTRY_PREFIX}.{pkg}.desktop"
 
@@ -482,6 +494,8 @@ def _main(argv: list[str], env: Mapping[str, str]) -> int:
 def _start(paths: Paths, args, level: str | None, into: Path | None, tail: list[str],
            env: Mapping[str, str]) -> int:
     target, atl_args = tail[0], tail[1:]
+    if notice := native_notice(paths, env):
+        _stderr(notice)
     if args.uri:                                    # empty: the menu entry started without a link
         atl_args = [f"--uri={args.uri}", *atl_args]
     apk = resolve_target(paths, target)

@@ -1,0 +1,5 @@
+[wrap-git]
+directory = libopensles-standalone
+url = https://gitlab.com/android_translation_layer/libopensles-standalone.git
+revision = c6982620c7dadeb90220b23c575b25eeffda765f
+depth = 1

@@ -1,0 +1,5 @@
+# package test: window of Material Files, 10 s, close
+wait-window me.zhanghai.android.files 180
+wait 10
+close-window
+wait 5

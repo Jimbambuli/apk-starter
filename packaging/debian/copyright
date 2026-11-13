@@ -1,0 +1,11 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: apk-starter
+Source: https://github.com/Jimbambuli/apk-starter
+
+Files: *
+Copyright: Jimbambuli
+License: GPL-3.0-or-later
+ The full text is in /usr/share/common-licenses/GPL-3 and in the source (LICENSE).
+ The binary package also contains Android Translation Layer, art_standalone,
+ bionic_translation, libopensles-standalone and wolfSSL, each under its own
+ licence (see /usr/lib/apk-starter/share/licenses).

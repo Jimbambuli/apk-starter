@@ -26,6 +26,24 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y gettext
       - run: python -m pytest -q
 
+  # The native build without Flatpak (native/, README «Native build»): Debian's packages, the documented commands.
+  native:
+    needs: tests
+    runs-on: ubuntu-latest
+    container:
+      image: debian:trixie
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Install the packages the README lists for Debian
+        run: apt-get update && apt-get install -y --no-install-recommends $(grep -v '^#' native/packages-debian.txt)
+      - name: Build and install
+        run: |
+          meson setup _native native --prefix "$PWD/_prefix"
+          meson install -C _native
+      - run: _prefix/bin/apk-starter --version
+
   flatpak:
     needs: tests
     runs-on: ubuntu-latest
@@ -88,6 +106,7 @@ jobs:
     permissions:
       pages: write
       id-token: write
+      contents: read
     environment:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
@@ -125,6 +144,25 @@ jobs:
           # alias published on the old gh-pages branch; keep the URL working
           cp site/io.github.Jimbambuli.ApkStarter.flatpakref site/apk-starter.flatpakref
           cp -r repo site/repo
+      # apt, rpm and pacman repositories from the packages attached to the two newest releases (packaging/build-all.sh
+      # makes them, they are uploaded to the release before the tag is pushed). Stateless: the two newest versions
+      # per distribution are kept. Same key as above, again only inside this one step.
+      - name: Package repositories
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FLATPAK_GPG_KEY_ID: ${{ vars.FLATPAK_GPG_KEY_ID }}
+          FLATPAK_GPG_PRIVATE_KEY: ${{ secrets.FLATPAK_GPG_PRIVATE_KEY }}
+        run: |
+          sudo apt-get install -y apt-utils createrepo-c rpm cpio pacman-package-manager libarchive-tools zstd
+          mkdir assets
+          for t in $(gh release list --limit 2 --json tagName --jq '.[].tagName'); do
+            gh release download "$t" --pattern '*.deb' --pattern '*.rpm' --pattern '*.pkg.tar.zst' --dir assets
+          done
+          export GNUPGHOME="$RUNNER_TEMP/gnupg-pkg" GPG_KEY="$FLATPAK_GPG_KEY_ID"
+          mkdir -m 700 "$GNUPGHOME"
+          printf '%s\n' "$FLATPAK_GPG_PRIVATE_KEY" | gpg --batch --import
+          packaging/make-repos.sh assets site
+          gpg --batch --yes --delete-secret-keys "$FLATPAK_GPG_KEY_ID"
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
         with:
           path: site

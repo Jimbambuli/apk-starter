@@ -19,6 +19,39 @@ command, so for a short command on the host add an alias:
 alias apk-starter='flatpak run --file-forwarding io.github.Jimbambuli.ApkStarter'
 ```
 
+### Install from a package repository (native, without the Flatpak sandbox)
+
+Packages for Debian 13, Fedora, openSUSE Tumbleweed and Arch Linux are published as signed
+repositories next to the Flatpak repository (the same key, [pages/apk-starter.gpg](pages/apk-starter.gpg)), so the
+package manager updates them. They install the starter and everything it needs in `/usr/lib/apk-starter`, and
+**the apps run with all the rights of your user account** (see «Native build» below).
+
+```
+# Debian 13
+sudo install -d /etc/apt/keyrings
+sudo curl -fsSL https://jimbambuli.github.io/apk-starter/apk-starter.gpg -o /etc/apt/keyrings/apk-starter.gpg
+echo "deb [signed-by=/etc/apt/keyrings/apk-starter.gpg] https://jimbambuli.github.io/apk-starter/apt $(. /etc/os-release; echo $VERSION_CODENAME) main" | sudo tee /etc/apt/sources.list.d/apk-starter.list
+sudo apt update && sudo apt install apk-starter
+
+# Fedora
+sudo curl -fsSL https://jimbambuli.github.io/apk-starter/rpm/apk-starter-fedora.repo -o /etc/yum.repos.d/apk-starter.repo
+sudo dnf install apk-starter
+
+# openSUSE Tumbleweed
+sudo curl -fsSL https://jimbambuli.github.io/apk-starter/rpm/apk-starter-opensuse.repo -o /etc/zypp/repos.d/apk-starter.repo
+sudo zypper --gpg-auto-import-keys refresh && sudo zypper install apk-starter
+
+# Arch Linux
+curl -fsSL https://jimbambuli.github.io/apk-starter/apk-starter.gpg | sudo pacman-key --add -
+sudo pacman-key --lsign-key 1F251896A0DCE48A938A72803EC299F0EA6163AD
+printf '\n[apk-starter]\nSigLevel = Required\nServer = https://jimbambuli.github.io/apk-starter/arch/$arch\n' | sudo tee -a /etc/pacman.conf
+sudo pacman -Sy apk-starter
+```
+
+Updates then come with `apt upgrade`, `dnf upgrade`, `zypper up` and `pacman -Syu`. Each release also has the packages
+as files on the [releases page](https://github.com/Jimbambuli/apk-starter/releases) (with `SHA256SUMS`). Only the
+newest two versions stay in the repositories.
+
 ## Use
 
 Open **APK Starter** from the application menu (or run `apk-starter` without arguments): the installed apps are
@@ -184,6 +217,46 @@ For the apps' media in the desktop's media controls and its media keys (MPRIS), 
 
 Without them (e.g. `flatpak override --user --nofilesystem=xdg-config/gtk-4.0 io.github.Jimbambuli.ApkStarter`) everything
 works with GTK's default theme in the desktop's light or dark variant.
+
+## Native build (without sandbox)
+
+APK Starter can also be built and installed without Flatpak, from the same sources at the same commits as the
+Flatpak (the manifest is the one place where they are set; `tools/check-native-pins.py` keeps `native/` equal to it).
+
+> **Warning: without the Flatpak sandbox the apps run with all the rights of your user account** – they can read and
+> change all your files, use the network and the devices. None of the limits in «Permissions» above apply. Install
+> only apps you trust. The starter says so once when it starts.
+
+Install the build dependencies of your distribution (the lists are tested on Debian 13, Fedora 45 and Arch Linux):
+
+```
+sudo apt install --no-install-recommends $(grep -v '^#' native/packages-debian.txt)   # Debian 13
+sudo dnf install $(grep -v '^#' native/packages-fedora.txt)                           # Fedora 45
+sudo pacman -S --needed $(grep -v '^#' native/packages-arch.txt)                      # Arch Linux
+```
+
+Then build and install into a folder of your own (no root needed; the build takes a while, ART alone is large):
+
+```
+cd native
+meson setup build --prefix ~/.local/opt/apk-starter
+meson install -C build
+```
+
+`meson setup` names a missing package (by its pkg-config name) before the long part starts, and fetches the
+components (`subprojects/*.wrap`). Start the starter with `~/.local/opt/apk-starter/bin/apk-starter`; for the
+application menu link its entry:
+
+```
+ln -s ~/.local/opt/apk-starter/share/applications/io.github.Jimbambuli.ApkStarter.desktop ~/.local/share/applications/
+```
+
+Differences to the Flatpak: the data of the starter and the apps lives in `~/.local/share/io.github.Jimbambuli.ApkStarter`
+and `~/.cache/io.github.Jimbambuli.ApkStarter` (instead of `~/.var/app/…`); the apps' menu entries are written
+directly into `~/.local/share/applications` (no portal); the system's own themes and icons are used. After new
+commits in the manifest: `meson subprojects update --reset` in `native/`, then `meson install -C build` again.
+The libraries and programs are installed without debug information; for a build with it, configure a new build
+directory with `-Dstrip=false`.
 
 ## Translations
 
