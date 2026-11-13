@@ -22,7 +22,7 @@ ExclusiveArch:  x86_64
 BuildRequires:  ninja
 BuildRequires:  java-21-openjdk-devel
 BuildRequires:  libxkbcommon-devel
-# (no pkgconfig(openxr) in Tumbleweed: the headers from the bundle, see %build)
+# (no pkgconfig(openxr) in Tumbleweed: the headers from the bundle, see build below)
 %else
 BuildRequires:  ninja-build
 BuildRequires:  pkgconfig(openxr)
@@ -57,7 +57,7 @@ their libraries) is built from source and installed in /usr/lib/apk-starter.
 %build
 %if 0%{?suse_version}
 x=$PWD/packaging/openxr; mkdir -p $x/pc
-printf 'prefix=%s\nName: openxr\nDescription: OpenXR headers\nVersion: 1.1.65\nCflags: -I${prefix}/include\n' "$x" > $x/pc/openxr.pc
+printf 'prefix=%%s\nName: openxr\nDescription: OpenXR headers\nVersion: 1.1.65\nCflags: -I${prefix}/include\n' "$x" > $x/pc/openxr.pc
 export PKG_CONFIG_PATH=$x/pc${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}
 %endif
 meson setup build native --prefix=%{pfx} --libdir=lib -Ddownload=false
