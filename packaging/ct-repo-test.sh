@@ -32,9 +32,10 @@ arch)
   if [ "$phase" = install ]; then
     curl -fsS "$base/apk-starter.gpg" -o $key
     pacman-key --init >/dev/null 2>&1; pacman-key --populate archlinux >/dev/null 2>&1
+    pacman -Syu --noconfirm --disable-sandbox >/dev/null 2>&1
     pacman-key --add $key; pacman-key --lsign-key "$(gpg --show-keys --with-colons $key | awk -F: '/^fpr/{print $10; exit}')" 2>&1 | tail -n 1
     printf '\n[apk-starter]\nSigLevel = Required\nServer = %s/arch/$arch\n' "$base" >> /etc/pacman.conf
-    pacman -Sy --noconfirm --disable-sandbox apk-starter 2>&1 | tail -n 3
+    pacman -Syu --noconfirm --disable-sandbox >/dev/null 2>&1; pacman -S --noconfirm --disable-sandbox apk-starter 2>&1 | tail -n 3
   else pacman -Syu --noconfirm --disable-sandbox 2>&1 | tail -n 3; fi ;;
 esac
 echo "$ID $phase: installed apk-starter $(installed); $(/usr/bin/apk-starter --version 2>&1)"

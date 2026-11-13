@@ -7,7 +7,7 @@
 # starts an app headless and removes it again (ct-test.sh; needs APK=, a test .apk).
 # Environment: NODE (default root@pve2), JUMP (ssh jump host, default root@pve1), OUT, BUNDLE (a ready bundle),
 # FLATPAK_HOST/FLATPAK_REPO: where the Flatpak build's repository is (adds the .flatpak bundles); no upload here.
-# KEEP=1 keeps the containers, CTBASE (first container id, default 180).
+# ASSEMBLE_ONLY=1: no builds, only the release folder from what is in OUT/<distro>. KEEP=1 keeps the containers, CTBASE (first container id, default 180).
 set -eu
 here=$(cd "$(dirname "$0")" && pwd)
 NODE=${NODE:-root@pve2}; JUMP=${JUMP:-root@pve1}; OUT=${OUT:-$here/out}; CTBASE=${CTBASE:-180}
@@ -26,9 +26,9 @@ info() {  # distro -> template ostype format
   esac
 }
 bundle=${BUNDLE:-}
-[ -n "$bundle" ] || { "$here/collect-sources.sh" "$OUT/bundle" >&2; bundle=$(ls "$OUT"/bundle/apk-starter-*.tar.xz); }
+[ -n "$bundle" ] || [ -n "${ASSEMBLE_ONLY:-}" ] || { "$here/collect-sources.sh" "$OUT/bundle" >&2; bundle=$(ls "$OUT"/bundle/apk-starter-*.tar.xz); }
 n=$CTBASE
-for d in $want; do
+for d in $([ -n "${ASSEMBLE_ONLY:-}" ] || echo $want); do
   set -- $(info "$d"); tpl=$1; ostype=$2; fmt=$3
   id=$n; n=$((n + 1)); dir=/var/lib/vz/pakete/$d
   echo "== $d: container $id"
@@ -42,7 +42,7 @@ for d in $want; do
       && for i in \$(seq 30); do pct exec $1 -- getent hosts deb.debian.org >/dev/null 2>&1 && break; sleep 2; done"; }
   ct $id
   sshn "pct exec $id -- sh /build/in/ct-build.sh $fmt /build/in/$(basename "$bundle") /build/out" 2>&1 | tail -n 40
-  [ "${KEEP:-}" = 1 ] || sshn "pct destroy $id --purge >/dev/null"
+  [ "${KEEP:-}" = 1 ] || sshn "pct stop $id; pct destroy $id --purge >/dev/null"
   mkdir -p "$OUT/$d"; scpn "$NODE:$dir/out/*" "$OUT/$d/"
   if [ "${TEST:-}" = 1 ]; then
     tid=$n; n=$((n + 1)); echo "== $d: test in fresh container $tid"
@@ -52,7 +52,7 @@ for d in $want; do
     ct $tid
     sshn "pct exec $tid -- sh /build/t/ct-test.sh /build/t/$(basename "$pk") /build/t/files.steps /build/t/$(basename "$APK") \
       /build/t/atl-doctor-input" 2>&1 | tee "$OUT/$d/test.log" | tail -n 30
-    [ "${KEEP:-}" = 1 ] || sshn "pct destroy $tid --purge >/dev/null"
+    [ "${KEEP:-}" = 1 ] || sshn "pct stop $tid; pct destroy $tid --purge >/dev/null"
   fi
   sshn "rm -rf --one-file-system $dir"
 done
@@ -71,6 +71,9 @@ for d in $want; do
     cp "$f" "$rel/$b"
   done
 done
+# the source bundle (what the AUR PKGBUILD downloads, same sha256) and the finished AUR files
+cp "$OUT/bundle/apk-starter-$version.tar.xz" "$rel/" 2>/dev/null || true
+for f in PKGBUILD .SRCINFO; do cp "$OUT/arch/$f" "$rel/$f" 2>/dev/null || true; done
 # Flatpak bundle (the existing way: flatpak build-bundle from the repository of the Flatpak build, runtime from
 # Flathub): FLATPAK_REPO=PATH on FLATPAK_HOST (ssh), e.g. claude@172.22.22.61 and ~/bau/r088/repo.
 if [ -n "${FLATPAK_REPO:-}" ]; then

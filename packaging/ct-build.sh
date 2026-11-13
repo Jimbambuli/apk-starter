@@ -38,7 +38,7 @@ rpm)
   rpmlint "$top"/RPMS/*/*.rpm > "$out/lint-rpm.txt" 2>&1 || true ;;
 arch)
   pacman-key --init >/dev/null 2>&1; pacman-key --populate archlinux >/dev/null 2>&1
-  pacman -Sy --noconfirm --needed --disable-sandbox base-devel namcap >/dev/null 2>&1
+  pacman -Syu --noconfirm --needed --disable-sandbox base-devel namcap >/dev/null 2>&1
   id builder >/dev/null 2>&1 || useradd -m builder
   b=/build/pkg; rm -rf $b; mkdir -p $b; cp "$tar" "$b/apk-starter-$version.tar.xz"; tar -xJOf "$tar" \
     "apk-starter-$version/packaging/PKGBUILD" | sed "s/@SHA256@/$(sha256sum "$tar" | cut -d' ' -f1)/" > $b/PKGBUILD; chown -R builder $b /build/work

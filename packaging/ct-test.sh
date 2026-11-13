@@ -18,7 +18,7 @@ case $pkg in
   else dnf -q -y install "$pkg" kwin-wayland dbus-daemon mesa-dri-drivers dejavu-sans-fonts glib2 >/dev/null
     remove() { dnf -q -y remove apk-starter; }; fi
   files() { rpm -ql apk-starter; } ;;
-*.pkg.tar.zst) pacman -Sy --noconfirm --disable-sandbox >/dev/null 2>&1
+*.pkg.tar.zst) pacman -Syu --noconfirm --disable-sandbox >/dev/null 2>&1
   pacman -U --noconfirm --disable-sandbox "$pkg" >/dev/null 2>&1
   pacman -S --noconfirm --needed --disable-sandbox kwin dbus mesa ttf-dejavu xorg-xauth glib2 >/dev/null 2>&1
   files() { pacman -Qlq apk-starter; }; remove() { pacman -R --noconfirm apk-starter >/dev/null; } ;;
