@@ -4,6 +4,7 @@ modules of io.github.Jimbambuli.ApkStarter.yml, and copy that tree into the pref
 
   build.py build --source NATIVE_DIR --build BUILD_DIR --stage STAGE --prefix PREFIX --jdk JDK --stamp FILE
   build.py install --stage STAGE --prefix PREFIX        (meson install; honours DESTDIR)
+  build.py fetch-jars --source NATIVE_DIR --dest DIR    (packaging/collect-sources.sh)
 
 Each component is installed into STAGE/PREFIX; the next one finds it there (CPATH, LIBRARY_PATH, pkg-config files
 rewritten to the staging tree). A component is built again only when its commit, the prefix or the JDK changed.
@@ -41,7 +42,11 @@ def wrap(source: Path, name: str) -> tuple[Path, str]:
     cp.read(source / "subprojects" / f"{name}.wrap", encoding="utf-8")
     d = source / "subprojects" / cp["wrap-git"]["directory"]
     rev = cp["wrap-git"]["revision"]
-    head = subprocess.run(["git", "-C", d, "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
+    pinned = d / ".pinned-revision"                  # the offline source bundle (packaging/) carries no .git
+    if pinned.is_file():
+        head = pinned.read_text(encoding="utf-8").strip()
+    else:
+        head = subprocess.run(["git", "-C", d, "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
     if head != rev:
         sys.exit(f"build.py: {d} is at {head or 'nothing'}, {name}.wrap wants {rev}: "
                  f"run `meson subprojects update --reset` in {source}")
@@ -58,8 +63,13 @@ def read_jars(source: Path) -> list[tuple[str, str, str]]:
     return out
 
 
-def fetch_jar(url: str, sha: str, dest: Path) -> None:
+def fetch_jar(url: str, sha: str, dest: Path, local: Path | None = None) -> None:
+    """DEST from the bundle's jars directory (LOCAL, offline) or else from URL; always checked against SHA."""
     if dest.is_file() and hashlib.sha256(dest.read_bytes()).hexdigest() == sha:
+        return
+    if local is not None and local.is_file() and hashlib.sha256(local.read_bytes()).hexdigest() == sha:
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(local, dest)
         return
     log(f"download {url}")
     with urllib.request.urlopen(url, timeout=120) as r:
@@ -146,12 +156,14 @@ def build(a: argparse.Namespace) -> None:
         apply_patch(art, doctor / "tools/openjdkjvmti-gcc14.diff", "-p0", env)
         run(["bash", doctor / "tools/build-jvmti-plugin.sh", art, sp], dict(env, J=jobs))
         shutil.copy2(art / "jvmti-out/libopenjdkjvmti.so", sp / "lib/art/libopenjdkjvmti.so")
+        # the script links with -rpath <staging>/lib/art; the plugin sits in that directory: $ORIGIN says the same
+        run(["patchelf", "--set-rpath", "$ORIGIN", sp / "lib/art/libopenjdkjvmti.so"], env)
 
     def do_atl() -> None:
         jars = {}
         for name, url, sha in read_jars(source):
             jars[name] = bld / "jars" / name
-            fetch_jar(url, sha, jars[name])
+            fetch_jar(url, sha, jars[name], source / "jars" / name)
         # inside its source tree, as flatpak-builder does: ninja runs a javac command line with every source file,
         # and with paths relative to a build directory elsewhere it passes the kernel's 128 KiB limit (E2BIG)
         bdir = atl / f"_build-{hashlib.sha256(str(bld).encode()).hexdigest()[:8]}"
@@ -258,6 +270,13 @@ def install(a: argparse.Namespace) -> None:
                 shutil.copy2(src, dst)
 
 
+def fetch_jars(a: argparse.Namespace) -> None:
+    """For the offline source bundle: every jar of tool-jars.txt into DEST (sha256 checked)."""
+    source = Path(a.source)
+    for name, url, sha in read_jars(source):
+        fetch_jar(url, sha, Path(a.dest) / name)
+
+
 def main() -> None:
     p = argparse.ArgumentParser()
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -268,8 +287,11 @@ def main() -> None:
     i = sub.add_parser("install")
     i.add_argument("--stage", required=True)
     i.add_argument("--prefix", required=True)
+    f = sub.add_parser("fetch-jars")
+    f.add_argument("--source", required=True)
+    f.add_argument("--dest", required=True)
     a = p.parse_args()
-    build(a) if a.cmd == "build" else install(a)
+    {"build": build, "install": install, "fetch-jars": fetch_jars}[a.cmd](a)
 
 
 if __name__ == "__main__":

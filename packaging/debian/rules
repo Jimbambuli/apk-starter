@@ -1,0 +1,27 @@
+#!/usr/bin/make -f
+# The native build installs into one private tree (its prefix is compiled into ART); nothing in it is a library
+# of the system, so no shlibs/symbols for it, and no stripping (strip would break ART's .oat boot image, which
+# the build has stripped already, ELF file by ELF file).
+P = /usr/lib/apk-starter
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+	meson setup obj native --prefix=$(P) --libdir=lib -Ddownload=false
+
+override_dh_auto_build:
+	meson compile -C obj
+
+override_dh_auto_test:
+
+override_dh_auto_install:
+	meson install -C obj --no-rebuild --destdir $(CURDIR)/debian/apk-starter
+	packaging/install-extras.sh $(CURDIR)/debian/apk-starter
+
+override_dh_strip:
+override_dh_dwz:
+override_dh_makeshlibs:
+
+override_dh_shlibdeps:
+	dh_shlibdeps -l$(P)/lib:$(P)/lib/art

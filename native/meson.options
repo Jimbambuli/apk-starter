@@ -1,1 +1,2 @@
 option('jdk', type: 'string', value: '', description: 'JDK directory (default: JAVA_HOME, else the one of javac in PATH)')
+option('download', type: 'boolean', value: true, description: 'fetch the components at the pinned commits (false: they are already in native/subprojects)')

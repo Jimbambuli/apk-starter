@@ -7,7 +7,7 @@
 # looks for libdl_bio at configure time), so they cannot be plain subproject() calls in one configure run.
 # build.py builds them one after the other into a staging tree inside the build directory, in the order of
 # the Flatpak manifest; `meson install` copies that tree into the prefix.
-project('apk-starter-native', version: '0.8.7', meson_version: '>=1.1', default_options: ['libdir=lib', 'strip=true'])
+project('apk-starter-native', meson_version: '>=1.1', default_options: ['libdir=lib', 'strip=true'])
 
 if get_option('libdir') != 'lib'
   error('the starter expects its libraries in <prefix>/lib: configure with -Dlibdir=lib (the default here)')
@@ -35,7 +35,7 @@ foreach d, v : versioned
 endforeach
 
 foreach p : ['git', 'make', 'patch', 'autoreconf', 'libtoolize', 'javac', 'java', 'jar', 'ninja', 'wayland-scanner',
-             'msgfmt', 'zip', 'glib-genmarshal', 'gdbus-codegen', 'glib-compile-resources']
+             'msgfmt', 'zip', 'glib-genmarshal', 'gdbus-codegen', 'glib-compile-resources', 'patchelf']
   find_program(p)
 endforeach
 
@@ -52,8 +52,11 @@ if not import('fs').is_file(jdk / 'include' / 'jni.h')
 endif
 
 # Fetch the components at the pinned commits (does nothing for those already there).
-run_command(find_program('meson'), 'subprojects', 'download', '--sourcedir', meson.project_source_root(),
-            check: true)
+# (-Ddownload=false for the offline source bundle of packaging/, which has them all.)
+if get_option('download')
+  run_command(find_program('meson'), 'subprojects', 'download', '--sourcedir', meson.project_source_root(),
+              check: true)
+endif
 
 stage = meson.current_build_dir() / 'stage'
 custom_target('components',
