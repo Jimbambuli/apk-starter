@@ -7,7 +7,10 @@ P = /usr/lib/apk-starter
 %:
 	dh $@
 
+# Ubuntu 24.04 has libunwind 1.6.2; bionic_translation asks for >= 1.8.0 (and so does native/meson.build). Where
+# the system has less, the requirement is lowered to what is there, for this package build only (tried on Ubuntu 24.04).
 override_dh_auto_configure:
+	pkg-config --atleast-version=1.8.0 libunwind || sed -i "s/>=1.8.0/>=1.6.0/" native/meson.build native/subprojects/bionic_translation/meson.build
 	meson setup obj native --prefix=$(P) --libdir=lib -Ddownload=false
 
 override_dh_auto_build:
