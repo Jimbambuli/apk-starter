@@ -122,7 +122,7 @@ def build_env(paths: Paths, pkg: str, base: Mapping[str, str]) -> dict[str, str]
     return env
 
 
-CACHE_FORMAT = 2                    # 2: with the permissions; older entries are read again
+CACHE_FORMAT = 3                    # 2: with the permissions, 3: gecko_gpu; older entries are read again
 
 
 def cached_apk_info(paths: Paths, apk: Path, lang: str | None,

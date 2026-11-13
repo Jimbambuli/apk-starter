@@ -183,3 +183,13 @@ def test_play_services_are_found_by_their_meta_data(tmp_path, strip_names):
                                                                  meta_data=["com.google.android.gms.games.APP_ID"]))
     plain = make_apk(tmp_path / "p.apk", manifest=axml_manifest())
     assert [read_apk_info(f).uses_gms for f in (gms, other, plain)] == [True, False, False]
+
+
+@pytest.mark.parametrize("strip_names", [False, True])
+def test_geckoview_is_found_by_its_gpu_service(tmp_path, strip_names):
+    services = ["org.mozilla.gecko.process.GeckoChildProcessServices$tab0",
+                "org.mozilla.gecko.process.GeckoChildProcessServices$gpu"]
+    gecko = make_apk(tmp_path / "g.apk", manifest=axml_manifest(strip_names=strip_names, services=services))
+    other = make_apk(tmp_path / "o.apk", manifest=axml_manifest(strip_names=strip_names, services=services[:1]))
+    named = make_apk(tmp_path / "m.apk", manifest=axml_manifest(meta_data=services[1:]))
+    assert [read_apk_info(f).gecko_gpu for f in (gecko, other, named)] == [True, False, False]

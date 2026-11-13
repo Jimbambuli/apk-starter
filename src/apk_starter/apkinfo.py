@@ -35,6 +35,7 @@ class ApkInfo:
     share_types: tuple[str, ...] = ()               # likewise: files it takes shared (ACTION_SEND)
     permissions: tuple[str, ...] = ()               # <uses-permission>, for the switches in the window
     uses_gms: bool = False                          # built with Google Play Services (microG offered)
+    gecko_gpu: bool = False                         # GeckoView app with a GPU process (Firefox): gecko.py
 
 
 def _read(z: zipfile.ZipFile, name: str, limit: int) -> bytes:
@@ -120,6 +121,7 @@ def read_apk_info(path: Path, lang: str | None = None) -> ApkInfo:
                 share_types=m.share_types,
                 permissions=m.permissions,
                 uses_gms=m.uses_gms,
+                gecko_gpu=m.gecko_gpu,
             )
     except zipfile.BadZipFile:
         raise ApkError(_("not an APK (no AndroidManifest.xml): {file}").format(file=path)) from None

@@ -74,6 +74,17 @@ VIEW and BROWSABLE): its own schemes (e.g. `jwlibrary:`) and web links (`https:`
 under **Open with**; the web browser stays the default for web links. A link goes to the running app,
 which gets it like on Android (`onNewIntent`). Apps installed before this need `--install` again.
 
+### Firefox and other GeckoView apps
+
+Gecko draws web pages in a separate GPU process; under ATL that process cannot reach the app's window, so pages would
+stay empty. For apps that have GeckoView's GPU process service (`org.mozilla.gecko.process.GeckoChildProcessServices$gpu`
+in the manifest: Firefox, Firefox Focus, …) APK Starter adds `user_pref("layers.gpu-process.enabled", false);` to the
+`user.js` of each profile listed in `files/mozilla/profiles.ini` of the app's data folder, at every start; Gecko then
+composites in the app's own process. Before the first start there is no profile yet: APK Starter writes
+`profiles.ini` with a profile folder `apkstarter.default`, which Gecko takes instead of making one with a random name.
+An existing `user.js` is never overwritten: the line is only added when the file does not mention the pref at all, so
+a setting of your own (also a commented-out one) stays.
+
 ### App stores (Aurora Store)
 
 **+ → Get apps (Aurora Store)** (or `--setup-aurora`) downloads the official Aurora Store from F-Droid, checks its APK
