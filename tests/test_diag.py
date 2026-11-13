@@ -143,7 +143,17 @@ def test_full_archives_are_recordings_and_say_so(tmp_path):
                                                                               (plain, "debug", False)]
 
 
-def test_pack_runs_atl_doctor_and_removes_the_folder(tmp_path):
+def _stand_in_atl_doctor(tmp_path, monkeypatch):
+    """pack only imports atl_doctor to find its folder (the command runs through `run`): an empty package will do,
+    so these tests do not depend on atl-doctor being installed."""
+    (tmp_path / "pkg" / "atl_doctor").mkdir(parents=True)
+    (tmp_path / "pkg" / "atl_doctor" / "__init__.py").write_text("")
+    monkeypatch.syspath_prepend(str(tmp_path / "pkg"))
+    monkeypatch.delitem(sys.modules, "atl_doctor", raising=False)
+
+
+def test_pack_runs_atl_doctor_and_removes_the_folder(tmp_path, monkeypatch):
+    _stand_in_atl_doctor(tmp_path, monkeypatch)
     p = _paths(tmp_path)
     folder, calls = _make(p, "org.a", 3, "debug"), []
 
@@ -158,7 +168,8 @@ def test_pack_runs_atl_doctor_and_removes_the_folder(tmp_path):
     assert cmd == [sys.executable, "-m", "atl_doctor", "pack", "--full", str(folder)] and (cwd / "atl_doctor").is_dir()
 
 
-def test_pack_failure_keeps_the_folder(tmp_path):
+def test_pack_failure_keeps_the_folder(tmp_path, monkeypatch):
+    _stand_in_atl_doctor(tmp_path, monkeypatch)
     p = _paths(tmp_path)
     folder = _make(p, "org.a", 3, "debug")
     run = lambda cmd, **kw: subprocess.CompletedProcess(cmd, 3, stdout="", stderr="boom\n")  # noqa: E731
