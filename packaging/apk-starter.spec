@@ -2,11 +2,12 @@
 # %changelog is appended by that script (one line per version).
 %global pfx %{_prefix}/lib/apk-starter
 # the private tree is not a set of system libraries: no stripping (it would break ART's boot image, the build has
-# stripped the ELF files itself), no debuginfo, no provides from it, no requires on its own libraries
+# stripped the ELF files itself), no debuginfo, no provides from it
 %global debug_package %{nil}
 %global __strip /bin/true
 %global __provides_exclude_from ^%{pfx}/
-%global __requires_exclude ^(libart.*|libartbase|libbase|libdexfile|libdl_bio|libbionic.*|liblog|libwolfssl|libandroid.*|libopensles.*|libopenjdkjvmti|libicu.*-android|libnativehelper.*|libziparchive|libunwindstack|libsigchain|libcutils|libutils|libandroidfw|libexpat-android|libz-android|libcrypto-android)\\.so.*
+# no requires on the private libraries (lazy %define: the regex is made from the installed tree)
+%define __requires_exclude %(sh %{_builddir}/apk-starter-%{version}/packaging/private-sonames.sh %{buildroot}%{pfx})
 
 Name:           apk-starter
 Version:        %{apkver}

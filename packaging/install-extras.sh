@@ -13,6 +13,9 @@ cp "$d$p/share/metainfo/$app.metainfo.xml" "$d/usr/share/metainfo/"
 # what lintian and rpmlint reject: executable jars/headers, libtool's .la file, bytecode written while building
 find "$d$p" -type f \( -name '*.jar' -o -name '*.h' \) -exec chmod 644 {} +
 find "$d$p" -name '*.la' -delete
+# development files of the bundled libraries (wolfSSL headers etc.): nothing at run time uses them
+rm -rf "$d$p/include" "$d$p/lib/pkgconfig"
+find "$d$p" -name .keep -size 0 -delete
 find "$d$p" -name __pycache__ -type d -prune -exec rm -r {} +
 # ART's Makefiles write the rpath as ${ORIGIN}; rpm's check-rpaths only accepts $ORIGIN (the same thing)
 find "$d$p" -type f | while read -r f; do
