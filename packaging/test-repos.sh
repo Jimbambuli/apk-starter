@@ -51,7 +51,9 @@ for d in $want; do
   echo "== $d (fresh container $id)"
   mkct $id $tpl $dir
   sshn "pct exec $id -- sh /build/ct-repo-test.sh install $BASE" 2>&1 | tail -n 6
-  rm -rf "$t/cur"/*; cp -a "$t/v2/." "$t/cur/"
+  # new mtimes: v1 and v2 are made within about a second; pacman asks for the database with If-Modified-Since,
+  # gets 304 for a v2 database of the same second, but always fetches the .sig -> v1 database, v2 signature, invalid
+  rm -rf "$t/cur"/*; cp -a "$t/v2/." "$t/cur/"; find "$t/cur" -type f -exec touch {} +
   sshn "pct exec $id -- sh /build/ct-repo-test.sh upgrade $BASE" 2>&1 | tail -n 6
   sshn "pct stop $id; pct destroy $id --purge >/dev/null; rm -rf --one-file-system $dir"
 done
