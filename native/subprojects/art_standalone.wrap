@@ -1,6 +1,6 @@
 [wrap-git]
 directory = art_standalone
-url = file:///home/claude/bau/r088/repos/art.git
-revision = 54b41f8545e61e3a9b5596aa5cf368e18426f999
+url = https://gitlab.com/Jimbambuli/art_standalone.git
+revision = 4da2503e438d339acd1ab3c2326ee1aa5e2efc6e
 depth = 1
 patch_directory = art_standalone

@@ -72,10 +72,10 @@ def test_atl_doctor_pinned_with_the_same_atl_source():
     assert f"commit: {pins['atl-doctor']}" in art and "libopenjdkjvmti.so" in art   # JVMTI plugin, same atl-doctor
 
 
-def test_atl_from_the_fix_r7_branch():
+def test_atl_from_the_fix_r8_branch():
     text = (ROOT / "io.github.Jimbambuli.ApkStarter.yml").read_text()
     module = text[text.index("- name: android_translation_layer"):text.index("- name: atl-doctor")]
     # fix-r6 + merges reste, kindstart, compose-klein, de-texte, webview, popups, surface-puffer, activity-prozess,
-    # fehlersuche (fix-r7 4e932390c)
-    assert "branch: fix-r7" in module
+    # fehlersuche (fix-r7 4e932390c); fix-r8 4104a23b4: + lebenszyklus, apps-rest, jellyfin, kleinkram, firefox
+    assert "branch: fix-r8" in module
     assert text.count(f"commit: {manifest_commits()['android_translation_layer']}") == 2      # also atl-src
