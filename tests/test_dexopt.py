@@ -80,7 +80,9 @@ def test_runtime_is_prepared_once_by_art_itself(art):
     vm, ghax = art.calls()
     assert vm["prog"] == "dalvikvm"
     assert vm["args"][0] == "-Ximage:/app/lib/art/../java/dex/art/oat/boot.art"
-    assert vm["args"][1:] == ["-cp", "/app/lib/art/../java/dex/android_translation_layer/api-impl.jar:"
+    jobs = f"-j{len(os.sched_getaffinity(0))}"      # ART's own dex2oat runs get the usable CPUs too
+    assert vm["args"][1:] == ["-Ximage-compiler-option", jobs, "-Xcompiler-option", jobs,
+                              "-cp", "/app/lib/art/../java/dex/android_translation_layer/api-impl.jar:"
                                      "/app/lib/art/../java/dex/android_translation_layer/framework-res.apk"]
     assert arg(ghax, "--dex-file=") == "/app/lib/art/../java/dex/android_translation_layer/ghax.jar"
     assert arg(ghax, "--class-loader-context=") == "PCL[];PCL[/app/lib/art/../java/dex/android_translation_layer/api-impl.jar]"
@@ -123,6 +125,8 @@ def test_app_compile_replaces_files_and_remembers_the_filter(art, tmp_path):
     assert arg(call, "--class-loader-context=") == dexopt.app_context(art.paths)
     assert arg(call, "--boot-image=") == "/app/lib/art/../java/dex/art/oat/boot.art"
     assert "--host" in call["args"] and arg(call, "--instruction-set=") == "x86_64"
+    # as many threads as the process may use CPUs (taskset, cgroups), not as many as the computer has
+    assert arg(call, "-j") == str(len(os.sched_getaffinity(0)))
     odex = dexopt.cache_file(art.paths, loc)
     assert odex.is_file() and odex.with_suffix(".vdex").is_file()
     assert sorted(p.name for p in odex.parent.iterdir() if p.is_dir()) == []      # no temp dir left
