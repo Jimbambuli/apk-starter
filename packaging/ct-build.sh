@@ -25,7 +25,8 @@ deb)
   lintian --no-tag-display-limit "$work"/*.changes > "$out/lint-deb.txt" 2>&1 || true ;;
 rpm)
   if command -v zypper >/dev/null; then
-    zypper -q --non-interactive install rpm-build rpmlint tar xz >/dev/null
+    zypper -q --non-interactive remove busybox-diffutils >/dev/null 2>&1 || true   # the container image's, conflicts with diffutils
+    zypper -q --non-interactive install diffutils rpm-build rpmlint tar xz >/dev/null
     pm='zypper -q --non-interactive install --no-recommends'
   else dnf -q -y install rpm-build rpmlint tar xz >/dev/null; pm='dnf -q -y install'; fi
   top=$work/rpmbuild; mkdir -p "$top/SOURCES" "$top/SPECS"; cp "$tar" "$top/SOURCES/"

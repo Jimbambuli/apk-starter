@@ -6,7 +6,7 @@
 %global debug_package %{nil}
 %global __strip /bin/true
 %global __provides_exclude_from ^%{pfx}/
-# no requires on the private libraries (lazy %define: the regex is made from the installed tree)
+# no requires on the private libraries (lazy definition: the regex is made from the installed tree)
 %define __requires_exclude %(sh %{_builddir}/apk-starter-%{version}/packaging/private-sonames.sh %{buildroot}%{pfx})
 
 Name:           apk-starter
