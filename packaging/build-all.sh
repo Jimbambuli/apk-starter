@@ -1,7 +1,7 @@
 #!/bin/sh
 # build-all.sh [DISTRO...]: the release command. Builds the packages of APK Starter, one container per
 # distribution on a Proxmox node, and collects them in OUT (default packaging/out):
-#   debian13 (.deb)  ubuntu2404 (.deb)  fedora (.rpm)  opensuse (.rpm, Tumbleweed)  arch (.pkg.tar.zst)
+#   debian13 (.deb)  fedora (.rpm)  opensuse (.rpm, Tumbleweed)  arch (.pkg.tar.zst)
 # Per distribution: new container, ct-build.sh (dependencies from the distribution, build without network, lint),
 # the package into OUT, container destroyed; with TEST=1 also a second, fresh container that installs the package,
 # starts an app headless and removes it again (ct-test.sh; needs APK=, a test .apk).
@@ -12,9 +12,9 @@ set -eu
 here=$(cd "$(dirname "$0")" && pwd)
 NODE=${NODE:-root@pve2}; JUMP=${JUMP:-root@pve1}; OUT=${OUT:-$here/out}; CTBASE=${CTBASE:-180}
 mkdir -p "$OUT"
-sshn() { ssh -o BatchMode=yes -J "$JUMP" "$NODE" "$@"; }
+sshn() { ssh -o BatchMode=yes -o ServerAliveInterval=20 -o ServerAliveCountMax=45 -J "$JUMP" "$NODE" "$@"; }
 scpn() { scp -q -o BatchMode=yes -J "$JUMP" "$@"; }
-all="debian13 ubuntu2404 fedora opensuse arch"; want=${*:-$all}
+all="debian13 fedora opensuse arch"; want=${*:-$all}
 info() {  # distro -> template ostype format
   case $1 in
   debian13) echo "debian-13-standard_13.6-1_amd64.tar.zst debian deb";;

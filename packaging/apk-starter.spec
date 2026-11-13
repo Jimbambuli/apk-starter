@@ -60,7 +60,7 @@ x=$PWD/packaging/openxr; mkdir -p $x/pc
 printf 'prefix=%%s\nName: openxr\nDescription: OpenXR headers\nVersion: 1.1.65\nCflags: -I${prefix}/include\n' "$x" > $x/pc/openxr.pc
 export PKG_CONFIG_PATH=$x/pc${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}
 # /usr/bin/javac is a link into /etc/alternatives here: the JDK directory itself
-export JAVA_HOME=$(dirname $(dirname $(readlink -f $(rpm -ql java-21-openjdk-devel | grep '/bin/javac$' | head -1))))
+export JAVA_HOME=$(dirname $(dirname $(readlink -f $(rpm -ql java-21-openjdk-devel | grep '/jvm/.*/bin/javac$' | head -1))))
 %endif
 meson setup build native --prefix=%{pfx} --libdir=lib -Ddownload=false
 meson compile -C build

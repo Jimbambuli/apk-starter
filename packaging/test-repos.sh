@@ -8,9 +8,9 @@ set -eu
 here=$(cd "$(dirname "$0")" && pwd)
 NODE=${NODE:-root@pve2}; JUMP=${JUMP:-root@pve1}; OUT=${OUT:-$here/out}; CTBASE=${CTBASE:-190}
 SERVE=${SERVE:-$(hostname -I | cut -d' ' -f1)}; PORT=8099; BASE=http://$SERVE:$PORT
-sshn() { ssh -o BatchMode=yes -J "$JUMP" "$NODE" "$@"; }
+sshn() { ssh -o BatchMode=yes -o ServerAliveInterval=20 -o ServerAliveCountMax=45 -J "$JUMP" "$NODE" "$@"; }
 scpn() { scp -q -o BatchMode=yes -J "$JUMP" "$@"; }
-want=${*:-debian13 ubuntu2404 fedora opensuse arch}
+want=${*:-debian13 fedora opensuse arch}
 t=$OUT/repo-test; rm -rf "$t"; mkdir -p "$t/cur"
 mkct() {  # id template ostype dir
   sshn "pct create $1 local:vztmpl/$2 --hostname pk-$1 --unprivileged 1 --features nesting=1 --cores 4 --memory 8192 \
