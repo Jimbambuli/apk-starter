@@ -14,7 +14,7 @@ cp "$d$p/share/metainfo/$app.metainfo.xml" "$d/usr/share/metainfo/"
 find "$d$p" -type f \( -name '*.jar' -o -name '*.h' \) -exec chmod 644 {} +
 find "$d$p" -name '*.la' -delete
 # development files of the bundled libraries (wolfSSL headers etc.): nothing at run time uses them
-rm -rf "$d$p/include" "$d$p/lib/pkgconfig"
+rm -rf "$d$p/include" "$d$p/lib/pkgconfig" "$d$p/share/doc/wolfssl"
 find "$d$p" -name .keep -size 0 -delete
 find "$d$p" -name __pycache__ -type d -prune -exec rm -r {} +
 # ART's Makefiles write the rpath as ${ORIGIN}; rpm's check-rpaths only accepts $ORIGIN (the same thing)

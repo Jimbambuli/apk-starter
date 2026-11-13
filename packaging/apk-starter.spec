@@ -22,8 +22,10 @@ ExclusiveArch:  x86_64
 BuildRequires:  ninja
 BuildRequires:  java-21-openjdk-devel
 BuildRequires:  libxkbcommon-devel
+# (no pkgconfig(openxr) in Tumbleweed: the headers from the bundle, see %build)
 %else
 BuildRequires:  ninja-build
+BuildRequires:  pkgconfig(openxr)
 BuildRequires:  java-25-openjdk-devel
 %endif
 BuildRequires:  git meson gcc gcc-c++ make patch autoconf automake libtool gettext zip unzip patchelf
@@ -31,7 +33,7 @@ BuildRequires:  python3 python3-gobject valgrind-devel wayland-devel glib2-devel
 BuildRequires:  pkgconfig(egl) pkgconfig(libelf) pkgconfig(libunwind) pkgconfig(libbsd) pkgconfig(sdl2)
 BuildRequires:  pkgconfig(sndfile) pkgconfig(icu-uc) pkgconfig(icu-i18n) pkgconfig(libcrypto) pkgconfig(expat)
 BuildRequires:  pkgconfig(liblz4) pkgconfig(liblzma) pkgconfig(libcap) pkgconfig(zlib) pkgconfig(gtk4)
-BuildRequires:  pkgconfig(vulkan) pkgconfig(openxr) pkgconfig(fontconfig) pkgconfig(gl) pkgconfig(wayland-client)
+BuildRequires:  pkgconfig(vulkan) pkgconfig(fontconfig) pkgconfig(gl) pkgconfig(wayland-client)
 BuildRequires:  pkgconfig(wayland-protocols) pkgconfig(libportal) pkgconfig(sqlite3) pkgconfig(libavcodec)
 BuildRequires:  pkgconfig(libavfilter) pkgconfig(libavformat) pkgconfig(libavutil) pkgconfig(libswscale)
 BuildRequires:  pkgconfig(libdrm) pkgconfig(gudev-1.0) pkgconfig(webkitgtk-6.0) pkgconfig(libsecret-1)
@@ -53,6 +55,11 @@ their libraries) is built from source and installed in /usr/lib/apk-starter.
 %autosetup -n apk-starter-%{version}
 
 %build
+%if 0%{?suse_version}
+x=$PWD/packaging/openxr; mkdir -p $x/pc
+printf 'prefix=%s\nName: openxr\nDescription: OpenXR headers\nVersion: 1.1.65\nCflags: -I${prefix}/include\n' "$x" > $x/pc/openxr.pc
+export PKG_CONFIG_PATH=$x/pc${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}
+%endif
 meson setup build native --prefix=%{pfx} --libdir=lib -Ddownload=false
 meson compile -C build
 

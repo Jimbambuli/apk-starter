@@ -20,6 +20,10 @@ for w in "$top"/native/subprojects/*.wrap; do
   rm -rf "$top/native/subprojects/$d/.git"
 done
 python3 "$top/native/build.py" fetch-jars --source "$top/native" --dest "$top/native/jars"
+# openSUSE Tumbleweed has no OpenXR package, and ATL only needs its headers (partial_dependency(includes)): the
+# headers of the Khronos OpenXR-SDK at a fixed tag, used by the openSUSE build only (apk-starter.spec)
+git clone -q --depth 1 --branch release-1.1.65 https://github.com/KhronosGroup/OpenXR-SDK "$work/xr"
+mkdir -p "$top/packaging/openxr"; cp -r "$work/xr/include" "$work/xr/LICENSE" "$top/packaging/openxr/"
 git -C "$repo" log -1 --format=%ct > "$top/.source-date-epoch"
 tar -C "$work" --sort=name --owner=0 --group=0 --numeric-owner -cJf "$out/apk-starter-$version.tar.xz" "apk-starter-$version"
 rm -rf --one-file-system "$work"

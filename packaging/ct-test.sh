@@ -15,7 +15,7 @@ case $pkg in
 *.rpm) if command -v zypper >/dev/null; then
     zypper -q --non-interactive --no-gpg-checks install --no-recommends "$pkg" kwin6 dbus-1-daemon Mesa-dri \
       dejavu-fonts glib2-tools >/dev/null; remove() { zypper -q --non-interactive remove apk-starter; }
-  else dnf -q -y install "$pkg" kwin-wayland dbus-daemon mesa-dri-drivers dejavu-sans-fonts glib2 >/dev/null
+  else dnf -q -y install "$pkg" kwin-wayland dbus-daemon mesa-dri-drivers dejavu-sans-fonts >/dev/null
     remove() { dnf -q -y remove apk-starter; }; fi
   files() { rpm -ql apk-starter; } ;;
 *.pkg.tar.zst) pacman-key --init >/dev/null 2>&1; pacman-key --populate archlinux >/dev/null 2>&1
