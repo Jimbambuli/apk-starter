@@ -276,3 +276,14 @@ def test_urgent_compile_keeps_better_code_that_arrived_meanwhile(art, tmp_path, 
         dexopt.compile_app(art.paths, art.env, loc, "verify", is_urgent=True)
     assert dexopt.app_filter(art.paths, loc) == "speed"
     assert dexopt.cache_file(art.paths, loc).read_bytes() == b"full"
+
+
+def test_the_runtime_is_not_paused_by_the_start_it_is_prepared_for(art, tmp_path):
+    # the first start of an app holds its urgent mark while it prepares the runtime: ghax.jar must not stand aside
+    started = str(make_apk(tmp_path / "started.apk", manifest=axml_manifest()))
+    art.env["FAKE_ART_TICKS"] = str(tmp_path / "ticks")     # dex2oat runs longer than PAUSE_POLL_S
+    with dexopt.urgent(art.paths, started):
+        t = _in_thread(lambda: dexopt.ensure_runtime(art.paths, art.env, lambda _m: None))
+        t.join(10)
+        assert not t.is_alive()
+    assert dexopt.runtime_ready(art.paths, art.env)
