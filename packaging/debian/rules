@@ -3,6 +3,10 @@
 # of the system, so no shlibs/symbols for it, and no stripping (strip would break ART's .oat boot image, which
 # the build has stripped already, ELF file by ELF file).
 P = /usr/lib/apk-starter
+# libopensles-standalone is built with -std=gnu23, which Ubuntu 24.04's default GCC 13 does not know (Debian 13: GCC 14 is
+# the default anyway)
+export CC = gcc-14
+export CXX = g++-14
 
 %:
 	dh $@
