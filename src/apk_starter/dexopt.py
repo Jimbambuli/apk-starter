@@ -202,7 +202,8 @@ def _dex2oat(paths: Paths, env: Mapping[str, str], location: str, context: str, 
         proc = _run(["dex2oat", f"--dex-file={location}", f"--oat-file={tmp / out.name}",
                      f"--instruction-set={ISA}", f"--instruction-set-features={ISA_FEATURES}", "--host",
                      f"--boot-image={boot_image(paths)}", f"--class-loader-context={context}",
-                     f"--compiler-filter={flt}"], env, idle, lambda: urgent_active(paths, own=location))
+                     f"--compiler-filter={flt}", f"-j{len(os.sched_getaffinity(0))}"],
+                    env, idle, lambda: urgent_active(paths, own=location))
         if proc.returncode != 0 or not (tmp / out.name).is_file():
             raise DexoptError(_failure(proc))
         if not keep():
@@ -244,7 +245,9 @@ def ensure_runtime(paths: Paths, env: Mapping[str, str], report: Callable[[str],
         _clean_tmp(dalvik_cache(paths, env))
         # ART checks what is there (checksums against the jars of this build) and generates what is missing
         # or invalid; dalvikvm then stops with "Class name required", so success is judged by the files.
-        proc = _run(["dalvikvm", f"-Ximage:{boot_image(paths)}",
+        jobs = f"-j{len(os.sched_getaffinity(0))}"   # ART's dex2oat would take every CPU of the computer
+        proc = _run(["dalvikvm", f"-Ximage:{boot_image(paths)}", "-Ximage-compiler-option", jobs,
+                     "-Xcompiler-option", jobs,
                      "-cp", f"{jar(paths, 'api-impl.jar')}:{jar(paths, 'framework-res.apk')}"], env)
         if not (cache_file(paths, boot_image(paths), env).is_file()
                 and cache_file(paths, jar(paths, "api-impl.jar"), env).is_file()):

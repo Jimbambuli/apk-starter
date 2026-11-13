@@ -23,7 +23,7 @@ from .paths import PROFILE_RE, Paths, apply_profile
 from .settings import load_settings
 from .run import (read_build_info, run_atl)
 
-VERSION = "0.8.7"
+VERSION = "0.8.8"
 COMPILE_GRACE_S = 20.0      # how long the end of the app waits for the full compile that runs in the background
 APP_ID = "io.github.Jimbambuli.ApkStarter"
 # A test build's menu entries and windows are its own (profile), so they do not replace those of stable.
@@ -158,7 +158,8 @@ def install_app(paths: Paths, info: ApkInfo, parts: tuple[tuple[str, Path], ...]
     else:
         paths.icon(info.package).unlink(missing_ok=True)
     meta = {"package": info.package, "label": info.label, "version_name": info.version_name,
-            "version_code": info.version_code, "target_sdk": info.target_sdk, "desktop_id": _desktop_id(info.package)}
+            "version_code": info.version_code, "target_sdk": info.target_sdk, "desktop_id": _desktop_id(info.package),
+            "share_types": list(info.share_types)}  # ATL's share sheet offers the app for these (ATLLoadedAppManager)
     _write_atomic(paths.meta(info.package), json.dumps(meta).encode("utf-8"))
 
 
@@ -543,9 +544,12 @@ def _start(paths: Paths, args, level: str | None, into: Path | None, tail: list[
     background.start()
     try:
         if debug_dir is not None:
-            return diag.record_restarting(paths, cmd, child_env, debug_dir, info.package,
-                                          shots=level == "debug-full")
-        return run_atl(cmd, child_env, None, {})
+            rc = diag.record_restarting(paths, cmd, child_env, debug_dir, info.package,
+                                        shots=level == "debug-full")
+        else:
+            rc = run_atl(cmd, child_env, None, {})
+        _tell_crash(env, info.label, rc)
+        return rc
     finally:
         if debug_dir is not None:                   # one archive, as soon as the app has ended
             try:
@@ -672,6 +676,17 @@ def refresh_menu_entries(paths: Paths, lang: str | None, renewing: Callable[[str
         marker.parent.mkdir(parents=True, exist_ok=True)
         _write_atomic(marker, key.encode("utf-8"))
     return renewed
+
+
+def _tell_crash(env: Mapping[str, str], label: str, rc: int) -> None:
+    """Started from the menu entry, a crash ends the window without a word: say it in a small window. The
+    starter's window says it itself for the apps it starts (APK_STARTER_FROM_WINDOW)."""
+    from .gui_model import crash_meaning
+    meaning = crash_meaning(True, rc)
+    if meaning is None or env.get("APK_STARTER_FROM_WINDOW"):
+        return
+    from . import install_request
+    install_request._dialog(env, _("{app} ended unexpectedly.").format(app=label), meaning, [("close", _("Close"))])
 
 
 def _compile_later(paths: Paths, env: Mapping[str, str], locations: list[str],

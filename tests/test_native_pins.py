@@ -1,4 +1,5 @@
 """tools/check-native-pins.py: the native build's wraps and jars equal the Flatpak manifest."""
+import re
 import shutil
 import subprocess
 import sys
@@ -23,11 +24,14 @@ def test_a_changed_manifest_commit_is_reported(tmp_path):
         shutil.copy(w, tmp_path / "native/subprojects" / w.name)
     shutil.copy(REPO / "native/tool-jars.txt", tmp_path / "native/tool-jars.txt")
     text = (REPO / "io.github.Jimbambuli.ApkStarter.yml").read_text(encoding="utf-8")
-    old = "commit: 0f37cc5f32d3e82aa01fe1fbb643e9178efafd55"
+    wrap = (REPO / "native/subprojects/android_translation_layer.wrap").read_text(encoding="utf-8")
+    url = re.search(r"^url = (\S+)", wrap, re.M).group(1)
+    rev = re.search(r"^revision = (\w+)", wrap, re.M).group(1)
+    old = "commit: " + rev
     assert old in text
     (tmp_path / "io.github.Jimbambuli.ApkStarter.yml").write_text(text.replace(old, "commit: " + "1" * 40),
                                                                   encoding="utf-8")
     r = run(tmp_path)
     assert r.returncode == 1
-    assert "manifest source without a wrap: https://gitlab.com/Jimbambuli/android_translation_layer.git 1111" in r.stderr
-    assert "wrap not in the manifest: https://gitlab.com/Jimbambuli/android_translation_layer.git 0f37cc5f" in r.stderr
+    assert f"manifest source without a wrap: {url} 1111" in r.stderr
+    assert f"wrap not in the manifest: {url} {rev[:8]}" in r.stderr

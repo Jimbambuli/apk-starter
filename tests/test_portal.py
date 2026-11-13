@@ -164,3 +164,19 @@ def test_share_mime_types_offer_the_app_under_open_with():
     from apk_starter.portal import share_mime_types
     assert share_mime_types(("image/*", "text/plain", "video/*", "*/*", "image/*", "bad type", "IMAGE/PNG")) == [
         "image/*", "image/png", "text/plain", "video/*"]
+
+
+def test_uninstall_missing_entry_is_no_error_in_any_language(monkeypatch):
+    """The portal answers a missing menu entry with GIO's NOT_FOUND, its text in the session's language."""
+    from apk_starter import portal
+    from apk_starter.errors import StarterError
+
+    def call(*_args):
+        raise StarterError("portal call Uninstall failed: GDBus.Error:org.gtk.GDBus.UnmappedGError.Quark."
+                           "_g_2dio_2derror_2dquark.Code1: Fehler beim Entfernen der Datei »/x/y.desktop«: "
+                           "Datei oder Verzeichnis nicht gefunden")
+    fake_glib = type("GLib", (), {"Variant": staticmethod(lambda *a: a)})
+    monkeypatch.setattr(portal, "_gi", lambda: (None, fake_glib))
+    monkeypatch.setattr(portal, "_connect", lambda Gio, GLib: None)
+    monkeypatch.setattr(portal, "_call", call)
+    portal.uninstall_launcher("org.x.y")
