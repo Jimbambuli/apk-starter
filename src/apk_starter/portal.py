@@ -177,6 +177,8 @@ def uninstall_launcher(pkg: str) -> None:
         _call(conn, Gio, GLib, "org.freedesktop.portal.DynamicLauncher", "Uninstall",
               GLib.Variant("(sa{sv})", (desktop_file_id(pkg), {})))
     except StarterError as e:
-        not_found = "not found" in str(e).lower() or "NotFound" in str(e)
+        # the text of the error is in the session's language; GIO's NOT_FOUND (code 1) names it in any
+        not_found = ("not found" in str(e).lower() or "NotFound" in str(e)
+                     or "_g_2dio_2derror_2dquark.Code1:" in str(e))
         if isinstance(e, PortalUnavailable) or not not_found:
             raise
