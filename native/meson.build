@@ -7,7 +7,7 @@
 # looks for libdl_bio at configure time), so they cannot be plain subproject() calls in one configure run.
 # build.py builds them one after the other into a staging tree inside the build directory, in the order of
 # the Flatpak manifest; `meson install` copies that tree into the prefix.
-project('apk-starter-native', version: '0.8.7', meson_version: '>=1.1', default_options: ['libdir=lib'])
+project('apk-starter-native', version: '0.8.7', meson_version: '>=1.1', default_options: ['libdir=lib', 'strip=true'])
 
 if get_option('libdir') != 'lib'
   error('the starter expects its libraries in <prefix>/lib: configure with -Dlibdir=lib (the default here)')
@@ -60,7 +60,7 @@ custom_target('components',
   output: 'components.stamp',
   command: [python, files('build.py'), 'build', '--source', meson.project_source_root(), '--build',
             meson.current_build_dir(), '--stage', stage, '--prefix', get_option('prefix'), '--jdk', jdk,
-            '--stamp', '@OUTPUT@'],
+            '--stamp', '@OUTPUT@'] + (get_option('strip') ? ['--strip'] : []),
   build_by_default: true,
   build_always_stale: true,
   console: true)

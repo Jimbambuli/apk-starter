@@ -211,6 +211,8 @@ Differences to the Flatpak: the data of the starter and the apps lives in `~/.lo
 and `~/.cache/io.github.Jimbambuli.ApkStarter` (instead of `~/.var/app/…`); the apps' menu entries are written
 directly into `~/.local/share/applications` (no portal); the system's own themes and icons are used. After new
 commits in the manifest: `meson subprojects update --reset` in `native/`, then `meson install -C build` again.
+The libraries and programs are installed without debug information; for a build with it, configure a new build
+directory with `-Dstrip=false`.
 
 ## Translations
 

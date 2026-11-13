@@ -37,3 +37,14 @@ def test_notice_once_and_only_native(tmp_path):
     assert native_notice(paths, {}) is None
     assert "without a sandbox" in native_notice(paths, {"APK_STARTER_NATIVE": "1"})
     assert native_notice(paths, {"APK_STARTER_NATIVE": "1"}) is None
+
+
+def test_starter_entry_exec_quoted():
+    """native/build.py: the starter's own menu entry, a prefix with a space quoted like the apps' entries."""
+    import importlib.util
+    from pathlib import Path
+    spec = importlib.util.spec_from_file_location("native_build", Path(__file__).parent.parent / "native/build.py")
+    build = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(build)
+    assert build.desktop_exec_arg("/opt/apk starter/bin/apk-starter") == '"/opt/apk starter/bin/apk-starter"'
+    assert build.desktop_exec_arg('/o/a"b$c\\d%e') == '"/o/a\\\\"b\\\\$c\\\\\\\\d%%e"'

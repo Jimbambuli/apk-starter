@@ -11,6 +11,7 @@ rewritten to the staging tree). A component is built again only when its commit,
 import argparse
 import configparser
 import hashlib
+import re
 import os
 import shutil
 import subprocess
@@ -185,8 +186,27 @@ def build(a: argparse.Namespace) -> None:
     step("art_standalone", art_rev, do_art)
     step("android_translation_layer", atl_rev, do_atl)
     step("atl-doctor", f"{doctor_rev} {atl_rev}", do_doctor)
+    if a.strip:
+        strip_tree(sp, env)
     install_starter(repo, sp, prefix, jdk, env)
     Path(a.stamp).write_text("ok\n", encoding="utf-8")
+
+
+def strip_tree(sp: Path, env: dict) -> None:
+    """Without debug information (meson option strip, the default): every ELF library and program of the staging
+    tree; ART's compiled boot image (.oat/.odex/.art) stays as it is. Done again each build, it is quick."""
+    for f in sorted(sp.rglob("*")):
+        if f.is_symlink() or not f.is_file() or f.suffix in (".oat", ".odex", ".vdex", ".art"):
+            continue
+        with open(f, "rb") as fh:
+            if fh.read(4) != b"\x7fELF":
+                continue
+        subprocess.run(["strip", "--strip-unneeded", f], env=env, check=True)
+
+
+def desktop_exec_arg(s: str) -> str:
+    """An Exec argument quoted as the Desktop Entry spec says (as portal.py does for the apps' entries)."""
+    return '"' + re.sub(r'([\\"`$])', r'\\\1', s).replace("\\", "\\\\").replace("%", "%%") + '"'
 
 
 def install_starter(repo: Path, sp: Path, prefix: str, jdk: str, env: dict) -> None:
@@ -214,7 +234,7 @@ def install_starter(repo: Path, sp: Path, prefix: str, jdk: str, env: dict) -> N
     # not in a Flatpak: the desktop has neither the command in PATH nor the icon in its theme
     entry = sp / f"share/applications/{app}.desktop"
     real_icon = f"{prefix}/share/icons/hicolor/scalable/apps/{app}.svg"
-    lines = [f"Exec={prefix}/bin/apk-starter %f" if line.startswith("Exec=") else
+    lines = [f"Exec={desktop_exec_arg(prefix + '/bin/apk-starter')} %f" if line.startswith("Exec=") else
              f"Icon={real_icon}" if line.startswith("Icon=") else line
              for line in entry.read_text(encoding="utf-8").splitlines()]
     entry.write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -244,6 +264,7 @@ def main() -> None:
     b = sub.add_parser("build")
     for opt in ("--source", "--build", "--stage", "--prefix", "--jdk", "--stamp"):
         b.add_argument(opt, required=True)
+    b.add_argument("--strip", action="store_true", help="install without debug information")
     i = sub.add_parser("install")
     i.add_argument("--stage", required=True)
     i.add_argument("--prefix", required=True)
