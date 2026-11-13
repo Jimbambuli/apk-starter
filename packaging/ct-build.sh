@@ -47,4 +47,11 @@ arch)
   cp $b/*.pkg.tar.zst "$out"/
   namcap $b/PKGBUILD $b/*.pkg.tar.zst > "$out/lint-arch.txt" 2>&1 || true ;;
 esac
+# test helper (not part of the package): atl-doctor's fake-input client for the headless run in ct-test.sh
+case $fmt in deb) h='libxkbcommon-dev';; rpm) h='pkgconfig(xkbcommon)';; arch) h=libxkbcommon;; esac
+case $fmt in deb) apt-get install -y -qq $h >/dev/null;; rpm) $pm $h >/dev/null;;
+  arch) pacman -S --noconfirm --needed --disable-sandbox $h >/dev/null 2>&1;; esac
+jdk=$(dirname "$(dirname "$(readlink -f "$(command -v javac)")")")
+meson setup /build/helper "$src/native/subprojects/atl-doctor/agent" -Djdk="$jdk" >/dev/null
+ninja -C /build/helper atl-doctor-input >/dev/null && cp /build/helper/atl-doctor-input "$out"/
 ls -l "$out"
