@@ -191,9 +191,10 @@ def _failure(proc: subprocess.CompletedProcess) -> str:
 
 
 def _dex2oat(paths: Paths, env: Mapping[str, str], location: str, context: str, flt: str, idle: bool,
-             keep: Callable[[], bool] = lambda: True) -> bool:
+             keep: Callable[[], bool] = lambda: True, pausable: bool = True) -> bool:
     """Compile into a private directory next to the target, then rename: never rewrite a mapped file.
-    False if `keep()` said no after the compile (somebody else was faster): nothing is replaced."""
+    False if `keep()` said no after the compile (somebody else was faster): nothing is replaced.
+    `pausable`: stopped while another app is being started (urgent()); not for the runtime, which every start needs."""
     out = cache_file(paths, location, env)
     out.parent.mkdir(parents=True, exist_ok=True)
     tmp = out.parent / f".apk-starter-{os.getpid()}-{time.monotonic_ns()}"
@@ -203,7 +204,7 @@ def _dex2oat(paths: Paths, env: Mapping[str, str], location: str, context: str, 
                      f"--instruction-set={ISA}", f"--instruction-set-features={ISA_FEATURES}", "--host",
                      f"--boot-image={boot_image(paths)}", f"--class-loader-context={context}",
                      f"--compiler-filter={flt}", f"-j{len(os.sched_getaffinity(0))}"],
-                    env, idle, lambda: urgent_active(paths, own=location))
+                    env, idle, (lambda: urgent_active(paths, own=location)) if pausable else None)
         if proc.returncode != 0 or not (tmp / out.name).is_file():
             raise DexoptError(_failure(proc))
         if not keep():
@@ -252,7 +253,9 @@ def ensure_runtime(paths: Paths, env: Mapping[str, str], report: Callable[[str],
         if not (cache_file(paths, boot_image(paths), env).is_file()
                 and cache_file(paths, jar(paths, "api-impl.jar"), env).is_file()):
             raise DexoptError(_failure(proc))
-        _dex2oat(paths, env, jar(paths, "ghax.jar"), f"PCL[];PCL[{jar(paths, 'api-impl.jar')}]", FULL, False)
+        # not pausable: the start that holds urgent() waits for this (before, the start stopped its own runtime compile for good)
+        _dex2oat(paths, env, jar(paths, "ghax.jar"), f"PCL[];PCL[{jar(paths, 'api-impl.jar')}]", FULL, False,
+                 pausable=False)
         _write(_marker(paths), runtime_key(paths))
 
 
