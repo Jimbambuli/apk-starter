@@ -36,6 +36,6 @@ arch)
     pacman-key --add $key; pacman-key --lsign-key "$(gpg --show-keys --with-colons $key | awk -F: '/^fpr/{print $10; exit}')" 2>&1 | tail -n 1
     printf '\n[apk-starter]\nSigLevel = Required\nServer = %s/arch/$arch\n' "$base" >> /etc/pacman.conf
     pacman -Syu --noconfirm --disable-sandbox >/dev/null 2>&1; pacman -S --noconfirm --disable-sandbox apk-starter 2>&1 | tail -n 3
-  else pacman -Syu --noconfirm --disable-sandbox 2>&1 | tail -n 3; fi ;;
+  else pacman -Syyu --noconfirm --disable-sandbox 2>&1 | tail -n 3; fi ;;
 esac
 echo "$ID $phase: installed apk-starter $(installed); $(/usr/bin/apk-starter --version 2>&1)"

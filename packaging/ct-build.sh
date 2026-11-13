@@ -34,7 +34,7 @@ rpm)
   printf '\n%%changelog\n* %s %s - %s-1\n- Release %s\n' "$(LC_ALL=C date -u -d @"$sde" '+%a %b %d %Y')" "$who" \
     "$version" "$version" >> "$spec"
   rpmspec -q --define "apkver $version" --buildrequires "$spec" | sed 's/ .*//' | sort -u | xargs $pm >/dev/null
-  $NONET rpmbuild -bb --define "_topdir $top" --define "apkver $version" "$spec"
+  $NONET rpmbuild -bb --define "_topdir $top" --define "apkver $version" "$spec" > "$out/build-rpm.log" 2>&1 || { grep -m5 -B3 "error:" "$out/build-rpm.log" | cut -c1-300; exit 1; }
   cp "$top"/RPMS/*/*.rpm "$out"/
   rpmlint "$top"/RPMS/*/*.rpm > "$out/lint-rpm.txt" 2>&1 || true ;;
 arch)

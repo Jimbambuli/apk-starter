@@ -59,7 +59,7 @@ done
 
 # The assets of the GitHub release: one folder, names that tell the distributions apart, SHA256SUMS.
 version=$(sed -n 's/^VERSION = "\(.*\)"$/\1/p' "$here/../src/apk_starter/cli.py")
-rel=$OUT/release; mkdir -p "$rel"
+rel=$OUT/release; rm -rf "$rel"; mkdir -p "$rel"
 for d in $want; do
   for f in "$OUT/$d"/*.deb "$OUT/$d"/*.rpm "$OUT/$d"/*.pkg.tar.zst; do
     [ -f "$f" ] || continue

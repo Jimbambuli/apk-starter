@@ -15,7 +15,7 @@ assets=$(realpath "$1"); site=$2; mkdir -p "$site"; site=$(realpath "$site")
 keep=${KEEP:-2}; base=${BASE:-https://jimbambuli.github.io/apk-starter}
 gpgs() { gpg --batch --yes --pinentry-mode loopback --passphrase '' -u "$GPG_KEY" "$@"; }
 newest() { ls -1 "$@" 2>/dev/null | sort -V | tail -n "$keep"; }   # the KEEP newest of the file names given
-prune() { dir=$1; pat=$2; ls -1 "$dir"/$pat 2>/dev/null | sort -V | head -n -"$keep" | xargs -r rm -f --; }
+prune() { ls -1 "$1"/$2 2>/dev/null | sort -V | head -n -"$keep" | xargs -r rm -f --; }
 bump() { echo "$1" | awk -F. '{$NF=$NF+1} 1' OFS=.; }
 w=$(mktemp -d); trap 'rm -rf --one-file-system "$w"' EXIT
 
@@ -43,10 +43,6 @@ for pair in debian13:trixie ubuntu2404:noble; do
 done
 
 # ---- rpm: Fedora (one directory per release; the package is built against that release's libraries) and Tumbleweed
-cat > "$w/macros" <<EOM
-%_gpg_name $GPG_KEY
-%__gpg $(command -v gpg)
-EOM
 for f in "$assets"/*.fc[0-9]*.x86_64.rpm "$assets"/*.opensuse-tumbleweed.x86_64.rpm; do
   [ -f "$f" ] || continue
   case $f in *.fc[0-9]*) n=${f##*.fc}; dir=fedora/${n%%.*};; *) dir=tumbleweed;; esac
@@ -54,13 +50,13 @@ for f in "$assets"/*.fc[0-9]*.x86_64.rpm "$assets"/*.opensuse-tumbleweed.x86_64.
   if [ "${BUMP:-}" = 1 ]; then
     v=$(rpm -qp --qf '%{VERSION}' "$f"); r=$(rpm -qp --qf '%{RELEASE}' "$f"); nv=$(bump "$v")
     mkdir -p "$w/rpm/tree" "$w/rpm/SPECS"; (cd "$w/rpm/tree" && rpm2cpio "$f" | cpio -idm 2>/dev/null)
-    printf 'Name: apk-starter\nVersion: %s\nRelease: %s\nSummary: test repack\nLicense: GPL-3.0-or-later\nAutoReqProv: no\n%%description\nrepack\n%%install\ncp -a %s/. %%{buildroot}\n%%files\n/usr/lib/apk-starter\n/usr/bin/apk-starter\n/usr/share/applications/*\n/usr/share/icons/hicolor/scalable/apps/*\n/usr/share/metainfo/*\n' \
+    printf 'Name: apk-starter\nVersion: %s\nRelease: %s\nSummary: test repack\nLicense: GPL-3.0-or-later\nAutoReqProv: no\n%%description\nrepack\n%%install\ncp -a %s/. %%{buildroot}\n%%files\n/usr/lib/apk-starter\n/usr/bin/apk-starter\n/usr/share/applications/*\n/usr/share/icons/hicolor/scalable/apps/*\n/usr/share/metainfo/*\n/usr/share/licenses/apk-starter\n' \
       "$nv" "$r" "$w/rpm/tree" > "$w/rpm/SPECS/a.spec"
     rpmbuild -bb --define "_topdir $w/rpm" --define '_binary_payload w19.zstdio' "$w/rpm/SPECS/a.spec" >/dev/null
     cp "$w"/rpm/RPMS/*/*.rpm "$site/rpm/$dir/"; rm -rf "$w/rpm"
   fi
   prune "$site/rpm/$dir" '*.rpm'
-  rpmsign --macros="/usr/lib/rpm/macros:$w/macros" --addsign "$site/rpm/$dir"/*.rpm >/dev/null
+  rpmsign --define "_gpg_name $GPG_KEY" --addsign "$site/rpm/$dir"/*.rpm >/dev/null
   createrepo_c -q --general-compress-type=gz "$site/rpm/$dir"
   gpgs --detach-sign --armor -o "$site/rpm/$dir/repodata/repomd.xml.asc" "$site/rpm/$dir/repodata/repomd.xml"
 done
