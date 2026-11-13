@@ -21,13 +21,13 @@ alias apk-starter='flatpak run --file-forwarding io.github.Jimbambuli.ApkStarter
 
 ### Install from a package repository (native, without the Flatpak sandbox)
 
-Packages for Debian 13, Ubuntu 24.04, Fedora, openSUSE Tumbleweed and Arch Linux are published as signed
+Packages for Debian 13, Fedora, openSUSE Tumbleweed and Arch Linux are published as signed
 repositories next to the Flatpak repository (the same key, [pages/apk-starter.gpg](pages/apk-starter.gpg)), so the
 package manager updates them. They install the starter and everything it needs in `/usr/lib/apk-starter`, and
 **the apps run with all the rights of your user account** (see «Native build» below).
 
 ```
-# Debian 13, Ubuntu 24.04
+# Debian 13
 sudo install -d /etc/apt/keyrings
 sudo curl -fsSL https://jimbambuli.github.io/apk-starter/apk-starter.gpg -o /etc/apt/keyrings/apk-starter.gpg
 echo "deb [signed-by=/etc/apt/keyrings/apk-starter.gpg] https://jimbambuli.github.io/apk-starter/apt $(. /etc/os-release; echo $VERSION_CODENAME) main" | sudo tee /etc/apt/sources.list.d/apk-starter.list

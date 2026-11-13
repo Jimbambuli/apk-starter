@@ -6,7 +6,7 @@ Standards-Version: 4.7.0
 Rules-Requires-Root: no
 Homepage: https://github.com/Jimbambuli/apk-starter
 Build-Depends: debhelper-compat (= 13), git, meson, ninja-build, pkg-config, build-essential, patch, autoconf,
- automake, libtool, gcc-14, g++-14, gettext, zip, unzip, python3, python3-gi, gir1.2-gtk-4.0, openjdk-21-jdk-headless,
+ automake, libtool, gettext, zip, unzip, python3, python3-gi, gir1.2-gtk-4.0, openjdk-21-jdk-headless,
  ca-certificates-java, patchelf, valgrind, wayland-protocols, libglib2.0-dev-bin, libegl-dev, libelf-dev,
  libunwind-dev, libbsd-dev, libsdl2-dev, libsndfile1-dev, libicu-dev, libssl-dev, libexpat1-dev, liblz4-dev,
  liblzma-dev, libcap-dev, zlib1g-dev, libgtk-4-dev, libvulkan-dev, libopenxr-dev, libfontconfig-dev, libgl-dev,
