@@ -19,6 +19,7 @@ info() {  # distro -> template ostype format
   case $1 in
   debian13) echo "debian-13-standard_13.6-1_amd64.tar.zst debian deb";;
   ubuntu2404) echo "ubuntu-24.04-standard_24.04-2_amd64.tar.zst ubuntu deb";;
+  ubuntu2604) echo "ubuntu-26.04-standard_26.04-1_amd64.tar.zst ubuntu deb";;
   fedora) echo "fedora-44-default_20260713_amd64.tar.xz fedora rpm";;
   opensuse) echo "opensuse-tumbleweed-20261113_amd64.tar.xz opensuse rpm";;
   arch) echo "archlinux-base_20260420-1_amd64.tar.zst archlinux arch";;
@@ -65,7 +66,7 @@ for d in $want; do
     [ -f "$f" ] || continue
     b=$(basename "$f")
     case $d in
-    debian13|ubuntu2404) b=apk-starter_${version}_${d}_amd64.deb;;           # same file name from both builds
+    debian13|ubuntu2404|ubuntu2604) b=apk-starter_${version}_${d}_amd64.deb;;           # same file name from both builds
     opensuse) b=$(echo "$b" | sed 's/\(-[0-9]*\)\.x86_64/\1.opensuse-tumbleweed.x86_64/');;
     esac                                                                      # fedora: .fc44 from %{?dist}; arch: unique
     cp "$f" "$rel/$b"
