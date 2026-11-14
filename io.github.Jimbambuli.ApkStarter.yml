@@ -124,7 +124,7 @@ modules:
       - type: git
         url: file:///home/claude/claude-arbeit/r089/repos/bionic.git
         branch: fix-r2
-        commit: d52582b7a843452c85419f626bc3c1ef7c5cef57
+        commit: 9533428d21b5a27d3923617dc87d0e08f8f6919f
 
   # OpenSL ES of the ATL project, fork branch fix-r1 (OutputMix interface, PCM_EX float and play position, no pending seek without SL_IID_SEEK) (SDL2 + libsndfile from the runtime): native app libraries that open
   # libOpenSLES.so (e.g. WhatsApp's libwhatsapp.so needs slCreateEngine).

@@ -1,5 +1,5 @@
 [wrap-git]
 directory = bionic_translation
 url = file:///home/claude/claude-arbeit/r089/repos/bionic.git
-revision = d52582b7a843452c85419f626bc3c1ef7c5cef57
+revision = 9533428d21b5a27d3923617dc87d0e08f8f6919f
 depth = 1
