@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-13 17:03+0000\n"
+"POT-Creation-Date: 2026-11-14 06:51+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -182,7 +182,7 @@ msgstr ""
 msgid "the downloaded file is not Aurora Store {code}"
 msgstr "завантажений файл не є Aurora Store {code}"
 
-#: src/apk_starter/aurora.py:75 src/apk_starter/gui.py:987
+#: src/apk_starter/aurora.py:75 src/apk_starter/gui.py:985
 msgid "Downloading Aurora Store from F-Droid…"
 msgstr "Завантаження Aurora Store з F-Droid…"
 
@@ -411,13 +411,13 @@ msgstr "Підготовка застосунків для цього комп�
 msgid "{app} keeps its old menu entry: {reason}"
 msgstr "{app} зберігає старий пункт меню: {reason}"
 
-#: src/apk_starter/cli.py:695 src/apk_starter/gui.py:902
+#: src/apk_starter/cli.py:695 src/apk_starter/gui.py:900
 #, python-brace-format
 msgid "{app} ended unexpectedly."
 msgstr "{app} неочікувано завершився."
 
 #: src/apk_starter/cli.py:695 src/apk_starter/gui.py:328
-#: src/apk_starter/gui.py:554 src/apk_starter/gui.py:903
+#: src/apk_starter/gui.py:554 src/apk_starter/gui.py:901
 #: src/apk_starter/install_request.py:83
 msgid "Close"
 msgstr "Закрити"
@@ -469,7 +469,7 @@ msgstr "Пошук застосунків"
 msgid "Name"
 msgstr "Назва"
 
-#: src/apk_starter/gui.py:149 src/apk_starter/gui.py:756
+#: src/apk_starter/gui.py:149 src/apk_starter/gui.py:748
 msgid "Last started"
 msgstr "Останній запуск"
 
@@ -580,7 +580,7 @@ msgstr "Отримати застосунки (Aurora Store)"
 msgid "Set up microG…"
 msgstr "Налаштувати microG…"
 
-#: src/apk_starter/gui.py:661 src/apk_starter/gui.py:828
+#: src/apk_starter/gui.py:661 src/apk_starter/gui.py:822
 msgid "Could not save the setting"
 msgstr "Не вдалося зберегти налаштування"
 
@@ -592,75 +592,91 @@ msgstr "Запустити"
 msgid "Uninstall…"
 msgstr "Видалити…"
 
-#: src/apk_starter/gui.py:735
-msgid "Options"
-msgstr "Параметри"
-
-#: src/apk_starter/gui.py:740
+#: src/apk_starter/gui.py:734
 msgid "Debug is on"
 msgstr "Налагодження ввімкнено"
 
-#: src/apk_starter/gui.py:746
+#: src/apk_starter/gui.py:738
 msgid "Delete data…"
 msgstr "Очистити дані…"
 
-#: src/apk_starter/gui.py:753
+#: src/apk_starter/gui.py:745
 msgid "Version"
 msgstr "Версія"
 
-#: src/apk_starter/gui.py:754
+#: src/apk_starter/gui.py:746
 msgid "Target SDK"
 msgstr "Цільовий SDK"
 
-#: src/apk_starter/gui.py:755
+#: src/apk_starter/gui.py:747
 msgid "Installed"
 msgstr "Установлено"
 
-#: src/apk_starter/gui.py:757
+#: src/apk_starter/gui.py:749
 msgid "Data"
 msgstr "Дані"
 
-#: src/apk_starter/gui.py:757
+#: src/apk_starter/gui.py:749
 msgid "no data"
 msgstr "немає даних"
 
-#: src/apk_starter/gui.py:758
+#: src/apk_starter/gui.py:750
 msgid "Status"
 msgstr "Стан"
 
-#: src/apk_starter/gui.py:775
+#: src/apk_starter/gui.py:777
+msgid "Permissions"
+msgstr "Дозволи"
+
+#: src/apk_starter/gui.py:793
+msgid "Appearance"
+msgstr "Вигляд"
+
+#: src/apk_starter/gui.py:794
 msgid "Window bar"
 msgstr "Панель вікна"
 
-#: src/apk_starter/gui.py:776
+#: src/apk_starter/gui.py:795
 msgid "With back button"
 msgstr "З кнопкою «Назад»"
 
-#: src/apk_starter/gui.py:776
+#: src/apk_starter/gui.py:795
 msgid "From the system"
 msgstr "Від системи"
 
-#: src/apk_starter/gui.py:777
+#: src/apk_starter/gui.py:796
 msgid "From the system + navigation bar"
 msgstr "Від системи + панель навігації"
 
-#: src/apk_starter/gui.py:786
+#: src/apk_starter/gui.py:804
 msgid "Android version"
 msgstr "Версія Android"
 
-#: src/apk_starter/gui.py:789
+#: src/apk_starter/gui.py:807
 msgid "Standard (target SDK)"
 msgstr "Стандартно (цільовий SDK)"
 
-#: src/apk_starter/gui.py:796 src/apk_starter/gui.py:868
+#: src/apk_starter/gui.py:815
+msgid "Report updates"
+msgstr "Повідомляти про оновлення"
+
+#: src/apk_starter/gui.py:828
+msgid "Updates"
+msgstr "Оновлення"
+
+#: src/apk_starter/gui.py:833
+msgid "Advanced"
+msgstr "Додатково"
+
+#: src/apk_starter/gui.py:834 src/apk_starter/gui.py:866
 msgid "Debug"
 msgstr "Налагодження"
 
-#: src/apk_starter/gui.py:797 src/apk_starter/gui.py:868
+#: src/apk_starter/gui.py:835 src/apk_starter/gui.py:866
 msgid "Debug full"
 msgstr "Debug повний"
 
-#: src/apk_starter/gui.py:798
+#: src/apk_starter/gui.py:836
 msgid ""
 "The archive contains everything in plain text, also passwords and personal "
 "data – do not pass it on"
@@ -668,70 +684,66 @@ msgstr ""
 "Архів містить усе відкритим текстом, зокрема паролі й особисті дані – не "
 "передавати далі"
 
-#: src/apk_starter/gui.py:821
-msgid "Report updates"
-msgstr "Повідомляти про оновлення"
+#: src/apk_starter/gui.py:856
+msgid "While Debug is on, the app runs more slowly."
+msgstr "Поки Debug увімкнено, застосунок працює повільніше."
 
-#: src/apk_starter/gui.py:845
-msgid "Permissions"
-msgstr "Дозволи"
-
-#: src/apk_starter/gui.py:866
+#: src/apk_starter/gui.py:864
 msgid "Recordings"
 msgstr "Записи"
 
-#: src/apk_starter/gui.py:869 src/apk_starter/gui.py:903
+#: src/apk_starter/gui.py:867 src/apk_starter/gui.py:901
 msgid "Open log folder"
 msgstr "Відкрити теку журналів"
 
-#: src/apk_starter/gui.py:885
+#: src/apk_starter/gui.py:883
 #, python-brace-format
 msgid "Cannot start {app}"
 msgstr "Не вдалося запустити {app}"
 
-#: src/apk_starter/gui.py:913 src/apk_starter/gui.py:922
+#: src/apk_starter/gui.py:911 src/apk_starter/gui.py:920
 msgid "Cannot open the log folder"
 msgstr "Не вдалося відкрити теку журналів"
 
-#: src/apk_starter/gui.py:926
+#: src/apk_starter/gui.py:924
 msgid "Android apps"
 msgstr "Android-застосунки"
 
-#: src/apk_starter/gui.py:932
+#: src/apk_starter/gui.py:930
 msgid "Install APK"
 msgstr "Встановити APK"
 
-#: src/apk_starter/gui.py:963 src/apk_starter/gui.py:985
+#: src/apk_starter/gui.py:961 src/apk_starter/gui.py:983
 #, python-brace-format
 msgid "{app} installed"
 msgstr "Застосунок {app} встановлено"
 
-#: src/apk_starter/gui.py:965 src/apk_starter/install_request.py:88
+#: src/apk_starter/gui.py:963 src/apk_starter/install_request.py:88
 msgid "This app uses Google services. Set up microG?"
 msgstr "Цей застосунок використовує сервіси Google. Налаштувати microG?"
 
-#: src/apk_starter/gui.py:965 src/apk_starter/install_request.py:90
+#: src/apk_starter/gui.py:963 src/apk_starter/install_request.py:90
 msgid "Not now"
 msgstr "Не зараз"
 
-#: src/apk_starter/gui.py:966
+#: src/apk_starter/gui.py:964
 msgid "Installing…"
 msgstr "Встановлення…"
 
-#: src/apk_starter/gui.py:968
+#: src/apk_starter/gui.py:966
 #, python-brace-format
 msgid "Cannot install {file}"
 msgstr "Не вдалося встановити {file}"
 
-#: src/apk_starter/gui.py:989
+#: src/apk_starter/gui.py:987
 msgid "Cannot set up Aurora Store"
 msgstr "Не вдається налаштувати Aurora Store"
 
-#: src/apk_starter/gui.py:990
+#: src/apk_starter/gui.py:988
 msgid "Set up Aurora Store?"
 msgstr "Налаштувати Aurora Store?"
 
-#: src/apk_starter/gui.py:991
+#: src/apk_starter/gui.py:989
 msgid ""
 "Free apps from Google Play. Downloaded from F-Droid and checked.\n"
 "\n"
@@ -741,34 +753,34 @@ msgstr ""
 "\n"
 "Входьте анонімно: Google може заблокувати ваш власний обліковий запис."
 
-#: src/apk_starter/gui.py:993 src/apk_starter/gui.py:1012
-#: src/apk_starter/gui.py:1017 src/apk_starter/install_request.py:29
+#: src/apk_starter/gui.py:991 src/apk_starter/gui.py:1010
+#: src/apk_starter/gui.py:1015 src/apk_starter/install_request.py:29
 #: src/apk_starter/install_request.py:144
 msgid "Cancel"
 msgstr "Скасувати"
 
-#: src/apk_starter/gui.py:993 src/apk_starter/gui.py:1012
+#: src/apk_starter/gui.py:991 src/apk_starter/gui.py:1010
 #: src/apk_starter/install_request.py:90
 msgid "Set up"
 msgstr "Налаштувати"
 
-#: src/apk_starter/gui.py:1002
+#: src/apk_starter/gui.py:1000
 msgid "microG is set up"
 msgstr "microG налаштовано"
 
-#: src/apk_starter/gui.py:1003 src/apk_starter/microg.py:98
+#: src/apk_starter/gui.py:1001 src/apk_starter/microg.py:98
 msgid "Downloading microG…"
 msgstr "Завантаження microG…"
 
-#: src/apk_starter/gui.py:1005
+#: src/apk_starter/gui.py:1003
 msgid "Cannot set up microG"
 msgstr "Не вдається налаштувати microG"
 
-#: src/apk_starter/gui.py:1009
+#: src/apk_starter/gui.py:1007
 msgid "Set up microG?"
 msgstr "Налаштувати microG?"
 
-#: src/apk_starter/gui.py:1010 src/apk_starter/install_request.py:89
+#: src/apk_starter/gui.py:1008 src/apk_starter/install_request.py:89
 msgid ""
 "Google services for apps (push messages, sign-in). Downloaded from the "
 "official microG repository and checked."
@@ -776,12 +788,12 @@ msgstr ""
 "Сервіси Google для застосунків (push-сповіщення, вхід). Завантажено з "
 "офіційного репозиторію microG і перевірено."
 
-#: src/apk_starter/gui.py:1022
+#: src/apk_starter/gui.py:1020
 #, python-brace-format
 msgid "Delete the data of {app}?"
 msgstr "Очистити дані {app}?"
 
-#: src/apk_starter/gui.py:1023
+#: src/apk_starter/gui.py:1021
 msgid ""
 "The app stays installed. Its settings, accounts and files are deleted. Close "
 "the app first."
@@ -789,52 +801,52 @@ msgstr ""
 "Застосунок залишиться встановленим. Його налаштування, облікові записи й "
 "файли буде видалено. Спершу закрийте застосунок."
 
-#: src/apk_starter/gui.py:1024
+#: src/apk_starter/gui.py:1022
 msgid "Delete Data"
 msgstr "Очистити дані"
 
-#: src/apk_starter/gui.py:1025
+#: src/apk_starter/gui.py:1023
 msgid "Deleting data…"
 msgstr "Видалення даних…"
 
-#: src/apk_starter/gui.py:1026
+#: src/apk_starter/gui.py:1024
 #, python-brace-format
 msgid "Cannot delete the data of {app}"
 msgstr "Не вдалося очистити дані {app}"
 
-#: src/apk_starter/gui.py:1030 src/apk_starter/install_request.py:144
+#: src/apk_starter/gui.py:1028 src/apk_starter/install_request.py:144
 msgid "Also delete app data"
 msgstr "Також очистити дані застосунку"
 
-#: src/apk_starter/gui.py:1037
+#: src/apk_starter/gui.py:1035
 #, python-brace-format
 msgid "{app} uninstalled"
 msgstr "Застосунок {app} видалено"
 
-#: src/apk_starter/gui.py:1038 src/apk_starter/install_request.py:144
+#: src/apk_starter/gui.py:1036 src/apk_starter/install_request.py:144
 #, python-brace-format
 msgid "Uninstall {app}?"
 msgstr "Видалити {app}?"
 
-#: src/apk_starter/gui.py:1039
+#: src/apk_starter/gui.py:1037
 msgid "The app and its menu entry are removed. Close the app first."
 msgstr ""
 "Застосунок і його пункт меню буде вилучено. Спершу закрийте застосунок."
 
-#: src/apk_starter/gui.py:1039 src/apk_starter/install_request.py:144
+#: src/apk_starter/gui.py:1037 src/apk_starter/install_request.py:144
 msgid "Uninstall"
 msgstr "Видалити"
 
-#: src/apk_starter/gui.py:1040
+#: src/apk_starter/gui.py:1038
 msgid "Uninstalling…"
 msgstr "Видалення програми…"
 
-#: src/apk_starter/gui.py:1042
+#: src/apk_starter/gui.py:1040
 #, python-brace-format
 msgid "Cannot uninstall {app}"
 msgstr "Не вдалося видалити {app}"
 
-#: src/apk_starter/gui.py:1186
+#: src/apk_starter/gui.py:1184
 msgid "Without a sandbox"
 msgstr "Без пісочниці"
 
@@ -1142,6 +1154,9 @@ msgid ""
 "computer."
 msgstr ""
 "{app} містить код лише для процесорів ARM і не працює на цьому комп’ютері."
+
+#~ msgid "Options"
+#~ msgstr "Параметри"
 
 #~ msgid "No apps installed"
 #~ msgstr "Немає встановлених застосунків"

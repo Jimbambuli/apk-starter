@@ -6,7 +6,7 @@ Store: the first one is the default; README uses 1 and 3.
 | File (in `pages/`)            | Content                                                        |
 |-------------------------------|----------------------------------------------------------------|
 | `screenshot.png` (exists)     | 1. App list with three F-Droid apps                            |
-| `screenshot-details.png`      | 2. A chosen app: details, Start, Delete data, Uninstall, gear  |
+| `screenshot-details.png`      | 2. A chosen app: details: Start, Delete data, Uninstall, then the sections (app info) |
 | `screenshot-running.png`      | 3. A running app (e.g. JW Library or a Compose app) in its window |
 | `screenshot-plus-menu.png`    | 4. The + menu with Set up Aurora Store / microG                 |
 | `screenshot-aurora.png`       | 5. Aurora Store running, with the Install prompt of APK Starter |
