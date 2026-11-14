@@ -1,4 +1,4 @@
-"""The ⚙ menu of an app shows its dangerous permissions by group, each with a switch; switching one off is
+"""The app info of an app shows its dangerous permissions by group, each with a switch; switching one off is
 remembered for the app. Usage: gui_permissions_probe.py (environment: XDG dirs with the app installed). JSON."""
 import json
 import os
@@ -24,6 +24,13 @@ def activate(a) -> None:
         if not win.rows:
             return True
         switches = win.permission_switches
+        report["sections"] = []                     # the headings of the app info, all visible, in this order
+        w = win.sections.get_first_child()
+        while w is not None:
+            if isinstance(w, Gtk.Label) and w.has_css_class("section-title"):
+                report["sections"].append([w.get_text(), w.get_mapped()])
+            w = w.get_next_sibling()
+        report["no_gear"] = not hasattr(win, "gear")
         report["shown"] = [(key, s.get_active()) for key, s in switches.items()]
         report["labels"] = [s.get_parent().get_first_child().get_text() for s in switches.values()]
         switches["camera"].set_active(False)

@@ -721,7 +721,7 @@ class Window(Gtk.ApplicationWindow):
         head.append(names)
         self.details.append(head)
 
-        # one row: Start, Delete data, Uninstall, ⚙ (window bar, Debug, recordings)
+        # one row: Start, Delete data, Uninstall, a note while Debug is on
         if r.package not in self.jobs:              # the rebuild after an update does not hold the start back (it goes first)
             start = Gtk.Button(label=_("Start"), action_name="win.start", action_target=target)
         else:                                       # locked while it is deleted or uninstalled (an action would free it)
@@ -730,21 +730,13 @@ class Window(Gtk.ApplicationWindow):
         self.start_button = start
         uninstall = Gtk.Button(label=_("Uninstall…"), action_name="win.uninstall", action_target=target)
         uninstall.add_css_class("danger-text")         # calm until the question, which is red
-        # a square icon button drawn by the theme; the icon from the icon theme: KDE's «configure» (Breeze),
-        # else the gear of Adwaita
-        gear = Gtk.MenuButton(popover=self.make_options(r, app), tooltip_text=_("Options"))
-        gear.get_first_child().add_css_class("image-button")    # the inner button, as set_icon_name() does
-        icon = Gtk.Overlay(child=Gtk.Image.new_from_gicon(Gio.ThemedIcon.new_from_names(
-            ["configure-symbolic", "configure", "emblem-system-symbolic"])))
-        self.gear_dot = label("●", "caption", "accent", halign=Gtk.Align.END, valign=Gtk.Align.START,
-                              visible=app.debug or app.debug_full, tooltip_text=_("Debug is on"))
-        icon.add_overlay(self.gear_dot)
-        gear.set_child(icon)
-        self.gear = gear
+        # a visible note instead of a dot: Debug makes the app slower and the archive grows
+        self.debug_badge = label(_("Debug is on"), "caption", "accent", valign=Gtk.Align.CENTER,
+                                 visible=app.debug or app.debug_full)
         # one height and font for all (the box gives them its height), only the theme draws them
         actions = Gtk.Box(spacing=8, valign=Gtk.Align.CENTER)
         for w in (start, Gtk.Button(label=_("Delete data…"), action_name="win.clear-data", action_target=target),
-                  uninstall, gear):
+                  uninstall, self.debug_badge):
             actions.append(w)
         self.details.append(actions)
 
@@ -762,17 +754,44 @@ class Window(Gtk.ApplicationWindow):
             facts.attach(value_label, 1, i, 1, 1)
         self.status_value = value_label
         self.details.append(Gtk.Frame(child=facts))
+        self.details.append(self.make_sections(r, app))
         if refocus and (not self.narrow or self.page == "details"):
             start.grab_focus()                      # not the name (a focused label shows all of it selected)
 
-    def make_options(self, r: AppRow, app) -> Gtk.Popover:
-        """The ⚙ menu: window bar and Debug (both remembered per app), the Debug recordings.
+    def make_sections(self, r: AppRow, app) -> Gtk.Box:
+        """The sections of the app info, all visible: permissions, appearance (window bar, Android version),
+        Aurora's updates, advanced (Debug, recordings); everything remembered per app.
 
-        The window bar is a group of option buttons, not a drop-down: the menu keeps one size and nothing in it
+        The window bar is a group of option buttons, not a drop-down: the page keeps one size and nothing in it
         opens over the rest."""
-        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8, margin_top=8, margin_bottom=8, margin_start=8,
-                      margin_end=8)
-        box.append(label(_("Window bar"), "section-title"))
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
+        self.sections = box
+        # the dangerous permissions of the manifest, by group: off = ATL answers «denied» (default: all on)
+        self.permission_switches = {}
+        try:
+            asked = cached_apk_info(self.paths, self.paths.apk(r.package), self.lang, read_apk_info).permissions
+        except (StarterError, OSError):
+            asked = ()
+        keys = permissions.groups(asked)
+        if keys:
+            box.append(label(_("Permissions"), "section-title"))
+
+        def switched(sw: Gtk.Switch, _param, pkg=r.package, key="") -> None:
+            denied = set(load_settings(self.paths.settings()).app(pkg).denied)
+            denied = denied - {key} if sw.get_active() else denied | {key}
+            self.save_app_setting(pkg, denied=tuple(k for k, _l, _p in permissions.GROUPS if k in denied))
+        for key in keys:
+            row = Gtk.Box(spacing=12)
+            row.append(label(_(permissions.LABELS[key]), hexpand=True))
+            sw = Gtk.Switch(active=key not in app.denied, valign=Gtk.Align.CENTER)
+            sw.connect("notify::active", switched, r.package, key)
+            row.append(sw)
+            box.append(row)
+            self.permission_switches[key] = sw
+        if keys:
+            box.append(Gtk.Separator(margin_top=4))
+        box.append(label(_("Appearance"), "section-title"))
+        box.append(label(_("Window bar"), "dim-label"))
         names_ = {"atl": _("With back button"), "system": _("From the system"),
                   "system-navigation": _("From the system + navigation bar")}
         choice: dict[str, Gtk.CheckButton] = {}
@@ -782,8 +801,7 @@ class Window(Gtk.ApplicationWindow):
             b.connect("toggled", lambda b, p=r.package, k=key: b.get_active() and self.save_app_setting(p, titlebar=k))
             choice[key] = b
             box.append(b)
-        box.append(Gtk.Separator(margin_top=4))
-        box.append(label(_("Android version"), "section-title"))
+        box.append(label(_("Android version"), "dim-label", margin_top=4))
         sdk_choice: dict[int | None, Gtk.CheckButton] = {}
         for key in (None, *SDK_CHOICES):            # the app's target SDK (the default), or a fixed level
             b = Gtk.CheckButton(label=_("Standard (target SDK)") if key is None else str(key), active=key == app.sdk,
@@ -792,7 +810,27 @@ class Window(Gtk.ApplicationWindow):
             sdk_choice[key] = b
             box.append(b)
         self.sdk_choice = sdk_choice
+        self.aurora_updates_check = None
+        if r.package == aurora.PACKAGE:             # Aurora Store: tell its updates (off by default)
+            updates = Gtk.CheckButton(label=_("Report updates"), active=load_settings(self.paths.settings()).aurora_updates)
+
+            def updates_toggled(b: Gtk.CheckButton) -> None:
+                try:
+                    save_settings(self.paths.settings(), dataclasses.replace(load_settings(self.paths.settings()),
+                                                                             aurora_updates=b.get_active()))
+                except OSError as e:
+                    self.alert(_("Could not save the setting"), describe_error(e))
+                    return
+                if b.get_active():
+                    self.check_updates()
+            updates.connect("toggled", updates_toggled)
+            box.append(Gtk.Separator(margin_top=4))
+            box.append(label(_("Updates"), "section-title"))
+            box.append(updates)
+            self.aurora_updates_check = updates
+
         box.append(Gtk.Separator(margin_top=4))
+        box.append(label(_("Advanced"), "section-title"))
         debug = Gtk.CheckButton(label=_("Debug"), active=app.debug and not app.debug_full)
         debug_full = Gtk.CheckButton(label=_("Debug full"), active=app.debug_full,
                                      tooltip_text=_("The archive contains everything in plain text, also passwords "
@@ -809,66 +847,26 @@ class Window(Gtk.ApplicationWindow):
             if (now.debug_full, now.debug) != (want["debug_full"], want["debug"]):
                 self.save_app_setting(pkg, **want)
             on = debug.get_active() or debug_full.get_active()
-            self.gear_dot.set_visible(on)
+            self.debug_badge.set_visible(on)
         debug.connect("toggled", debug_toggled)
         debug_full.connect("toggled", debug_toggled)
         self.debug_check, self.debug_full_check, self.titlebar_choice = debug, debug_full, choice
         for w in (debug, debug_full):
             box.append(w)
-
-        self.aurora_updates_check = None
-        if r.package == aurora.PACKAGE:             # Aurora Store: tell its updates (off by default)
-            updates = Gtk.CheckButton(label=_("Report updates"), active=load_settings(self.paths.settings()).aurora_updates)
-
-            def updates_toggled(b: Gtk.CheckButton) -> None:
-                try:
-                    save_settings(self.paths.settings(), dataclasses.replace(load_settings(self.paths.settings()),
-                                                                             aurora_updates=b.get_active()))
-                except OSError as e:
-                    self.alert(_("Could not save the setting"), describe_error(e))
-                    return
-                if b.get_active():
-                    self.check_updates()
-            updates.connect("toggled", updates_toggled)
-            box.append(updates)
-            self.aurora_updates_check = updates
-
-        # the dangerous permissions of the manifest, by group: off = ATL answers «denied» (default: all on)
-        self.permission_switches = {}
-        try:
-            asked = cached_apk_info(self.paths, self.paths.apk(r.package), self.lang, read_apk_info).permissions
-        except (StarterError, OSError):
-            asked = ()
-        keys = permissions.groups(asked)
-        if keys:
-            box.append(Gtk.Separator(margin_top=4))
-            box.append(label(_("Permissions"), "section-title"))
-
-        def switched(sw: Gtk.Switch, _param, pkg=r.package, key="") -> None:
-            denied = set(load_settings(self.paths.settings()).app(pkg).denied)
-            denied = denied - {key} if sw.get_active() else denied | {key}
-            self.save_app_setting(pkg, denied=tuple(k for k, _l, _p in permissions.GROUPS if k in denied))
-        for key in keys:
-            row = Gtk.Box(spacing=12)
-            row.append(label(_(permissions.LABELS[key]), hexpand=True))
-            sw = Gtk.Switch(active=key not in app.denied, valign=Gtk.Align.CENTER)
-            sw.connect("notify::active", switched, r.package, key)
-            row.append(sw)
-            box.append(row)
-            self.permission_switches[key] = sw
+        box.append(label(_("While Debug is on, the app runs more slowly."), "dim-label", wrap=True,
+                         max_width_chars=TEXT_CHARS))
 
         recs = diag.recordings(self.paths, r.package)
         debugs = [rec for rec in recs if rec.kind == "debug"]       # the plain logs are in the folder only
         self.recordings_shown = len(debugs[:RECORDINGS_SHOWN])
         if recs:
-            box.append(Gtk.Separator(margin_top=4))
             if debugs:
-                box.append(label(_("Recordings"), "section-title"))
+                box.append(label(_("Recordings"), "dim-label", margin_top=4))
             for rec in debugs[:RECORDINGS_SHOWN]:
                 box.append(label(f"{rec.started:%Y-%m-%d %H:%M} · {_('Debug full') if rec.full else _('Debug')}"))
             box.append(Gtk.Button(label=_("Open log folder"), action_name="win.open-logs",
                                   action_target=GLib.Variant("s", r.package), halign=Gtk.Align.START))
-        return Gtk.Popover(child=box)
+        return box
 
     # -- actions -------------------------------------------------------------------------------------------
     def start(self, pkg: str, level: str | None) -> None:

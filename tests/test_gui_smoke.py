@@ -314,8 +314,9 @@ def test_options_switch_permissions_per_app(tmp_path, monkeypatch):
         out = subprocess.run([sys.executable, str(HERE / "gui_permissions_probe.py")], env={**display, **env},
                              capture_output=True, text=True, timeout=60)
     report = json.loads(out.stdout.strip().splitlines()[-1])
-    assert report == {"shown": [["location", True], ["camera", True]], "labels": ["Location", "Camera"],
-                      "saved": ["camera"]}, out.stderr
+    assert report == {"sections": [["Permissions", True], ["Appearance", True], ["Advanced", True]],
+                      "no_gear": True, "shown": [["location", True], ["camera", True]],
+                      "labels": ["Location", "Camera"], "saved": ["camera"]}, out.stderr
 
 
 @needs_broadway

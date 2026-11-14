@@ -72,7 +72,7 @@ def activate(a) -> None:
         win.paths.meta("com.aurora.store").write_text("{}")
         win.update_add_menu()
         report["add_menu_aurora_installed"] = menu_labels(win)     # «Get apps» stays: it starts Aurora Store
-        report["bravo_menu"] = [win.recordings_shown, win.gear_dot.get_visible()]
+        report["bravo_menu"] = [win.recordings_shown, win.debug_badge.get_visible()]
         report["version_line"] = [win.add_menu.get_n_items(), win.lookup_action("version") is None]
         dlg = win.make_about()                              # a plain window in the app style, no credit tabs
         report["about"] = dlg.about_fields
@@ -137,10 +137,10 @@ def activate(a) -> None:
     def started():
         report["started"] = Path(record).read_text().split()
         report["focus_on_start"] = win.get_focus() is win.start_button
-        report["charlie_menu"] = [win.recordings_shown, win.gear_dot.get_visible()]
+        report["charlie_menu"] = [win.recordings_shown, win.debug_badge.get_visible()]
         win.titlebar_choice["system-navigation"].set_active(True)  # From the system + navigation bar
         win.debug_check.set_active(True)
-        report["dot_with_debug"] = win.gear_dot.get_visible()
+        report["dot_with_debug"] = win.debug_badge.get_visible()
         report["settings"] = json.loads(paths.settings().read_text())
         Path(record).unlink()
         win.start_button.emit("clicked")
@@ -148,14 +148,14 @@ def activate(a) -> None:
 
     def debug_started():
         report["debug_started"] = Path(record).read_text().split()      # the start reads the setting, no option
-        report["debug_stays_on"] = [win.debug_check.get_active(), win.gear_dot.get_visible()]
+        report["debug_stays_on"] = [win.debug_check.get_active(), win.debug_badge.get_visible()]
         win.debug_check.set_active(False)
         win.debug_check.set_active(True)
         win.debug_full_check.set_active(True)               # the two levels exclude each other
         saved = json.loads(paths.settings().read_text())["apps"]["org.c.charlie"]
         report["debug_full"] = [win.debug_check.get_active(), win.debug_full_check.get_active(), saved["debug"],
                                 saved.get("debug_full"), win.debug_full_check.get_tooltip_text(),
-                                win.gear_dot.get_visible()]
+                                win.debug_badge.get_visible()]
         win.debug_check.set_active(True)
         saved = json.loads(paths.settings().read_text())["apps"]["org.c.charlie"]
         report["debug_back"] = [win.debug_full_check.get_active(), saved["debug"], saved.get("debug_full")]
