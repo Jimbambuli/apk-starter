@@ -195,7 +195,7 @@ modules:
       - type: git
         url: file:///home/claude/claude-arbeit/r089/repos/atl.git
         branch: fix-r9
-        commit: d2cc757ac77228e7f6734c8c1647a015526225de
+        commit: 8e73b691ddd28b31d07bb5293264a9a0d5b779a3
 
   # atl-doctor (public, fixed commit): JVMTI agent and trace counter for Log/Debug, its Python package for the
   # Debug recorder and packer (`atl-doctor pack`), and the stub list of exactly this ATL (for stub hits). The whole
@@ -221,7 +221,7 @@ modules:
         commit: 2f91d3a54f075592352de22a7c7417dcdbe6fa3f
       - type: git
         url: file:///home/claude/claude-arbeit/r089/repos/atl.git
-        commit: d2cc757ac77228e7f6734c8c1647a015526225de
+        commit: 8e73b691ddd28b31d07bb5293264a9a0d5b779a3
         dest: atl-src
 
   - name: apk-starter
