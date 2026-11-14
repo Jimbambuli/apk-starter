@@ -117,14 +117,14 @@ modules:
       - /share/doc
       - '*.la'
 
-  # Fork branch fix-r1 = fix-r6-cleanup (apk-starter: upstream 6253dec + MR !27 linker + !28 pthread, thread-local pthread cleanup stack) + fehlersuche (__pread_chk/__pwrite_chk) + firefox (dladdr names the library by its path).
+  # Fork branch fix-r2 = fix-r1 (fix-r6-cleanup (apk-starter: upstream 6253dec + MR !27 linker + !28 pthread, thread-local pthread cleanup stack) + fehlersuche (__pread_chk/__pwrite_chk) + firefox (dladdr names the library by its path)) + low pthread keys for bionic callers (Go cgo inittls).
   - name: bionic_translation
     buildsystem: meson
     sources:
       - type: git
-        url: https://gitlab.com/Jimbambuli/bionic_translation.git
-        branch: fix-r1
-        commit: 2497555cc4deb2b1ac202922bb43062bc646c13e
+        url: file:///home/claude/claude-arbeit/r089/repos/bionic.git
+        branch: fix-r2
+        commit: d52582b7a843452c85419f626bc3c1ef7c5cef57
 
   # OpenSL ES of the ATL project, fork branch fix-r1 (OutputMix interface, PCM_EX float and play position, no pending seek without SL_IID_SEEK) (SDL2 + libsndfile from the runtime): native app libraries that open
   # libOpenSLES.so (e.g. WhatsApp's libwhatsapp.so needs slCreateEngine).
@@ -193,9 +193,9 @@ modules:
       - -Ddownload_tool_deps=false
     sources:
       - type: git
-        url: https://gitlab.com/Jimbambuli/android_translation_layer.git
-        branch: fix-r8
-        commit: 4104a23b46a4aa124db02e5f88830220340d77b9
+        url: file:///home/claude/claude-arbeit/r089/repos/atl.git
+        branch: fix-r9
+        commit: 4034931c9f0490331e6b77a1386a5ac208686794
 
   # atl-doctor (public, fixed commit): JVMTI agent and trace counter for Log/Debug, its Python package for the
   # Debug recorder and packer (`atl-doctor pack`), and the stub list of exactly this ATL (for stub hits). The whole
@@ -220,8 +220,8 @@ modules:
         branch: popups
         commit: 2f91d3a54f075592352de22a7c7417dcdbe6fa3f
       - type: git
-        url: https://gitlab.com/Jimbambuli/android_translation_layer.git
-        commit: 4104a23b46a4aa124db02e5f88830220340d77b9
+        url: file:///home/claude/claude-arbeit/r089/repos/atl.git
+        commit: 4034931c9f0490331e6b77a1386a5ac208686794
         dest: atl-src
 
   - name: apk-starter
