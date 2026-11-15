@@ -72,10 +72,10 @@ def test_atl_doctor_pinned_with_the_same_atl_source():
     assert f"commit: {pins['atl-doctor']}" in art and "libopenjdkjvmti.so" in art   # JVMTI plugin, same atl-doctor
 
 
-def test_atl_from_the_fix_r11_branch():
+def test_atl_from_the_fix_r12_branch():
     text = (ROOT / "io.github.Jimbambuli.ApkStarter.yml").read_text()
     module = text[text.index("- name: android_translation_layer"):text.index("- name: atl-doctor")]
     # fix-r6 + merges reste, kindstart, compose-klein, de-texte, webview, popups, surface-puffer, activity-prozess,
-    # fehlersuche (fix-r7 4e932390c); fix-r8 4104a23b4: + lebenszyklus, apps-rest, jellyfin, kleinkram, firefox; fix-r9 4034931c9: + firefox2, gmail; 8e73b691d: + argv[0] = process name, MediaCodec, Build.SOC_MODEL; c15bc7b08: + MediaCodec input offset/size, remote SurfaceTexture; c0903f9fd: + fdroid (BitmapFactory InputStream exception); 56b5b3739: + whatsapp2, ffvideo, receivers per Context; 36ebcf64f: + scan-a..f, onReceive gets the registering Context, compile fixes; fix-r10 f70088a27: + scan2-a..f, wa3; fix-r11 ad107ee3c: + hierarchie, nativ, voll-0..9
-    assert "branch: fix-r11" in module
+    # fehlersuche (fix-r7 4e932390c); fix-r8 4104a23b4: + lebenszyklus, apps-rest, jellyfin, kleinkram, firefox; fix-r9 4034931c9: + firefox2, gmail; 8e73b691d: + argv[0] = process name, MediaCodec, Build.SOC_MODEL; c15bc7b08: + MediaCodec input offset/size, remote SurfaceTexture; c0903f9fd: + fdroid (BitmapFactory InputStream exception); 56b5b3739: + whatsapp2, ffvideo, receivers per Context; 36ebcf64f: + scan-a..f, onReceive gets the registering Context, compile fixes; fix-r10 f70088a27: + scan2-a..f, wa3; fix-r11 ad107ee3c: + hierarchie, nativ, voll-0..9; fix-r12 250cdc6a0: + Oeffi fix, all new classes in meson.build
+    assert "branch: fix-r12" in module
     assert text.count(f"commit: {manifest_commits()['android_translation_layer']}") == 2      # also atl-src
