@@ -122,7 +122,7 @@ modules:
     buildsystem: meson
     sources:
       - type: git
-        url: file:///home/claude/claude-arbeit/r089/repos/bionic.git
+        url: https://gitlab.com/Jimbambuli/bionic_translation.git
         branch: fix-r2
         commit: 9533428d21b5a27d3923617dc87d0e08f8f6919f
 
@@ -193,7 +193,7 @@ modules:
       - -Ddownload_tool_deps=false
     sources:
       - type: git
-        url: file:///home/claude/claude-arbeit/r089/repos/atl.git
+        url: https://gitlab.com/Jimbambuli/android_translation_layer.git
         branch: fix-r9
         commit: c0903f9fd047c0d4eba51ffd5e90b5d7c5d8cc5d
 
@@ -220,7 +220,7 @@ modules:
         branch: popups
         commit: 2f91d3a54f075592352de22a7c7417dcdbe6fa3f
       - type: git
-        url: file:///home/claude/claude-arbeit/r089/repos/atl.git
+        url: https://gitlab.com/Jimbambuli/android_translation_layer.git
         commit: c0903f9fd047c0d4eba51ffd5e90b5d7c5d8cc5d
         dest: atl-src
 
