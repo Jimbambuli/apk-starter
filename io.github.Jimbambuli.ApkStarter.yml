@@ -122,7 +122,7 @@ modules:
     buildsystem: meson
     sources:
       - type: git
-        url: https://gitlab.com/Jimbambuli/bionic_translation.git
+        url: https://github.com/Jimbambuli/bionic_translation.git
         branch: fix-r2
         commit: 9533428d21b5a27d3923617dc87d0e08f8f6919f
 
@@ -132,7 +132,7 @@ modules:
     buildsystem: meson
     sources:
       - type: git
-        url: https://gitlab.com/Jimbambuli/libopensles-standalone.git
+        url: https://github.com/Jimbambuli/libopensles-standalone.git
         branch: fix-r1
         commit: 4f97c5ce801c3e8a60eebd935e13bb6d10e57c0a
 
@@ -152,7 +152,7 @@ modules:
       - install -Dm755 jvmti-out/libopenjdkjvmti.so /app/lib/art/libopenjdkjvmti.so
     sources:
       - type: git
-        url: https://gitlab.com/Jimbambuli/art_standalone.git
+        url: https://github.com/Jimbambuli/art_standalone.git
         branch: fix-r4
         commit: 4da2503e438d339acd1ab3c2326ee1aa5e2efc6e
       - type: git
@@ -193,9 +193,9 @@ modules:
       - -Ddownload_tool_deps=false
     sources:
       - type: git
-        url: https://gitlab.com/Jimbambuli/android_translation_layer.git
+        url: https://github.com/Jimbambuli/android_translation_layer.git
         branch: fix-r9
-        commit: c0903f9fd047c0d4eba51ffd5e90b5d7c5d8cc5d
+        commit: 56b5b37390befe6eb007825b7d34f49af2807646
 
   # atl-doctor (public, fixed commit): JVMTI agent and trace counter for Log/Debug, its Python package for the
   # Debug recorder and packer (`atl-doctor pack`), and the stub list of exactly this ATL (for stub hits). The whole
@@ -220,8 +220,8 @@ modules:
         branch: popups
         commit: 2f91d3a54f075592352de22a7c7417dcdbe6fa3f
       - type: git
-        url: https://gitlab.com/Jimbambuli/android_translation_layer.git
-        commit: c0903f9fd047c0d4eba51ffd5e90b5d7c5d8cc5d
+        url: https://github.com/Jimbambuli/android_translation_layer.git
+        commit: 56b5b37390befe6eb007825b7d34f49af2807646
         dest: atl-src
 
   - name: apk-starter
