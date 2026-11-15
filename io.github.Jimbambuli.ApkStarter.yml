@@ -154,7 +154,7 @@ modules:
       - type: git
         url: https://github.com/Jimbambuli/art_standalone.git
         branch: fix-r5
-        commit: e6dff1a70c26010c442c2e94dbd6fdd0eed500ce
+        commit: 00f2481ceb074a12a33673e18a265f99ceb4e561
       - type: git
         url: https://github.com/Jimbambuli/atl-doctor.git
         branch: popups
