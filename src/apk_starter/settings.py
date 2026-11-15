@@ -7,7 +7,7 @@ from pathlib import Path
 
 # ATL_TITLEBAR: ATL's title bar with the back button (default), the desktop's, the desktop's + navigation bar
 TITLEBARS = ("atl", "system", "system-navigation")
-SDK_CHOICES = (34, 35, 36)              # the Android versions to pin an app to (anything else is ignored)
+SDK_CHOICES = (36, 35, 34)              # the Android versions to pin an app to (anything else is ignored)
 
 
 @dataclass(frozen=True)
