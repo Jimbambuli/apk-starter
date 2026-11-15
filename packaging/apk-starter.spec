@@ -22,17 +22,20 @@ ExclusiveArch:  x86_64
 BuildRequires:  ninja
 BuildRequires:  java-21-openjdk-devel
 BuildRequires:  libxkbcommon-devel
-BuildRequires:  pkgconfig(glesv2)
+BuildRequires:  pkgconfig(glesv2) Mesa-libGLESv3-devel
+# pkgconfig(libcrypto) would pull libressl-devel, which lacks the OpenSSL 3 headers (openssl/core_names.h)
+BuildRequires:  libopenssl-3-devel
 # (no pkgconfig(openxr) in Tumbleweed: the headers from the bundle, see build below)
 %else
 BuildRequires:  ninja-build
 BuildRequires:  pkgconfig(openxr)
 BuildRequires:  java-25-openjdk-devel
+BuildRequires:  pkgconfig(libcrypto)
 %endif
 BuildRequires:  git meson gcc gcc-c++ make patch autoconf automake libtool gettext zip unzip patchelf
 BuildRequires:  python3 python3-gobject valgrind-devel wayland-devel glib2-devel xz
 BuildRequires:  pkgconfig(egl) pkgconfig(libelf) pkgconfig(libunwind) pkgconfig(libbsd) pkgconfig(sdl2)
-BuildRequires:  pkgconfig(sndfile) pkgconfig(icu-uc) pkgconfig(icu-i18n) pkgconfig(libcrypto) pkgconfig(expat)
+BuildRequires:  pkgconfig(sndfile) pkgconfig(icu-uc) pkgconfig(icu-i18n) pkgconfig(expat)
 BuildRequires:  pkgconfig(liblz4) pkgconfig(liblzma) pkgconfig(libcap) pkgconfig(zlib) pkgconfig(gtk4)
 BuildRequires:  pkgconfig(vulkan) pkgconfig(fontconfig) pkgconfig(gl) pkgconfig(wayland-client)
 BuildRequires:  pkgconfig(wayland-protocols) pkgconfig(libportal) pkgconfig(sqlite3) pkgconfig(libavcodec)
