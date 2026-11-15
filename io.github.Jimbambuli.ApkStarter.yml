@@ -194,8 +194,8 @@ modules:
     sources:
       - type: git
         url: https://github.com/Jimbambuli/android_translation_layer.git
-        branch: fix-r10
-        commit: f70088a2786330d4e90c003037c433d621ce9335
+        branch: fix-r11
+        commit: 46f5cd8f1b52f76fdce631c5c2f6e69055e87de7
 
   # atl-doctor (public, fixed commit): JVMTI agent and trace counter for Log/Debug, its Python package for the
   # Debug recorder and packer (`atl-doctor pack`), and the stub list of exactly this ATL (for stub hits). The whole
@@ -221,7 +221,7 @@ modules:
         commit: 2f91d3a54f075592352de22a7c7417dcdbe6fa3f
       - type: git
         url: https://github.com/Jimbambuli/android_translation_layer.git
-        commit: f70088a2786330d4e90c003037c433d621ce9335
+        commit: 46f5cd8f1b52f76fdce631c5c2f6e69055e87de7
         dest: atl-src
 
   - name: apk-starter
