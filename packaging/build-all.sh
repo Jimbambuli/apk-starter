@@ -86,4 +86,4 @@ if [ -n "${FLATPAK_REPO:-}" ]; then
     rm -f /tmp/ApkStarter-$version.flatpak /tmp/ApkStarter-$version.Locale.flatpak" | tar -x -C "$rel"
 fi
 (cd "$rel" && rm -f SHA256SUMS && sha256sum -- * > SHA256SUMS && cat SHA256SUMS)
-echo "release assets in $rel; upload (not done here): gh release create v$version --repo Jimbambuli/apk-starter $rel/*"
+echo "release assets in $rel; upload (not done here): gh release create $version --repo Jimbambuli/apk-starter $rel/*"

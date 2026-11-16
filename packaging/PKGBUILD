@@ -14,7 +14,7 @@ makedepends=(git meson ninja patch autoconf automake libtool gettext zip unzip p
              wayland-protocols glib2-devel jdk21-openjdk vulkan-headers)
 # stripping would break ART's .oat boot image (the build strips the ELF files itself)
 options=(!strip !debug !lto)
-source=("https://github.com/Jimbambuli/apk-starter/releases/download/v$pkgver/apk-starter-$pkgver.tar.xz")
+source=("https://github.com/Jimbambuli/apk-starter/releases/download/$pkgver/apk-starter-$pkgver.tar.xz")
 sha256sums=(@SHA256@)
 
 build() {
