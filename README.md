@@ -3,7 +3,7 @@
 Run Android apps (APK files) on the Linux desktop – a Flatpak built on
 [Android Translation Layer (ATL)](https://gitlab.com/android_translation_layer/android_translation_layer).
 
-Works: JW Library, Jetpack Compose apps, Aurora Store, microG (Google sign-in for apps), most free apps from F-Droid.
+Works: Jetpack Compose apps, Aurora Store, microG (Google sign-in for apps), most free apps from F-Droid.
 Limits: x86_64 APKs only, no ARM-only apps; camera, Bluetooth and telephony are not supported.
 
 ## Install
@@ -18,39 +18,6 @@ command, so for a short command on the host add an alias:
 ```
 alias apk-starter='flatpak run --file-forwarding io.github.Jimbambuli.ApkStarter'
 ```
-
-### Install from a package repository (native, without the Flatpak sandbox)
-
-Packages for Debian 13, Fedora, openSUSE Tumbleweed and Arch Linux are published as signed
-repositories next to the Flatpak repository (the same key, [pages/apk-starter.gpg](pages/apk-starter.gpg)), so the
-package manager updates them. They install the starter and everything it needs in `/usr/lib/apk-starter`, and
-**the apps run with all the rights of your user account** (see «Native build» below).
-
-```
-# Debian 13
-sudo install -d /etc/apt/keyrings
-sudo curl -fsSL https://jimbambuli.github.io/apk-starter/apk-starter.gpg -o /etc/apt/keyrings/apk-starter.gpg
-echo "deb [signed-by=/etc/apt/keyrings/apk-starter.gpg] https://jimbambuli.github.io/apk-starter/apt $(. /etc/os-release; echo $VERSION_CODENAME) main" | sudo tee /etc/apt/sources.list.d/apk-starter.list
-sudo apt update && sudo apt install apk-starter
-
-# Fedora
-sudo curl -fsSL https://jimbambuli.github.io/apk-starter/rpm/apk-starter-fedora.repo -o /etc/yum.repos.d/apk-starter.repo
-sudo dnf install apk-starter
-
-# openSUSE Tumbleweed
-sudo curl -fsSL https://jimbambuli.github.io/apk-starter/rpm/apk-starter-opensuse.repo -o /etc/zypp/repos.d/apk-starter.repo
-sudo zypper --gpg-auto-import-keys refresh && sudo zypper install apk-starter
-
-# Arch Linux
-curl -fsSL https://jimbambuli.github.io/apk-starter/apk-starter.gpg | sudo pacman-key --add -
-sudo pacman-key --lsign-key 1F251896A0DCE48A938A72803EC299F0EA6163AD
-printf '\n[apk-starter]\nSigLevel = Required\nServer = https://jimbambuli.github.io/apk-starter/arch/$arch\n' | sudo tee -a /etc/pacman.conf
-sudo pacman -Sy apk-starter
-```
-
-Updates then come with `apt upgrade`, `dnf upgrade`, `zypper up` and `pacman -Syu`. Each release also has the packages
-as files on the [releases page](https://github.com/Jimbambuli/apk-starter/releases) (with `SHA256SUMS`). Only the
-newest two versions stay in the repositories.
 
 ## Use
 
@@ -219,6 +186,9 @@ Without them (e.g. `flatpak override --user --nofilesystem=xdg-config/gtk-4.0 io
 works with GTK's default theme in the desktop's light or dark variant.
 
 ## Native build (without sandbox)
+
+APK Starter is released as a Flatpak only; there are no native packages. The native build below is kept for
+development.
 
 APK Starter can also be built and installed without Flatpak, from the same sources at the same commits as the
 Flatpak (the manifest is the one place where they are set; `tools/check-native-pins.py` keeps `native/` equal to it).
