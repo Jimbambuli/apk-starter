@@ -117,14 +117,14 @@ modules:
       - /share/doc
       - '*.la'
 
-  # Fork branch fix-r2 = fix-r1 (fix-r6-cleanup (apk-starter: upstream 6253dec + MR !27 linker + !28 pthread, thread-local pthread cleanup stack) + fehlersuche (__pread_chk/__pwrite_chk) + firefox (dladdr names the library by its path)) + low pthread keys for bionic callers (Go cgo inittls).
+  # Fork branch fix-r3 = fix-r2 (fix-r1 (fix-r6-cleanup (apk-starter: upstream 6253dec + MR !27 linker + !28 pthread, thread-local pthread cleanup stack) + fehlersuche (__pread_chk/__pwrite_chk) + firefox (dladdr names the library by its path)) + low pthread keys for bionic callers (Go cgo inittls)) + dlsym(RTLD_DEFAULT) falls back to the host libraries, __sendto_chk.
   - name: bionic_translation
     buildsystem: meson
     sources:
       - type: git
         url: https://github.com/Jimbambuli/bionic_translation.git
-        branch: fix-r2
-        commit: 9533428d21b5a27d3923617dc87d0e08f8f6919f
+        branch: fix-r3
+        commit: 484ad80d314cb5796d360df5db6beab8e6ad91d5
 
   # OpenSL ES of the ATL project, fork branch fix-r1 (OutputMix interface, PCM_EX float and play position, no pending seek without SL_IID_SEEK) (SDL2 + libsndfile from the runtime): native app libraries that open
   # libOpenSLES.so (e.g. WhatsApp's libwhatsapp.so needs slCreateEngine).
@@ -153,8 +153,8 @@ modules:
     sources:
       - type: git
         url: https://github.com/Jimbambuli/art_standalone.git
-        branch: fix-r9
-        commit: bf1fad05694ba0d41af9360e24057ebdd596f076
+        branch: fix-r10
+        commit: a131da6ab32b33bee035ea19ced74cc08396cc23
       - type: git
         url: https://github.com/Jimbambuli/atl-doctor.git
         branch: popups
@@ -194,8 +194,8 @@ modules:
     sources:
       - type: git
         url: https://github.com/Jimbambuli/android_translation_layer.git
-        branch: fix-r18
-        commit: d8d33799c81329aeaaaa3231111825608bf1422b
+        branch: fix-r19
+        commit: fd43c47e50fcc78a9778c7c5d2e998c795b232bc
 
   # atl-doctor (public, fixed commit): JVMTI agent and trace counter for Log/Debug, its Python package for the
   # Debug recorder and packer (`atl-doctor pack`), and the stub list of exactly this ATL (for stub hits). The whole
@@ -221,7 +221,7 @@ modules:
         commit: 2f91d3a54f075592352de22a7c7417dcdbe6fa3f
       - type: git
         url: https://github.com/Jimbambuli/android_translation_layer.git
-        commit: d8d33799c81329aeaaaa3231111825608bf1422b
+        commit: fd43c47e50fcc78a9778c7c5d2e998c795b232bc
         dest: atl-src
 
   - name: apk-starter
