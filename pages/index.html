@@ -56,7 +56,7 @@
     {"@type": "Question", "name": "How is APK Starter different from Waydroid or Anbox?",
      "acceptedAnswer": {"@type": "Answer", "text": "Waydroid and Anbox start a complete Android system in a container and show its apps from there. APK Starter does not run an Android system: Android Translation Layer implements Android's app interfaces directly on Linux, so every app is a normal Linux process with its own window, menu entry and data folder. There is no Android image and no container or virtual machine. Apps that need parts of Android that are not implemented yet do not work."}},
     {"@type": "Question", "name": "Which Android apps run?",
-     "acceptedAnswer": {"@type": "Answer", "text": "In the test run for version 0.9.2, 150 of 151 free apps started and went through a short scripted test (start, scroll, menu, back) without crashing; one (Amaze) crashed. JW Library, including video and picture-in-picture, is tested with every release. A test without a crash does not mean that every function of an app works."}},
+     "acceptedAnswer": {"@type": "Answer", "text": "In the test run for version 0.9.2, 150 of 151 free apps started and went through a short scripted test (start, scroll, menu, back) without crashing; one (Amaze) crashed. A test without a crash does not mean that every function of an app works."}},
     {"@type": "Question", "name": "How do I install APK Starter?",
      "acceptedAnswer": {"@type": "Answer", "text": "As a Flatpak from the project's own signed repository: flatpak install --user https://jimbambuli.github.io/apk-starter/io.github.Jimbambuli.ApkStarter.flatpakref. Native packages for Debian 13, Fedora 44 and 45, openSUSE Tumbleweed and Arch Linux are attached to each release on GitHub."}},
     {"@type": "Question", "name": "Does it include Google Play Services?",
@@ -147,7 +147,7 @@ loaded as Linux libraries.</p>
 <h3>Which apps run?</h3>
 <p>For every release we run a test with 151 free apps (<a href="#tested">list below</a>). With 0.9.2, 150 of them
 started and went through a short scripted test – start, scroll, open the menu, go back – without crashing; one (Amaze)
-crashed. <strong>JW Library</strong>, including video and picture-in-picture, is tested with every release.
+crashed.
 WhatsApp reached the page for linking it as a companion device (QR code) in our 0.9.1 test; using it after linking was
 not part of our tests. A run without a crash does not mean that every function of an app works.</p>
 

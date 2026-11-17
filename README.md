@@ -16,8 +16,7 @@ not work.
 
 **Which apps run?** In the test run for 0.9.2, 150 of 151 free apps started and went through a short scripted test
 (start, scroll, menu, back) without crashing; one (Amaze) crashed – the full list is on the
-[project page](https://jimbambuli.github.io/apk-starter/#tested). JW Library (with video and picture-in-picture),
-Jetpack Compose apps (e.g. Tasks), Flutter apps (e.g. Sanmill, Aves) and Aurora Store are part of the tests. A run
+[project page](https://jimbambuli.github.io/apk-starter/#tested). Jetpack Compose apps (e.g. Tasks), Flutter apps (e.g. Sanmill, Aves) and Aurora Store are part of the tests. A run
 without a crash does not mean that every function of an app works.
 
 **Limits:** x86_64 APKs only, no ARM-only apps; camera, Bluetooth and telephony are not supported; no Google Play
