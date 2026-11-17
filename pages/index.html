@@ -58,7 +58,7 @@
     {"@type": "Question", "name": "Which Android apps run?",
      "acceptedAnswer": {"@type": "Answer", "text": "In the test run for version 0.9.2, 150 of 151 free apps started and went through a short scripted test (start, scroll, menu, back) without crashing; one (Amaze) crashed. A test without a crash does not mean that every function of an app works."}},
     {"@type": "Question", "name": "How do I install APK Starter?",
-     "acceptedAnswer": {"@type": "Answer", "text": "As a Flatpak from the project's own signed repository: flatpak install --user https://jimbambuli.github.io/apk-starter/io.github.Jimbambuli.ApkStarter.flatpakref. Native packages for Debian 13, Fedora 44 and 45, openSUSE Tumbleweed and Arch Linux are attached to each release on GitHub."}},
+     "acceptedAnswer": {"@type": "Answer", "text": "As a Flatpak from the project's own signed repository: flatpak install --user https://jimbambuli.github.io/apk-starter/io.github.Jimbambuli.ApkStarter.flatpakref."}},
     {"@type": "Question", "name": "Does it include Google Play Services?",
      "acceptedAnswer": {"@type": "Answer", "text": "No. Apps that need Google Play Services can use microG, which APK Starter downloads from its official source when asked. Apps can be installed with Aurora Store in the same way."}},
     {"@type": "Question", "name": "What does not work?",
@@ -93,7 +93,7 @@ details{margin:.6rem 0}summary{cursor:pointer;font-weight:600}
 <p>Open an APK file and the app runs in its own window on your Linux desktop, with an entry in the application menu
 and its own data folder. APK Starter packages
 <a href="https://gitlab.com/android_translation_layer/android_translation_layer">Android Translation Layer (ATL)</a>
-as a Flatpak and as native packages, reads name and icon from the APK and takes care of installing, starting and
+as a Flatpak, reads name and icon from the APK and takes care of installing, starting and
 removing apps.</p>
 <p class="mut">Version 0.9.2 (17 November 2026) · free software, GPL-3.0-or-later · own Flatpak repository, not on Flathub ·
 <a href="https://github.com/Jimbambuli/apk-starter">source code on GitHub</a></p>
@@ -152,8 +152,7 @@ WhatsApp reached the page for linking it as a companion device (QR code) in our 
 not part of our tests. A run without a crash does not mean that every function of an app works.</p>
 
 <h3>How do I install it?</h3>
-<p>As a Flatpak (sandboxed), or as a native package for Debian 13, Fedora 44 and 45, openSUSE Tumbleweed or
-Arch Linux – see <a href="#install">Install</a>.</p>
+<p>As a Flatpak from the project's own signed repository – see <a href="#install">Install</a>.</p>
 
 <h3>Where do the apps come from?</h3>
 <p>You bring the APK files yourself, or install apps with Aurora Store from inside APK Starter. APK Starter ships no
@@ -178,7 +177,7 @@ crashed when it ran without a sound device, and the Gmail app did not get throug
 </ul>
 
 <h2 id="install">Install</h2>
-<h3>Flatpak (sandboxed, recommended)</h3>
+<h3>Flatpak</h3>
 <pre><code>flatpak install --user https://jimbambuli.github.io/apk-starter/io.github.Jimbambuli.ApkStarter.flatpakref</code></pre>
 <p>Or add the repository first:
 <a href="apk-starter.flatpakrepo">apk-starter.flatpakrepo</a>,
@@ -187,19 +186,6 @@ The repository is signed; the public key is <a href="apk-starter.gpg">apk-starte
 from Flathub.</p>
 <pre><code>flatpak run --file-forwarding io.github.Jimbambuli.ApkStarter @@ app.apk @@</code></pre>
 
-<h3>Native packages (no sandbox)</h3>
-<p>Attached to the <a href="https://github.com/Jimbambuli/apk-starter/releases/tag/0.9.2">0.9.2 release</a>, with
-<code>SHA256SUMS</code>. There are no apt, dnf, zypper or pacman repositories.
-<strong>The apps then run with all the rights of your user account.</strong></p>
-<div class="tw"><table>
-<tr><th>Distribution</th><th>File</th><th>Install</th></tr>
-<tr><td>Debian 13</td><td><code>apk-starter_0.9.2_debian13_amd64.deb</code></td><td><code>sudo apt install ./FILE</code></td></tr>
-<tr><td>Fedora 44</td><td><code>apk-starter-0.9.2-1.fc44.x86_64.rpm</code></td><td><code>sudo dnf install ./FILE</code></td></tr>
-<tr><td>Fedora 45</td><td><code>apk-starter-0.9.2-1.fc45.x86_64.rpm</code></td><td><code>sudo dnf install ./FILE</code></td></tr>
-<tr><td>openSUSE Tumbleweed</td><td><code>apk-starter-0.9.2-1.opensuse-tumbleweed.x86_64.rpm</code></td><td><code>sudo zypper install ./FILE</code></td></tr>
-<tr><td>Arch Linux</td><td><code>apk-starter-0.9.2-1-x86_64.pkg.tar.zst</code></td><td><code>sudo pacman -U ./FILE</code> (or <code>makepkg -si</code> with the <code>PKGBUILD</code>)</td></tr>
-</table></div>
-<p class="mut">An AUR package will follow; registration at the AUR is closed at the moment.</p>
 <p>Details, options and the shell alias are in the
 <a href="https://github.com/Jimbambuli/apk-starter#readme">README</a>.</p>
 
