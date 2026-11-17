@@ -1,10 +1,27 @@
 # APK Starter
 
-Run Android apps (APK files) on the Linux desktop – a Flatpak built on
-[Android Translation Layer (ATL)](https://gitlab.com/android_translation_layer/android_translation_layer).
+**Run Android apps on Linux as native windows – no emulator, no container.**
 
-Works: Jetpack Compose apps, Aurora Store, microG (Google sign-in for apps), most free apps from F-Droid.
-Limits: x86_64 APKs only, no ARM-only apps; camera, Bluetooth and telephony are not supported.
+APK Starter runs Android apps (APK files) on the Linux desktop: each app gets its own window, a menu entry and its
+own data folder. It is a Flatpak built on
+[Android Translation Layer (ATL)](https://gitlab.com/android_translation_layer/android_translation_layer), which
+implements Android's app interfaces on Linux; the app code runs in ART, Android's runtime.
+
+![The APK Starter window with some installed Android apps](pages/screenshot.png)
+
+**How is it different from Waydroid or Anbox?** Waydroid and Anbox start a complete Android system in a container.
+APK Starter does not run an Android system: every app is a normal Linux process with its own window. There is no
+Android image and no container or virtual machine; apps that need parts of Android that ATL does not implement yet do
+not work.
+
+**Which apps run?** In the test run for 0.9.2, 150 of 151 free apps started and went through a short scripted test
+(start, scroll, menu, back) without crashing; one (Amaze) crashed – the full list is on the
+[project page](https://jimbambuli.github.io/apk-starter/#tested). JW Library (with video and picture-in-picture),
+Jetpack Compose apps (e.g. Tasks), Flutter apps (e.g. Sanmill, Aves) and Aurora Store are part of the tests. A run
+without a crash does not mean that every function of an app works.
+
+**Limits:** x86_64 APKs only, no ARM-only apps; camera, Bluetooth and telephony are not supported; no Google Play
+Services (use microG).
 
 ## Install
 
@@ -243,9 +260,14 @@ xgettext --from-code=UTF-8 --keyword=_ --keyword=N_ --add-comments=Translators -
 for l in $(cat po/LINGUAS); do msgmerge --update --backup=none po/$l.po po/apk-starter.pot; done
 ```
 
-**Status:** preview 0.8 (own Flatpak repository, not on Flathub yet).
+**Status:** 0.9.2 (own Flatpak repository, not on Flathub).
 
 ## Credits and license
+
+APK Starter is built on [Android Translation Layer](https://gitlab.com/android_translation_layer/android_translation_layer),
+«a translation layer that allows running Android apps on a Linux system», developed by Mis012, Julian Winkler and
+other contributors. Thank you! Our forks of ATL and its parts are under
+[github.com/Jimbambuli](https://github.com/Jimbambuli).
 
 License: GPL-3.0-or-later (same as ATL), see [LICENSE](LICENSE). Built from: ATL (GPL-3.0), art_standalone
 (Apache-2.0), bionic_translation, wolfSSL (GPL). Aurora Store and microG are not shipped; on request they are
