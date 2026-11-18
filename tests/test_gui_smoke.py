@@ -53,7 +53,7 @@ def test_window_lists_installs_starts_and_uninstalls(tmp_path):
     heading, body = report.pop("install_error")
     assert heading == "Cannot install broken.apk" and body.startswith("not an APK"), (body, out.stderr)
     heading, body = report.pop("install_warning")
-    assert heading == "Cannot install demo.apk" and body.startswith("Demo is installed without a menu entry")
+    assert heading == "Demo installed" and "Demo is installed without a menu entry" in body
     heading, body = report.pop("remove_warning")
     assert heading == "Demo uninstalled" and "menu entry was not removed" in body
     assert report.pop("busy") == [1, ["demo.apk"], "list"]     # one spinner, in the row of the job
@@ -314,7 +314,7 @@ def test_options_switch_permissions_per_app(tmp_path, monkeypatch):
         out = subprocess.run([sys.executable, str(HERE / "gui_permissions_probe.py")], env={**display, **env},
                              capture_output=True, text=True, timeout=60)
     report = json.loads(out.stdout.strip().splitlines()[-1])
-    assert report == {"sections": [["Permissions", True], ["Appearance", True], ["Advanced", True]],
+    assert report == {"sections": [["Permissions", True], ["Menu entry", False], ["Appearance", True], ["Advanced", True]],
                       "no_gear": True, "shown": [["location", True], ["camera", True]],
                       "labels": ["Location", "Camera"], "saved": ["camera"]}, out.stderr
 
