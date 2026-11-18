@@ -219,6 +219,20 @@ def test_portal_error_on_remove_does_not_leave_the_app_half_installed(box):
     assert len(warnings) == 1 and "menu entry was not removed" in warnings[0] and "boom" in warnings[0]
 
 
+def test_failed_menu_entry_names_the_installed_app(box):
+    """The window takes it as a warning on an installed app, not as «Cannot install»."""
+    from apk_starter.cli import install_files
+    from apk_starter.errors import NoMenuEntry
+
+    def boom(*a, **kw):
+        raise PortalUnavailable("x")
+    box.fake.install_launcher = boom
+    with pytest.raises(NoMenuEntry) as e:
+        install_files(apk_starter.paths.Paths.from_env(box.env), [box.apk], None, box.env, lambda _m: None,
+                      lambda _w: None)
+    assert e.value.info.package == PKG
+
+
 def test_no_menu_entry_wanted_is_not_an_error(box, capsys):
     def cancel(*a, **kw):
         raise LauncherCancelled("menu entry not created (cancelled)")

@@ -261,10 +261,11 @@ def install_parts(paths: Paths, info: ApkInfo, parts: tuple[tuple[str, Path], ..
             raise NoMenuEntry(
                 _("{app} is installed without a menu entry: the DynamicLauncher portal is not available; "
                   "start the app with: {command}").format(app=info.label,
-                                                         command=f"flatpak run {RUN_REF} {info.package}")) from None
+                                                         command=f"flatpak run {RUN_REF} {info.package}"),
+                info) from None
         except StarterError as e:
             raise NoMenuEntry(_("{app} is installed without a menu entry: {reason}").format(
-                app=info.label, reason=e)) from None
+                app=info.label, reason=e), info) from None
     return info
 
 

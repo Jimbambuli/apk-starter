@@ -16,7 +16,7 @@ from .apkinfo import read_apk_info
 from .launch import cached_apk_info
 from .run import read_build_info
 from .install_request import wants_microg
-from .errors import StarterError, describe_error
+from .errors import NoMenuEntry, StarterError, describe_error
 from .i18n import _
 from .gui_model import (AppRow, WindowState, crash_meaning, details_layout, filter_rows, group_parts, is_narrow,
                         component_lines, key_action, load_rows, load_state, save_state, sort_rows, start_argv)
@@ -979,7 +979,8 @@ class Window(Gtk.ApplicationWindow):
             if new and wants_microg(self.paths, info):      # asked once: when the app is new, not on updates
                 self.ask_setup_microg(_("This app uses Google services. Set up microG?"), _("Not now"))
         progress, end = self.begin(name, _("Installing…"))
-        self.background(lambda: install_files(self.paths, files, self.lang, self.env, progress, warnings.append),
+        self.background(lambda: installed(lambda: install_files(self.paths, files, self.lang, self.env, progress,
+                                                               warnings.append), warnings),
                         done, _("Cannot install {file}").format(file=name), end=end)
 
     def get_apps(self) -> None:
@@ -1000,7 +1001,8 @@ class Window(Gtk.ApplicationWindow):
                     self.alert(_("{app} installed").format(app=info.label), "\n".join(warnings))
                 self.start(info.package, None)
             progress, end = self.begin("Aurora Store", _("Downloading Aurora Store from F-Droid…"))
-            self.background(lambda: aurora.setup(self.paths, self.env, progress, warnings.append), done,
+            self.background(lambda: installed(lambda: aurora.setup(self.paths, self.env, progress, warnings.append),
+                                              warnings), done,
                             _("Cannot set up Aurora Store"), end=end)
         Dialog(self, _("Set up Aurora Store?"),
                _("Free apps from Google Play. Downloaded from F-Droid and checked.\n\n"
@@ -1016,7 +1018,8 @@ class Window(Gtk.ApplicationWindow):
             self.search.set_text("")
             self.alert(_("microG is set up"), "\n".join(warnings + [microg_hint()]))
         progress, end = self.begin("microG", _("Downloading microG…"))
-        self.background(lambda: setup_microg(self.paths, self.lang, self.env, progress, warnings.append),
+        self.background(lambda: installed(lambda: setup_microg(self.paths, self.lang, self.env, progress,
+                                                               warnings.append), warnings),
                         done, _("Cannot set up microG"), end=end)
 
     def ask_setup_microg(self, heading: str | None = None, cancel: str | None = None) -> None:
@@ -1063,6 +1066,15 @@ class Window(Gtk.ApplicationWindow):
                                            lambda: remove_app(self.paths, pkg, purge.get_active()), removed,
                                            _("Cannot uninstall {app}").format(app=label_)),
                       extra=purge)
+
+
+def installed(work: Callable[[], object], warnings: list[str]) -> object:
+    """An app whose menu entry alone failed is installed: a warning, not «Cannot install»."""
+    try:
+        return work()
+    except NoMenuEntry as e:
+        warnings.append(str(e))
+        return e.info
 
 
 class ThemeWatcher:

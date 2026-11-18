@@ -19,7 +19,12 @@ class SignatureConflict(StarterError):
 
 
 class NoMenuEntry(StarterError):
-    """The app is installed, only its menu entry could not be made (no DynamicLauncher portal, or the dialog refused)."""
+    """The app is installed, only its menu entry could not be made (no DynamicLauncher portal, or a portal error);
+    `info` is the installed app."""
+
+    def __init__(self, message: str, info=None):
+        super().__init__(message)
+        self.info = info
 
 
 def describe_error(e: BaseException) -> str:
