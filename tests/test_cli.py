@@ -33,6 +33,10 @@ class PortalUnavailable(StarterError):
     pass
 
 
+class LauncherCancelled(StarterError):
+    pass
+
+
 @pytest.fixture
 def box(tmp_path, monkeypatch):
     """Isolated XDG/prefix dirs, a PATH with the fake ATL, and a fake portal module."""
@@ -49,6 +53,7 @@ def box(tmp_path, monkeypatch):
     links = {}
     fake = types.ModuleType("apk_starter.portal")
     fake.PortalUnavailable = PortalUnavailable
+    fake.LauncherCancelled = LauncherCancelled
     fake.link_mime_types = real_link_mime_types
     fake.share_mime_types = real_share_mime_types
     fake.desktop_entry = real_desktop_entry
@@ -214,14 +219,45 @@ def test_portal_error_on_remove_does_not_leave_the_app_half_installed(box):
     assert len(warnings) == 1 and "menu entry was not removed" in warnings[0] and "boom" in warnings[0]
 
 
-def test_cancelled_menu_entry_says_the_app_is_installed(box, capsys):
+def test_no_menu_entry_wanted_is_not_an_error(box, capsys):
     def cancel(*a, **kw):
-        raise StarterError("menu entry not created (cancelled)")
+        raise LauncherCancelled("menu entry not created (cancelled)")
     box.fake.install_launcher = cancel
-    assert main(["--install", str(box.apk)], env=box.env) == 1
+    assert main(["--install", str(box.apk)], env=box.env) == 0
     assert (box.data / "apps" / f"{PKG}.apk").exists()
-    err = capsys.readouterr().err
-    assert "Demo is installed without a menu entry" in err and "cancelled" in err
+    assert "menu entry" not in capsys.readouterr().err
+
+
+def test_menu_entry_added_later_and_removed_again(box):
+    from apk_starter.cli import add_menu_entry, has_menu_entry, install_files, remove_menu_entry
+    paths = apk_starter.paths.Paths.from_env(box.env)
+    install_files(paths, [box.apk], None, box.env, lambda _m: None, lambda _w: None, label="Mein Demo")
+    box.calls.clear()
+    assert add_menu_entry(paths, PKG, None) is True
+    assert box.calls == [("install", PKG, "Mein Demo", DEFAULT_ICON)]   # the name given when installing
+    remove_menu_entry(PKG)
+    assert box.calls[-1] == ("uninstall", PKG) and paths.apk(PKG).exists()     # the app stays
+    box.fake.launcher_entry = {PKG: "[Desktop Entry]\n"}.get
+    assert has_menu_entry(PKG) is True and has_menu_entry("org.example.other") is False
+
+
+def test_menu_entry_added_later_can_be_cancelled(box):
+    from apk_starter.cli import add_menu_entry
+    assert main(["--install", str(box.apk)], env=box.env) == 0
+
+    def cancel(*a, **kw):
+        raise LauncherCancelled("menu entry not created (cancelled)")
+    box.fake.install_launcher = cancel
+    assert add_menu_entry(apk_starter.paths.Paths.from_env(box.env), PKG, None) is False
+
+
+def test_without_the_portal_no_menu_entry_is_offered(box):
+    from apk_starter.cli import has_menu_entry
+
+    def gone(pkg):
+        raise PortalUnavailable("x")
+    box.fake.launcher_entry = gone
+    assert has_menu_entry(PKG) is None
 
 
 def test_remove_all_goes_on_after_a_failure(box, capsys, monkeypatch):

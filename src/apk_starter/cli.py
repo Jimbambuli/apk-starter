@@ -252,15 +252,11 @@ def install_parts(paths: Paths, info: ApkInfo, parts: tuple[tuple[str, Path], ..
         prepare_installed(paths, os.environ if env is None else env, info, report, warn, flt)
         if not MENU_ENTRIES:
             return info
-        icon = info.icon
-        if icon is None:
-            try:
-                icon = paths.default_icon().read_bytes()
-            except OSError:
-                icon = b""
         try:
-            portal.install_launcher(info.package, info.label, icon,
+            portal.install_launcher(info.package, info.label, _menu_icon(paths, info.package),
                                     mime_types=menu_mime_types(portal, info))
+        except portal.LauncherCancelled:
+            pass                                    # no menu entry wanted: it can be added later in the app info
         except portal.PortalUnavailable:
             raise NoMenuEntry(
                 _("{app} is installed without a menu entry: the DynamicLauncher portal is not available; "
@@ -270,6 +266,48 @@ def install_parts(paths: Paths, info: ApkInfo, parts: tuple[tuple[str, Path], ..
             raise NoMenuEntry(_("{app} is installed without a menu entry: {reason}").format(
                 app=info.label, reason=e)) from None
     return info
+
+
+def _menu_icon(paths: Paths, pkg: str) -> bytes:
+    """The app's icon as install_app keeps it, else the starter's own."""
+    for f in (paths.icon(pkg), paths.default_icon()):
+        try:
+            return f.read_bytes()
+        except OSError:
+            continue
+    return b""
+
+
+def has_menu_entry(pkg: str) -> bool | None:
+    """Whether the app has a menu entry; None: menu entries cannot be made here (no portal)."""
+    from . import portal
+    if not MENU_ENTRIES:
+        return None
+    try:
+        return portal.launcher_entry(pkg) is not None
+    except StarterError:
+        return None
+
+
+def add_menu_entry(paths: Paths, pkg: str, lang: str | None) -> bool:
+    """The menu entry of an installed app, made later (no entry was wanted when it was installed, or it was
+    removed); False: cancelled in the portal's dialog."""
+    from . import portal
+    with package_lock(paths, pkg):
+        meta = json.loads(paths.meta(pkg).read_text(encoding="utf-8"))
+        info = cached_apk_info(paths, paths.apk(pkg), lang, read_apk_info)
+        try:
+            portal.install_launcher(pkg, meta.get("label") or info.label, _menu_icon(paths, pkg),
+                                    mime_types=menu_mime_types(portal, info))
+        except portal.LauncherCancelled:
+            return False
+    return True
+
+
+def remove_menu_entry(pkg: str) -> None:
+    """Only the menu entry: the app stays installed and starts from the starter's window."""
+    from . import portal
+    portal.uninstall_launcher(pkg)
 
 
 def microg_hint() -> str:

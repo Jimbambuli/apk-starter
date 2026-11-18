@@ -10,8 +10,8 @@ from collections.abc import Callable, Mapping
 from pathlib import Path
 
 from . import aurora, dexopt, diag, microg, permissions, theme
-from .cli import (APP_ID, ENTRY_PREFIX, clear_data, install_files, lang_from_env, microg_hint, native_notice,
-                  prepare_all, remove_app, setup_microg, VERSION)
+from .cli import (APP_ID, ENTRY_PREFIX, add_menu_entry, clear_data, has_menu_entry, install_files, lang_from_env,
+                  microg_hint, native_notice, prepare_all, remove_app, remove_menu_entry, setup_microg, VERSION)
 from .apkinfo import read_apk_info
 from .launch import cached_apk_info
 from .run import read_build_info
@@ -790,6 +790,23 @@ class Window(Gtk.ApplicationWindow):
             self.permission_switches[key] = sw
         if keys:
             box.append(Gtk.Separator(margin_top=4))
+        # the menu entry: none is fine (not wanted when installing), added or removed here; shown once the portal
+        # has said whether there is one (not at all without the portal)
+        menu_parts = (label(_("Menu entry"), "section-title", visible=False),
+                      Gtk.Button(halign=Gtk.Align.START, visible=False), Gtk.Separator(margin_top=4, visible=False))
+        menu_button = menu_parts[1]
+        self.menu_entry_button = menu_button
+        for w in menu_parts:
+            box.append(w)
+
+        def menu_state(there: bool | None) -> None:
+            if there is None or self.menu_entry_button is not menu_button:     # no portal, or another app shown
+                return
+            menu_button.set_label(_("Remove from menu") if there else _("Add to menu"))
+            menu_button.connect("clicked", lambda _b, pkg=r.package: self.change_menu_entry(pkg, remove=there))
+            for w in menu_parts:
+                w.set_visible(True)
+        self.background(lambda pkg=r.package: has_menu_entry(pkg), menu_state, None, job=False)
         box.append(label(_("Appearance"), "section-title"))
         box.append(label(_("Window bar"), "dim-label"))
         names_ = {"atl": _("With back button"), "system": _("From the system"),
@@ -1022,6 +1039,13 @@ class Window(Gtk.ApplicationWindow):
                         "Close the app first."), _("Delete Data"),
                       lambda: self.run_for(pkg, _("Deleting data…"), lambda: clear_data(self.paths, pkg), None,
                                            _("Cannot delete the data of {app}").format(app=label_)))
+
+    def change_menu_entry(self, pkg: str, remove: bool) -> None:
+        """No question first: the app stays installed and its entry can be added again."""
+        label_ = self.rows[pkg].label if pkg in self.rows else pkg
+        work = (lambda: remove_menu_entry(pkg)) if remove else (lambda: add_menu_entry(self.paths, pkg, self.lang))
+        self.run_for(pkg, _("Updating the menu entry…"), work, lambda _r: self.show_details(),
+                     _("Cannot change the menu entry of {app}").format(app=label_))
 
     def ask_uninstall(self, pkg: str) -> None:
         label_ = self.rows[pkg].label if pkg in self.rows else pkg

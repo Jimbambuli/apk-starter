@@ -22,6 +22,10 @@ class PortalUnavailable(StarterError):
     pass
 
 
+class LauncherCancelled(StarterError):
+    """The user said no in the portal's dialog: the app has no menu entry, which is not an error."""
+
+
 def desktop_file_id(pkg: str) -> str:
     return f"{ENTRY_PREFIX}.{pkg}.desktop"
 
@@ -179,7 +183,7 @@ def install_launcher(pkg: str, label: str, icon: bytes, mime_types: list[str] = 
 
     response, results = _request(conn, Gio, GLib, iface, "PrepareInstall", prepare)
     if response != 0 or "token" not in results:
-        raise StarterError(_("menu entry not created (cancelled)"))
+        raise LauncherCancelled(_("menu entry not created (cancelled)"))
     _call(conn, Gio, GLib, iface, "Install",
           GLib.Variant("(sssa{sv})", (results["token"], desktop_file_id(pkg), desktop_entry(pkg, label, mime_types), {})))
 
