@@ -166,6 +166,13 @@ def test_share_mime_types_offer_the_app_under_open_with():
         "image/*", "image/png", "text/plain", "video/*"]
 
 
+def test_share_mime_types_leave_out_unregistered_media_types():
+    """OsmAnd takes binary/octet-stream: desktop-file-validate calls the whole entry invalid for it."""
+    from apk_starter.portal import share_mime_types
+    assert share_mime_types(("binary/octet-stream", "application/octet-stream", "x-content/foo")) == [
+        "application/octet-stream", "x-content/foo"]
+
+
 def test_uninstall_missing_entry_is_no_error_in_any_language(monkeypatch):
     """The portal answers a missing menu entry with GIO's NOT_FOUND, its text in the session's language."""
     from apk_starter import portal

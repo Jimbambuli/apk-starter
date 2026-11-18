@@ -55,12 +55,16 @@ def link_mime_types(filters: Iterable[LinkFilter]) -> list[str]:
 
 
 _MIME_RE = re.compile(r"[a-z0-9][a-z0-9!#$&^_.+-]*/(\*|[a-z0-9][a-z0-9!#$&^_.+-]*)")
+# the media types desktop-file-validate 0.28 knows; an app's own one (e.g. OsmAnd's binary/octet-stream) makes the
+# entry invalid
+_MEDIA_TYPES = {"application", "audio", "chemical", "example", "font", "image", "inode", "message", "model",
+                "multipart", "text", "video", "x-content", "x-epoc"}
 
 
 def share_mime_types(types: Iterable[str]) -> list[str]:
     """MimeType for the types the app takes shared (ACTION_SEND/SEND_MULTIPLE): it is offered under «Open with»
     for such files; the default stays what mimeapps.list says. */* is left out (every file)."""
-    out = {t.lower() for t in types if _MIME_RE.fullmatch(t.lower()) and not t.startswith("*")}
+    out = {t.lower() for t in types if _MIME_RE.fullmatch(t.lower()) and t.lower().split("/")[0] in _MEDIA_TYPES}
     return sorted(out)
 
 
