@@ -1,5 +1,5 @@
 [wrap-git]
 directory = bionic_translation
 url = https://github.com/Jimbambuli/bionic_translation.git
-revision = 484ad80d314cb5796d360df5db6beab8e6ad91d5
+revision = b26d3383a75651a741d2410715e2cb621ac64bab
 depth = 1
