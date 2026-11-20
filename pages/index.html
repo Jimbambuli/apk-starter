@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>APK Starter – run Android apps on Linux as native windows</title>
-<meta name="description" content="APK Starter runs Android apps (APK files) on the Linux desktop as normal windows – no emulator, no container, no virtual machine. Flatpak and packages for Debian, Fedora, openSUSE and Arch Linux. Built on Android Translation Layer.">
+<meta name="description" content="APK Starter runs Android apps (APK files) on the Linux desktop as normal windows – no emulator, no container, no virtual machine. Flatpak. Built on Android Translation Layer.">
 <link rel="canonical" href="https://jimbambuli.github.io/apk-starter/">
 <link rel="icon" href="icon.svg">
 <meta property="og:type" content="website">
@@ -26,13 +26,13 @@
   "description": "Runs Android apps (APK files) on the Linux desktop as normal windows, without an emulator, container or virtual machine. Built on Android Translation Layer (ATL) and ART.",
   "applicationCategory": "UtilitiesApplication",
   "operatingSystem": "Linux (x86_64)",
-  "softwareVersion": "0.9.2",
-  "datePublished": "2026-11-17",
+  "softwareVersion": "0.9.3",
+  "datePublished": "2026-11-20",
   "license": "https://www.gnu.org/licenses/gpl-3.0.html",
   "isAccessibleForFree": true,
   "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"},
   "url": "https://jimbambuli.github.io/apk-starter/",
-  "downloadUrl": "https://github.com/Jimbambuli/apk-starter/releases/tag/0.9.2",
+  "downloadUrl": "https://github.com/Jimbambuli/apk-starter/releases/tag/0.9.3",
   "installUrl": "https://jimbambuli.github.io/apk-starter/io.github.Jimbambuli.ApkStarter.flatpakref",
   "image": "https://jimbambuli.github.io/apk-starter/icon.svg",
   "screenshot": [
@@ -56,13 +56,15 @@
     {"@type": "Question", "name": "How is APK Starter different from Waydroid or Anbox?",
      "acceptedAnswer": {"@type": "Answer", "text": "Waydroid and Anbox start a complete Android system in a container and show its apps from there. APK Starter does not run an Android system: Android Translation Layer implements Android's app interfaces directly on Linux, so every app is a normal Linux process with its own window, menu entry and data folder. There is no Android image and no container or virtual machine. Apps that need parts of Android that are not implemented yet do not work."}},
     {"@type": "Question", "name": "Which Android apps run?",
-     "acceptedAnswer": {"@type": "Answer", "text": "In the test run for version 0.9.2, 150 of 151 free apps started and went through a short scripted test (start, scroll, menu, back) without crashing; one (Amaze) crashed. A test without a crash does not mean that every function of an app works."}},
+     "acceptedAnswer": {"@type": "Answer", "text": "In the test run for version 0.9.3, 150 of 151 free apps started and went through a short scripted test (start, scroll, menu, back) without crashing; one (Amaze) crashed. A test without a crash does not mean that every function of an app works."}},
     {"@type": "Question", "name": "How do I install APK Starter?",
      "acceptedAnswer": {"@type": "Answer", "text": "As a Flatpak from the project's own signed repository: flatpak install --user https://jimbambuli.github.io/apk-starter/io.github.Jimbambuli.ApkStarter.flatpakref."}},
     {"@type": "Question", "name": "Does it include Google Play Services?",
      "acceptedAnswer": {"@type": "Answer", "text": "No. Apps that need Google Play Services can use microG, which APK Starter downloads from its official source when asked. Apps can be installed with Aurora Store in the same way."}},
     {"@type": "Question", "name": "What does not work?",
-     "acceptedAnswer": {"@type": "Answer", "text": "Only x86_64 APKs run; apps whose native code exists only for ARM are refused. Camera, Bluetooth and telephony are not supported. Some apps and demanding games fail."}}
+     "acceptedAnswer": {"@type": "Answer", "text": "Only x86_64 APKs run; apps whose native code exists only for ARM are refused. Camera, Bluetooth and telephony are not supported. Some apps and demanding games fail."}},
+    {"@type": "Question", "name": "How was APK Starter made?",
+     "acceptedAnswer": {"@type": "Answer", "text": "APK Starter is vibe coded: the starter and its fixes in ATL, ART and bionic_translation were written by an AI coding assistant (Claude by Anthropic) under the direction of the maintainer, and checked with test runs on real apps."}}
   ]
 }
 </script>
@@ -95,7 +97,7 @@ and its own data folder. APK Starter packages
 <a href="https://gitlab.com/android_translation_layer/android_translation_layer">Android Translation Layer (ATL)</a>
 as a Flatpak, reads name and icon from the APK and takes care of installing, starting and
 removing apps.</p>
-<p class="mut">Version 0.9.2 (17 November 2026) · free software, GPL-3.0-or-later · own Flatpak repository, not on Flathub ·
+<p class="mut">Version 0.9.3 (20 November 2026) · free software, GPL-3.0-or-later · own Flatpak repository, not on Flathub ·
 <a href="https://github.com/Jimbambuli/apk-starter">source code on GitHub</a></p>
 
 <figure><img class="win" src="screenshot.png" width="1052" height="807" alt="The APK Starter window: the list of installed Android apps and the details of the chosen app">
@@ -145,12 +147,11 @@ not implement yet do not work.</p>
 loaded as Linux libraries.</p>
 
 <h3>Which apps run?</h3>
-<p>For every release we run a test with 151 free apps (<a href="#tested">list below</a>). With 0.9.2, 150 of them
+<p>For every release we run a test with 151 free apps (<a href="#tested">list below</a>). With 0.9.3, 150 of them
 started and went through a short scripted test – start, scroll, open the menu, go back – without crashing; one (Amaze)
 crashed.
-WhatsApp runs as a linked companion device (QR code): in a hands-on test with 0.9.2 the chats, sending messages,
-animated GIFs, opening links in the browser and playing voice messages worked; profile pictures were missing and
-pausing a voice message did not work cleanly. A run without a crash does not mean that every function of an app works.</p>
+WhatsApp runs as a linked companion device (QR code): in hands-on tests the chats, sending messages, animated GIFs,
+opening links in the browser, playing voice messages and profile pictures worked. A run without a crash does not mean that every function of an app works.</p>
 
 <h3>How do I install it?</h3>
 <p>As a Flatpak from the project's own signed repository – see <a href="#install">Install</a>.</p>
@@ -166,6 +167,11 @@ official source when you ask for it.</p>
 <h3>What does not work?</h3>
 <p>See <a href="#limits">Limits</a>: in short, only x86_64 APKs, no camera, Bluetooth or telephony, and not every app
 or game runs.</p>
+
+<h3>How was it made?</h3>
+<p>APK Starter is vibe coded: the starter and its fixes in ATL, ART and bionic_translation were written by an AI
+coding assistant (Claude by Anthropic) under the direction of the maintainer, and checked with test runs on real apps
+(see <a href="#tested">Tested apps</a>).</p>
 </div>
 
 <h2 id="limits">Limits</h2>
@@ -173,7 +179,7 @@ or game runs.</p>
 <li>x86_64 APKs only. Apps whose native code exists only for ARM are refused with a message.</li>
 <li>Camera, Bluetooth and telephony are not supported.</li>
 <li>No Google Play Services; apps that need them need microG.</li>
-<li>Not every app runs: in the 0.9.2 test the file manager Amaze crashed; in our 0.9.1 tests the game Mindustry
+<li>Not every app runs: in the 0.9.3 test the file manager Amaze crashed; in our 0.9.1 tests the game Mindustry
 crashed when it ran without a sound device, and the Gmail app did not get through the test.</li>
 </ul>
 
@@ -190,8 +196,8 @@ from Flathub.</p>
 <p>Details, options and the shell alias are in the
 <a href="https://github.com/Jimbambuli/apk-starter#readme">README</a>.</p>
 
-<h2 id="tested">Tested apps (0.9.2)</h2>
-<p>151 free apps, each started with the published build in a 420×807 window with English locale and taken through
+<h2 id="tested">Tested apps (0.9.3)</h2>
+<p>151 free apps, each started with a build from the same sources as the 0.9.3 release in a 420×807 window with English locale and taken through
 the same short script: start, scroll, open the menu, go back (about one minute per app). «No crash» means: the app
 started, the steps ran, and there was no fatal exception and no fatal signal. It does not mean that every function of
 the app works. Notes only where the test showed something.</p>
@@ -204,7 +210,7 @@ the app works. Notes only where the test showed something.</p>
 <tr><td>Aegis</td><td>3.4.3</td><td><code>com.beemdevelopment.aegis</code></td><td class="ok">no crash</td><td></td></tr>
 <tr><td>Aisleron</td><td>2026.6.3</td><td><code>com.aisleron</code></td><td class="ok">no crash</td><td></td></tr>
 <tr><td>Alibi</td><td>0.5.3</td><td><code>app.myzel394.alibi</code></td><td class="ok">no crash</td><td></td></tr>
-<tr><td>Amaze</td><td>3.11.4</td><td><code>com.amaze.filemanager</code></td><td class="bad">crash</td><td>crashed with a fatal signal (also in 0.9.1)</td></tr>
+<tr><td>Amaze</td><td>3.11.4</td><td><code>com.amaze.filemanager</code></td><td class="bad">crash</td><td>crashed with a fatal signal (also in 0.9.1 and 0.9.2)</td></tr>
 <tr><td>Andor&#x27;s Trail</td><td>0.8.18</td><td><code>com.gpl.rpg.AndorsTrail</code></td><td class="ok">no crash</td><td></td></tr>
 <tr><td>AnkiDroid</td><td>2.25.3</td><td><code>com.ichi2.anki</code></td><td class="ok">no crash</td><td></td></tr>
 <tr><td>AntennaPod</td><td>3.12.3</td><td><code>de.danoeh.antennapod</code></td><td class="ok">no crash</td><td></td></tr>
@@ -344,7 +350,7 @@ the app works. Notes only where the test showed something.</p>
 <tr><td>VLC</td><td>3.7.2</td><td><code>org.videolan.vlc</code></td><td class="ok">no crash</td><td></td></tr>
 <tr><td>Voice Recorder</td><td>1.7.4</td><td><code>org.fossify.voicerecorder</code></td><td class="ok">no crash</td><td></td></tr>
 <tr><td>Waterfly III</td><td>1.3.0</td><td><code>com.dreautall.waterflyiii</code></td><td class="ok">no crash</td><td></td></tr>
-<tr><td>WeeWX App</td><td>2.2.19</td><td><code>com.odiousapps.weewxweather</code></td><td class="ok">no crash</td><td></td></tr>
+<tr><td>WeeWX App</td><td>2.2.19</td><td><code>com.odiousapps.weewxweather</code></td><td class="ok">no crash</td><td>crashed once in the first run; two repeated runs without crash</td></tr>
 <tr><td>WiFiAnalyzer</td><td>3.3.1</td><td><code>com.vrem.wifianalyzer</code></td><td class="ok">no crash</td><td></td></tr>
 <tr><td>Wikipedia</td><td>r/50616-r-2026-11-03</td><td><code>org.wikipedia</code></td><td class="ok">no crash</td><td></td></tr>
 <tr><td>World Weather</td><td>1.2.6</td><td><code>com.haringeymobile.ukweather</code></td><td class="ok">no crash</td><td></td></tr>

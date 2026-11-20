@@ -14,10 +14,14 @@ APK Starter does not run an Android system: every app is a normal Linux process 
 Android image and no container or virtual machine; apps that need parts of Android that ATL does not implement yet do
 not work.
 
-**Which apps run?** In the test run for 0.9.2, 150 of 151 free apps started and went through a short scripted test
+**Which apps run?** In the test run for 0.9.3, 150 of 151 free apps started and went through a short scripted test
 (start, scroll, menu, back) without crashing; one (Amaze) crashed – the full list is on the
 [project page](https://jimbambuli.github.io/apk-starter/#tested). Jetpack Compose apps (e.g. Tasks), Flutter apps (e.g. Sanmill, Aves) and Aurora Store are part of the tests. A run
 without a crash does not mean that every function of an app works.
+
+**How was it made?** APK Starter is vibe coded: the starter and its fixes in ATL, ART and bionic_translation were
+written by an AI coding assistant (Claude by Anthropic) under the direction of the maintainer, and checked with test
+runs on real apps.
 
 **Limits:** x86_64 APKs only, no ARM-only apps; camera, Bluetooth and telephony are not supported; no Google Play
 Services (use microG).
