@@ -1,6 +1,6 @@
 [wrap-git]
 directory = art_standalone
 url = https://github.com/Jimbambuli/art_standalone.git
-revision = a131da6ab32b33bee035ea19ced74cc08396cc23
+revision = 150a09e9dcdcea5f6b4fdc2d19f16591722d4337
 depth = 1
 patch_directory = art_standalone
