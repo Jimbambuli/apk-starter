@@ -1,6 +1,6 @@
 # APK Starter
 
-**Run Android apps on Linux as native windows – no emulator, no container.**
+**Run Android apps on Linux as native windows. No emulator, no container.**
 
 APK Starter runs Android apps (APK files) on the Linux desktop: each app gets its own window, a menu entry and its
 own data folder. It is a Flatpak built on
@@ -15,7 +15,7 @@ Android image and no container or virtual machine; apps that need parts of Andro
 not work.
 
 **Which apps run?** In the test run for 0.9.3, 150 of 151 free apps started and went through a short scripted test
-(start, scroll, menu, back) without crashing; one (Amaze) crashed – the full list is on the
+(start, scroll, menu, back) without crashing; one (Amaze) crashed. The full list is on the
 [project page](https://jimbambuli.github.io/apk-starter/#tested). Jetpack Compose apps (e.g. Tasks), Flutter apps (e.g. Sanmill, Aves) and Aurora Store are part of the tests. A run
 without a crash does not mean that every function of an app works.
 
@@ -43,7 +43,7 @@ alias apk-starter='flatpak run --file-forwarding io.github.Jimbambuli.ApkStarter
 
 Open **APK Starter** from the application menu (or run `apk-starter` without arguments): the installed apps are
 listed on the left (search with Ctrl+F or by just typing, sort by name, last start, last install or data size), the
-chosen app's details on the right – version, target SDK, dates, data size, whether it is prepared for this computer,
+chosen app's details on the right: version, target SDK, dates, data size, whether it is prepared for this computer,
 and its newest log and debug recordings. Double-click or Enter starts an app, Delete asks to uninstall it.
 Install a new APK with **+** or by dropping it anywhere onto the window; while no app is installed, the window
 offers **Get apps** (Aurora Store) and **Open APK…** as big buttons. The window takes the desktop's GTK theme,
@@ -167,12 +167,12 @@ Uninstalling: run `apk-starter --remove-all` before `flatpak uninstall io.github
 `flatpak uninstall` does not remove the menu entries of the installed apps; desktops hide them once APK Starter is
 gone, but the files stay in `~/.local/share/xdg-desktop-portal/` (and come back if you install APK Starter again).
 
-Bring your own APK – this project ships ATL and its free dependencies only, no apps. Only apps with x86_64 native libraries (or none) run;
+Bring your own APK: this project ships ATL and its free dependencies only, no apps. Only apps with x86_64 native libraries (or none) run;
 ARM-only apps are refused. Apps that use Google Play Services need microG (see above).
 
 ## Permissions
 
-Besides the display, sound, network and GPU, APK Starter reads – never writes – these parts of your system, to take
+Besides the display, sound, network and GPU, APK Starter reads (never writes) these parts of your system, to take
 over the desktop's look on GTK's own Adwaita (`settings.ini` of GTK 4: icons, cursor, font and the order of the window
 buttons; KDE's colour scheme in `colors.css`), for its window and for the apps' title bars, and to follow a change of
 them at once:
@@ -213,7 +213,7 @@ development.
 APK Starter can also be built and installed without Flatpak, from the same sources at the same commits as the
 Flatpak (the manifest is the one place where they are set; `tools/check-native-pins.py` keeps `native/` equal to it).
 
-> **Warning: without the Flatpak sandbox the apps run with all the rights of your user account** – they can read and
+> **Warning: without the Flatpak sandbox the apps run with all the rights of your user account**: they can read and
 > change all your files, use the network and the devices. None of the limits in «Permissions» above apply. Install
 > only apps you trust. The starter says so once when it starts.
 
@@ -252,7 +252,7 @@ directory with `-Dstrip=false`.
 
 The window, `--help`, the messages and the menu/AppStream texts follow the system language. Included: German,
 French, Italian, Spanish, Brazilian Portuguese, Dutch, Polish, Czech, Ukrainian, Russian, Japanese and simplified
-Chinese; English is the source language. The translations are machine-assisted – corrections are welcome as issues or
+Chinese; English is the source language. The translations are machine-assisted; corrections are welcome as issues or
 pull requests against `po/<language>.po`.
 
 After changing texts, update the template and the catalogs:
