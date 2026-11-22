@@ -27,6 +27,7 @@ import zipfile
 from collections.abc import Callable, Iterator, Mapping
 from pathlib import Path, PurePosixPath
 
+from . import splits
 from .errors import StarterError
 from .i18n import _
 from .paths import Paths
@@ -295,12 +296,17 @@ def compile_app(paths: Paths, env: Mapping[str, str], location: str, flt: str, i
 
 
 def extract_natives(paths: Paths, pkg: str, apk: Path) -> None:
-    """ATL's extractFromAPK("lib/x86_64/", "lib/"): same target, and a file newer than the APK is kept."""
-    prefix = f"lib/{ISA}/"
+    """ATL's extractFromAPK("lib/<abi>/", "lib/") for the ABI ATL picks (splits.primary_abi): same target, and a
+    file newer than the APK is kept."""
     lib = paths.data(pkg) / f"{pkg}.apk_" / "lib"
     apk_mtime = os.stat(apk).st_mtime_ns
     try:
         with zipfile.ZipFile(apk) as z:
+            native = {n.split("/")[1] for n in z.namelist() if n.startswith("lib/") and n.endswith(".so") and n.count("/") == 2}
+            abi = splits.primary_abi(native)
+            if abi is None:
+                return
+            prefix = f"lib/{abi}/"
             for entry in z.infolist():
                 rel = PurePosixPath(entry.filename[len(prefix):])
                 if (not entry.filename.startswith(prefix) or entry.is_dir() or not rel.parts

@@ -90,8 +90,8 @@ def test_double_click_on_arm_only_apk_says_why_in_a_window(box, monkeypatch, cap
     monkeypatch.setattr(install_request, "_dialog", lambda env, heading, body, buttons: told.append(heading))
     arm = make_apk(box.tmp / "arm.apk", manifest=axml_manifest(), files={"lib/armeabi-v7a/l.so": b"a"})
     assert main([str(arm)], env=box.env) == 7
-    assert told == ["Demo contains program code only for ARM processors and does not run on this computer."]
-    assert "only for ARM processors" in capsys.readouterr().err
+    assert told == ["Demo contains program code only for 32-bit x86 or ARM processors, which is not supported."]
+    assert "only for 32-bit x86 or ARM processors" in capsys.readouterr().err
     assert not (box.data / "apps" / f"{PKG}.apk").exists()
 
 
