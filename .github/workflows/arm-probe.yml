@@ -1,0 +1,69 @@
+name: arm-probe
+
+# Probe only: does the Flatpak build for aarch64 on GitHub's arm64 runner? Builds the manifest as pinned on main
+# and keeps a bundle plus the build log with per module times and disk/RAM samples. No publishing.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [arm-probe]
+
+permissions:
+  contents: read
+
+jobs:
+  aarch64:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Runner facts
+        run: |
+          uname -a; nproc; free -m; df -h / "$GITHUB_WORKSPACE"; cat /etc/os-release | head -3
+      - name: Install flatpak and flatpak-builder
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y flatpak flatpak-builder
+          flatpak --version; flatpak-builder --version
+          # Ubuntu 24.04 limits unprivileged user namespaces, which bubblewrap needs
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true
+      - name: Install GNOME 51 SDK and Platform for aarch64 from Flathub
+        run: |
+          flatpak --user remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+          flatpak --user install -y --noninteractive --arch=aarch64 flathub \
+            org.gnome.Platform//51 org.gnome.Sdk//51
+          flatpak --user list --columns=application,arch,branch
+          df -h /
+      - name: Build for aarch64
+        run: |
+          mkdir -p probe
+          ( while true; do echo "$(date +%s) $(df -m --output=used,avail / | tail -1) $(free -m | awk '/Mem:/{print $3, $7}')"; sleep 20; done ) > probe/resources.txt &
+          set -o pipefail
+          flatpak-builder --user --arch=aarch64 --force-clean --disable-rofiles-fuse --default-branch=stable --repo=repo \
+            --install-deps-from=flathub             build-dir io.github.Jimbambuli.ApkStarter.yml 2>&1 \
+            | while IFS= read -r l; do printf '%s %s\n' "$(date +%s)" "$l"; done | tee probe/build.log
+      - name: Module times
+        if: always()
+        run: |
+          grep -E '^[0-9]+ (Starting module|Committing stage|Error|error:|FAILED)' probe/build.log | tee probe/modules.txt || true
+          tail -3 probe/resources.txt || true
+          free -m; df -h /
+      - name: Bundle
+        run: |
+          flatpak build-bundle --arch=aarch64 repo probe/apk-starter-aarch64.flatpak io.github.Jimbambuli.ApkStarter stable
+          ls -l probe
+      - name: Smoke (version only)
+        continue-on-error: true
+        run: |
+          flatpak --user install -y --noninteractive probe/apk-starter-aarch64.flatpak
+          flatpak run io.github.Jimbambuli.ApkStarter --version
+          flatpak run --command=sh io.github.Jimbambuli.ApkStarter -c 'file /app/lib/art/libart.so 2>/dev/null || ls -l /app/lib/art | head; ls /app/lib/java/dex 2>/dev/null | head' || true
+      - name: Keep the probe results
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: arm-probe
+          path: probe
+          retention-days: 7
