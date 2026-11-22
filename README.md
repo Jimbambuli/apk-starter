@@ -199,6 +199,9 @@ Pictures, Documents, Music and Videos (`--filesystem=xdg-pictures:ro` etc.); a f
 app. Of these, only Downloads is writable (`--filesystem=xdg-download`). Apps save and export through the desktop's
 file dialog (portal), which writes only where you choose.
 
+Apps with Bluetooth use your computer's adapter through BlueZ: APK Starter may talk to BlueZ on the system bus
+(`--system-talk-name=org.bluez`) and receive Bluetooth sockets from it (`--allow=bluetooth`).
+
 The apps see Pictures, Music, Videos and Downloads the way Android apps see the phone's shared storage: a gallery or
 music player lists your pictures, songs and videos (Android's MediaStore). Downloads is read and written: a file an
 app saves as a download through MediaStore lands in your Downloads folder, and the app may change or delete its own
