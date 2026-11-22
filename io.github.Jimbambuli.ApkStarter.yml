@@ -163,8 +163,6 @@ modules:
         # The AOSP-style makefiles ignore LDFLAGS; -lbsd lives in /app/lib.
         LIBRARY_PATH: /app/lib
     build-commands:
-      # liblog asks for -m64, which GCC knows only on x86 (probe)
-      - if [ "$FLATPAK_ARCH" = aarch64 ]; then sed -i 's/ -m64$//' system/core/liblog/Android.mk; fi
       - make -j$FLATPAK_BUILDER_N_JOBS ____PREFIX=/app ____LIBDIR=lib
       - make ____PREFIX=/app ____LIBDIR=lib install
       # ART's JVMTI plugin (not in ____art_all, its make target lacks include paths): built with atl-doctor's
