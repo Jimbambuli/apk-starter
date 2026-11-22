@@ -113,6 +113,7 @@ class Dialog(Gtk.Window):
             then(rid)
 
 
+SCROLLBAR_SPACE = 14                    # px right of the row spinners: the overlay scroll bar (about 8 px) and a gap
 READY_FILE = ".apk-starter-ready"       # ATL_READY_FILE in the app's data folder
 READY_POLL_MS = 200
 START_TIMEOUT_S = 60                    # no first window by then: the button is free again
@@ -171,6 +172,8 @@ class Window(Gtk.ApplicationWindow):
         self.main_button = main
         self.listbox = Gtk.ListBox(selection_mode=Gtk.SelectionMode.SINGLE, activate_on_single_click=False)
         self.listbox.add_css_class("navigation-sidebar")
+        self.listbox.set_has_tooltip(True)          # asked for the row under the pointer, never kept from an old row
+        self.listbox.connect("query-tooltip", self.on_list_tooltip)
         self.listbox.connect("row-selected", self.on_row_selected)
         self.listbox.connect("row-activated", self.on_row_activated)
         self.nothing = label(_("No app matches."), "dim-label", xalign=0.5, margin_top=24, visible=False)
@@ -583,6 +586,16 @@ class Window(Gtk.ApplicationWindow):
         if microg_todo:
             self.add_menu.append(_("Set up microG…"), "win.setup-microg")
 
+    def on_list_tooltip(self, box: Gtk.ListBox, _x: int, y: int, keyboard: bool, tooltip: Gtk.Tooltip) -> bool:
+        """The package of the row under the pointer (the rows are made anew with every refresh, so a tooltip of
+        the row that was there before must not stay)."""
+        row = box.get_selected_row() if keyboard else box.get_row_at_y(y)
+        text = getattr(row, "tip", None)
+        if not text:
+            return False
+        tooltip.set_text(text)
+        return True
+
     def visible_rows(self) -> list[AppRow]:
         return filter_rows(sort_rows(self.all_rows, self.sort), self.search.get_text())
 
@@ -602,8 +615,10 @@ class Window(Gtk.ApplicationWindow):
                 chosen = item
         if chosen is None and rows:
             chosen = self.listbox.get_row_at_index(len(self.pending))
+        self.listbox.unselect_all()
         self.listbox.select_row(chosen)
         self.filling = False
+        self.listbox.trigger_tooltip_query()        # a tooltip that is open belonged to a row that is gone
         self.selected = chosen.package if chosen is not None else (keep if keep in self.rows else None)
         self.show_details()
         self.update_pages()
@@ -616,10 +631,13 @@ class Window(Gtk.ApplicationWindow):
         text.append(label(r.version or r.package, "dim-label", "caption", ellipsize=Pango.EllipsizeMode.END))
         text.set_hexpand(True)
         box.append(text)
-        spinner = Gtk.Spinner(spinning=True, visible=self.status_of(r.package) is not None, valign=Gtk.Align.CENTER)
+        # margin_end: the overlay scroll bar lies over the right edge of the list
+        spinner = Gtk.Spinner(spinning=True, visible=self.status_of(r.package) is not None, valign=Gtk.Align.CENTER,
+                              margin_end=SCROLLBAR_SPACE)
         self.row_spinners[r.package] = spinner
         box.append(spinner)
-        item = Gtk.ListBoxRow(child=box, tooltip_text=r.package)
+        item = Gtk.ListBoxRow(child=box)
+        item.tip = r.package
         item.package = r.package
         item.title = r.label
         return item
@@ -631,8 +649,9 @@ class Window(Gtk.ApplicationWindow):
         names.append(label(title, "row-name", ellipsize=Pango.EllipsizeMode.END))
         names.append(label(text, "dim-label", "caption", ellipsize=Pango.EllipsizeMode.END))
         box.append(names)
-        box.append(Gtk.Spinner(spinning=True, valign=Gtk.Align.CENTER))
-        item = Gtk.ListBoxRow(child=box, selectable=False, activatable=False, tooltip_text=text)
+        box.append(Gtk.Spinner(spinning=True, valign=Gtk.Align.CENTER, margin_end=SCROLLBAR_SPACE))
+        item = Gtk.ListBoxRow(child=box, selectable=False, activatable=False)
+        item.tip = text
         item.package = None
         item.title = title
         return item
