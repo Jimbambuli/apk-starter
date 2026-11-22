@@ -1228,3 +1228,21 @@ msgstr ""
 #, python-brace-format
 #~ msgid "no log: cannot write {file}: {reason}"
 #~ msgstr "журнала нет: не удаётся записать в {file}: {reason}"
+
+msgid "Architecture"
+msgstr "Архитектура"
+
+msgid "Java only"
+msgstr "Только Java"
+
+msgid "Not supported ({abis})"
+msgstr "Не поддерживается ({abis})"
+
+msgid "{arch} (translated)"
+msgstr "{arch} (транслируется)"
+
+msgid "{arch} (also contains {other})"
+msgstr "{arch} (также содержит {other})"
+
+msgid "Starting…"
+msgstr "Запуск…"

@@ -154,6 +154,22 @@ def translated(abi: str | None) -> bool:
     return abi is not None and abi != HOST_ABIS.get(platform.machine())
 
 
+def architecture(native: set[str]) -> str:
+    """The architecture line of the details page: what ATL runs of an installed app, by the same choice as
+    primary_abi (the processor's own ABI before the bridged one)."""
+    if not native:
+        return _("Java only")
+    abi = primary_abi(native)
+    if abi is None:
+        return _("Not supported ({abis})").format(abis=", ".join(sorted(native)))
+    names = {"x86_64": "x86_64", "arm64-v8a": "ARM64"}
+    name = names[abi]
+    if translated(abi):
+        return _("{arch} (translated)").format(arch=name)
+    other = next((names[a] for a in names if a != abi and a in native), None)
+    return _("{arch} (also contains {other})").format(arch=name, other=other) if other else name
+
+
 def select(s: SplitSet, label: str) -> SplitSet:
     """The parts for this computer: without the ABI parts of other ABIs; refused if the app has native code but none
     that this computer runs (Android would refuse it with INSTALL_FAILED_NO_MATCHING_ABIS)."""

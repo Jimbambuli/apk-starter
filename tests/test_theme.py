@@ -97,3 +97,12 @@ def test_own_accent_only_without_a_system_theme():
     t = Theme(dark=False, accent=(0.24, 0.68, 0.91))
     assert "#3dade8" in window_css(t, system_theme=False) and ".danger-text" in window_css(t, system_theme=False)
     assert "#3dade8" not in window_css(t, system_theme=True) and ".danger-text" in window_css(t, system_theme=True)
+
+
+def test_no_own_accent_rules_under_kde():
+    t = Theme(accent=(0.24, 0.68, 0.91))
+    assert "#3dade8" in window_css(t, system_theme=False)
+    assert "#3dade8" not in window_css(t, system_theme=False, kde=True) and ".danger-text" in window_css(t, False, True)
+    from apk_starter.theme import is_kde
+    assert is_kde({"XDG_CURRENT_DESKTOP": "KDE"}) and is_kde({"XDG_CURRENT_DESKTOP": "ubuntu:KDE"})
+    assert not is_kde({"XDG_CURRENT_DESKTOP": "GNOME"}) and not is_kde({})

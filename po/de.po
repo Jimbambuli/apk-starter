@@ -1242,3 +1242,21 @@ msgstr ""
 #, python-brace-format
 #~ msgid "no log: cannot write {file}: {reason}"
 #~ msgstr "kein Protokoll: {file} kann nicht beschrieben werden: {reason}"
+
+msgid "Architecture"
+msgstr "Architektur"
+
+msgid "Java only"
+msgstr "Nur Java"
+
+msgid "Not supported ({abis})"
+msgstr "Nicht unterstützt ({abis})"
+
+msgid "{arch} (translated)"
+msgstr "{arch} (übersetzt)"
+
+msgid "{arch} (also contains {other})"
+msgstr "{arch} (auch {other} enthalten)"
+
+msgid "Starting…"
+msgstr "Startet…"

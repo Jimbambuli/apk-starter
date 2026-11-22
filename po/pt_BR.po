@@ -1233,3 +1233,21 @@ msgstr ""
 #, python-brace-format
 #~ msgid "no log: cannot write {file}: {reason}"
 #~ msgstr "sem registro: não é possível gravar em {file}: {reason}"
+
+msgid "Architecture"
+msgstr "Arquitetura"
+
+msgid "Java only"
+msgstr "Somente Java"
+
+msgid "Not supported ({abis})"
+msgstr "Não suportado ({abis})"
+
+msgid "{arch} (translated)"
+msgstr "{arch} (traduzido)"
+
+msgid "{arch} (also contains {other})"
+msgstr "{arch} (contém também {other})"
+
+msgid "Starting…"
+msgstr "Iniciando…"

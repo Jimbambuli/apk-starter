@@ -80,6 +80,7 @@ def desktop_entry(pkg: str, label: str, mime_types: list[str] = ()) -> str:
         f"Name={text}\n"
         f"Exec={exec_line}\n"
         "Terminal=false\n"
+        "StartupNotify=true\n"
         "Categories=Utility;\n"
         f"StartupWMClass={ENTRY_PREFIX}.{pkg}\n"
         f"X-ApkStarter-Package={pkg}\n"

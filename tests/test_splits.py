@@ -153,3 +153,20 @@ def test_32_bit_only_app_is_refused(tmp_path, bridge, files):
 
 def test_device_abi_list_puts_the_host_first(bridge):
     assert splits.supported_abis() == ("x86_64", "arm64-v8a")
+
+
+def test_architecture_line(monkeypatch):
+    from apk_starter import splits
+    bridge = type("B", (), {"is_file": lambda self: True})()
+    monkeypatch.setattr(splits, "NATIVE_BRIDGE", bridge)
+    monkeypatch.setattr(splits.platform, "machine", lambda: "x86_64")
+    a = splits.architecture
+    assert a(set()) == "Java only"
+    assert a({"x86_64"}) == "x86_64"
+    assert a({"arm64-v8a"}) == "ARM64 (translated)"
+    assert a({"arm64-v8a", "x86_64", "armeabi-v7a"}) == "x86_64 (also contains ARM64)"
+    assert a({"armeabi-v7a"}) == "Not supported (armeabi-v7a)"
+    monkeypatch.setattr(splits.platform, "machine", lambda: "aarch64")
+    monkeypatch.setattr(splits, "NATIVE_BRIDGE", type("B", (), {"is_file": lambda self: False})())
+    assert a({"arm64-v8a"}) == "ARM64"
+    assert a({"arm64-v8a", "x86_64"}) == "ARM64 (also contains x86_64)"

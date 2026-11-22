@@ -3,3 +3,5 @@ art_commit=33933a59b56c5092fa100ad855c336b50f612c69
 bionic_commit=fa000915eadf7fa221493b105227ef88fe1f2f16
 wolfssl=v5.9.4-stable
 atl_doctor_commit=24d82bc43552a8cf0e3c369f171472e0100a98cd
+digitalis_commit=81c34d5
+digitalis_bundle=e199616

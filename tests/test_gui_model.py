@@ -128,6 +128,7 @@ def test_component_lines_from_build_info_and_without():
     from apk_starter.run import read_build_info
     assert component_lines({"atl_commit": "87dfd5577bc9c35d4e3c4da982f6b69f8a642acc", "art_commit": "unknown"}, "?") == [
         "ATL 87dfd5577bc9", "art_standalone ?", "bionic_translation ?", "atl-doctor ?"]
+    assert component_lines({}, "?", True)[-1] == "Digitalis ?"
     real = read_build_info(Path(__file__).parent.parent / "data/build-info")
     assert all(not l.endswith(" unknown") for l in component_lines(real, "unknown"))
     assert component_lines(read_build_info(Path("/nonexistent")), "unknown")[0] == "ATL unknown"

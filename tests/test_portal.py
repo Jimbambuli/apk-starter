@@ -8,6 +8,7 @@ Type=Application
 Name=Demo
 Exec=apk-starter org.x.y
 Terminal=false
+StartupNotify=true
 Categories=Utility;
 StartupWMClass=io.github.Jimbambuli.ApkStarter.org.x.y
 X-ApkStarter-Package=org.x.y

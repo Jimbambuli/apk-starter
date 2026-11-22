@@ -1231,3 +1231,21 @@ msgstr ""
 #, python-brace-format
 #~ msgid "no log: cannot write {file}: {reason}"
 #~ msgstr "geen logboek: kan niet schrijven naar {file}: {reason}"
+
+msgid "Architecture"
+msgstr "Architectuur"
+
+msgid "Java only"
+msgstr "Alleen Java"
+
+msgid "Not supported ({abis})"
+msgstr "Niet ondersteund ({abis})"
+
+msgid "{arch} (translated)"
+msgstr "{arch} (vertaald)"
+
+msgid "{arch} (also contains {other})"
+msgstr "{arch} (bevat ook {other})"
+
+msgid "Starting…"
+msgstr "Starten…"

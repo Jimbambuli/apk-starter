@@ -1132,3 +1132,21 @@ msgid ""
 "{app} contains program code only for ARM processors and does not run on this "
 "computer."
 msgstr ""
+
+msgid "Architecture"
+msgstr ""
+
+msgid "Java only"
+msgstr ""
+
+msgid "Not supported ({abis})"
+msgstr ""
+
+msgid "{arch} (translated)"
+msgstr ""
+
+msgid "{arch} (also contains {other})"
+msgstr ""
+
+msgid "Starting…"
+msgstr ""

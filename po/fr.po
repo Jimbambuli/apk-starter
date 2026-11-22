@@ -1245,3 +1245,21 @@ msgstr ""
 #, python-brace-format
 #~ msgid "no log: cannot write {file}: {reason}"
 #~ msgstr "pas de journal : impossible d'écrire dans {file} : {reason}"
+
+msgid "Architecture"
+msgstr "Architecture"
+
+msgid "Java only"
+msgstr "Java uniquement"
+
+msgid "Not supported ({abis})"
+msgstr "Non pris en charge ({abis})"
+
+msgid "{arch} (translated)"
+msgstr "{arch} (traduit)"
+
+msgid "{arch} (also contains {other})"
+msgstr "{arch} (contient aussi {other})"
+
+msgid "Starting…"
+msgstr "Démarrage…"

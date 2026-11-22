@@ -9,7 +9,7 @@ import threading
 from collections.abc import Callable, Mapping
 from pathlib import Path
 
-from . import aurora, dexopt, diag, microg, permissions, theme
+from . import aurora, dexopt, diag, microg, permissions, splits, theme
 from .cli import (APP_ID, ENTRY_PREFIX, add_menu_entry, clear_data, has_menu_entry, install_files, lang_from_env,
                   microg_hint, native_notice, prepare_all, remove_app, remove_menu_entry, setup_microg, VERSION)
 from .apkinfo import read_apk_info
@@ -113,6 +113,11 @@ class Dialog(Gtk.Window):
             then(rid)
 
 
+READY_FILE = ".apk-starter-ready"       # ATL_READY_FILE in the app's data folder
+READY_POLL_MS = 200
+START_TIMEOUT_S = 60                    # no first window by then: the button is free again
+
+
 class Window(Gtk.ApplicationWindow):
     def __init__(self, app: Gtk.Application, paths: Paths, lang: str | None, launcher: list[str],
                  env: Mapping[str, str] | None = None):
@@ -128,6 +133,7 @@ class Window(Gtk.ApplicationWindow):
         self.busy = 0                               # running install/remove/clear jobs
         # what runs for an app, shown as a spinner in its row and in «Status» (no bar):
         self.working: dict[str, str] = {}           # the rebuild after an update, per app
+        self.starting: set[str] = set()             # started, first window not there yet («Starting…»)
         self.jobs: dict[str, str] = {}              # delete data / uninstall
         self.pending: dict[int, list[str]] = {}     # installs and set-ups, before their app is in the list
         self.problems: dict[str, str] = {}          # the last failure of the rebuild, per app
@@ -399,7 +405,7 @@ class Window(Gtk.ApplicationWindow):
         for pkg, spinner in self.row_spinners.items():
             spinner.set_visible(self.status_of(pkg) is not None)
         if self.selected in self.rows and self.status_value is not None:
-            if (self.selected not in self.jobs) != self.start_button.get_sensitive():
+            if (self.selected not in self.jobs and self.selected not in self.starting) != self.start_button.get_sensitive():
                 self.show_details()                 # «Start» locked or free again
             else:
                 self.status_value.set_text(self.status_text(self.rows[self.selected]))
@@ -550,7 +556,7 @@ class Window(Gtk.ApplicationWindow):
                          "caption", xalign=0.5, halign=Gtk.Align.CENTER, wrap=True, max_width_chars=48))
         box.append(Gtk.Separator(margin_top=8, margin_bottom=4))
         box.append(label(_("Components"), "section-title"))
-        lines = component_lines(info, _("unknown"))
+        lines = component_lines(info, _("unknown"), splits.NATIVE_BRIDGE.is_file())
         for line in lines:
             box.append(label(line, "dim-label", selectable=True))
         close = Gtk.Button(label=_("Close"), halign=Gtk.Align.END, margin_top=12)
@@ -724,7 +730,12 @@ class Window(Gtk.ApplicationWindow):
         self.details.append(head)
 
         # one row: Start, Delete data, Uninstall, a note while Debug is on
-        if r.package not in self.jobs:              # the rebuild after an update does not hold the start back (it goes first)
+        if r.package in self.starting:              # until the app's first window is there (or it ended)
+            start = Gtk.Button(sensitive=False, child=Gtk.Box(spacing=8, halign=Gtk.Align.CENTER))
+            self.start_spinner = Gtk.Spinner(spinning=True)
+            start.get_child().append(self.start_spinner)
+            start.get_child().append(Gtk.Label(label=_("Starting…")))
+        elif r.package not in self.jobs:            # the rebuild after an update does not hold the start back (it goes first)
             start = Gtk.Button(label=_("Start"), action_name="win.start", action_target=target)
         else:                                       # locked while it is deleted or uninstalled (an action would free it)
             start = Gtk.Button(label=_("Start"), sensitive=False)
@@ -742,10 +753,16 @@ class Window(Gtk.ApplicationWindow):
             actions.append(w)
         self.details.append(actions)
 
+        try:
+            native = splits.abis(splits.collect([self.paths.apk(r.package), *self.paths.installed_splits(r.package)]))
+            arch_text = splits.architecture(native)
+        except (StarterError, OSError):
+            arch_text = "–"
         facts = Gtk.Grid(column_spacing=24, row_spacing=8, margin_top=14, margin_bottom=14, margin_start=18,
                          margin_end=18)
         lines = ((_("Version"), r.version or "–"),
                  (_("Target SDK"), str(r.target_sdk) if r.target_sdk else "–"),
+                 (_("Architecture"), arch_text),
                  (_("Installed"), when(r.installed)),
                  (_("Last started"), when(r.started)),
                  (_("Data"), GLib.format_size(r.size) if r.size else _("no data")),
@@ -891,19 +908,41 @@ class Window(Gtk.ApplicationWindow):
     def start(self, pkg: str, level: str | None) -> None:
         """level None: as from the menu entry (Debug if it is ticked for the app), or "debug" / "debug-full"."""
         label_ = self.rows[pkg].label if pkg in self.rows else pkg
-        if pkg in self.jobs:
-            return                                  # being deleted or uninstalled
+        if pkg in self.jobs or pkg in self.starting:
+            return                                  # being deleted or uninstalled, or just started
         before = {rec.path for rec in diag.recordings(self.paths, pkg)}
+        ready = self.paths.data(pkg) / READY_FILE
+        ready.unlink(missing_ok=True)
         try:
             launcher = Gio.SubprocessLauncher.new(Gio.SubprocessFlags.NONE)
             launcher.setenv("APK_STARTER_FROM_WINDOW", "1", True)   # this window says a crash itself (crashed())
+            launcher.setenv("ATL_READY_FILE", str(ready), True)     # ATL creates it when its window is on screen
+            token = self.activation_token()
+            if token:                               # the app's first window takes it (GTK reads it at startup)
+                launcher.setenv("XDG_ACTIVATION_TOKEN", token, True)
+                launcher.setenv("DESKTOP_STARTUP_ID", token, True)
             proc = launcher.spawnv(start_argv(self.launcher, pkg, level))
         except GLib.Error as e:
             self.alert(_("Cannot start {app}").format(app=label_), e.message)
             return
+        self.set_starting(pkg, True)
+        waited = [0]
+
+        def poll() -> bool:                         # the first window; the end of the process stops it too
+            waited[0] += 1
+            if pkg not in self.starting:
+                return False
+            if ready.exists() or waited[0] * READY_POLL_MS >= START_TIMEOUT_S * 1000:
+                ready.unlink(missing_ok=True)
+                self.set_starting(pkg, False)
+                return False
+            return True
+        GLib.timeout_add(READY_POLL_MS, poll)
 
         def ended(p: Gio.Subprocess, res) -> None:
             p.wait_finish(res)
+            ready.unlink(missing_ok=True)
+            self.set_starting(pkg, False)
             exited = p.get_if_exited()
             meaning = crash_meaning(exited, p.get_exit_status() if exited else p.get_term_sig())
             if meaning is not None:
@@ -912,6 +951,23 @@ class Window(Gtk.ApplicationWindow):
             if pkg in self.rows:
                 self.refresh()                      # «last started», recordings
         proc.wait_async(None, ended)
+
+    def activation_token(self) -> str | None:
+        """A token of the desktop for the app's first window (xdg-activation / startup notification), so that the
+        desktop's launch feedback ends when the window is there."""
+        try:
+            context = self.get_display().get_app_launch_context()
+            return context.get_startup_notify_id(None, []) or None
+        except (GLib.Error, TypeError, AttributeError):
+            return None
+
+    def set_starting(self, pkg: str, on: bool) -> None:
+        """The Start button of an app shows «Starting…» (with a spinner) while it is in `starting`."""
+        if on == (pkg in self.starting):
+            return
+        self.starting.add(pkg) if on else self.starting.discard(pkg)
+        if self.selected == pkg and pkg in self.rows:
+            self.show_details()
 
     def crashed(self, label_: str, meaning: str, recording: Path | None) -> None:
         """A real crash, not a normal end (exit 0, SIGTERM): what it means; atl-doctor reads the recordings.
@@ -1176,7 +1232,7 @@ class ThemeWatcher:
         font = self.system.font or t.font
         if font:
             settings.set_property("gtk-font-name", font)
-        self.css.load_from_string(theme.window_css(t, self.system.found))
+        self.css.load_from_string(theme.window_css(t, self.system.found, theme.is_kde(os.environ)))
 
 
 def install_styles(display: Gdk.Display) -> None:

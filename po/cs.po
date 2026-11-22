@@ -1224,3 +1224,21 @@ msgstr "{app} obsahuje kód jen pro procesory ARM a na tomto počítači nepobě
 #, python-brace-format
 #~ msgid "no log: cannot write {file}: {reason}"
 #~ msgstr "žádný protokol: do {file} nelze zapisovat: {reason}"
+
+msgid "Architecture"
+msgstr "Architektura"
+
+msgid "Java only"
+msgstr "Pouze Java"
+
+msgid "Not supported ({abis})"
+msgstr "Nepodporováno ({abis})"
+
+msgid "{arch} (translated)"
+msgstr "{arch} (překládáno)"
+
+msgid "{arch} (also contains {other})"
+msgstr "{arch} (obsahuje také {other})"
+
+msgid "Starting…"
+msgstr "Spouštění…"

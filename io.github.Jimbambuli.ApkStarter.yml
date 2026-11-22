@@ -17,6 +17,9 @@ finish-args:
   - --share=ipc
   # the desktop's GTK 4 settings and colours on GTK's own Adwaita, read only; no host-os (README «Permissions»)
   - --filesystem=xdg-config/gtk-4.0:ro
+  # the GTK 4 themes the user installed (the one the desktop sets, e.g. kde-gtk-config's choice), read only
+  - --filesystem=xdg-data/themes:ro
+  - --filesystem=~/.themes:ro
   # KDE draws the KWin window buttons there, for ATL's title bar (read only)
   - --filesystem=xdg-config/gtk-3.0/assets:ro
   # KWin's title font, decoration and Breeze button size, for the height of ATL's title bar (read only)

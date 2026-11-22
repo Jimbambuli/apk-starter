@@ -1186,3 +1186,21 @@ msgstr "{app} 只包含适用于 ARM 处理器的代码，无法在这台电脑�
 #, python-brace-format
 #~ msgid "no log: cannot write {file}: {reason}"
 #~ msgstr "无日志：无法写入 {file}：{reason}"
+
+msgid "Architecture"
+msgstr "架构"
+
+msgid "Java only"
+msgstr "仅 Java"
+
+msgid "Not supported ({abis})"
+msgstr "不支持 ({abis})"
+
+msgid "{arch} (translated)"
+msgstr "{arch}（转译运行）"
+
+msgid "{arch} (also contains {other})"
+msgstr "{arch}（还包含 {other}）"
+
+msgid "Starting…"
+msgstr "正在启动…"

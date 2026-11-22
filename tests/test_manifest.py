@@ -30,6 +30,7 @@ def test_build_info_matches_manifest():
     bi = dict(l.split("=", 1) for l in (ROOT / "data/build-info").read_text().split())
     assert bi["atl_commit"] == pins["android_translation_layer"] and bi["art_commit"] == pins["art_standalone"]
     assert bi["bionic_commit"] == pins["bionic_translation"]
+    assert f"digitalis-bundle-{bi['digitalis_bundle']}.tar.gz" in MANIFEST.read_text()
 
 
 def test_finish_args_exact():
@@ -39,6 +40,8 @@ def test_finish_args_exact():
                              "--socket=pulseaudio", "--share=network", "--share=ipc",
                              # the desktop's GTK 4 settings and colours, read only (Spec 14, README «Permissions»)
                              "--filesystem=xdg-config/gtk-4.0:ro",
+                             # the GTK 4 themes the user installed (the desktop's choice), read only
+                             "--filesystem=xdg-data/themes:ro", "--filesystem=~/.themes:ro",
                              # the pictures of the KWin window buttons for ATL's title bar, read only
                              "--filesystem=xdg-config/gtk-3.0/assets:ro",
                              # KWin's title font/decoration/button size for the title bar's height, read only

@@ -78,9 +78,15 @@ entry:focus-within, button:focus-visible, .navigation-sidebar > row:focus-visibl
 """
 
 
-def window_css(t: Theme, system_theme: bool) -> str:
+def is_kde(env: Mapping[str, str]) -> bool:
+    return "KDE" in env.get("XDG_CURRENT_DESKTOP", "").upper().split(":")
+
+
+def window_css(t: Theme, system_theme: bool, kde: bool = False) -> str:
+    """Own rules only where the desktop's theme cannot supply them: the portal's accent on plain GTK (GNOME). Under
+    KDE the GTK theme the user set decides (kde-gtk-config), GTK's own style if it is not installed."""
     danger = "#ff7b63" if t.dark else "#c01c28"           # readable red on either background
-    accent = "" if system_theme else accent_css(t.accent)
+    accent = "" if system_theme or kde else accent_css(t.accent)
     return accent + f".danger-text {{ color: {danger}; }}"
 
 

@@ -95,13 +95,16 @@ def save_state(path: Path, state: WindowState) -> None:
 
 
 COMPONENTS = (("ATL", "atl_commit"), ("art_standalone", "art_commit"), ("bionic_translation", "bionic_commit"),
-              ("atl-doctor", "atl_doctor_commit"))
+              ("atl-doctor", "atl_doctor_commit"), ("Digitalis", "digitalis_commit"))
 
 
-def component_lines(info: dict[str, str], unknown: str) -> list[str]:
-    """«Name commit» per pinned component (build-info); a missing or «unknown» entry shows `unknown`."""
+def component_lines(info: dict[str, str], unknown: str, bridge: bool = False) -> list[str]:
+    """«Name commit» per pinned component (build-info); a missing or «unknown» entry shows `unknown`.
+    Digitalis only where the native bridge is installed (x86_64 builds)."""
     lines = []
     for name, key in COMPONENTS:
+        if key == "digitalis_commit" and not bridge:
+            continue
         value = info.get(key, "unknown")
         lines.append(f"{name} {unknown if value == 'unknown' else value[:12]}")
     return lines
