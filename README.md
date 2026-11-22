@@ -126,6 +126,13 @@ installed app uses Google Play Services (its manifest has the meta-data `com.goo
 is missing, APK Starter asks once whether to set it up. Every app then shares microG's data. In «microG settings» switch on «Google device registration» and «Cloud
 Messaging»; to sign in: Accounts → Add Google account.
 
+Apps that ask Google Play Services for the position get it from microG's network location, and that works only with
+an online location service switched on in «microG settings» → Location (BeaconDB or Positon; both are off by
+default). microG then sends the Wi-Fi networks around you (their addresses, names, signal strength and frequency, as
+apps get them from Wi-Fi, see «Permissions») to that service, which works out the position; the service also sees
+your IP address and so learns where you are. Networks whose name ends in `_nomap` are left out. The desktop's own
+location (portal) does not reach microG.
+
 Without the alias use `flatpak run --file-forwarding io.github.Jimbambuli.ApkStarter …` instead of `apk-starter`.
 Double-clicking an APK in the file manager and starting an installed app from the menu work without any command.
 
