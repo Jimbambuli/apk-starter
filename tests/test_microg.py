@@ -12,7 +12,7 @@ from apk_starter.paths import Paths, apply_profile
 from apkgen import axml_manifest, make_apk
 from test_cli import PKG, box  # noqa: F401  (fixture)
 
-GMS, GSF = "com.google.android.gms", "com.google.android.gsf"
+GMS, GSF, VENDING = "com.google.android.gms", "com.google.android.gsf", "com.android.vending"
 
 
 def test_profile_folders_beside_stable_once():
@@ -27,9 +27,9 @@ def test_profile_folders_beside_stable_once():
 
 
 def repo(tmp_path, monkeypatch, gms_hash=None, served=None, signer=None):
-    """A fake microG repository: index and two APKs; the v2 check is faked (the real one: test_apksig)."""
+    """A fake microG repository: index and three APKs; the v2 check is faked (the real one: test_apksig)."""
     files = {}
-    for pkg, code in ((GMS, 252432034), (GSF, 8)):
+    for pkg, code in ((GMS, 252432034), (GSF, 8), (VENDING, 84022636)):
         f = tmp_path / f"{pkg}-{code}.apk"
         make_apk(f, manifest=axml_manifest(package=pkg, label="microG Services", version_code=code))
         files[pkg] = (f, code)
@@ -61,9 +61,11 @@ def test_setup_downloads_checks_and_installs_microg(box, tmp_path, monkeypatch, 
     assert not microg.installed(Paths.from_env(box.env))
     assert main(["--setup-microg"], env=box.env) == 0
     assert served == [microg.INDEX, "https://microg.org/fdroid/repo/com.google.android.gsf-8.apk",
+                      microg.INDEX, "https://microg.org/fdroid/repo/com.android.vending-84022636.apk",
                       microg.INDEX, "https://microg.org/fdroid/repo/com.google.android.gms-252432034.apk"]
-    assert box.calls == [("install", GMS, "microG settings", b"<svg/>")]      # GsfProxy: no menu entry
-    assert (box.data / "apps" / f"{GSF}.apk").is_file() and not (box.data / "apps" / f"{GSF}.json").exists()
+    assert box.calls == [("install", GMS, "microG settings", b"<svg/>")]      # GsfProxy, Companion: no menu entry
+    for pkg in (GSF, VENDING):
+        assert (box.data / "apps" / f"{pkg}.apk").is_file() and not (box.data / "apps" / f"{pkg}.json").exists()
     assert microg.installed(Paths.from_env(box.env))
     served.clear()
     assert main(["--setup-microg"], env=box.env) == 0 and served == []     # nothing is missing: nothing is fetched
@@ -76,6 +78,21 @@ def test_wrong_checksum_or_signer_is_refused(tmp_path, monkeypatch):
     repo(tmp_path, monkeypatch, signer="00" * 32)
     with pytest.raises(StarterError, match="not signed by the NOGAPPS Project"):
         microg.download(GMS, tmp_path / "x.apk")
+    with pytest.raises(StarterError, match="not signed by the NOGAPPS Project"):     # Companion: the same signer
+        microg.download(VENDING, tmp_path / "x.apk")
+
+
+def test_microg_set_up_before_companion_gets_it(box, tmp_path, monkeypatch):  # noqa: F811
+    """microG set up by an older starter (no Companion): not «set up», and setting up fetches only Companion."""
+    served = []
+    repo(tmp_path, monkeypatch, served=served)
+    assert main(["--setup-microg"], env=box.env) == 0
+    (box.data / "apps" / f"{VENDING}.apk").unlink()
+    assert not microg.installed(Paths.from_env(box.env))
+    served.clear()
+    assert main(["--setup-microg"], env=box.env) == 0
+    assert served == [microg.INDEX, "https://microg.org/fdroid/repo/com.android.vending-84022636.apk"]
+    assert microg.installed(Paths.from_env(box.env))
 
 
 def test_gsf_must_match_its_pinned_checksum(tmp_path, monkeypatch):

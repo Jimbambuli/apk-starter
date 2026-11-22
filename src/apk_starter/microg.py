@@ -1,4 +1,4 @@
-"""microG: GmsCore and GsfProxy, set up like Aurora Store: downloaded from the official microG F-Droid repository,
+"""microG: GmsCore, GsfProxy and microG Companion, set up like Aurora Store: downloaded from the official microG F-Droid repository,
 checked, installed (Spec 15).
 
 ATL loads Play Services into the app's own process from its installed APKs, which the starter points to apps/
@@ -24,20 +24,24 @@ from .paths import Paths
 
 GMS = "com.google.android.gms"
 GSF = "com.google.android.gsf"
-SERVICES = (GMS, GSF)
+# microG Companion: microG's Play Store stand-in (licensing for Play apps, Play Integrity, installing for Aurora)
+VENDING = "com.android.vending"
+SERVICES = (GMS, GSF, VENDING)
 INDEX = "https://microg.org/fdroid/repo/index-v1.json"
 APK_URL = "https://microg.org/fdroid/repo/{apk}"
-# GmsCore is signed (APK signature v2) by the NOGAPPS Project; checked 3.11.2026 for 0.3.17.252432 (252432034).
+# GmsCore and Companion are signed (APK signature v2) by the NOGAPPS Project; checked 3.11.2026 for 0.3.17.252432
+# (252432034), for Companion 22.11.2026 with 0.3.18.40226 (84022636).
 SIGNER = "9bd06727e62796c0130eb6dab39b73157451582cbd138e86c468acc395d14165"
 # GsfProxy 8 (2016, final) has only a v1 signature: its file checksum is pinned instead (same signer, per the index)
 PINNED_SHA256 = {GSF: "86891b174301f06a1c84187b545a0a2a57044c6b768f3e84e865908743349692"}
-MAX_SIZE = {GMS: 200 << 20, GSF: 1 << 20}
+MAX_SIZE = {GMS: 200 << 20, GSF: 1 << 20, VENDING: 32 << 20}
+SIGNED = (GMS, VENDING)
 APK_NAME = re.compile(r"[A-Za-z0-9._-]+\.apk")
 
 
 def installed(paths: Paths) -> bool:
-    """microG is set up: GmsCore as an app (list, menu entry) and GsfProxy in apps/."""
-    return paths.meta(GMS).is_file() and paths.apk(GSF).is_file()
+    """microG is set up: GmsCore as an app (list, menu entry), GsfProxy and Companion in apps/."""
+    return paths.meta(GMS).is_file() and paths.apk(GSF).is_file() and paths.apk(VENDING).is_file()
 
 
 def _entry(index: bytes, pkg: str) -> dict:
@@ -76,7 +80,7 @@ def _index(fetch: Callable[[str, int, Callable[[bytes], None]], None]) -> bytes:
 def download(pkg: str, dest: Path, fetch: Callable[[str, int, Callable[[bytes], None]], None] | None = None,
              signer: str = SIGNER) -> ApkInfo:
     """The newest APK of `pkg` from the microG repository into dest, checked: SHA-256 of the file (from the index,
-    and pinned for GsfProxy), for GmsCore also the v2 signature by the NOGAPPS certificate, package name and version."""
+    and pinned for GsfProxy), for GmsCore and Companion also the v2 signature by the NOGAPPS certificate, package name and version."""
     fetch = fetch or _get
     try:
         entry = _entry(_index(fetch), pkg)
@@ -93,7 +97,7 @@ def download(pkg: str, dest: Path, fetch: Callable[[str, int, Callable[[bytes], 
     if digest.hexdigest() != entry["sha256"] or digest.hexdigest() != PINNED_SHA256.get(pkg, entry["sha256"]):
         raise StarterError(_("the downloaded {package} does not match its checksum; it was not installed").format(
             package=pkg))
-    if pkg == GMS:
+    if pkg in SIGNED:
         found = apksig.verify(dest).cert_sha256
         if found != signer:
             raise StarterError(_("the downloaded microG is not signed by the NOGAPPS Project (certificate {found}); "
@@ -107,21 +111,24 @@ def download(pkg: str, dest: Path, fetch: Callable[[str, int, Callable[[bytes], 
 def setup(paths: Paths, env: Mapping[str, str], lang: str | None, report: Callable[[str], None],
           warn: Callable[[str], None],
           fetch: Callable[[str, int, Callable[[bytes], None]], None] | None = None) -> ApkInfo:
-    """Download and install what is missing: GmsCore as «microG settings» (list and menu entry), GsfProxy into
-    apps/ only. Returns GmsCore's app."""
+    """Download and install what is missing: GmsCore as «microG settings» (list and menu entry), GsfProxy and
+    Companion into apps/ only (Companion's own launcher activity is disabled; its settings are in «microG settings»).
+    Returns GmsCore's app."""
     from .cli import install_files, parts_dir
     info = None
     with parts_dir(paths) as tmp:
-        if not paths.meta(GMS).is_file() or not paths.apk(GSF).is_file():
+        if not installed(paths):
             report(_("Downloading microG…"))
-        # GsfProxy first: installing GmsCore fails at its menu entry when the launcher portal is missing or refused
-        if not paths.apk(GSF).is_file():
-            apk = Path(tmp) / f"{GSF}.apk"
-            download(GSF, apk, fetch)
-            paths.apps_dir().mkdir(parents=True, exist_ok=True)
-            part = paths.apk(GSF).with_name(f"{GSF}.apk.{os.getpid()}.tmp")
-            part.write_bytes(apk.read_bytes())
-            os.replace(part, paths.apk(GSF))    # a dangling link from an older build is replaced, not followed
+        # GsfProxy and Companion first: installing GmsCore fails at its menu entry when the launcher portal is
+        # missing or refused
+        for pkg in (GSF, VENDING):
+            if not paths.apk(pkg).is_file():
+                apk = Path(tmp) / f"{pkg}.apk"
+                download(pkg, apk, fetch)
+                paths.apps_dir().mkdir(parents=True, exist_ok=True)
+                part = paths.apk(pkg).with_name(f"{pkg}.apk.{os.getpid()}.tmp")
+                part.write_bytes(apk.read_bytes())
+                os.replace(part, paths.apk(pkg))    # a dangling link from an older build is replaced, not followed
         if not paths.meta(GMS).is_file():
             apk = Path(tmp) / f"{GMS}.apk"
             download(GMS, apk, fetch)
