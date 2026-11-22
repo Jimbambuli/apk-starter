@@ -34,6 +34,8 @@ def test_build_info_matches_manifest():
 
 def test_finish_args_exact():
     assert finish_args() == {"--socket=wayland", "--socket=fallback-x11", "--device=dri",
+                             # game controllers (evdev, force feedback)
+                             "--device=input",
                              "--socket=pulseaudio", "--share=network", "--share=ipc",
                              # the desktop's GTK 4 settings and colours, read only (Spec 14, README «Permissions»)
                              "--filesystem=xdg-config/gtk-4.0:ro",

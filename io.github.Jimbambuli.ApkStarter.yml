@@ -9,6 +9,9 @@ finish-args:
   - --socket=wayland
   - --socket=fallback-x11
   - --device=dri
+  # game controllers (/dev/input, read like Android's EventHub; force feedback for their vibration), as Flathub games
+  # do (Flatpak 1.15.6 or newer)
+  - --device=input
   - --socket=pulseaudio
   - --share=network
   - --share=ipc

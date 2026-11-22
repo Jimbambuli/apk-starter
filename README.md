@@ -227,6 +227,10 @@ bus (`--system-talk-name=org.freedesktop.ModemManager1`): the apps see the modem
 receive SMS through it, as on Android. Calls go to the phone's dialer. Without ModemManager or a modem (most desktops)
 the apps see a device without telephony.
 
+Game controllers reach the apps as they do on Android (buttons, sticks, triggers, rumble): APK Starter reads the input
+devices of `/dev/input` (`--device=input`, Flatpak 1.15.6 or newer) and keeps the game controllers among them; the
+keyboard, mouse and touchpad stay with the desktop.
+
 Without them (e.g. `flatpak override --user --nofilesystem=xdg-config/gtk-4.0 io.github.Jimbambuli.ApkStarter`) everything
 works with GTK's default theme in the desktop's light or dark variant.
 
