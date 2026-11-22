@@ -222,6 +222,11 @@ polkit allows your session (e.g. switch Wi-Fi off). Without it (`flatpak overrid
 --system-no-talk-name=org.freedesktop.NetworkManager io.github.Jimbambuli.ApkStarter`) the apps see Wi-Fi
 switched off.
 
+For phone calls and SMS on a Linux phone (postmarketOS, Mobian), APK Starter may talk to ModemManager on the system
+bus (`--system-talk-name=org.freedesktop.ModemManager1`): the apps see the modem's SIM, network and signal and send and
+receive SMS through it, as on Android. Calls go to the phone's dialer. Without ModemManager or a modem (most desktops)
+the apps see a device without telephony.
+
 Without them (e.g. `flatpak override --user --nofilesystem=xdg-config/gtk-4.0 io.github.Jimbambuli.ApkStarter`) everything
 works with GTK's default theme in the desktop's light or dark variant.
 
