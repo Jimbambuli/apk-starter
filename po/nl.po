@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-18 05:20+0000\n"
+"POT-Creation-Date: 2026-11-22 13:29+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -109,7 +109,7 @@ msgstr ""
 msgid "The app list with three free apps from F-Droid"
 msgstr "De applijst met drie vrije apps van F-Droid"
 
-#: src/apk_starter/apkinfo.py:44 src/apk_starter/splits.py:77
+#: src/apk_starter/apkinfo.py:44 src/apk_starter/splits.py:84
 #, python-brace-format
 msgid "{file} is too large ({size} bytes)"
 msgstr "{file} is te groot ({size} bytes)"
@@ -121,19 +121,19 @@ msgstr ""
 "gesplitste APK-bundels (.apks/.xapk) worden nog niet ondersteund: {file}"
 
 #: src/apk_starter/apkinfo.py:98 src/apk_starter/apkinfo.py:127
-#: src/apk_starter/splits.py:75 src/apk_starter/splits.py:82
+#: src/apk_starter/splits.py:82 src/apk_starter/splits.py:89
 #, python-brace-format
 msgid "not an APK (no AndroidManifest.xml): {file}"
 msgstr "geen APK (AndroidManifest.xml ontbreekt): {file}"
 
-#: src/apk_starter/apkinfo.py:102 src/apk_starter/splits.py:89
+#: src/apk_starter/apkinfo.py:102 src/apk_starter/splits.py:96
 #, python-brace-format
 msgid "invalid package name in manifest: {package}"
 msgstr "ongeldige pakketnaam in manifest: {package}"
 
 #: src/apk_starter/apkinfo.py:129 src/apk_starter/apkinfo.py:131
-#: src/apk_starter/splits.py:62 src/apk_starter/splits.py:64
-#: src/apk_starter/splits.py:84 src/apk_starter/splits.py:86
+#: src/apk_starter/splits.py:69 src/apk_starter/splits.py:71
+#: src/apk_starter/splits.py:91 src/apk_starter/splits.py:93
 #, python-brace-format
 msgid "cannot read {file}: {reason}"
 msgstr "kan {file} niet lezen: {reason}"
@@ -182,7 +182,7 @@ msgstr ""
 msgid "the downloaded file is not Aurora Store {code}"
 msgstr "het gedownloade bestand is niet Aurora Store {code}"
 
-#: src/apk_starter/aurora.py:75 src/apk_starter/gui.py:1002
+#: src/apk_starter/aurora.py:75 src/apk_starter/gui.py:1003
 msgid "Downloading Aurora Store from F-Droid…"
 msgstr "Aurora Store wordt van F-Droid gedownload…"
 
@@ -209,7 +209,7 @@ msgstr ""
 "kan {file} niet lezen: bestand bestaat niet (in de Flatpak-sandbox zijn "
 "alleen paden zichtbaar die met --file-forwarding zijn doorgegeven: {command})"
 
-#: src/apk_starter/cli.py:80 src/apk_starter/cli.py:370
+#: src/apk_starter/cli.py:80 src/apk_starter/cli.py:374
 #: src/apk_starter/install_request.py:180
 #, python-brace-format
 msgid "not installed: {package}"
@@ -239,7 +239,16 @@ msgstr "{app} wordt voorbereid voor deze computer…"
 msgid "{app} could not be prepared in advance: {reason}"
 msgstr "{app} kon niet vooraf worden voorbereid: {reason}"
 
-#: src/apk_starter/cli.py:262
+#: src/apk_starter/cli.py:241
+#, python-brace-format
+msgid ""
+"{app} contains program code only for ARM processors: it runs translated, "
+"which is slower."
+msgstr ""
+"{app} bevat alleen programmacode voor ARM-processors: de app draait vertaald "
+"en daardoor langzamer."
+
+#: src/apk_starter/cli.py:265
 #, python-brace-format
 msgid ""
 "{app} is installed without a menu entry: the DynamicLauncher portal is not "
@@ -248,12 +257,12 @@ msgstr ""
 "{app} is geïnstalleerd zonder menu-item: het DynamicLauncher-portaal is niet "
 "beschikbaar; start de app met: {command}"
 
-#: src/apk_starter/cli.py:266
+#: src/apk_starter/cli.py:270
 #, python-brace-format
 msgid "{app} is installed without a menu entry: {reason}"
 msgstr "{app} is geïnstalleerd zonder menu-item: {reason}"
 
-#: src/apk_starter/cli.py:314
+#: src/apk_starter/cli.py:318
 msgid ""
 "In «microG settings» switch on «Google device registration» and «Cloud "
 "Messaging». To sign in: Accounts → Add Google account."
@@ -261,32 +270,32 @@ msgstr ""
 "Zet in «microG-instellingen» «Google-apparaatregistratie» en "
 "«Cloudberichten» aan. Aanmelden: Accounts → Google account toevoegen."
 
-#: src/apk_starter/cli.py:354
+#: src/apk_starter/cli.py:358
 #, python-brace-format
 msgid "cannot remove {folder}: {reason}"
 msgstr "kan {folder} niet verwijderen: {reason}"
 
-#: src/apk_starter/cli.py:375
+#: src/apk_starter/cli.py:379
 msgid ""
 "the DynamicLauncher portal is not available; the menu entry was not removed"
 msgstr ""
 "het DynamicLauncher-portaal is niet beschikbaar; het menu-item is niet "
 "verwijderd"
 
-#: src/apk_starter/cli.py:377
+#: src/apk_starter/cli.py:381
 #, python-brace-format
 msgid "the menu entry was not removed: {reason}"
 msgstr "het menu-item is niet verwijderd: {reason}"
 
-#: src/apk_starter/cli.py:411
+#: src/apk_starter/cli.py:415
 msgid "(no arguments: open the management window)"
 msgstr "(zonder argumenten: beheervenster openen)"
 
-#: src/apk_starter/cli.py:412
+#: src/apk_starter/cli.py:416
 msgid "Start Android apps (APK) with Android Translation Layer."
 msgstr "Android-apps (APK) starten met Android Translation Layer."
 
-#: src/apk_starter/cli.py:414
+#: src/apk_starter/cli.py:418
 #, fuzzy
 msgid ""
 "record the app for atl-doctor: exceptions, ATL stub calls, time line, view "
@@ -298,7 +307,7 @@ msgstr ""
 "logboek; daarna één archief, schoongemaakt van persoonlijke gegevens "
 "(standaard: logs/<pakket>-<tijd>.tar.gz); gebruik --debug=MAP"
 
-#: src/apk_starter/cli.py:418
+#: src/apk_starter/cli.py:422
 #, fuzzy
 msgid ""
 "like --debug, but the archive keeps everything in plain text, passwords and "
@@ -308,23 +317,23 @@ msgstr ""
 "zoals --debug, maar het archief bewaart alles in leesbare tekst, ook "
 "wachtwoorden en persoonlijke gegevens (naam eindigt op -FULL): niet doorgeven"
 
-#: src/apk_starter/cli.py:420
+#: src/apk_starter/cli.py:424
 msgid "override the SDK level passed to ATL"
 msgstr "het SDK-niveau voor ATL overschrijven"
 
-#: src/apk_starter/cli.py:421
+#: src/apk_starter/cli.py:425
 msgid "window size (remembered per app)"
 msgstr "venstergrootte (per app onthouden)"
 
-#: src/apk_starter/cli.py:422
+#: src/apk_starter/cli.py:426
 msgid "open a link in the app (the menu entry passes it)"
 msgstr "een link in de app openen (het menu-item geeft hem door)"
 
-#: src/apk_starter/cli.py:423
+#: src/apk_starter/cli.py:427
 msgid "with --remove/--remove-all: also delete the app data"
 msgstr "met --remove/--remove-all: ook de appgegevens wissen"
 
-#: src/apk_starter/cli.py:425
+#: src/apk_starter/cli.py:429
 msgid ""
 "install the APK and add a menu entry; a split APK: the base and its parts, "
 "or one .apks/.xapk file"
@@ -332,21 +341,21 @@ msgstr ""
 "de APK installeren en een menu-item toevoegen; een gesplitste APK: de basis "
 "en de delen, of één .apks/.xapk-bestand"
 
-#: src/apk_starter/cli.py:432
+#: src/apk_starter/cli.py:436
 msgid "download Aurora Store from F-Droid, check its signature and install it"
 msgstr ""
 "Aurora Store van F-Droid downloaden, de handtekening controleren en "
 "installeren"
 
-#: src/apk_starter/cli.py:433
+#: src/apk_starter/cli.py:437
 msgid "list installed apps"
 msgstr "geïnstalleerde apps tonen"
 
-#: src/apk_starter/cli.py:434
+#: src/apk_starter/cli.py:438
 msgid "remove an installed app"
 msgstr "een geïnstalleerde app verwijderen"
 
-#: src/apk_starter/cli.py:436
+#: src/apk_starter/cli.py:440
 msgid ""
 "remove all installed apps and their menu entries (before uninstalling the "
 "Flatpak)"
@@ -354,11 +363,11 @@ msgstr ""
 "alle geïnstalleerde apps en hun menu-items verwijderen (vóór het verwijderen "
 "van de Flatpak)"
 
-#: src/apk_starter/cli.py:437
+#: src/apk_starter/cli.py:441
 msgid "show the version and exit"
 msgstr "versie tonen en afsluiten"
 
-#: src/apk_starter/cli.py:438
+#: src/apk_starter/cli.py:442
 msgid ""
 "download microG from its repository, check it and install it (Google "
 "services for the apps)"
@@ -366,7 +375,7 @@ msgstr ""
 "microG uit zijn repository downloaden, controleren en installeren (Google-"
 "diensten voor de apps)"
 
-#: src/apk_starter/cli.py:477
+#: src/apk_starter/cli.py:481
 msgid ""
 "--install, --list, --remove, --remove-all and --version take no other "
 "arguments"
@@ -374,62 +383,62 @@ msgstr ""
 "--install, --list, --remove, --remove-all en --version nemen geen andere "
 "argumenten"
 
-#: src/apk_starter/cli.py:479
+#: src/apk_starter/cli.py:483
 msgid "--purge only works with --remove or --remove-all"
 msgstr "--purge werkt alleen met --remove of --remove-all"
 
-#: src/apk_starter/cli.py:524
+#: src/apk_starter/cli.py:528
 msgid "no APK given and no display for the window"
 msgstr "geen APK opgegeven en geen beeldscherm voor het venster"
 
-#: src/apk_starter/cli.py:528
+#: src/apk_starter/cli.py:532
 msgid "no APK given"
 msgstr "geen APK opgegeven"
 
-#: src/apk_starter/cli.py:580
+#: src/apk_starter/cli.py:584
 #, python-brace-format
 msgid "cannot write {file}: {reason}"
 msgstr "kan {file} niet schrijven: {reason}"
 
-#: src/apk_starter/cli.py:624 src/apk_starter/cli.py:650
+#: src/apk_starter/cli.py:628 src/apk_starter/cli.py:654
 #, python-brace-format
 msgid "the Android runtime could not be prepared in advance: {reason}"
 msgstr "de Android-runtime kon niet vooraf worden voorbereid: {reason}"
 
-#: src/apk_starter/cli.py:646 src/apk_starter/cli.py:741
+#: src/apk_starter/cli.py:650 src/apk_starter/cli.py:745
 msgid "Preparing…"
 msgstr "Voorbereiden…"
 
-#: src/apk_starter/cli.py:656 src/apk_starter/gui.py:1047
+#: src/apk_starter/cli.py:660 src/apk_starter/gui.py:1050
 msgid "Updating the menu entry…"
 msgstr "Menu-item bijwerken…"
 
-#: src/apk_starter/cli.py:659
+#: src/apk_starter/cli.py:663
 msgid "Preparing apps for this computer…"
 msgstr "Apps worden voorbereid voor deze computer…"
 
-#: src/apk_starter/cli.py:714
+#: src/apk_starter/cli.py:718
 #, python-brace-format
 msgid "{app} keeps its old menu entry: {reason}"
 msgstr "{app} houdt het oude menu-item: {reason}"
 
-#: src/apk_starter/cli.py:733 src/apk_starter/gui.py:917
+#: src/apk_starter/cli.py:737 src/apk_starter/gui.py:917
 #, python-brace-format
 msgid "{app} ended unexpectedly."
 msgstr "{app} is onverwacht gestopt."
 
-#: src/apk_starter/cli.py:733 src/apk_starter/gui.py:328
+#: src/apk_starter/cli.py:737 src/apk_starter/gui.py:328
 #: src/apk_starter/gui.py:554 src/apk_starter/gui.py:918
 #: src/apk_starter/install_request.py:83
 msgid "Close"
 msgstr "Sluiten"
 
-#: src/apk_starter/dexopt.py:169
+#: src/apk_starter/dexopt.py:170
 #, python-brace-format
 msgid "cannot run {program}: {reason}"
 msgstr "kan {program} niet uitvoeren: {reason}"
 
-#: src/apk_starter/dexopt.py:245
+#: src/apk_starter/dexopt.py:246
 msgid "Preparing the Android runtime for this computer…"
 msgstr "De Android-runtime wordt voorbereid voor deze computer…"
 
@@ -448,7 +457,7 @@ msgstr "atl-doctor pack kon niet starten: {reason}"
 msgid "atl-doctor pack failed, the recording stays in {folder}: {reason}"
 msgstr "atl-doctor pack is mislukt, de opname blijft in {folder}: {reason}"
 
-#: src/apk_starter/errors.py:31
+#: src/apk_starter/errors.py:36
 #, python-brace-format
 msgid "unexpected error: {error}"
 msgstr "onverwachte fout: {error}"
@@ -726,7 +735,7 @@ msgstr "Android-apps"
 msgid "Install APK"
 msgstr "APK installeren"
 
-#: src/apk_starter/gui.py:978 src/apk_starter/gui.py:1000
+#: src/apk_starter/gui.py:978 src/apk_starter/gui.py:1001
 #, python-brace-format
 msgid "{app} installed"
 msgstr "{app} geïnstalleerd"
@@ -743,20 +752,20 @@ msgstr "Niet nu"
 msgid "Installing…"
 msgstr "Installeren…"
 
-#: src/apk_starter/gui.py:983
+#: src/apk_starter/gui.py:984
 #, python-brace-format
 msgid "Cannot install {file}"
 msgstr "Kan {file} niet installeren"
 
-#: src/apk_starter/gui.py:1004
+#: src/apk_starter/gui.py:1006
 msgid "Cannot set up Aurora Store"
 msgstr "Aurora Store kan niet worden ingesteld"
 
-#: src/apk_starter/gui.py:1005
+#: src/apk_starter/gui.py:1007
 msgid "Set up Aurora Store?"
 msgstr "Aurora Store instellen?"
 
-#: src/apk_starter/gui.py:1006
+#: src/apk_starter/gui.py:1008
 msgid ""
 "Free apps from Google Play. Downloaded from F-Droid and checked.\n"
 "\n"
@@ -766,34 +775,34 @@ msgstr ""
 "\n"
 "Meld je anoniem aan: Google kan je eigen account blokkeren."
 
-#: src/apk_starter/gui.py:1008 src/apk_starter/gui.py:1027
-#: src/apk_starter/gui.py:1032 src/apk_starter/install_request.py:29
+#: src/apk_starter/gui.py:1010 src/apk_starter/gui.py:1030
+#: src/apk_starter/gui.py:1035 src/apk_starter/install_request.py:29
 #: src/apk_starter/install_request.py:144
 msgid "Cancel"
 msgstr "Annuleren"
 
-#: src/apk_starter/gui.py:1008 src/apk_starter/gui.py:1027
+#: src/apk_starter/gui.py:1010 src/apk_starter/gui.py:1030
 #: src/apk_starter/install_request.py:90
 msgid "Set up"
 msgstr "Instellen"
 
-#: src/apk_starter/gui.py:1017
+#: src/apk_starter/gui.py:1019
 msgid "microG is set up"
 msgstr "microG is ingesteld"
 
-#: src/apk_starter/gui.py:1018 src/apk_starter/microg.py:98
+#: src/apk_starter/gui.py:1020 src/apk_starter/microg.py:98
 msgid "Downloading microG…"
 msgstr "microG downloaden…"
 
-#: src/apk_starter/gui.py:1020
+#: src/apk_starter/gui.py:1023
 msgid "Cannot set up microG"
 msgstr "Kan microG niet instellen"
 
-#: src/apk_starter/gui.py:1024
+#: src/apk_starter/gui.py:1027
 msgid "Set up microG?"
 msgstr "microG instellen?"
 
-#: src/apk_starter/gui.py:1025 src/apk_starter/install_request.py:89
+#: src/apk_starter/gui.py:1028 src/apk_starter/install_request.py:89
 msgid ""
 "Google services for apps (push messages, sign-in). Downloaded from the "
 "official microG repository and checked."
@@ -801,12 +810,12 @@ msgstr ""
 "Google-diensten voor apps (pushberichten, aanmelden). Gedownload uit de "
 "officiële microG-repository en gecontroleerd."
 
-#: src/apk_starter/gui.py:1037
+#: src/apk_starter/gui.py:1040
 #, python-brace-format
 msgid "Delete the data of {app}?"
 msgstr "Gegevens van {app} wissen?"
 
-#: src/apk_starter/gui.py:1038
+#: src/apk_starter/gui.py:1041
 msgid ""
 "The app stays installed. Its settings, accounts and files are deleted. Close "
 "the app first."
@@ -814,56 +823,56 @@ msgstr ""
 "De app blijft geïnstalleerd. De instellingen, accounts en bestanden worden "
 "gewist. Sluit eerst de app."
 
-#: src/apk_starter/gui.py:1039
+#: src/apk_starter/gui.py:1042
 msgid "Delete Data"
 msgstr "Gegevens wissen"
 
-#: src/apk_starter/gui.py:1040
+#: src/apk_starter/gui.py:1043
 msgid "Deleting data…"
 msgstr "Gegevens wissen…"
 
-#: src/apk_starter/gui.py:1041
+#: src/apk_starter/gui.py:1044
 #, python-brace-format
 msgid "Cannot delete the data of {app}"
 msgstr "Kan de gegevens van {app} niet wissen"
 
-#: src/apk_starter/gui.py:1048
+#: src/apk_starter/gui.py:1051
 #, python-brace-format
 msgid "Cannot change the menu entry of {app}"
 msgstr "Kan het menu-item van {app} niet wijzigen"
 
-#: src/apk_starter/gui.py:1052 src/apk_starter/install_request.py:144
+#: src/apk_starter/gui.py:1055 src/apk_starter/install_request.py:144
 msgid "Also delete app data"
 msgstr "Ook appgegevens wissen"
 
-#: src/apk_starter/gui.py:1059
+#: src/apk_starter/gui.py:1062
 #, python-brace-format
 msgid "{app} uninstalled"
 msgstr "{app} verwijderd"
 
-#: src/apk_starter/gui.py:1060 src/apk_starter/install_request.py:144
+#: src/apk_starter/gui.py:1063 src/apk_starter/install_request.py:144
 #, python-brace-format
 msgid "Uninstall {app}?"
 msgstr "{app} verwijderen?"
 
-#: src/apk_starter/gui.py:1061
+#: src/apk_starter/gui.py:1064
 msgid "The app and its menu entry are removed. Close the app first."
 msgstr "De app en het menu-item worden verwijderd. Sluit eerst de app."
 
-#: src/apk_starter/gui.py:1061 src/apk_starter/install_request.py:144
+#: src/apk_starter/gui.py:1064 src/apk_starter/install_request.py:144
 msgid "Uninstall"
 msgstr "Verwijderen"
 
-#: src/apk_starter/gui.py:1062
+#: src/apk_starter/gui.py:1065
 msgid "Uninstalling…"
 msgstr "Verwijderen…"
 
-#: src/apk_starter/gui.py:1064
+#: src/apk_starter/gui.py:1067
 #, python-brace-format
 msgid "Cannot uninstall {app}"
 msgstr "Kan {app} niet verwijderen"
 
-#: src/apk_starter/gui.py:1208
+#: src/apk_starter/gui.py:1220
 msgid "Without a sandbox"
 msgstr "Zonder sandbox"
 
@@ -1092,16 +1101,16 @@ msgstr "Fysieke activiteit"
 msgid "Notifications"
 msgstr "Meldingen"
 
-#: src/apk_starter/portal.py:114
+#: src/apk_starter/portal.py:118
 #, python-brace-format
 msgid "portal call {method} failed: {reason}"
 msgstr "portaalaanroep {method} mislukt: {reason}"
 
-#: src/apk_starter/portal.py:139
+#: src/apk_starter/portal.py:143
 msgid "portal did not answer"
 msgstr "het portaal antwoordde niet"
 
-#: src/apk_starter/portal.py:186
+#: src/apk_starter/portal.py:190
 msgid "menu entry not created (cancelled)"
 msgstr "menu-item niet aangemaakt (geannuleerd)"
 
@@ -1131,41 +1140,50 @@ msgstr "android-translation-layer niet gevonden"
 msgid "cannot start android-translation-layer: {reason}"
 msgstr "kan android-translation-layer niet starten: {reason}"
 
-#: src/apk_starter/splits.py:49
+#: src/apk_starter/splits.py:56
 #, python-brace-format
 msgid "no APK in {file}"
 msgstr "geen APK in {file}"
 
-#: src/apk_starter/splits.py:51
+#: src/apk_starter/splits.py:58
 #, python-brace-format
 msgid "too many parts in {file}"
 msgstr "te veel delen in {file}"
 
-#: src/apk_starter/splits.py:91
+#: src/apk_starter/splits.py:98
 #, python-brace-format
 msgid "invalid split name in {file}"
 msgstr "ongeldige deelnaam in {file}"
 
-#: src/apk_starter/splits.py:104
+#: src/apk_starter/splits.py:111
 #, python-brace-format
 msgid "the parts belong to different apps: {a} and {b}"
 msgstr "de delen horen bij verschillende apps: {a} en {b}"
 
-#: src/apk_starter/splits.py:108
+#: src/apk_starter/splits.py:115
 #, python-brace-format
 msgid "more than one base APK: {a} and {b}"
 msgstr "meer dan één basis-APK: {a} en {b}"
 
-#: src/apk_starter/splits.py:113
+#: src/apk_starter/splits.py:120
 #, python-brace-format
 msgid "the part {split} is there twice"
 msgstr "het deel {split} is er twee keer"
 
-#: src/apk_starter/splits.py:116
+#: src/apk_starter/splits.py:123
 msgid "no base APK among the files (only configuration parts)"
 msgstr "geen basis-APK tussen de bestanden (alleen configuratiedelen)"
 
-#: src/apk_starter/splits.py:134
+#: src/apk_starter/splits.py:164
+#, python-brace-format
+msgid ""
+"{app} contains program code only for 32-bit x86 or ARM processors, which is "
+"not supported."
+msgstr ""
+"{app} bevat alleen programmacode voor 32-bits x86- of ARM-processors, en dat "
+"wordt niet ondersteund."
+
+#: src/apk_starter/splits.py:166
 #, python-brace-format
 msgid ""
 "{app} contains program code only for ARM processors and does not run on this "
@@ -1204,13 +1222,3 @@ msgstr ""
 #, python-brace-format
 #~ msgid "no log: cannot write {file}: {reason}"
 #~ msgstr "geen logboek: kan niet schrijven naar {file}: {reason}"
-
-#: src/apk_starter/cli.py:241
-#, python-brace-format
-msgid "{app} contains program code only for ARM processors: it runs translated, which is slower."
-msgstr "{app} bevat alleen programmacode voor ARM-processors: de app draait vertaald en daardoor langzamer."
-
-#: src/apk_starter/splits.py
-#, python-brace-format
-msgid "{app} contains program code only for 32-bit x86 or ARM processors, which is not supported."
-msgstr "{app} bevat alleen programmacode voor 32-bits x86- of ARM-processors, en dat wordt niet ondersteund."
