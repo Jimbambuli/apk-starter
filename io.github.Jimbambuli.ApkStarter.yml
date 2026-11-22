@@ -149,7 +149,7 @@ modules:
       - type: git
         url: https://github.com/Jimbambuli/bionic_translation.git
         branch: fix-r5
-        commit: fa000915eadf7fa221493b105227ef88fe1f2f16
+        commit: 5b784f368ab0da916eaa780c46007016de75121a
 
   # OpenSL ES of the ATL project, fork branch fix-r1 (OutputMix interface, PCM_EX float and play position, no pending seek without SL_IID_SEEK) (SDL2 + libsndfile from the runtime): native app libraries that open
   # libOpenSLES.so (e.g. WhatsApp's libwhatsapp.so needs slCreateEngine).
@@ -179,7 +179,7 @@ modules:
       - type: git
         url: https://github.com/Jimbambuli/art_standalone.git
         branch: fix-r12
-        commit: 33933a59b56c5092fa100ad855c336b50f612c69
+        commit: 4b38f82bf846b8d59b006289bc3d8ff9d0d68e7b
       - type: git
         url: https://github.com/Jimbambuli/atl-doctor.git
         branch: r094
@@ -249,7 +249,7 @@ modules:
       - type: git
         url: https://github.com/Jimbambuli/android_translation_layer.git
         branch: fix-r22
-        commit: 5eb0ac1f7939f214326b9e31047ecc2bf52f99fb
+        commit: c8d7e3683eb34a68536ba6345f77fae2d6d79ea1
 
   # atl-doctor (public, fixed commit): JVMTI agent and trace counter for Log/Debug, its Python package for the
   # Debug recorder and packer (`atl-doctor pack`), and the stub list of exactly this ATL (for stub hits). The whole
@@ -275,7 +275,7 @@ modules:
         commit: 24d82bc43552a8cf0e3c369f171472e0100a98cd
       - type: git
         url: https://github.com/Jimbambuli/android_translation_layer.git
-        commit: 5eb0ac1f7939f214326b9e31047ecc2bf52f99fb
+        commit: c8d7e3683eb34a68536ba6345f77fae2d6d79ea1
         dest: atl-src
 
   - name: apk-starter
