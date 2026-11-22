@@ -136,6 +136,24 @@ modules:
         branch: fix-r1
         commit: 4f97c5ce801c3e8a60eebd935e13bb6d10e57c0a
 
+  # aarch64 only: ART's arm/arm64 code generators and disassembler link the system libvixl (art_standalone 7323f7f8,
+  # headers under $C_INCLUDE_PATH/vixl). Not in the SDK; VIXL has only SCons, so plain g++ over its sources.
+  - name: vixl
+    only-arches:
+      - aarch64
+    buildsystem: simple
+    build-commands:
+      - g++ -std=c++17 -O2 -fPIC -shared -DVIXL_CODE_BUFFER_MMAP -Isrc -o libvixl.so src/*.cc src/aarch32/*.cc src/aarch64/*.cc
+      - install -Dm755 libvixl.so /app/lib/libvixl.so
+      - cd src && find . -name '*.h' -exec install -Dm644 {} /app/include/vixl/{} \;
+    sources:
+      - type: git
+        url: https://github.com/Linaro/vixl.git
+        tag: 7.0.0
+        commit: ea4fb65498a8b2a3ef219b3a6ec23b0c3b50c8cd
+    cleanup:
+      - /include
+
   - name: art_standalone
     buildsystem: simple
     build-options:
