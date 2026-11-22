@@ -162,8 +162,9 @@ class Sandbox:
 
     def command(self, cmd: list[str], env: Mapping[str, str]) -> list[str]:
         rw, ro, rw_try, ro_try = self.exposed()
-        out = [SPAWN, "--sandbox", "--watch-bus", "--sandbox-flag=share-display", "--sandbox-flag=share-sound",
-               "--sandbox-flag=share-gpu"]
+        # the working directory: the app's own folder (the Starter's may not exist in the app's sandbox)
+        out = [SPAWN, "--sandbox", "--watch-bus", f"--directory={self.paths.data(self.pkg)}",
+               "--sandbox-flag=share-display", "--sandbox-flag=share-sound", "--sandbox-flag=share-gpu"]
         out += [f"--sandbox-expose-path={x}" for x in [*rw, self.relay]]
         if self._proxy is not None:
             out.append(f"--sandbox-expose-path={self.bus}")
