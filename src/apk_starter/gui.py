@@ -188,6 +188,8 @@ class Window(Gtk.ApplicationWindow):
                                           tooltip_text=_("Add apps"))
         self.welcome_main = Gtk.MenuButton(menu_model=main_menu, icon_name="open-menu-symbolic",
                                            tooltip_text=_("Main menu"))
+        for button in (sort, install, main, self.welcome_add, self.welcome_main):
+            button.get_popover().set_has_arrow(False)       # a plain menu under the button, no speech-bubble arrow
         self.welcome_bar.append(self.welcome_add)
         self.welcome_bar.append(self.welcome_main)
         detail_side.append(self.welcome_bar)
