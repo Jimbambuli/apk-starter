@@ -12,8 +12,8 @@ TREE=$(realpath "$1"); OUT=$(realpath "$2")
 
 # project path, commit
 PINNED=(
-	"frameworks/libs/binary_translation a28dbbd"
-	"digitalis 8ea2025"
+	"frameworks/libs/binary_translation e199616"
+	"digitalis 81c34d5"
 )
 # project files with the licences of what the bundle contains
 NOTICES=(
@@ -53,6 +53,9 @@ bash digitalis/scripts/build-and-package-prebuilts.sh --collect-only --username 
 bash digitalis/scripts/verify-digitalis-prebuilts.sh
 
 PKG=digitalis/dist/digitalis-prebuilts
+# the host side (libberberis_arm64.so, the proxies) needs the platform's libc++ next to it: on a device it is in
+# /system/lib64, on a glibc host with bionic_translation nothing else provides it
+cp "$(get_build_var PRODUCT_OUT)/system/lib64/libc++.so" "$PKG/system/lib64/"
 mkdir -p "$PKG/NOTICES"
 for f in "${NOTICES[@]}"; do cp "$f" "$PKG/NOTICES/$(echo "$f" | tr / _)"; done
 "${REPO:-repo}" manifest -r > "$PKG/BUILD-INFO"
