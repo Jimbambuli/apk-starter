@@ -127,3 +127,65 @@ def test_setup_without_portal_still_installs_both(box, tmp_path, monkeypatch, ca
     assert main(["--setup-microg"], env=box.env) == 1
     assert microg.installed(Paths.from_env(box.env))
     assert f"flatpak run io.github.Jimbambuli.ApkStarter {GMS}" in capsys.readouterr().err
+
+
+def _flaky(monkeypatch, bodies):
+    """fetch serving the index bodies in turn (a body of None raises IncompleteDownload); sleeping is skipped."""
+    monkeypatch.setattr(microg.time, "sleep", lambda _s: None)
+    calls = []
+
+    def fetch(url, limit, sink):
+        calls.append(url)
+        body = bodies[len(calls) - 1]
+        if body is None:
+            raise microg.IncompleteDownload("cut")
+        sink(body)
+    return fetch, calls
+
+
+GOOD = json.dumps({"packages": {GSF: [{"apkName": "a.apk", "hash": "0" * 64, "hashType": "sha256",
+                                       "versionCode": 8}]}}).encode()
+
+
+def test_cut_off_index_is_fetched_again(monkeypatch):
+    fetch, calls = _flaky(monkeypatch, [GOOD[:50], None, GOOD])
+    assert microg._entry(microg._index(fetch), GSF)["code"] == 8
+    assert len(calls) == 3
+
+
+def test_index_always_cut_off_says_incomplete_not_missing(monkeypatch, tmp_path):
+    fetch, calls = _flaky(monkeypatch, [GOOD[:50]] * 3)
+    with pytest.raises(StarterError, match="downloaded incompletely"):
+        microg.download(GSF, tmp_path / "x.apk", fetch)
+    assert len(calls) == 3
+
+
+def test_complete_index_without_the_package_still_says_no_usable_version(monkeypatch, tmp_path):
+    fetch, calls = _flaky(monkeypatch, [b'{"packages": {}}'])
+    with pytest.raises(StarterError, match="no usable version"):
+        microg.download(GSF, tmp_path / "x.apk", fetch)
+    assert len(calls) == 1
+
+
+def test_get_notices_a_short_body():
+    import http.server
+    import threading
+
+    from apk_starter import aurora
+
+    class H(http.server.BaseHTTPRequestHandler):
+        def do_GET(self):
+            self.send_response(200)
+            self.send_header("Content-Length", "100")
+            self.end_headers()
+            self.wfile.write(b"x" * 40)
+
+        def log_message(self, *a):
+            pass
+    srv = http.server.HTTPServer(("127.0.0.1", 0), H)
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    try:
+        with pytest.raises(aurora.IncompleteDownload):
+            aurora._get(f"http://127.0.0.1:{srv.server_port}/", 1000, lambda _c: None)
+    finally:
+        srv.shutdown()

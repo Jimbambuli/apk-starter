@@ -10,13 +10,14 @@ import hashlib
 import json
 import os
 import re
+import time
 import urllib.error
 from collections.abc import Callable, Mapping
 from pathlib import Path
 
 from . import apksig
 from .apkinfo import ApkInfo, read_apk_info
-from .aurora import _get
+from .aurora import IncompleteDownload, _get
 from .errors import StarterError
 from .i18n import _
 from .paths import Paths
@@ -53,15 +54,32 @@ def _entry(index: bytes, pkg: str) -> dict:
     return {"apk": name, "sha256": digest, "code": code}
 
 
+INDEX_TRIES = 3
+
+
+def _index(fetch: Callable[[str, int, Callable[[bytes], None]], None]) -> bytes:
+    """The repository index, complete: a cut-off download (connection closed early, or JSON that does not parse) is
+    fetched again, up to INDEX_TRIES times, and then reported as incomplete, not as a missing version."""
+    for attempt in range(INDEX_TRIES):
+        index = bytearray()
+        try:
+            fetch(INDEX, 8 << 20, index.extend)
+            json.loads(index)
+            return bytes(index)
+        except (IncompleteDownload, ValueError):    # ValueError: JSON cut off (UnicodeDecodeError is one too)
+            if attempt + 1 < INDEX_TRIES:
+                time.sleep(attempt + 1)
+    raise StarterError(_("the microG repository index was downloaded incompletely {tries} times; "
+                         "check the connection and try again").format(tries=INDEX_TRIES))
+
+
 def download(pkg: str, dest: Path, fetch: Callable[[str, int, Callable[[bytes], None]], None] | None = None,
              signer: str = SIGNER) -> ApkInfo:
     """The newest APK of `pkg` from the microG repository into dest, checked: SHA-256 of the file (from the index,
     and pinned for GsfProxy), for GmsCore also the v2 signature by the NOGAPPS certificate, package name and version."""
     fetch = fetch or _get
     try:
-        index = bytearray()
-        fetch(INDEX, 8 << 20, index.extend)
-        entry = _entry(bytes(index), pkg)
+        entry = _entry(_index(fetch), pkg)
         digest = hashlib.sha256()
 
         def sink(chunk: bytes) -> None:

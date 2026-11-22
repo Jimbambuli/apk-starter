@@ -126,6 +126,13 @@ installed app uses Google Play Services (its manifest has the meta-data `com.goo
 is missing, APK Starter asks once whether to set it up. Every app then shares microG's data. In «microG settings» switch on «Google device registration» and «Cloud
 Messaging»; to sign in: Accounts → Add Google account.
 
+Apps that ask Google Play Services for the position get it from microG's network location, and that works only with
+an online location service switched on in «microG settings» → Location (BeaconDB or Positon; both are off by
+default). microG then sends the Wi-Fi networks around you (their addresses, names, signal strength and frequency, as
+apps get them from Wi-Fi, see «Permissions») to that service, which works out the position; the service also sees
+your IP address and so learns where you are. Networks whose name ends in `_nomap` are left out. The desktop's own
+location (portal) does not reach microG.
+
 Without the alias use `flatpak run --file-forwarding io.github.Jimbambuli.ApkStarter …` instead of `apk-starter`.
 Double-clicking an APK in the file manager and starting an installed app from the menu work without any command.
 
@@ -201,6 +208,16 @@ not listed.
 
 For the apps' media in the desktop's media controls and its media keys (MPRIS), APK Starter may own the D-Bus names
 `org.mpris.MediaPlayer2.*` (`--own-name`).
+
+For Wi-Fi (`--system-talk-name=org.freedesktop.NetworkManager`), the apps get what Android's WifiManager gives: the
+networks around you from NetworkManager's scans (name, address, signal, channel, security), the connected network and
+whether Wi-Fi is on; an app may ask NetworkManager to scan (the desktop's polkit decides). Like on Android, only apps
+that have the location permission see the networks, because they tell where you are: microG, for example, can send
+them to an online service (BeaconDB, if you choose it in microG's location settings) to find your position. The
+permission is not limited to reading: an app's native code could also call NetworkManager's other functions that
+polkit allows your session (e.g. switch Wi-Fi off). Without it (`flatpak override --user
+--system-no-talk-name=org.freedesktop.NetworkManager io.github.Jimbambuli.ApkStarter`) the apps see Wi-Fi
+switched off.
 
 Without them (e.g. `flatpak override --user --nofilesystem=xdg-config/gtk-4.0 io.github.Jimbambuli.ApkStarter`) everything
 works with GTK's default theme in the desktop's light or dark variant.

@@ -24,6 +24,9 @@ finish-args:
   - --own-name=org.mpris.MediaPlayer2.*
   # accounts of microG (ATL's AccountManager) in the desktop's secret store (libsecret)
   - --talk-name=org.freedesktop.secrets
+  # Wi-Fi for the apps (ATL's WifiManager): scan results, connection and radio state from NetworkManager, scan
+  # requests (polkit org.freedesktop.NetworkManager.wifi.scan); without it the apps see Wi-Fi switched off
+  - --system-talk-name=org.freedesktop.NetworkManager
   # «Open with» an app for a file in the standard folders: the menu entry gets the path, not a portal document (the
   # DynamicLauncher portal writes no --file-forwarding); read only, saving goes through the file chooser portal.
   # Downloads is writable: apps save there through MediaStore.Downloads as on Android
