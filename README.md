@@ -216,8 +216,8 @@ that have the location permission see the networks, because they tell where you 
 them to an online service (BeaconDB, if you choose it in microG's location settings) to find your position. The
 permission is not limited to reading: an app's native code could also call NetworkManager's other functions that
 polkit allows your session (e.g. switch Wi-Fi off). Without it (`flatpak override --user
---system-no-talk-name=org.freedesktop.NetworkManager io.github.Jimbambuli.ApkStarter`) the apps see a device without
-Wi-Fi.
+--system-no-talk-name=org.freedesktop.NetworkManager io.github.Jimbambuli.ApkStarter`) the apps see Wi-Fi
+switched off.
 
 Without them (e.g. `flatpak override --user --nofilesystem=xdg-config/gtk-4.0 io.github.Jimbambuli.ApkStarter`) everything
 works with GTK's default theme in the desktop's light or dark variant.
