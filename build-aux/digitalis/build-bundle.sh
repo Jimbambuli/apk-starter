@@ -56,6 +56,16 @@ PKG=digitalis/dist/digitalis-prebuilts
 # the host side (libberberis_arm64.so, the proxies) needs the platform's libc++ next to it: on a device it is in
 # /system/lib64, on a glibc host with bionic_translation nothing else provides it
 cp "$(get_build_var PRODUCT_OUT)/system/lib64/libc++.so" "$PKG/system/lib64/"
+cp digitalis/LICENSE "$PKG/LICENSE"
+cat > "$PKG/NOTICE" <<NOTICE
+Digitalis bundle for APK Starter (ATL native bridge for arm64-v8a apps on x86_64)
+
+Digitalis: https://github.com/DigitalisX64/digitalis, licensed under the Apache License 2.0 (LICENSE).
+Built from the Android Open Source Project (Berberis binary translator, native_bridge_support, bionic and
+the libraries in system/lib64/arm64) with the changes in https://github.com/Jimbambuli/digitalis and
+https://github.com/Jimbambuli/platform_frameworks_libs_binary_translation, branch atl-digitalis-3.
+Exact source revisions: BUILD-INFO. Licences of the projects the files are built from: NOTICES/.
+NOTICE
 mkdir -p "$PKG/NOTICES"
 for f in "${NOTICES[@]}"; do cp "$f" "$PKG/NOTICES/$(echo "$f" | tr / _)"; done
 "${REPO:-repo}" manifest -r > "$PKG/BUILD-INFO"
