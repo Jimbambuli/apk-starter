@@ -209,8 +209,8 @@ modules:
       - cp NOTICES/* BUILD-INFO README.md /app/share/licenses/digitalis/
     sources:
       - type: archive
-        url: https://github.com/Jimbambuli/apk-starter/releases/download/digitalis-a28dbbd/digitalis-bundle-a28dbbd.tar.gz
-        sha256: 8f19653f64ec7619008715b178954c3902b5d1fef190a74eb5645566fa7b5bd6
+        url: https://github.com/Jimbambuli/apk-starter/releases/download/digitalis-e199616/digitalis-bundle-e199616.tar.gz
+        sha256: 890a14118cb6d9bf255a66bc42e6dc1b806e10be0f012d93c85b987bab3495dc
 
   - name: android_translation_layer
     buildsystem: meson
