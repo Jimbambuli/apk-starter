@@ -1,5 +1,6 @@
 """«Set up Aurora Store»: the official Aurora Store APK from F-Droid, checked against Aurora's signing certificate,
 installed like any app. Aurora Store is not part of the Flatpak (Spec 15)."""
+import http.client
 import json
 import urllib.error
 import urllib.request
@@ -22,15 +23,26 @@ MAX_SIZE = 100 << 20
 TIMEOUT = 60
 
 
+class IncompleteDownload(ConnectionError):
+    """The server closed the connection before the announced number of bytes arrived."""
+
+
 def _get(url: str, limit: int, sink) -> None:
     req = urllib.request.Request(url, headers={"User-Agent": "apk-starter"})
     with urllib.request.urlopen(req, timeout=TIMEOUT) as r:
         total = 0
-        while chunk := r.read(1 << 16):
-            total += len(chunk)
-            if total > limit:
-                raise StarterError(_("the download is larger than expected: {url}").format(url=url))
-            sink(chunk)
+        try:
+            while chunk := r.read(1 << 16):
+                total += len(chunk)
+                if total > limit:
+                    raise StarterError(_("the download is larger than expected: {url}").format(url=url))
+                sink(chunk)
+        except http.client.IncompleteRead:
+            raise IncompleteDownload(_("the download ended early ({got} bytes received)").format(got=total)) from None
+        expected = r.headers.get("Content-Length")
+        if expected and expected.isdigit() and total < int(expected):
+            raise IncompleteDownload(_("the download ended early ({got} of {expected} bytes)").format(
+                got=total, expected=expected))
 
 
 def latest_version(fetch: Callable[[str, int, Callable[[bytes], None]], None] | None = None) -> int:
