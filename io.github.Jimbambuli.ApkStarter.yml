@@ -32,10 +32,6 @@ finish-args:
   - --filesystem=xdg-documents:ro
   - --filesystem=xdg-music:ro
   - --filesystem=xdg-videos:ro
-  # Digitalis (module digitalis, x86_64 builds): its system tree is in /app/lib/digitalis, not in /system, and it
-  # runs on glibc with bionic_translation as the bionic layer; without the module (aarch64) nothing reads these
-  - --env=BERBERIS_SYSTEM_ROOT=/app/lib/digitalis
-  - --env=BERBERIS_FLAGS=glibc-host-thread-id-handoff
 build-options:
   append-path: /usr/lib/sdk/openjdk21/bin
   env:

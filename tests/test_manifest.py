@@ -51,10 +51,7 @@ def test_finish_args_exact():
                              # MediaStore.Downloads
                              "--filesystem=xdg-download", "--filesystem=xdg-pictures:ro",
                              "--filesystem=xdg-documents:ro", "--filesystem=xdg-music:ro",
-                             "--filesystem=xdg-videos:ro",
-                             # Digitalis (x86_64): its system tree outside /system, glibc host with bionic layer
-                             "--env=BERBERIS_SYSTEM_ROOT=/app/lib/digitalis",
-                             "--env=BERBERIS_FLAGS=glibc-host-thread-id-handoff"}
+                             "--filesystem=xdg-videos:ro"}
 
 
 def test_all_git_sources_pinned():
