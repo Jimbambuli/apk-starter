@@ -5,6 +5,7 @@ The exit status is the PackageInstaller status ATL hands back to the app: 0 inst
 4 not a valid APK, 5 conflict (signed by another certificate than the installed app), 7 incompatible (no x86_64
 code), 1 other failure; the last line on stderr is its message."""
 import os
+import re
 import sys
 from collections.abc import Mapping
 from pathlib import Path
@@ -95,6 +96,12 @@ def wants_microg(paths: Paths, info: ApkInfo) -> bool:
     return info.uses_gms and info.package not in microg.SERVICES and not microg.installed(paths)
 
 
+def store_package(env: Mapping[str, str]) -> str | None:
+    """The package of the store that asks (ATL_INSTALLER_PACKAGE), if it is a package name."""
+    pkg = env.get("ATL_INSTALLER_PACKAGE", "")
+    return pkg if re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*(\.[A-Za-z][A-Za-z0-9_]*)+", pkg) else None
+
+
 def run(paths: Paths, env: Mapping[str, str], files: list[Path]) -> int:
     from .cli import check_signer, install_parts, lang_from_env, parts_dir, read_parts
     installer = env.get("ATL_INSTALLER_LABEL") or env.get("ATL_INSTALLER_PACKAGE") or _("An app")
@@ -108,7 +115,7 @@ def run(paths: Paths, env: Mapping[str, str], files: list[Path]) -> int:
                 _say(_("Installation of {app} cancelled").format(app=info.label))
                 return STATUS_ABORTED
             try:
-                install_parts(paths, info, parts.splits, lang, env)
+                install_parts(paths, info, parts.splits, lang, env, installer=store_package(env))
             except StarterError as e:
                 if not paths.meta(info.package).is_file():
                     raise

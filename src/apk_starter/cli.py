@@ -145,7 +145,10 @@ def check_signer(paths: Paths, info: ApkInfo) -> None:
         raise SignatureConflict(_("Different signature – not installed"))
 
 
-def install_app(paths: Paths, info: ApkInfo, parts: tuple[tuple[str, Path], ...] = ()) -> None:
+def install_app(paths: Paths, info: ApkInfo, parts: tuple[tuple[str, Path], ...] = (),
+                installer: str | None = None) -> None:
+    """`installer`: the app store that installed the app through ATL (ATL_INSTALLER_PACKAGE); ATL reports it as
+    the app's installer (PackageManager.getInstallSourceInfo), as Android does. Installed by the user: none."""
     dest = paths.apk(info.package)
     paths.apps_dir().mkdir(parents=True, exist_ok=True)
     if not (dest.exists() and os.path.samefile(info.path, dest)):
@@ -160,6 +163,8 @@ def install_app(paths: Paths, info: ApkInfo, parts: tuple[tuple[str, Path], ...]
     meta = {"package": info.package, "label": info.label, "version_name": info.version_name,
             "version_code": info.version_code, "target_sdk": info.target_sdk, "desktop_id": _desktop_id(info.package),
             "share_types": list(info.share_types)}  # ATL's share sheet offers the app for these (ATLLoadedAppManager)
+    if installer:
+        meta["installer"] = installer               # ATLLoadedAppManager.recordedInstaller()
     _write_atomic(paths.meta(info.package), json.dumps(meta).encode("utf-8"))
 
 
@@ -245,11 +250,12 @@ def install_files(paths: Paths, files: list[Path], lang: str | None, env: Mappin
 
 def install_parts(paths: Paths, info: ApkInfo, parts: tuple[tuple[str, Path], ...], lang: str | None,
                   env: Mapping[str, str] | None, report: Callable[[str], None] = _stderr,
-                  warn: Callable[[str], None] = _stderr, flt: str = dexopt.FULL) -> ApkInfo:
+                  warn: Callable[[str], None] = _stderr, flt: str = dexopt.FULL,
+                  installer: str | None = None) -> ApkInfo:
     from . import portal
     with package_lock(paths, info.package):
         check_signer(paths, info)
-        install_app(paths, info, parts)
+        install_app(paths, info, parts, installer)
         with contextlib.suppress(OSError):          # the first start then needs not parse the APK (F182)
             cached_apk_info(paths, paths.apk(info.package), lang, lambda p, _l: dataclasses.replace(info, path=p))
         prepare_installed(paths, os.environ if env is None else env, info, report, warn, flt)

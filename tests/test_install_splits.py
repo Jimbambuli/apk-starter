@@ -76,6 +76,20 @@ def test_install_request_asks_first(box, monkeypatch, capsys, answer, code):
         assert capsys.readouterr().err.strip().splitlines()[-1].endswith("cancelled")
 
 
+def test_store_is_recorded_as_installer_until_the_user_installs(box, monkeypatch):
+    """ATL reports the store as the app's installer (getInstallSourceInfo); the user's own install records none."""
+    import json
+    monkeypatch.setattr(install_request, "ask", lambda *a: True)
+    meta = box.data / "apps" / f"{PKG}.json"
+    env = dict(box.env, ATL_INSTALLER_PACKAGE="com.android.vending", ATL_INSTALLER_LABEL="microG Companion")
+    assert main(["--install-request", *map(str, parts(box.tmp))], env=env) == 0
+    assert json.loads(meta.read_text())["installer"] == "com.android.vending"
+    assert main(["--install-request", *map(str, parts(box.tmp))], env=dict(env, ATL_INSTALLER_PACKAGE="../x")) == 0
+    assert "installer" not in json.loads(meta.read_text())
+    assert main(["--install", *map(str, parts(box.tmp))], env=box.env) == 0
+    assert "installer" not in json.loads(meta.read_text())
+
+
 def test_install_request_for_arm_only_app_does_not_ask(box, monkeypatch):
     monkeypatch.setattr(install_request, "ask", lambda *a: pytest.fail("asked"))
     told = []
