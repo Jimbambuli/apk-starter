@@ -143,7 +143,9 @@ modules:
       - aarch64
     buildsystem: simple
     build-commands:
-      - g++ -std=c++17 -O2 -fPIC -shared -DVIXL_CODE_BUFFER_MMAP -Isrc -o libvixl.so src/*.cc src/aarch32/*.cc src/aarch64/*.cc
+      # the SCons target options (a64, a32, t32, mmap) written into the header, so ART sees the same ones
+      - printf '%s\n' '#define VIXL_INCLUDE_TARGET_A64' '#define VIXL_INCLUDE_TARGET_A32' '#define VIXL_INCLUDE_TARGET_T32' '#define VIXL_CODE_BUFFER_MMAP' | cat - src/globals-vixl.h > g.h && mv g.h src/globals-vixl.h
+      - g++ -std=c++17 -O2 -fPIC -shared -Isrc -o libvixl.so src/*.cc src/aarch32/*.cc src/aarch64/*.cc
       - install -Dm755 libvixl.so /app/lib/libvixl.so
       - cd src && find . -name '*.h' -exec install -Dm644 {} /app/include/vixl/{} \;
     sources:
