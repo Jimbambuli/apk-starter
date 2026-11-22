@@ -1,5 +1,5 @@
 [wrap-git]
 directory = libopensles-standalone
 url = https://github.com/Jimbambuli/libopensles-standalone.git
-revision = 4f97c5ce801c3e8a60eebd935e13bb6d10e57c0a
+revision = 199c69eb0acaab023c51477ce9a84601d10e814e
 depth = 1

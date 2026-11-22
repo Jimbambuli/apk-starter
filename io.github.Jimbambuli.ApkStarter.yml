@@ -145,8 +145,8 @@ modules:
     sources:
       - type: git
         url: https://github.com/Jimbambuli/bionic_translation.git
-        branch: fix-r4
-        commit: b26d3383a75651a741d2410715e2cb621ac64bab
+        branch: fix-r5
+        commit: fa000915eadf7fa221493b105227ef88fe1f2f16
 
   # OpenSL ES of the ATL project, fork branch fix-r1 (OutputMix interface, PCM_EX float and play position, no pending seek without SL_IID_SEEK) (SDL2 + libsndfile from the runtime): native app libraries that open
   # libOpenSLES.so (e.g. WhatsApp's libwhatsapp.so needs slCreateEngine).
@@ -155,8 +155,8 @@ modules:
     sources:
       - type: git
         url: https://github.com/Jimbambuli/libopensles-standalone.git
-        branch: fix-r1
-        commit: 4f97c5ce801c3e8a60eebd935e13bb6d10e57c0a
+        branch: fix-r2
+        commit: 199c69eb0acaab023c51477ce9a84601d10e814e
 
   - name: art_standalone
     buildsystem: simple
@@ -175,12 +175,12 @@ modules:
     sources:
       - type: git
         url: https://github.com/Jimbambuli/art_standalone.git
-        branch: fix-r11
-        commit: 150a09e9dcdcea5f6b4fdc2d19f16591722d4337
+        branch: fix-r12
+        commit: 33933a59b56c5092fa100ad855c336b50f612c69
       - type: git
         url: https://github.com/Jimbambuli/atl-doctor.git
-        branch: popups
-        commit: 2f91d3a54f075592352de22a7c7417dcdbe6fa3f
+        branch: r094
+        commit: 24d82bc43552a8cf0e3c369f171472e0100a98cd
         dest: atl-doctor
 
   # ATL's jni_upcall_gen resolves asm/asm-tree/java-getopt via xmvn5-resolve or
@@ -245,8 +245,8 @@ modules:
     sources:
       - type: git
         url: https://github.com/Jimbambuli/android_translation_layer.git
-        branch: fix-r21
-        commit: 6e7dd5a677adda5dd8d71b481c1d0d2984e7fb46
+        branch: fix-r22
+        commit: 5eb0ac1f7939f214326b9e31047ecc2bf52f99fb
 
   # atl-doctor (public, fixed commit): JVMTI agent and trace counter for Log/Debug, its Python package for the
   # Debug recorder and packer (`atl-doctor pack`), and the stub list of exactly this ATL (for stub hits). The whole
@@ -268,11 +268,11 @@ modules:
     sources:
       - type: git
         url: https://github.com/Jimbambuli/atl-doctor.git
-        branch: popups
-        commit: 2f91d3a54f075592352de22a7c7417dcdbe6fa3f
+        branch: r094
+        commit: 24d82bc43552a8cf0e3c369f171472e0100a98cd
       - type: git
         url: https://github.com/Jimbambuli/android_translation_layer.git
-        commit: 6e7dd5a677adda5dd8d71b481c1d0d2984e7fb46
+        commit: 5eb0ac1f7939f214326b9e31047ecc2bf52f99fb
         dest: atl-src
 
   - name: apk-starter
