@@ -153,12 +153,12 @@ msgstr "下载内容比预期的大：{url}"
 #: src/apk_starter/aurora.py:41
 #, python-brace-format
 msgid "the download ended early ({got} bytes received)"
-msgstr ""
+msgstr "下载提前结束（已接收 {got} 字节）"
 
 #: src/apk_starter/aurora.py:44
 #, python-brace-format
 msgid "the download ended early ({got} of {expected} bytes)"
-msgstr ""
+msgstr "下载提前结束（{got} / {expected} 字节）"
 
 #: src/apk_starter/aurora.py:56 src/apk_starter/aurora.py:58
 msgid "F-Droid gave no version of Aurora Store"
@@ -290,25 +290,18 @@ msgid "Start Android apps (APK) with Android Translation Layer."
 msgstr "使用 Android Translation Layer 启动 Android 应用（APK）。"
 
 #: src/apk_starter/cli.py:418
-#, fuzzy
 msgid ""
 "record the app for atl-doctor: exceptions, ATL stub calls, time line, view "
 "trees, clicks and typed text, verbose log; afterwards one archive cleaned of "
 "personal data (default: logs/<package>-<time>.tar.gz); use --debug=DIR"
-msgstr ""
-"为 atl-doctor 记录应用：异常、ATL 桩调用、时间线、带截图的视图树、点击和输入"
-"的文字、详细日志；结束后生成一个已清除个人数据的归档（默认：logs/<包名>-<时间"
-">.tar.gz）；可用 --debug=文件夹"
+msgstr "为 atl-doctor 记录应用：异常、ATL 桩调用、时间线、视图树、点击和输入的文字、详细日志；结束后生成一个已清除个人数据的归档（默认：logs/<包名>-<时间>.tar.gz）；可用 --debug=文件夹"
 
 #: src/apk_starter/cli.py:422
-#, fuzzy
 msgid ""
 "like --debug, but the archive keeps everything in plain text, passwords and "
 "personal data and screenshots included (name ends in -FULL): do not pass it "
 "on"
-msgstr ""
-"与 --debug 相同，但归档以明文保存全部内容，包括密码和个人数据（名称以 -FULL "
-"结尾）：请勿转发"
+msgstr "与 --debug 相同，但归档以明文保存全部内容，包括密码、个人数据和截图（名称以 -FULL 结尾）：请勿转发"
 
 #: src/apk_starter/cli.py:424
 msgid "override the SDK level passed to ATL"
@@ -993,7 +986,7 @@ msgstr "microG 仓库没有列出 {package} 的可用版本"
 msgid ""
 "the microG repository index was downloaded incompletely {tries} times; check "
 "the connection and try again"
-msgstr ""
+msgstr "microG 软件源索引已 {tries} 次下载不完整；请检查网络连接后重试"
 
 #: src/apk_starter/microg.py:91
 #, python-brace-format

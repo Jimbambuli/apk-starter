@@ -161,12 +161,12 @@ msgstr "ダウンロードが想定より大きいです: {url}"
 #: src/apk_starter/aurora.py:41
 #, python-brace-format
 msgid "the download ended early ({got} bytes received)"
-msgstr ""
+msgstr "ダウンロードが途中で終了しました（{got} バイト受信）"
 
 #: src/apk_starter/aurora.py:44
 #, python-brace-format
 msgid "the download ended early ({got} of {expected} bytes)"
-msgstr ""
+msgstr "ダウンロードが途中で終了しました（{expected} バイト中 {got} バイト）"
 
 #: src/apk_starter/aurora.py:56 src/apk_starter/aurora.py:58
 msgid "F-Droid gave no version of Aurora Store"
@@ -305,26 +305,18 @@ msgid "Start Android apps (APK) with Android Translation Layer."
 msgstr "Android Translation Layer で Android アプリ (APK) を起動します。"
 
 #: src/apk_starter/cli.py:418
-#, fuzzy
 msgid ""
 "record the app for atl-doctor: exceptions, ATL stub calls, time line, view "
 "trees, clicks and typed text, verbose log; afterwards one archive cleaned of "
 "personal data (default: logs/<package>-<time>.tar.gz); use --debug=DIR"
-msgstr ""
-"atl-doctor 用にアプリを記録する: 例外、ATL スタブ呼び出し、タイムライン、スク"
-"リーンショット付きのビューツリー、クリックと入力したテキスト、詳細ログ。。終"
-"了後、個人情報を取り除いたアーカイブを 1 つ作成します（既定: logs/<パッケージ"
-">-<時刻>.tar.gz）。--debug=フォルダ も使えます"
+msgstr "atl-doctor 用にアプリを記録する: 例外、ATL スタブ呼び出し、タイムライン、ビューツリー、クリックと入力したテキスト、詳細ログ。終了後、個人情報を取り除いたアーカイブを 1 つ作成します（既定: logs/<パッケージ>-<時刻>.tar.gz）。--debug=フォルダ も使えます"
 
 #: src/apk_starter/cli.py:422
-#, fuzzy
 msgid ""
 "like --debug, but the archive keeps everything in plain text, passwords and "
 "personal data and screenshots included (name ends in -FULL): do not pass it "
 "on"
-msgstr ""
-"--debug と同じですが、アーカイブはパスワードや個人情報を含むすべてを平文のま"
-"ま保存します（名前は -FULL で終わります）: 他人に渡さないでください"
+msgstr "--debug と同じですが、アーカイブはパスワード、個人情報、スクリーンショットを含むすべてを平文のまま保存します（名前は -FULL で終わります）: 他人に渡さないでください"
 
 #: src/apk_starter/cli.py:424
 msgid "override the SDK level passed to ATL"
@@ -1025,7 +1017,7 @@ msgstr "microG リポジトリに {package} の使用可能なバージョンが
 msgid ""
 "the microG repository index was downloaded incompletely {tries} times; check "
 "the connection and try again"
-msgstr ""
+msgstr "microG リポジトリのインデックスのダウンロードが {tries} 回不完全に終わりました。接続を確認して、もう一度お試しください"
 
 #: src/apk_starter/microg.py:91
 #, python-brace-format

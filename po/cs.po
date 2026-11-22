@@ -161,12 +161,12 @@ msgstr "stahovaný soubor je větší, než se čekalo: {url}"
 #: src/apk_starter/aurora.py:41
 #, python-brace-format
 msgid "the download ended early ({got} bytes received)"
-msgstr ""
+msgstr "stahování skončilo předčasně (přijato {got} bajtů)"
 
 #: src/apk_starter/aurora.py:44
 #, python-brace-format
 msgid "the download ended early ({got} of {expected} bytes)"
-msgstr ""
+msgstr "stahování skončilo předčasně ({got} z {expected} bajtů)"
 
 #: src/apk_starter/aurora.py:56 src/apk_starter/aurora.py:58
 msgid "F-Droid gave no version of Aurora Store"
@@ -304,26 +304,18 @@ msgid "Start Android apps (APK) with Android Translation Layer."
 msgstr "Spouští aplikace pro Android (APK) pomocí Android Translation Layer."
 
 #: src/apk_starter/cli.py:418
-#, fuzzy
 msgid ""
 "record the app for atl-doctor: exceptions, ATL stub calls, time line, view "
 "trees, clicks and typed text, verbose log; afterwards one archive cleaned of "
 "personal data (default: logs/<package>-<time>.tar.gz); use --debug=DIR"
-msgstr ""
-"nahrát aplikaci pro atl-doctor: výjimky, volání stubů ATL, časová osa, "
-"stromy pohledů se snímkem obrazovky, kliknutí a zadaný text, podrobný "
-"protokol; poté jeden archiv očištěný od osobních údajů (výchozí: logs/"
-"<balíček>-<čas>.tar.gz); použijte --debug=SLOŽKA"
+msgstr "nahrát aplikaci pro atl-doctor: výjimky, volání stubů ATL, časová osa, stromy pohledů, kliknutí a zadaný text, podrobný protokol; poté jeden archiv očištěný od osobních údajů (výchozí: logs/<balíček>-<čas>.tar.gz); použijte --debug=SLOŽKA"
 
 #: src/apk_starter/cli.py:422
-#, fuzzy
 msgid ""
 "like --debug, but the archive keeps everything in plain text, passwords and "
 "personal data and screenshots included (name ends in -FULL): do not pass it "
 "on"
-msgstr ""
-"jako --debug, ale archiv ponechá vše čitelným textem, včetně hesel a "
-"osobních údajů (název končí na -FULL): nepředávat dál"
+msgstr "jako --debug, ale archiv ponechá vše čitelným textem, včetně hesel, osobních údajů a snímků obrazovky (název končí na -FULL): nepředávat dál"
 
 #: src/apk_starter/cli.py:424
 msgid "override the SDK level passed to ATL"
@@ -1024,7 +1016,7 @@ msgstr "repozitář microG neuvádí použitelnou verzi {package}"
 msgid ""
 "the microG repository index was downloaded incompletely {tries} times; check "
 "the connection and try again"
-msgstr ""
+msgstr "index repozitáře microG byl {tries}krát stažen neúplně; zkontrolujte připojení a zkuste to znovu"
 
 #: src/apk_starter/microg.py:91
 #, python-brace-format

@@ -162,12 +162,12 @@ msgstr "de download is groter dan verwacht: {url}"
 #: src/apk_starter/aurora.py:41
 #, python-brace-format
 msgid "the download ended early ({got} bytes received)"
-msgstr ""
+msgstr "de download is voortijdig gestopt ({got} bytes ontvangen)"
 
 #: src/apk_starter/aurora.py:44
 #, python-brace-format
 msgid "the download ended early ({got} of {expected} bytes)"
-msgstr ""
+msgstr "de download is voortijdig gestopt ({got} van {expected} bytes)"
 
 #: src/apk_starter/aurora.py:56 src/apk_starter/aurora.py:58
 msgid "F-Droid gave no version of Aurora Store"
@@ -306,26 +306,18 @@ msgid "Start Android apps (APK) with Android Translation Layer."
 msgstr "Android-apps (APK) starten met Android Translation Layer."
 
 #: src/apk_starter/cli.py:418
-#, fuzzy
 msgid ""
 "record the app for atl-doctor: exceptions, ATL stub calls, time line, view "
 "trees, clicks and typed text, verbose log; afterwards one archive cleaned of "
 "personal data (default: logs/<package>-<time>.tar.gz); use --debug=DIR"
-msgstr ""
-"de app opnemen voor atl-doctor: uitzonderingen, ATL-stubaanroepen, tijdlijn, "
-"weergavebomen met schermafbeelding, kliks en getypte tekst, uitgebreid "
-"logboek; daarna één archief, schoongemaakt van persoonlijke gegevens "
-"(standaard: logs/<pakket>-<tijd>.tar.gz); gebruik --debug=MAP"
+msgstr "de app opnemen voor atl-doctor: uitzonderingen, ATL-stubaanroepen, tijdlijn, weergavebomen, kliks en getypte tekst, uitgebreid logboek; daarna één archief, schoongemaakt van persoonlijke gegevens (standaard: logs/<pakket>-<tijd>.tar.gz); gebruik --debug=MAP"
 
 #: src/apk_starter/cli.py:422
-#, fuzzy
 msgid ""
 "like --debug, but the archive keeps everything in plain text, passwords and "
 "personal data and screenshots included (name ends in -FULL): do not pass it "
 "on"
-msgstr ""
-"zoals --debug, maar het archief bewaart alles in leesbare tekst, ook "
-"wachtwoorden en persoonlijke gegevens (naam eindigt op -FULL): niet doorgeven"
+msgstr "zoals --debug, maar het archief bewaart alles in leesbare tekst, ook wachtwoorden, persoonlijke gegevens en schermafbeeldingen (naam eindigt op -FULL): niet doorgeven"
 
 #: src/apk_starter/cli.py:424
 msgid "override the SDK level passed to ATL"
@@ -1028,7 +1020,7 @@ msgstr "de microG-repository vermeldt geen bruikbare versie van {package}"
 msgid ""
 "the microG repository index was downloaded incompletely {tries} times; check "
 "the connection and try again"
-msgstr ""
+msgstr "de index van de microG-repository is {tries} keer onvolledig gedownload; controleer de verbinding en probeer het opnieuw"
 
 #: src/apk_starter/microg.py:91
 #, python-brace-format

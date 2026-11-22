@@ -162,12 +162,12 @@ msgstr "завантаження більше, ніж очікувалося: {u
 #: src/apk_starter/aurora.py:41
 #, python-brace-format
 msgid "the download ended early ({got} bytes received)"
-msgstr ""
+msgstr "завантаження перервалося передчасно (отримано байтів: {got})"
 
 #: src/apk_starter/aurora.py:44
 #, python-brace-format
 msgid "the download ended early ({got} of {expected} bytes)"
-msgstr ""
+msgstr "завантаження перервалося передчасно ({got} з {expected} байтів)"
 
 #: src/apk_starter/aurora.py:56 src/apk_starter/aurora.py:58
 msgid "F-Droid gave no version of Aurora Store"
@@ -305,26 +305,18 @@ msgstr ""
 "Запуск Android-застосунків (APK) за допомогою Android Translation Layer."
 
 #: src/apk_starter/cli.py:418
-#, fuzzy
 msgid ""
 "record the app for atl-doctor: exceptions, ATL stub calls, time line, view "
 "trees, clicks and typed text, verbose log; afterwards one archive cleaned of "
 "personal data (default: logs/<package>-<time>.tar.gz); use --debug=DIR"
-msgstr ""
-"записати застосунок для atl-doctor: винятки, виклики заглушок ATL, часова "
-"шкала, дерева подань зі знімком екрана, клацання і введений текст, докладний "
-"журнал; потім один архів, очищений від особистих даних (типово: logs/<пакет>-"
-"<час>.tar.gz); використовуйте --debug=ТЕКА"
+msgstr "записати застосунок для atl-doctor: винятки, виклики заглушок ATL, часова шкала, дерева подань, клацання і введений текст, докладний журнал; потім один архів, очищений від особистих даних (типово: logs/<пакет>-<час>.tar.gz); використовуйте --debug=ТЕКА"
 
 #: src/apk_starter/cli.py:422
-#, fuzzy
 msgid ""
 "like --debug, but the archive keeps everything in plain text, passwords and "
 "personal data and screenshots included (name ends in -FULL): do not pass it "
 "on"
-msgstr ""
-"як --debug, але архів зберігає все відкритим текстом, зокрема паролі й "
-"особисті дані (назва закінчується на -FULL): не передавати далі"
+msgstr "як --debug, але архів зберігає все відкритим текстом, зокрема паролі, особисті дані й знімки екрана (назва закінчується на -FULL): не передавати далі"
 
 #: src/apk_starter/cli.py:424
 msgid "override the SDK level passed to ATL"
@@ -1027,7 +1019,7 @@ msgstr "репозиторій microG не містить придатної в�
 msgid ""
 "the microG repository index was downloaded incompletely {tries} times; check "
 "the connection and try again"
-msgstr ""
+msgstr "індекс репозиторію microG завантажено не повністю (спроб: {tries}); перевірте з'єднання і спробуйте ще раз"
 
 #: src/apk_starter/microg.py:91
 #, python-brace-format

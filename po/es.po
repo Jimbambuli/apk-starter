@@ -163,12 +163,12 @@ msgstr "la descarga es mayor de lo esperado: {url}"
 #: src/apk_starter/aurora.py:41
 #, python-brace-format
 msgid "the download ended early ({got} bytes received)"
-msgstr ""
+msgstr "la descarga terminó antes de tiempo ({got} bytes recibidos)"
 
 #: src/apk_starter/aurora.py:44
 #, python-brace-format
 msgid "the download ended early ({got} of {expected} bytes)"
-msgstr ""
+msgstr "la descarga terminó antes de tiempo ({got} de {expected} bytes)"
 
 #: src/apk_starter/aurora.py:56 src/apk_starter/aurora.py:58
 msgid "F-Droid gave no version of Aurora Store"
@@ -308,26 +308,18 @@ msgid "Start Android apps (APK) with Android Translation Layer."
 msgstr "Inicia aplicaciones Android (APK) con Android Translation Layer."
 
 #: src/apk_starter/cli.py:418
-#, fuzzy
 msgid ""
 "record the app for atl-doctor: exceptions, ATL stub calls, time line, view "
 "trees, clicks and typed text, verbose log; afterwards one archive cleaned of "
 "personal data (default: logs/<package>-<time>.tar.gz); use --debug=DIR"
-msgstr ""
-"grabar la app para atl-doctor: excepciones, llamadas a stubs de ATL, línea "
-"de tiempo, árboles de vistas con captura de pantalla, clics y texto escrito, "
-"registro detallado; después un archivo limpio de datos personales (por "
-"defecto: logs/<paquete>-<hora>.tar.gz); usar --debug=CARPETA"
+msgstr "grabar la app para atl-doctor: excepciones, llamadas a stubs de ATL, línea de tiempo, árboles de vistas, clics y texto escrito, registro detallado; después un archivo limpio de datos personales (por defecto: logs/<paquete>-<hora>.tar.gz); usar --debug=CARPETA"
 
 #: src/apk_starter/cli.py:422
-#, fuzzy
 msgid ""
 "like --debug, but the archive keeps everything in plain text, passwords and "
 "personal data and screenshots included (name ends in -FULL): do not pass it "
 "on"
-msgstr ""
-"como --debug, pero el archivo conserva todo en texto claro, también "
-"contraseñas y datos personales (el nombre termina en -FULL): no compartirlo"
+msgstr "como --debug, pero el archivo conserva todo en texto claro, también contraseñas, datos personales y capturas de pantalla (el nombre termina en -FULL): no compartirlo"
 
 #: src/apk_starter/cli.py:424
 msgid "override the SDK level passed to ATL"
@@ -1030,7 +1022,7 @@ msgstr ""
 msgid ""
 "the microG repository index was downloaded incompletely {tries} times; check "
 "the connection and try again"
-msgstr ""
+msgstr "el índice del repositorio de microG se descargó incompleto {tries} veces; comprueba la conexión y vuelve a intentarlo"
 
 #: src/apk_starter/microg.py:91
 #, python-brace-format

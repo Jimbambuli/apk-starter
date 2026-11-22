@@ -162,12 +162,12 @@ msgstr "pobierany plik jest większy niż oczekiwano: {url}"
 #: src/apk_starter/aurora.py:41
 #, python-brace-format
 msgid "the download ended early ({got} bytes received)"
-msgstr ""
+msgstr "pobieranie zakończyło się przedwcześnie (odebrano {got} bajtów)"
 
 #: src/apk_starter/aurora.py:44
 #, python-brace-format
 msgid "the download ended early ({got} of {expected} bytes)"
-msgstr ""
+msgstr "pobieranie zakończyło się przedwcześnie ({got} z {expected} bajtów)"
 
 #: src/apk_starter/aurora.py:56 src/apk_starter/aurora.py:58
 msgid "F-Droid gave no version of Aurora Store"
@@ -306,26 +306,18 @@ msgstr ""
 "Uruchamia aplikacje na Androida (APK) za pomocą Android Translation Layer."
 
 #: src/apk_starter/cli.py:418
-#, fuzzy
 msgid ""
 "record the app for atl-doctor: exceptions, ATL stub calls, time line, view "
 "trees, clicks and typed text, verbose log; afterwards one archive cleaned of "
 "personal data (default: logs/<package>-<time>.tar.gz); use --debug=DIR"
-msgstr ""
-"nagrać aplikację dla atl-doctor: wyjątki, wywołania stubów ATL, oś czasu, "
-"drzewa widoków ze zrzutem ekranu, kliknięcia i wpisany tekst, szczegółowy "
-"dziennik; potem jedno archiwum oczyszczone z danych osobowych (domyślnie: "
-"logs/<pakiet>-<czas>.tar.gz); użyj --debug=FOLDER"
+msgstr "nagrać aplikację dla atl-doctor: wyjątki, wywołania stubów ATL, oś czasu, drzewa widoków, kliknięcia i wpisany tekst, szczegółowy dziennik; potem jedno archiwum oczyszczone z danych osobowych (domyślnie: logs/<pakiet>-<czas>.tar.gz); użyj --debug=FOLDER"
 
 #: src/apk_starter/cli.py:422
-#, fuzzy
 msgid ""
 "like --debug, but the archive keeps everything in plain text, passwords and "
 "personal data and screenshots included (name ends in -FULL): do not pass it "
 "on"
-msgstr ""
-"jak --debug, ale archiwum zachowuje wszystko jawnym tekstem, także hasła i "
-"dane osobowe (nazwa kończy się na -FULL): nie przekazywać dalej"
+msgstr "jak --debug, ale archiwum zachowuje wszystko jawnym tekstem, także hasła, dane osobowe i zrzuty ekranu (nazwa kończy się na -FULL): nie przekazywać dalej"
 
 #: src/apk_starter/cli.py:424
 msgid "override the SDK level passed to ATL"
@@ -1030,7 +1022,7 @@ msgstr "repozytorium microG nie podaje użytecznej wersji {package}"
 msgid ""
 "the microG repository index was downloaded incompletely {tries} times; check "
 "the connection and try again"
-msgstr ""
+msgstr "indeks repozytorium microG został pobrany niekompletnie {tries} razy; sprawdź połączenie i spróbuj ponownie"
 
 #: src/apk_starter/microg.py:91
 #, python-brace-format
