@@ -48,6 +48,14 @@ def test_finish_args_exact():
                              "--own-name=org.mpris.MediaPlayer2.*",
                              # microG: accounts in the secret store
                              "--talk-name=org.freedesktop.secrets",
+                             # the desktop's or phone's hardware services on the system bus (ATL's WifiManager,
+                             # android.bluetooth, telephony, biometrics, NFC, sensors) and Bluetooth sockets
+                             "--system-talk-name=org.freedesktop.NetworkManager", "--system-talk-name=org.bluez",
+                             "--allow=bluetooth", "--system-talk-name=org.freedesktop.ModemManager1",
+                             "--system-talk-name=net.reactivated.Fprint", "--system-talk-name=org.neard",
+                             "--system-talk-name=net.hadess.SensorProxy",
+                             # the on-screen keyboard of Phosh
+                             "--talk-name=sm.puri.OSK0",
                              # «Open with» an app for a file there (standard folders, read only;
                              # saving goes through the file chooser portal); Downloads writable for
                              # MediaStore.Downloads

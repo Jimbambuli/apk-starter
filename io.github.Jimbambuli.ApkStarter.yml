@@ -37,6 +37,15 @@ finish-args:
   # the modem for TelephonyManager/SmsManager (ATL's ModemManagerPhone): ModemManager on the system bus, as on
   # postmarketOS/Phosh; without ModemManager or a modem the apps see a device without telephony
   - --system-talk-name=org.freedesktop.ModemManager1
+  # fingerprint unlock for the apps (ATL's BiometricManager/FingerprintManager): the desktop's fprintd on the
+  # system bus; without it the apps see a device without a fingerprint sensor
+  - --system-talk-name=net.reactivated.Fprint
+  # NFC tags for the apps (ATL's NfcAdapter): neard on the system bus; without it the apps see a device without NFC
+  - --system-talk-name=org.neard
+  # light and proximity sensors of phones and laptops (ATL's SensorManager): iio-sensor-proxy on the system bus
+  - --system-talk-name=net.hadess.SensorProxy
+  # the shell's on-screen keyboard as the apps' input method on phones (Phosh's squeekboard, sm.puri.OSK0)
+  - --talk-name=sm.puri.OSK0
   # «Open with» an app for a file in the standard folders: the menu entry gets the path, not a portal document (the
   # DynamicLauncher portal writes no --file-forwarding); read only, saving goes through the file chooser portal.
   # Downloads is writable: apps save there through MediaStore.Downloads as on Android

@@ -246,6 +246,11 @@ bus (`--system-talk-name=org.freedesktop.ModemManager1`): the apps see the modem
 receive SMS through it, as on Android. Calls go to the phone's dialer. Without ModemManager or a modem (most desktops)
 the apps see a device without telephony.
 
+On phones and laptops that have them, the apps also get fingerprint unlock through fprintd
+(`--system-talk-name=net.reactivated.Fprint`), NFC tags through neard (`--system-talk-name=org.neard`), the light and
+proximity sensors through iio-sensor-proxy (`--system-talk-name=net.hadess.SensorProxy`) and, on Phosh, the shell's
+on-screen keyboard (`--talk-name=sm.puri.OSK0`). Without these services the apps see a device without the hardware.
+
 Game controllers reach the apps as they do on Android (buttons, sticks, triggers, rumble): APK Starter reads the input
 devices of `/dev/input` (`--device=input`, Flatpak 1.15.6 or newer) and keeps the game controllers among them; the
 keyboard, mouse and touchpad stay with the desktop.

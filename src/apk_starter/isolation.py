@@ -36,7 +36,11 @@ from .microg import SERVICES
 from .paths import Paths
 
 RELAY_ENV = "APK_STARTER_RELAY"
-OFF_ENV = "APK_STARTER_ISOLATION"         # "0": all apps in the Starter's sandbox, as up to 0.9.3 (diagnosis)
+# "1": each app in a sandbox of its own. Off by default: flatpak-spawn --sandbox gives the sub-sandbox no devices
+# (/dev/input of game controllers; /dev is reserved for --sandbox-expose), no features (Bluetooth sockets) and no
+# system bus (BlueZ, NetworkManager, ModemManager, fprintd, neard, iio-sensor-proxy), and the session proxy below
+# keeps out WebKit's web processes (portal.Flatpak) and the document portal
+OFF_ENV = "APK_STARTER_ISOLATION"
 SPAWN = "flatpak-spawn"
 PROXY = "xdg-dbus-proxy"
 SUN_PATH_MAX = 107
@@ -52,7 +56,7 @@ MAX_FDS = 64
 
 
 def enabled(env: Mapping[str, str]) -> bool:
-    return (Path("/.flatpak-info").is_file() and env.get(OFF_ENV) != "0" and shutil.which(SPAWN) is not None)
+    return (Path("/.flatpak-info").is_file() and env.get(OFF_ENV) == "1" and shutil.which(SPAWN) is not None)
 
 
 def user_dirs(config: Path, home: Path) -> dict[str, Path]:
