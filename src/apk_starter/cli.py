@@ -237,6 +237,9 @@ def install_files(paths: Paths, files: list[Path], lang: str | None, env: Mappin
         info, parts = read_parts(paths, files, lang, Path(tmp))
         if label:
             info = dataclasses.replace(info, label=label)
+        if splits.translated(splits.primary_abi(splits.abis(parts))):
+            report(_("{app} contains program code only for ARM processors: it runs translated, which is slower."
+                     ).format(app=info.label))
         return install_parts(paths, info, parts.splits, lang, env, report, warn, flt)
 
 

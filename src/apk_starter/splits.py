@@ -1,6 +1,7 @@
 """Split APKs: a base APK and its configuration parts (ABI, screen density, language), given as several files or
 as one bundle (.apks from bundletool / SAI, .xapk from APKPure). ATL loads the base first and the parts after it
 (class path and resources), like Android's LoadedApk with splitSourceDirs."""
+import platform
 import re
 import zipfile
 import zlib
@@ -12,7 +13,6 @@ from .axml import parse_manifest
 from .errors import ApkError
 from .i18n import _
 
-ISA = "x86_64"                  # the ABI ATL runs (dexopt.ISA)
 BUNDLES = (".apks", ".xapk", ".apkm")
 SPLIT_NAME_RE = re.compile(r"[A-Za-z0-9_.-]{1,100}")
 # Play's ABI parts are named after the ABI with "_" for "-" (config.arm64_v8a)
@@ -20,6 +20,11 @@ ABI_SPLITS = {"config.armeabi": "armeabi", "config.armeabi_v7a": "armeabi-v7a", 
               "config.x86": "x86", "config.x86_64": "x86_64", "config.mips": "mips", "config.mips64": "mips64",
               "config.riscv64": "riscv64"}
 MAX_PARTS = 200
+# the Android ABI of this computer's processor (platform.machine())
+HOST_ABIS = {"x86_64": "x86_64", "aarch64": "arm64-v8a"}
+# ATL's native bridge, Digitalis (Flatpak module digitalis, only in x86_64 builds), and the ABIs it runs
+NATIVE_BRIDGE = Path("/app/lib/digitalis/system/lib64/libberberis_arm64.so")
+BRIDGED_ABIS = ("arm64-v8a",)
 
 
 class IncompatibleError(ApkError):
@@ -126,13 +131,35 @@ def abis(s: SplitSet) -> set[str]:
     return found
 
 
+def supported_abis() -> tuple[str, ...]:
+    """The ABIs this computer runs, in order, like ro.product.cpu.abilist: the processor's own, then those of the
+    native bridge if it is installed."""
+    host = HOST_ABIS.get(platform.machine())
+    supported = (host,) if host else ()
+    if NATIVE_BRIDGE.is_file():
+        supported += tuple(a for a in BRIDGED_ABIS if a not in supported)
+    return supported
+
+
+def primary_abi(native: set[str]) -> str | None:
+    """The ABI the app's native code is used for, as PackageManager picks it: the first ABI of this computer that the
+    app has; None if it has none of them."""
+    return next((a for a in supported_abis() if a in native), None)
+
+
+def translated(abi: str | None) -> bool:
+    """Whether native code of this ABI runs through the native bridge, not on the processor itself."""
+    return abi is not None and abi != HOST_ABIS.get(platform.machine())
+
+
 def select(s: SplitSet, label: str) -> SplitSet:
     """The parts for this computer: without the ABI parts of other ABIs; refused if the app has native code but none
-    for x86_64 (Android would refuse it with INSTALL_FAILED_NO_MATCHING_ABIS)."""
+    that this computer runs (Android would refuse it with INSTALL_FAILED_NO_MATCHING_ABIS)."""
     native = abis(s)
-    if native and ISA not in native:
+    abi = primary_abi(native)
+    if native and abi is None:
         raise IncompatibleError(_("{app} contains program code only for ARM processors and does not run on this "
                                   "computer.").format(app=label))
-    keep = tuple((n, p) for n, p in s.splits if n not in ABI_SPLITS or ABI_SPLITS[n] == ISA)
+    keep = tuple((n, p) for n, p in s.splits if n not in ABI_SPLITS or ABI_SPLITS[n] == abi)
     return SplitSet(s.package, s.base, keep)
 

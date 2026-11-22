@@ -32,6 +32,10 @@ finish-args:
   - --filesystem=xdg-documents:ro
   - --filesystem=xdg-music:ro
   - --filesystem=xdg-videos:ro
+  # Digitalis (module digitalis, x86_64 builds): its system tree is in /app/lib/digitalis, not in /system, and it
+  # runs on glibc with bionic_translation as the bionic layer; without the module (aarch64) nothing reads these
+  - --env=BERBERIS_SYSTEM_ROOT=/app/lib/digitalis
+  - --env=BERBERIS_FLAGS=glibc-host-thread-id-handoff
 build-options:
   append-path: /usr/lib/sdk/openjdk21/bin
   env:
@@ -187,10 +191,37 @@ modules:
       - /share/apk-starter-build
       - /bin/xmvn5-resolve
 
+  # Digitalis (github.com/DigitalisX64/digitalis, Apache-2.0; forks Jimbambuli/digitalis*, see
+  # build-aux/digitalis/build-bundle.sh): the Berberis binary translator as ATL's native bridge, so apps whose native
+  # code is only for arm64-v8a run on x86_64. The bundle is built from source in a Digitalis AOSP tree (pinned
+  # commits in build-bundle.sh, revisions of all projects in BUILD-INFO); licence texts in NOTICES/.
+  # aarch64 runs arm64-v8a natively and needs no bridge.
+  - name: digitalis
+    only-arches:
+      - x86_64
+    buildsystem: simple
+    build-commands:
+      - mkdir -p /app/lib/digitalis /app/share/licenses/digitalis
+      - cp -a system /app/lib/digitalis/
+      # the guest linker's namespaces name the real place of the tree (Berberis points it at this file)
+      - sed -i 's|/system|/app/lib/digitalis/system|g' /app/lib/digitalis/system/etc/ld.config.arm64.txt
+      - rm -rf /app/lib/digitalis/system/etc/init /app/lib/digitalis/system/etc/binfmt_misc /app/lib/digitalis/system/bin/berberis_program_runner*
+      - cp NOTICES/* BUILD-INFO README.md /app/share/licenses/digitalis/
+    sources:
+      - type: archive
+        url: https://github.com/Jimbambuli/apk-starter/releases/download/digitalis-a28dbbd/digitalis-bundle-a28dbbd.tar.gz
+        sha256: 8f19653f64ec7619008715b178954c3902b5d1fef190a74eb5645566fa7b5bd6
+
   - name: android_translation_layer
     buildsystem: meson
     config-opts:
       - -Ddownload_tool_deps=false
+    build-options:
+      arch:
+        x86_64:
+          config-opts:
+            - -Dnative_bridge=/app/lib/digitalis/system/lib64/libberberis_arm64.so
+            - -Dnative_bridge_abi=arm64-v8a
     sources:
       - type: git
         url: https://github.com/Jimbambuli/android_translation_layer.git

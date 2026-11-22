@@ -1197,3 +1197,8 @@ msgstr "{app} obsahuje kód jen pro procesory ARM a na tomto počítači nepobě
 #, python-brace-format
 #~ msgid "no log: cannot write {file}: {reason}"
 #~ msgstr "žádný protokol: do {file} nelze zapisovat: {reason}"
+
+#: src/apk_starter/cli.py:241
+#, python-brace-format
+msgid "{app} contains program code only for ARM processors: it runs translated, which is slower."
+msgstr "{app} obsahuje kód pouze pro procesory ARM: aplikace běží v překladu, a proto pomaleji."

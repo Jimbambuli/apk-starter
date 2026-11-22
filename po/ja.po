@@ -1201,3 +1201,8 @@ msgstr ""
 #, python-brace-format
 #~ msgid "no log: cannot write {file}: {reason}"
 #~ msgstr "ログなし: {file} に書き込めません: {reason}"
+
+#: src/apk_starter/cli.py:241
+#, python-brace-format
+msgid "{app} contains program code only for ARM processors: it runs translated, which is slower."
+msgstr "{app} には ARM プロセッサ用のコードしかありません。アプリは変換して実行されるため、動作が遅くなります。"

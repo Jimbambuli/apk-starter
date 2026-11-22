@@ -51,7 +51,10 @@ def test_finish_args_exact():
                              # MediaStore.Downloads
                              "--filesystem=xdg-download", "--filesystem=xdg-pictures:ro",
                              "--filesystem=xdg-documents:ro", "--filesystem=xdg-music:ro",
-                             "--filesystem=xdg-videos:ro"}
+                             "--filesystem=xdg-videos:ro",
+                             # Digitalis (x86_64): its system tree outside /system, glibc host with bionic layer
+                             "--env=BERBERIS_SYSTEM_ROOT=/app/lib/digitalis",
+                             "--env=BERBERIS_FLAGS=glibc-host-thread-id-handoff"}
 
 
 def test_all_git_sources_pinned():
@@ -79,3 +82,12 @@ def test_atl_from_the_fix_r21_branch():
     # fehlersuche (fix-r7 4e932390c); fix-r8 4104a23b4: + lebenszyklus, apps-rest, jellyfin, kleinkram, firefox; fix-r9 4034931c9: + firefox2, gmail; 8e73b691d: + argv[0] = process name, MediaCodec, Build.SOC_MODEL; c15bc7b08: + MediaCodec input offset/size, remote SurfaceTexture; c0903f9fd: + fdroid (BitmapFactory InputStream exception); 56b5b3739: + whatsapp2, ffvideo, receivers per Context; 36ebcf64f: + scan-a..f, onReceive gets the registering Context, compile fixes; fix-r10 f70088a27: + scan2-a..f, wa3; fix-r11 ad107ee3c: + hierarchie, nativ, voll-0..9; fix-r12 3d01a9eef: + Oeffi fix, all new classes in meson.build, wa6 d5a7cc8e7; fix-r13 017f2677b: + wa6 260888d23 (AOSP style constructors, TabHost); fix-r14 92952cffa: + wa7 (saveLayer/Porter-Duff, inverse fill), wa8 (TextShaper, PdfRenderer), var-par (overloads, Parcelable); fix-r15 09c723673: + EditText cursor move reported after the TextWatchers; fix-r16 e21f2988a: + fix-optik, fix-tasks, fr2-p1..p7, p9, p10, p12; fix-r17 f477ea48a: + fr3-q1..q8, q4-window, q6b, fr4-r1, r3; fix-r18 d8d33799c: + fr4-r2, r4, r5b (no hinting), r6, fr5-s1..s3 (getCookie(null), shouldOverrideUrlLoading only for page navigations, getTitle() never null), ViewGroup drawChild reverted; fix-r19 fd43c47e5: + fr6-t1..t8 (Flutter eglGetProcAddress, permission rationale, compound drawables, Bcp47 locale script, GradientColor, AAudio, service name, layout flags); fix-r20 d3334f600: + fr7 (Bitmap.getPixel, shadow layer, RGB_565, BitmapShader round rect, DrawableContainer callback, AudioTrack non-blocking, activity title, ReplacementSpan.draw); fr8-wahg badb986b5: + BitmapShader tile modes, ALPHA_8 decode of grayscale images; fix-r21 6e7dd5a67: + fr9 (AudioTrack interrupt/leak, window title = app label, replacement runs and paragraph spans, setHinting, WebView methods, setCookie(null), framework action bar and menus, AndroidKeyStore RSA, Android 16 system colors, opaque shadow caster)
     assert "branch: fix-r21" in module
     assert text.count(f"commit: {manifest_commits()['android_translation_layer']}") == 2      # also atl-src
+
+
+def test_digitalis_only_on_x86_64():
+    """aarch64 runs arm64-v8a natively: the bridge module and ATL's bridge options are x86_64 only."""
+    text = MANIFEST.read_text(encoding="utf-8")
+    module = re.search(r"^  - name: digitalis\n((?:    .*\n|\n)+?)(?=^  - name: )", text, re.M).group(1)
+    assert re.search(r"only-arches:\n\s+- x86_64\n", module)
+    atl = re.search(r"^  - name: android_translation_layer\n((?:    .*\n)+)", text, re.M).group(1)
+    assert re.search(r"arch:\n\s+x86_64:\n\s+config-opts:\n\s+- -Dnative_bridge=", atl)

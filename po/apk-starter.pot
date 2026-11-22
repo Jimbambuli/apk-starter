@@ -1101,3 +1101,8 @@ msgid ""
 "{app} contains program code only for ARM processors and does not run on this "
 "computer."
 msgstr ""
+
+#: src/apk_starter/cli.py:241
+#, python-brace-format
+msgid "{app} contains program code only for ARM processors: it runs translated, which is slower."
+msgstr ""
