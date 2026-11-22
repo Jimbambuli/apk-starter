@@ -168,6 +168,8 @@ modules:
       # ART's JVMTI plugin (not in ____art_all, its make target lacks include paths): built with atl-doctor's
       # script and template fix (needed with GCC 14 and 16); loaded only for «Start with log/debug».
       - patch -p0 < atl-doctor/tools/openjdkjvmti-gcc14.diff
+      # the plugin script links with -m64, which GCC knows only on x86 (probe)
+      - if [ "$FLATPAK_ARCH" = aarch64 ]; then sed -i 's/ -m64 / /' atl-doctor/tools/build-jvmti-plugin.sh; fi
       - J=$FLATPAK_BUILDER_N_JOBS bash atl-doctor/tools/build-jvmti-plugin.sh . /app
       - install -Dm755 jvmti-out/libopenjdkjvmti.so /app/lib/art/libopenjdkjvmti.so
     sources:
