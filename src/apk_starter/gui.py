@@ -797,7 +797,7 @@ class Window(Gtk.ApplicationWindow):
             start.grab_focus()                      # not the name (a focused label shows all of it selected)
 
     def make_sections(self, r: AppRow, app) -> Gtk.Box:
-        """The sections of the app info, all visible: permissions, appearance (window bar, Android version),
+        """The sections of the app info, all visible: permissions, appearance (window bar, Android version, mouse as touch),
         Aurora's updates, advanced (Debug, recordings); everything remembered per app.
 
         The window bar is a group of option buttons, not a drop-down: the page keeps one size and nothing in it
@@ -865,6 +865,15 @@ class Window(Gtk.ApplicationWindow):
             sdk_choice[key] = b
             box.append(b)
         self.sdk_choice = sdk_choice
+        # the left mouse button as a finger on a touchscreen, for games that only take touches (off by default)
+        box.append(label(_("Input"), "dim-label", margin_top=4))
+        row = Gtk.Box(spacing=12)
+        row.append(label(_("Mouse as touch"), hexpand=True))
+        touch = Gtk.Switch(active=app.mouse_as_touch, valign=Gtk.Align.CENTER,
+                           tooltip_text=_("The left mouse button acts as a finger, for games that ignore the mouse"))
+        touch.connect("notify::active", lambda sw, _p, p=r.package: self.save_app_setting(p, mouse_as_touch=sw.get_active()))
+        row.append(touch)
+        box.append(row)
         self.aurora_updates_check = None
         if r.package == aurora.PACKAGE:             # Aurora Store: tell its updates (off by default)
             updates = Gtk.CheckButton(label=_("Report updates"), active=load_settings(self.paths.settings()).aurora_updates)

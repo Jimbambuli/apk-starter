@@ -52,3 +52,14 @@ def test_sdk_override_is_kept_and_unknown_values_are_dropped(tmp_path):
     assert "sdk" not in path.read_text()
     path.write_text('{"apps": {"org.a": {"sdk": 12}, "org.b": {"sdk": true}, "org.c": {"sdk": "36"}}}')
     assert [load_settings(path).app(k).sdk for k in ("org.a", "org.b", "org.c")] == [None, None, None]
+
+
+def test_mouse_as_touch_is_kept_per_app_and_off_by_default(tmp_path):
+    path = tmp_path / "settings.json"
+    save_settings(path, Settings().with_app("org.a", mouse_as_touch=True))
+    assert load_settings(path).app("org.a").mouse_as_touch is True
+    assert load_settings(path).app("org.b").mouse_as_touch is False
+    save_settings(path, load_settings(path).with_app("org.a", mouse_as_touch=False))
+    assert "mouse_as_touch" not in path.read_text()
+    path.write_text('{"apps": {"org.a": {"mouse_as_touch": 1}}}')
+    assert load_settings(path).app("org.a").mouse_as_touch is False

@@ -102,6 +102,9 @@ def build_env(paths: Paths, pkg: str, base: Mapping[str, str]) -> dict[str, str]
     env.pop("ATL_DENIED_PERMISSIONS", None)
     if app.denied:                                  # switched off in the window: ATL answers «denied»
         env["ATL_DENIED_PERMISSIONS"] = ",".join(permissions.denied_permissions(app.denied))
+    env.pop("ATL_MOUSE_AS_TOUCH", None)
+    if app.mouse_as_touch:                          # switched on in the window: the left mouse button is a finger
+        env["ATL_MOUSE_AS_TOUCH"] = "1"
     # the tooltips of ATL's navigation bar ◁ ○ □ in the desktop's language (ATL has no translations)
     env["ATL_NAVIGATION_TOOLTIPS"] = "\n".join((_("Back"), _("Start page of the app"), _("Open pages of the app")))
     # app stores (Aurora Store): ATL finds the installed apps here and hands installs back to the starter

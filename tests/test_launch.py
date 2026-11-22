@@ -79,3 +79,10 @@ def test_titlebar_of_the_app_reaches_atl(tmp_path):
     p.icon("org.c").parent.mkdir(parents=True, exist_ok=True)
     p.icon("org.c").write_bytes(b"png")
     assert build_env(p, "org.c", {})["ATL_APP_ICON"] == str(p.icon("org.c"))
+
+
+def test_mouse_as_touch_of_the_app_reaches_atl(tmp_path):
+    p = Paths(tmp_path / "d", tmp_path / "c", Path("/app"))
+    save_settings(p.settings(), Settings().with_app("org.a", mouse_as_touch=True))
+    assert build_env(p, "org.a", {})["ATL_MOUSE_AS_TOUCH"] == "1"
+    assert "ATL_MOUSE_AS_TOUCH" not in build_env(p, "org.b", {"ATL_MOUSE_AS_TOUCH": "1"})

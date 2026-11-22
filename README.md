@@ -87,6 +87,13 @@ apk-starter --version
 Exit codes: 0 ok, 1 error (e.g. cannot write), 2 wrong usage, 3 APK not readable, 7 the app has native code only
 for other processors (e.g. ARM); if the app is ended by a signal, 128+N.
 
+### Mouse as touch
+
+The apps get the mouse as a mouse, as on Android. Some games only take touches and ignore a drag of the mouse (e.g.
+the slingshot of Angry Birds Friends, Android 16 does the same). For such an app, switch on **Mouse as touch** in its
+details (remembered per app, off by default): the left button then acts as a finger on a touchscreen, without
+hovering. The wheel scrolls and the other buttons stay those of the mouse.
+
 ### Dead keys and input methods
 
 The apps type through the GTK of the Flatpak runtime (GNOME 51, GTK 4.24). Since GTK 4.19.2, GTK on Wayland leaves
