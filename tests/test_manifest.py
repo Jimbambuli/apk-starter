@@ -101,3 +101,13 @@ def test_digitalis_only_on_x86_64():
     assert re.search(r"only-arches:\n\s+- x86_64\n", module)
     atl = re.search(r"^  - name: android_translation_layer\n((?:    .*\n)+)", text, re.M).group(1)
     assert re.search(r"arch:\n\s+x86_64:\n\s+config-opts:\n\s+- -Dnative_bridge=", atl)
+
+
+def test_breeze_gtk4_theme_is_bundled():
+    """gtk-theme-name=Breeze from the desktop works in the sandbox: the generated GTK 4 part and its assets."""
+    text = MANIFEST.read_text(encoding="utf-8")
+    assert "data/themes/Breeze " in text and "breeze-gtk-LICENSE-BSD-3-Clause.txt" in text
+    themes = ROOT / "data/themes"
+    css = (themes / "Breeze/gtk-4.0/gtk.css").read_text() + (themes / "Breeze-Dark/gtk-4.0/gtk.css").read_text()
+    for name in set(re.findall(r"\.\./assets/([A-Za-z0-9._-]+)", css)):
+        assert (themes / "Breeze/assets" / name).is_file(), name

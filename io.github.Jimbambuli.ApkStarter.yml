@@ -292,6 +292,10 @@ modules:
       - msgfmt --xml --template=data/io.github.Jimbambuli.ApkStarter.metainfo.xml.in -d po -o io.github.Jimbambuli.ApkStarter.metainfo.xml
       - install -Dm644 io.github.Jimbambuli.ApkStarter.desktop /app/share/applications/io.github.Jimbambuli.ApkStarter.desktop
       - install -Dm644 io.github.Jimbambuli.ApkStarter.metainfo.xml /app/share/metainfo/io.github.Jimbambuli.ApkStarter.metainfo.xml
+      # The GTK 4 part of the Breeze theme (data/themes/README), so that the desktop's gtk-theme-name=Breeze works here
+      - mkdir -p /app/share/themes && cp -r data/themes/Breeze data/themes/Breeze-Dark /app/share/themes/
+      - cp -r data/themes/Breeze/assets /app/share/themes/Breeze-Dark/assets
+      - install -Dm644 data/themes/LICENSE-BSD-3-Clause.txt /app/share/licenses/io.github.Jimbambuli.ApkStarter/breeze-gtk-LICENSE-BSD-3-Clause.txt
       - install -Dm644 data/icons/io.github.Jimbambuli.ApkStarter.svg /app/share/icons/hicolor/scalable/apps/io.github.Jimbambuli.ApkStarter.svg
     sources:
       - type: dir
