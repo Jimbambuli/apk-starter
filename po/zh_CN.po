@@ -1167,3 +1167,8 @@ msgstr "{app} 只包含适用于 ARM 处理器的代码，无法在这台电脑�
 #, python-brace-format
 msgid "{app} contains program code only for ARM processors: it runs translated, which is slower."
 msgstr "{app} 只包含 ARM 处理器的程序代码：应用以翻译方式运行，因此速度较慢。"
+
+#: src/apk_starter/splits.py
+#, python-brace-format
+msgid "{app} contains program code only for 32-bit x86 or ARM processors, which is not supported."
+msgstr "{app} 只包含 32 位 x86 或 ARM 处理器的程序代码，不受支持。"

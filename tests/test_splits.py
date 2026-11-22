@@ -143,9 +143,10 @@ def test_fewer_x86_64_libraries_than_arm64_ones_still_x86_64(tmp_path, bridge):
     assert splits.primary_abi(splits.abis(s)) == "x86_64"
 
 
-def test_32_bit_x86_only_app_is_refused(tmp_path, bridge):
-    s = splits.collect([part(tmp_path, "b.apk", files={"lib/x86/l.so": b"x"})])
-    with pytest.raises(splits.IncompatibleError) as e:
+@pytest.mark.parametrize("files", [{"lib/x86/l.so": b"x"}, {"lib/armeabi-v7a/l.so": b"x", "lib/x86/l.so": b"x"}])
+def test_32_bit_only_app_is_refused(tmp_path, bridge, files):
+    s = splits.collect([part(tmp_path, "b.apk", files=files)])
+    with pytest.raises(splits.IncompatibleError, match="only for 32-bit x86 or ARM processors, which is not supported") as e:
         splits.select(s, "Demo")
     assert e.value.code == 7
 

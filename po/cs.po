@@ -1202,3 +1202,8 @@ msgstr "{app} obsahuje kód jen pro procesory ARM a na tomto počítači nepobě
 #, python-brace-format
 msgid "{app} contains program code only for ARM processors: it runs translated, which is slower."
 msgstr "{app} obsahuje kód pouze pro procesory ARM: aplikace běží v překladu, a proto pomaleji."
+
+#: src/apk_starter/splits.py
+#, python-brace-format
+msgid "{app} contains program code only for 32-bit x86 or ARM processors, which is not supported."
+msgstr "{app} obsahuje kód pouze pro 32bitové procesory x86 nebo ARM, který není podporován."

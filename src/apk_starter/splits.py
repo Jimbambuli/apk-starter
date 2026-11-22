@@ -25,6 +25,8 @@ HOST_ABIS = {"x86_64": "x86_64", "aarch64": "arm64-v8a"}
 # ATL's native bridge, Digitalis (Flatpak module digitalis, only in x86_64 builds), and the ABIs it runs
 NATIVE_BRIDGE = Path("/app/lib/digitalis/system/lib64/libberberis_arm64.so")
 BRIDGED_ABIS = ("arm64-v8a",)
+# ABIs ATL never runs: it is a 64-bit process
+ABIS_32_BIT = {"armeabi", "armeabi-v7a", "x86", "mips"}
 
 
 class IncompatibleError(ApkError):
@@ -158,6 +160,9 @@ def select(s: SplitSet, label: str) -> SplitSet:
     native = abis(s)
     abi = primary_abi(native)
     if native and abi is None:
+        if native <= ABIS_32_BIT:
+            raise IncompatibleError(_("{app} contains program code only for 32-bit x86 or ARM processors, which is not "
+                                      "supported.").format(app=label))
         raise IncompatibleError(_("{app} contains program code only for ARM processors and does not run on this "
                                   "computer.").format(app=label))
     keep = tuple((n, p) for n, p in s.splits if n not in ABI_SPLITS or ABI_SPLITS[n] == abi)
