@@ -16,7 +16,7 @@ from pathlib import Path
 from .apkinfo import PACKAGE_RE, ApkInfo, read_apk_info, read_icon
 from .errors import ApkError, NoMenuEntry, SignatureConflict, StarterError, UsageError, describe_error
 from .i18n import _
-from . import dexopt, diag, i18n, splits
+from . import dexopt, diag, i18n, isolation, splits
 from .launch import (DEFAULT_SIZE, build_command, build_env, cached_apk_info, parse_size, prepare_apk,
                      remember_size, remembered_size, sdk_for)
 from .paths import PROFILE_RE, Paths, apply_profile
@@ -443,6 +443,12 @@ def _parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None, env: Mapping[str, str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     env = os.environ if env is None else env
+    if env.get(isolation.RELAY_ENV):                # in an app's sandbox: ATL's request goes to the Starter
+        try:
+            return isolation.relay(argv, env)
+        except OSError as e:
+            print(f"apk-starter: {describe_error(e)}", file=sys.stderr)
+            return 1
     if isinstance(env, MutableMapping):
         apply_profile(env)
         i18n.follow_desktop(env)
@@ -570,8 +576,9 @@ def _start(paths: Paths, args, level: str | None, into: Path | None, tail: list[
         debug_dir = into or diag.default_debug_dir(paths, info.package, started)
     apk_path = prepare_apk(paths, info)
     parts = paths.installed_splits(info.package) if apk_path == paths.apk(info.package) else []
+    app_id = f"{ENTRY_PREFIX}.{info.package}"
     cmd = build_command(paths, apk_path, size=size, sdk=sdk_for(info, args.sdk if args.sdk is not None else mine.sdk), atl_args=atl_args,
-                        app_id=f"{ENTRY_PREFIX}.{info.package}", splits=parts)
+                        app_id=app_id, splits=parts)
     child_env = build_env(paths, info.package, env)
     if info.gecko_gpu:                              # Firefox & Co.: pages only without Gecko's GPU process
         from . import gecko
@@ -591,6 +598,9 @@ def _start(paths: Paths, args, level: str | None, into: Path | None, tail: list[
         if debug_dir is not None:
             rc = diag.record_restarting(paths, cmd, child_env, debug_dir, info.package,
                                         shots=level == "debug-full")
+        elif isolation.enabled(env):               # a sandbox of its own, as Android's user ID per app
+            with isolation.Sandbox(paths, info.package, app_id, env) as sandbox:
+                rc = run_atl(sandbox.command(cmd, child_env), dict(env), None, {})
         else:
             rc = run_atl(cmd, child_env, None, {})
         _tell_crash(env, info.label, rc)
