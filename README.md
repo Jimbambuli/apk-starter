@@ -87,6 +87,25 @@ apk-starter --version
 Exit codes: 0 ok, 1 error (e.g. cannot write), 2 wrong usage, 3 APK not readable, 7 the app has native code only
 for other processors (e.g. ARM); if the app is ended by a signal, 128+N.
 
+### Dead keys and input methods
+
+The apps type through the GTK of the Flatpak runtime (GNOME 51, GTK 4.24). Since GTK 4.19.2, GTK on Wayland leaves
+dead keys (`^` `` ` `` `´` `¨` `~` before a letter, e.g. on the Swiss, French or German keyboard) and compose
+sequences to the desktop's input method (Wayland text-input). GNOME brings IBus. KDE Plasma has one when an input
+method runs: Plasma Keyboard, Fcitx 5 or IBus (System Settings, Keyboard, Virtual Keyboard). Without one, a dead key
+is lost and only the letter arrives (`^e` gives `e` instead of `ê`); the GTK programs of the system with GTK 4.20 or
+newer behave the same.
+
+APK Starter keeps the desktop's choice: an input method set with `GTK_IM_MODULE` (e.g. `ibus` or `fcitx`) reaches the
+apps unchanged. Without an input method on the desktop, let GTK compose the dead keys itself:
+
+```
+flatpak override --user --env=GTK_IM_MODULE=gtk-im-context-simple io.github.Jimbambuli.ApkStarter
+```
+
+This turns off input methods in the apps (no IBus or Fcitx, no on-screen keyboard). `flatpak override --user --reset
+io.github.Jimbambuli.ApkStarter` takes it back (together with your other overrides of APK Starter).
+
 ### Links
 
 The menu entry of an installed app offers it for the links its activities accept (Android intent filters with
