@@ -202,6 +202,16 @@ not listed.
 For the apps' media in the desktop's media controls and its media keys (MPRIS), APK Starter may own the D-Bus names
 `org.mpris.MediaPlayer2.*` (`--own-name`).
 
+For Wi-Fi (`--system-talk-name=org.freedesktop.NetworkManager`), the apps get what Android's WifiManager gives: the
+networks around you from NetworkManager's scans (name, address, signal, channel, security), the connected network and
+whether Wi-Fi is on; an app may ask NetworkManager to scan (the desktop's polkit decides). Like on Android, only apps
+that have the location permission see the networks, because they tell where you are: microG, for example, can send
+them to an online service (BeaconDB, if you choose it in microG's location settings) to find your position. The
+permission is not limited to reading: an app's native code could also call NetworkManager's other functions that
+polkit allows your session (e.g. switch Wi-Fi off). Without it (`flatpak override --user
+--system-no-talk-name=org.freedesktop.NetworkManager io.github.Jimbambuli.ApkStarter`) the apps see a device without
+Wi-Fi.
+
 Without them (e.g. `flatpak override --user --nofilesystem=xdg-config/gtk-4.0 io.github.Jimbambuli.ApkStarter`) everything
 works with GTK's default theme in the desktop's light or dark variant.
 
