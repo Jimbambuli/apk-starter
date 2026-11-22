@@ -126,3 +126,29 @@ def test_arm64_runs_natively_on_aarch64(tmp_path, monkeypatch):
     monkeypatch.setattr(splits, "NATIVE_BRIDGE", tmp_path / "missing.so")
     s = splits.collect([part(tmp_path, "b.apk", files={"lib/arm64-v8a/l.so": b"x", "lib/x86_64/l.so": b"x"})])
     assert splits.primary_abi(splits.abis(s)) == "arm64-v8a" and not splits.translated("arm64-v8a")
+
+
+def test_x86_64_part_is_kept_with_the_bridge(tmp_path, bridge):
+    s = splits.collect([part(tmp_path, "b.apk"),
+                        part(tmp_path, "x.apk", "config.x86_64", files={"lib/x86_64/l.so": b"x"}),
+                        part(tmp_path, "a.apk", "config.arm64_v8a", files={"lib/arm64-v8a/l.so": b"x"})])
+    assert [n for n, _p in splits.select(s, "Demo").splits] == ["config.x86_64"]
+    assert not splits.translated(splits.primary_abi(splits.abis(s)))
+
+
+def test_fewer_x86_64_libraries_than_arm64_ones_still_x86_64(tmp_path, bridge):
+    """AOSP's rule: the first ABI of the device's list that the app has, however many libraries it has"""
+    files = {"lib/x86_64/a.so": b"x", **{f"lib/arm64-v8a/l{i}.so": b"x" for i in range(5)}}
+    s = splits.collect([part(tmp_path, "b.apk", files=files)])
+    assert splits.primary_abi(splits.abis(s)) == "x86_64"
+
+
+def test_32_bit_x86_only_app_is_refused(tmp_path, bridge):
+    s = splits.collect([part(tmp_path, "b.apk", files={"lib/x86/l.so": b"x"})])
+    with pytest.raises(splits.IncompatibleError) as e:
+        splits.select(s, "Demo")
+    assert e.value.code == 7
+
+
+def test_device_abi_list_puts_the_host_first(bridge):
+    assert splits.supported_abis() == ("x86_64", "arm64-v8a")

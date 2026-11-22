@@ -287,3 +287,21 @@ def test_the_runtime_is_not_paused_by_the_start_it_is_prepared_for(art, tmp_path
         t.join(10)
         assert not t.is_alive()
     assert dexopt.runtime_ready(art.paths, art.env)
+
+
+@pytest.mark.parametrize("files,expected", [
+    ({"lib/x86_64/libfoo.so": b"x86", "lib/arm64-v8a/libfoo.so": b"arm"}, b"x86"),      # both: x86_64, no bridge
+    ({"lib/arm64-v8a/libfoo.so": b"arm"}, b"arm"),                                      # ARM only: the bridge's ABI
+    ({"lib/x86_64/libfoo.so": b"x86", **{f"lib/arm64-v8a/lib{i}.so": b"arm" for i in range(4)}}, b"x86"),  # list order, not count
+])
+def test_native_libraries_of_the_abi_atl_picks_with_the_bridge(art, tmp_path, monkeypatch, files, expected):
+    from apk_starter import splits
+    lib_bridge = tmp_path / "libberberis_arm64.so"
+    lib_bridge.write_bytes(b"")
+    monkeypatch.setattr(splits, "NATIVE_BRIDGE", lib_bridge)
+    monkeypatch.setattr(splits.platform, "machine", lambda: "x86_64")
+    apk = make_apk(tmp_path / "demo.apk", manifest=axml_manifest(), files=files)
+    dexopt.extract_natives(art.paths, PKG, apk)
+    lib = art.paths.data(PKG) / f"{PKG}.apk_" / "lib"
+    assert (lib / "libfoo.so").read_bytes() == expected
+    assert not (lib / "lib0.so").exists()                                          # nothing of the other ABI
