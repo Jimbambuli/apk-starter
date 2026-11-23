@@ -603,16 +603,17 @@ def _start(paths: Paths, args, level: str | None, into: Path | None, tail: list[
             paths.started(info.package).touch()
     background = threading.Thread(target=_compile_later, args=(paths, env, later), daemon=True)
     background.start()
+    ended: dict = {}
     try:
         if debug_dir is not None:
             rc = diag.record_restarting(paths, cmd, child_env, debug_dir, info.package,
                                         shots=level == "debug-full")
         elif isolation.enabled(env):               # a sandbox of its own, as Android's user ID per app
             with isolation.Sandbox(paths, info.package, app_id, env) as sandbox:
-                rc = run_atl(sandbox.command(cmd, child_env), dict(env), None, {})
+                rc = run_atl(sandbox.command(cmd, child_env), dict(env), None, {}, ended)
         else:
-            rc = run_atl(cmd, child_env, None, {})
-        _tell_crash(env, info.label, rc)
+            rc = run_atl(cmd, child_env, None, {}, ended)
+        _tell_crash(env, info.label, rc, ended.get("gpu_lost", False))
         return rc
     finally:
         if debug_dir is not None:                   # one archive, as soon as the app has ended
@@ -742,11 +743,11 @@ def refresh_menu_entries(paths: Paths, lang: str | None, renewing: Callable[[str
     return renewed
 
 
-def _tell_crash(env: Mapping[str, str], label: str, rc: int) -> None:
+def _tell_crash(env: Mapping[str, str], label: str, rc: int, gpu_lost: bool = False) -> None:
     """Started from the menu entry, a crash ends the window without a word: say it in a small window. The
     starter's window says it itself for the apps it starts (APK_STARTER_FROM_WINDOW)."""
     from .gui_model import crash_meaning
-    meaning = crash_meaning(True, rc)
+    meaning = crash_meaning(True, rc, gpu_lost)
     if meaning is None or env.get("APK_STARTER_FROM_WINDOW"):
         return
     from . import install_request

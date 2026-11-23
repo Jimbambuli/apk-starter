@@ -147,14 +147,18 @@ def details_layout(width: int) -> int:
 SIGNALS = {6: "SIGABRT", 9: "SIGKILL", 11: "SIGSEGV", 15: "SIGTERM"}
 
 
-def crash_meaning(exited: bool, status: int) -> str | None:
+def crash_meaning(exited: bool, status: int, gpu_lost: bool = False) -> str | None:
     """What the end of an app means (Spec 14), None for a normal end: exit 0 or SIGTERM. `status` is the exit code
-    of `apk-starter PACKAGE` (128+N when ATL died of signal N) or, if it did not exit, its signal."""
+    of `apk-starter PACKAGE` (128+N when ATL died of signal N) or, if it did not exit, its signal; `gpu_lost`: the
+    graphics driver had reported a lost GPU."""
     signal = None if exited else status
     if exited and 128 < status < 128 + 65:
         signal = status - 128
     if (exited and status == 0) or signal == 15:
         return None
+    if gpu_lost:
+        return _("The graphics processor (GPU) stopped responding: the graphics driver reported it as lost, then the "
+                 "app ended")
     if signal is None:
         if status == 10:
             return _("Exit code 10: crash (an exception the app did not catch)")

@@ -53,6 +53,20 @@ def test_signal_maps_to_128_plus_n_and_trailer(tmp_path, capsys):
     assert "killed by SIGSEGV" in capsys.readouterr().err
 
 
+def test_fatal_signal_reported_by_art_counts_as_that_signal(capsys):
+    """ART hard-exits with 1 when its fatal-signal dump faults (re-entered): its line tells the signal."""
+    ended: dict = {}
+    assert run_atl(fake_cmd(), fake_env("fatal"), None, {}, ended) == 139 and ended == {}
+    err = capsys.readouterr().err
+    assert "HandleUnexpectedSignal reentered" in err and "killed by SIGSEGV" in err     # the output still goes on
+
+
+def test_lost_gpu_is_reported():
+    ended: dict = {}
+    assert run_atl(fake_cmd(), fake_env("gpu"), None, {}, ended) == 139 and ended == {"gpu_lost": True}
+    assert run_atl(fake_cmd(), fake_env("exit:1"), None, {}) == 1      # exit 1 without such a line stays
+
+
 def test_trailer_on_new_line(tmp_path):
     log = tmp_path / "a.log"
     run_atl(fake_cmd(), fake_env("noeol"), log, {})

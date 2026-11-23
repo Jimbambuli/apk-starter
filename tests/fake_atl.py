@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Stand-in for android-translation-layer in tests. Mode from FAKE_ATL_MODE: exit:N | signal:N | noeol | sleep:S |
+"""Stand-in for android-translation-layer in tests. Mode from FAKE_ATL_MODE: exit:N | signal:N | noeol | fatal | gpu | sleep:S |
 viewdump:S (like sleep, but answers ATL_VIEWDUMP requests with a tree and shots/NAME.png, as ATLViewDump does) |
 restart:FILE (exit 75 = restart while FILE does not exist yet, creating it; then exit 0).
 FAKE_ATL_CHECK=PATH: records whether PATH existed when ATL started. With -agentpath:LIB=OUT,... it writes one
@@ -33,6 +33,16 @@ if kind == "noeol":
     sys.exit(0)
 sys.stdout.write("fake atl output\n")
 sys.stdout.flush()
+if kind == "fatal":                     # ART's fatal-signal dump faulting itself: re-entered, hard exit 1
+    sys.stdout.write("Fatal signal 11 (SIGSEGV), code 1 (SEGV_MAPERR) fault addr 0x10\n"
+                     "A/art     (   24): HandleUnexpectedSignal reentered\n")
+    sys.stdout.flush()
+    sys.exit(1)
+if kind == "gpu":                       # the graphics driver loses the GPU, then the same
+    sys.stdout.write("Vulkan: ../src/freedreno/vulkan/tu_knl_drm_msm.cc:329: GPU faulted or hung "
+                     "(VK_ERROR_DEVICE_LOST)\nFatal signal 11 (SIGSEGV), code 1 (SEGV_MAPERR) fault addr 0x10\n")
+    sys.stdout.flush()
+    sys.exit(1)
 if kind == "sleep":
     import time
     time.sleep(float(arg))

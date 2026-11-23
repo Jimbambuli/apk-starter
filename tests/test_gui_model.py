@@ -108,6 +108,7 @@ def test_crash_meaning_only_for_real_crashes():
     assert "3" in crash_meaning(True, 3)
     assert crash_meaning(True, 128 + 11).startswith("SIGSEGV") and crash_meaning(False, 6).startswith("SIGABRT")
     assert "memory" in crash_meaning(True, 128 + 9)
+    assert "GPU" in crash_meaning(True, 128 + 11, gpu_lost=True) and crash_meaning(True, 0, gpu_lost=True) is None
 
 
 def test_group_parts_puts_the_parts_of_an_app_together(tmp_path):

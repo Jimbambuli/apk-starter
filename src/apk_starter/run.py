@@ -1,6 +1,7 @@
 """Run android-translation-layer as a child: optional log with versioned header and trailer, exit mapping."""
 import configparser
 import os
+import re
 import shlex
 import signal
 import select
@@ -22,6 +23,12 @@ FORWARDED = (signal.SIGINT, signal.SIGTERM, signal.SIGHUP)
 # another process kills the main process and starts the app again; ATL runs all of them in one process)
 EXIT_RESTART = 75
 MAX_RESTARTS = 5        # per start, against an app that restarts in a loop
+# What ATL's output says about its end, as Android learns of a crash from its log (debuggerd), not from the exit
+# status: ART's line for a fatal signal (runtime_common.cc HandleUnexpectedSignalCommonDump; when the dump itself
+# faults, the handler is re-entered and hard-exits with status 1), and the graphics driver losing the GPU.
+FATAL_SIGNAL_RE = re.compile(rb"Fatal signal (\d{1,2}) \(SIG")
+GPU_LOST_RE = re.compile(rb"VK_ERROR_DEVICE_LOST|GPU faulted or hung")
+SCAN_OVERLAP = 64       # a line split between two reads
 
 
 def default_log_path(paths: Paths, pkg: str, now: datetime) -> Path:
@@ -85,7 +92,10 @@ def _emit_stderr(chunk: bytes) -> None:
         err.flush()
 
 
-def run_atl(cmd: list[str], env: dict[str, str], log: Path | None, header: dict[str, str]) -> int:
+def run_atl(cmd: list[str], env: dict[str, str], log: Path | None, header: dict[str, str],
+            ended: dict | None = None) -> int:
+    """ATL's exit status (128+N for signal N, also when ART reported a fatal signal N and then hard-exited);
+    `ended` gets "gpu_lost": True if the graphics driver reported a lost GPU."""
     logf = None
     if log is not None:
         try:
@@ -99,7 +109,8 @@ def run_atl(cmd: list[str], env: dict[str, str], log: Path | None, header: dict[
     t0 = time.monotonic()
     restarts = 0
     while True:
-        rc, last = _run_once(cmd, env, log, logf)
+        seen: dict = {}
+        rc, last = _run_once(cmd, env, log, logf, seen)
         if rc != EXIT_RESTART or restarts == MAX_RESTARTS:
             break
         restarts += 1
@@ -107,6 +118,10 @@ def run_atl(cmd: list[str], env: dict[str, str], log: Path | None, header: dict[
             logf.write(("" if last == b"\n" else "\n").encode() + f"{HEADER_PREFIX}restart\n".encode())
             logf.flush()
     duration = time.monotonic() - t0
+    if rc == 1 and "signal" in seen:
+        rc = -seen["signal"]
+    if ended is not None and seen.get("gpu_lost"):
+        ended["gpu_lost"] = True
     sig_name = None
     if rc < 0:
         try:
@@ -127,11 +142,11 @@ def run_atl(cmd: list[str], env: dict[str, str], log: Path | None, header: dict[
     return rc
 
 
-def _run_once(cmd: list[str], env: dict[str, str], log: Path | None, logf) -> tuple[int, bytes]:
-    """One ATL process: its exit status (negative: the signal) and the last byte of its output."""
+def _run_once(cmd: list[str], env: dict[str, str], log: Path | None, logf, seen: dict) -> tuple[int, bytes]:
+    """One ATL process: its exit status (negative: the signal) and the last byte of its output; `seen` gets
+    the fatal signal ART reported and whether the GPU was lost. The output goes on to stderr (and the log)."""
     try:
-        proc = subprocess.Popen(cmd, env=env, **({"stdout": subprocess.PIPE, "stderr": subprocess.STDOUT}
-                                                 if logf else {}))
+        proc = subprocess.Popen(cmd, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     except FileNotFoundError:
         if logf:
             logf.close()
@@ -150,25 +165,32 @@ def _run_once(cmd: list[str], env: dict[str, str], log: Path | None, logf) -> tu
     except ValueError:      # not the main thread
         previous = {}
     last = b"\n"
+    tail = b""
     try:
-        if logf:
-            fd = proc.stdout.fileno()
-            while True:
-                # EOF comes when every holder of the pipe has closed it: a child of ATL that outlives it
-                # (a leftover helper process) must not keep this process, and with it the Flatpak
-                # instance, alive. So read until ATL has ended, then only what is there.
-                ready, _w, _x = select.select([fd], [], [], 0.5)
-                if not ready:
-                    if proc.poll() is not None:
-                        break
-                    continue
-                chunk = os.read(fd, 65536)
-                if not chunk:
+        fd = proc.stdout.fileno()
+        while True:
+            # EOF comes when every holder of the pipe has closed it: a child of ATL that outlives it
+            # (a leftover helper process) must not keep this process, and with it the Flatpak
+            # instance, alive. So read until ATL has ended, then only what is there.
+            ready, _w, _x = select.select([fd], [], [], 0.5)
+            if not ready:
+                if proc.poll() is not None:
                     break
+                continue
+            chunk = os.read(fd, 65536)
+            if not chunk:
+                break
+            if logf:
                 logf.write(chunk)
                 logf.flush()
-                _emit_stderr(chunk)
-                last = chunk[-1:]
+            _emit_stderr(chunk)
+            last = chunk[-1:]
+            text = tail + chunk
+            for m in FATAL_SIGNAL_RE.finditer(text):
+                seen.setdefault("signal", int(m.group(1)))
+            if GPU_LOST_RE.search(text):
+                seen["gpu_lost"] = True
+            tail = text[-SCAN_OVERLAP:]
         rc = proc.wait()
     finally:
         for sig, old in previous.items():
