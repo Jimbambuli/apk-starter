@@ -486,6 +486,10 @@ def _main(argv: list[str], env: Mapping[str, str]) -> int:
         args = parser.parse_args([a for a in kept if a != "--"])
     except SystemExit as e:
         return e.code if isinstance(e.code, int) else 0
+    if args.uri and not tail and ":" not in args.uri:
+        # a menu entry started without a link: the desktop drops its %u, so "--uri %u PKG" arrives as "--uri PKG"
+        # (GLib, KDE). As Android's launcher intent (no data), that starts the app itself.
+        tail, args.uri = [args.uri], None
     mode = (args.install or args.install_request or args.setup_aurora or args.setup_microg or args.list or args.remove
             or args.remove_all or args.version)
     more = tail if (args.install or args.install_request) else []       # the further parts of a split APK
