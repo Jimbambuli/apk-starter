@@ -318,7 +318,7 @@ chmod +x APK_Starter-*-x86_64.AppImage
 ./APK_Starter-*-x86_64.AppImage
 ```
 
-What the computer needs: glibc 2.41 or newer (Debian 13, Ubuntu 25.04, Fedora 42, Arch Linux and newer), FUSE
+What the computer needs: glibc 2.41 or newer (tested on Debian 13, Ubuntu 26.04, Fedora 44 and 45 and Arch Linux), FUSE
 (`fusermount3`, package `fuse3`) and the libraries every desktop has: the graphics driver (Mesa or NVIDIA, with
 libGL/EGL/Vulkan, libdrm, libva), fontconfig/FreeType/HarfBuzz, ALSA with the PipeWire or PulseAudio client
 libraries, and a Wayland or X11 session (`packaging/appimage/excludelist` lists them all). Without FUSE, unpack it once
