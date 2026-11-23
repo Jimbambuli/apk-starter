@@ -1,0 +1,5 @@
+#!/bin/sh
+# AppRun of the APK Starter AppImage: the bundled Python runs apprun.py (stable path, environment), which then
+# starts the starter. Python finds its standard library relative to its own place (usr/lib/python3.X).
+HERE=$(dirname "$(readlink -f "$0")")
+exec "$HERE/usr/bin/python3" -I "$HERE/apprun.py" "$@"

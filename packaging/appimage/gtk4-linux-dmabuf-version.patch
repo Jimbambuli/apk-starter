@@ -1,0 +1,15 @@
+From GTK 4.20 (gdk/wayland/gdkdisplay-wayland.c, LINUX_DMABUF_VERSION): bind zwp_linux_dmabuf_v1 at most at
+version 5. GTK 4.18 bound the version the compositor offers; a compositor with version 6 (KWin 6.8) then sends
+feedback that GTK 4.18 does not expect (observed: tranches without main_device) and GTK crashes in
+linux_dmabuf_tranche_done() while it opens the display. Used by packaging/appimage/build.sh for Debian 13's GTK.
+--- a/gdk/wayland/gdkdisplay-wayland.c	2026-11-23 08:30:53.771714312 +0000
++++ b/gdk/wayland/gdkdisplay-wayland.c	2026-11-23 08:30:53.772480311 +0000
+@@ -367,7 +367,7 @@
+       struct zwp_linux_dmabuf_feedback_v1 *feedback;
+ 
+       display_wayland->linux_dmabuf =
+-        wl_registry_bind (display_wayland->wl_registry, id, &zwp_linux_dmabuf_v1_interface, version);
++        wl_registry_bind (display_wayland->wl_registry, id, &zwp_linux_dmabuf_v1_interface, MIN (version, 5));
+       feedback = zwp_linux_dmabuf_v1_get_default_feedback (display_wayland->linux_dmabuf);
+       display_wayland->dmabuf_formats_info = dmabuf_formats_info_new (GDK_DISPLAY (display_wayland),
+                                                                       "default",

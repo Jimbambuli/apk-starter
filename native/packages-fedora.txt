@@ -4,4 +4,4 @@ pkgconfig(egl) pkgconfig(libelf) pkgconfig(libunwind) pkgconfig(libbsd) pkgconfi
 pkgconfig(icu-uc) pkgconfig(icu-i18n) pkgconfig(libcrypto) pkgconfig(expat) pkgconfig(liblz4) pkgconfig(liblzma) pkgconfig(libcap) pkgconfig(zlib)
 pkgconfig(gtk4) pkgconfig(vulkan) pkgconfig(openxr) pkgconfig(fontconfig) pkgconfig(gl) pkgconfig(wayland-client) pkgconfig(wayland-protocols)
 pkgconfig(libportal) pkgconfig(sqlite3) pkgconfig(libavcodec) pkgconfig(libavfilter) pkgconfig(libavformat) pkgconfig(libavutil) pkgconfig(libswscale)
-pkgconfig(libdrm) pkgconfig(gudev-1.0) pkgconfig(webkitgtk-6.0) pkgconfig(libsecret-1) pkgconfig(pangoft2) pkgconfig(libwebp) pkgconfig(alsa) pkgconfig(librsvg-2.0)
+pkgconfig(libdrm) pkgconfig(gudev-1.0) pkgconfig(webkitgtk-6.0) pkgconfig(libsecret-1) pkgconfig(pangoft2) pkgconfig(libwebp) pkgconfig(alsa) pkgconfig(librsvg-2.0) pkgconfig(libpipewire-0.3)

@@ -1,0 +1,76 @@
+# Libraries the AppImage takes from the host instead of bundling them (make-appdir.py; fnmatch patterns of sonames).
+# Base: the C library and the compiler's runtime; the host's are at least as new (glibc >= 2.41 is required anyway).
+ld-linux-x86-64.so.2
+libc.so.6
+libm.so.6
+libdl.so.2
+libpthread.so.0
+librt.so.1
+libresolv.so.2
+libutil.so.1
+libanl.so.1
+libmvec.so.1
+libBrokenLocale.so.1
+libthread_db.so.1
+libnss_*
+libstdc++.so.6
+libgcc_s.so.1
+# The graphics stack: the host's GL/EGL/Vulkan drivers (Mesa, NVIDIA) load with the host's libraries; an older
+# bundled copy of one of them in LD_LIBRARY_PATH would break the driver. (libwayland-egl/-cursor are bundled: small,
+# stable, and not every system with Mesa has them.)
+libGL.so.1
+libEGL.so.1
+libGLX.so.0
+libGLdispatch.so.0
+libOpenGL.so.0
+libGLESv1_CM.so.1
+libGLESv2.so.2
+libgbm.so.1
+libdrm.so.2
+libdrm_*.so.*
+libvulkan.so.1
+libwayland-client.so.0
+libwayland-server.so.0
+libxcb*.so.*
+libX11.so.6
+libX11-xcb.so.1
+libXext.so.6
+libXau.so.6
+libXdmcp.so.6
+libxshmfence.so.1
+libva*.so.*
+libvdpau.so.1
+libz.so.1
+libzstd.so.1
+libexpat.so.1
+libffi.so.8
+libelf.so.1
+# Sound: the host's sound server and its client libraries (ALSA plugins, PipeWire, PulseAudio) belong together
+# (seen on Arch: the host's libpulse with Debian's libpulsecommon fails, and with it SDL2 and ALSA's pulse plugin).
+libasound.so.2
+libpipewire-0.3.so.0
+libpulse.so.0
+libpulse-simple.so.0
+libpulsecommon-*.so
+# Fonts: the host's fontconfig with its configuration and the matching FreeType/HarfBuzz.
+libfontconfig.so.1
+libfreetype.so.6
+libharfbuzz.so.0
+libharfbuzz-subset.so.0
+# System libraries every desktop has (util-linux, systemd, D-Bus, PCRE2, libcap, p11-kit, libgpg-error).
+libmount.so.1
+libblkid.so.1
+libuuid.so.1
+libudev.so.1
+libsystemd.so.0
+libdbus-1.so.3
+libpcre2-8.so.0
+libcap.so.2
+libp11-kit.so.0
+libgpg-error.so.0
+# Libraries of the host's shell and tools (bash, readline): the AppImage's library path reaches every program
+# started from it, and an older copy breaks them (seen: bash with Debian's libreadline on Arch).
+libreadline.so.8
+libhistory.so.8
+libtinfo.so.6
+libncursesw.so.6
