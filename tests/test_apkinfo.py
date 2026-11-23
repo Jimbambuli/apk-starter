@@ -161,6 +161,8 @@ def test_adaptive_icon_with_a_vector_foreground_is_drawn_as_svg(tmp_path):
     text = svg.decode()
     assert root.tag.endswith("svg") and 'fill="#3366cc"' in text and 'd="M30,30h48v48h-48z"' in text
     assert 'fill="#ffffff"' in text and "rotate(45" in text and "translate(64" in text
+    # Qt's SVG renderer (KDE portal dialog) draws a nested <svg> unscaled: only the root may be one
+    assert [e.tag for e in root.iter() if e.tag.endswith("svg")] == [root.tag]
 
 
 def test_adaptive_icon_with_a_bitmap_foreground_in_the_density_part(tmp_path):

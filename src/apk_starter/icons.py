@@ -197,8 +197,10 @@ class _Renderer:
             return None
         mask = self.new_id("m")
         self.defs.insert(0, f'<clipPath id="{mask}"><rect x="18" y="18" width="72" height="72" rx="16"/></clipPath>')
-        return ('<svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="18 18 72 72">'
-                f'<defs>{"".join(self.defs)}</defs><g clip-path="url(#{mask})">{"".join(layers)}</g></svg>').encode()
+        return ('<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" '
+                'width="72" height="72" viewBox="0 0 72 72">'
+                f'<defs>{"".join(self.defs)}</defs><g transform="translate(-18 -18)"><g clip-path="url(#{mask})">'
+                f'{"".join(layers)}</g></g></svg>').encode()
 
     def layer(self, node: Node, w: float, h: float, depth: int) -> str:
         """The drawable of an element (android:drawable or its child element) in a w x h box."""
@@ -225,7 +227,7 @@ class _Renderer:
             if not data:
                 return ""
             href = f"data:{BITMAP_TYPES[ext]};base64,{base64.b64encode(data).decode()}"
-            return (f'<image width="{_num(w)}" height="{_num(h)}" preserveAspectRatio="none" href="{href}"/>')
+            return (f'<image width="{_num(w)}" height="{_num(h)}" preserveAspectRatio="none" xlink:href="{href}"/>')
         node = parse_xml(_read(z, path, MAX_XML) or b"")
         return self.element(node, w, h, depth + 1) if node else ""
 
@@ -265,8 +267,12 @@ class _Renderer:
         vh = _float(attrs.get("viewportHeight"), 0) or _float(attrs.get("height"), h) or h
         alpha = _float(attrs.get("alpha"), 1.0)
         body = self.children(node[2], vw, vh)
-        return (f'<svg width="{_num(w)}" height="{_num(h)}" viewBox="0 0 {_num(vw)} {_num(vh)}" '
-                f'preserveAspectRatio="none"' + (f' opacity="{_num(alpha)}"' if alpha < 1 else "") + f">{body}</svg>")
+        # no nested <svg> (Qt's SVG renderer, used by KDE's portal dialog, ignores its viewBox and draws the layer
+        # unscaled: only the pink background showed) and xlink:href for images (Qt does not read plain href)
+        clip = self.new_id("v")
+        self.defs.append(f'<clipPath id="{clip}"><rect width="{_num(vw)}" height="{_num(vh)}"/></clipPath>')
+        return (f'<g transform="scale({_num(w / vw)} {_num(h / vh)})" clip-path="url(#{clip})"'
+                + (f' opacity="{_num(alpha)}"' if alpha < 1 else "") + f">{body}</g>")
 
     def children(self, nodes: list, vw: float, vh: float) -> str:
         out, open_clips = [], 0
