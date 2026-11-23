@@ -103,6 +103,14 @@ def test_digitalis_only_on_x86_64():
     assert re.search(r"arch:\n\s+x86_64:\n\s+config-opts:\n\s+- -Dnative_bridge=", atl)
 
 
+
+def test_vixl_only_on_aarch64():
+    """ART links the system libvixl only for its arm/arm64 code (not in the SDK); x86_64 builds stay without it."""
+    text = MANIFEST.read_text(encoding="utf-8")
+    module = re.search(r"^  - name: vixl\n((?:    .*\n|\n)+?)(?=^  - name: )", text, re.M).group(1)
+    assert re.search(r"only-arches:\n\s+- aarch64\n", module)
+
+
 def test_breeze_gtk4_theme_is_bundled():
     """gtk-theme-name=Breeze from the desktop works in the sandbox: the generated GTK 4 part and its assets."""
     text = MANIFEST.read_text(encoding="utf-8")
