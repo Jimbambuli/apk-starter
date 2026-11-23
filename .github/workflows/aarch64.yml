@@ -16,19 +16,15 @@ jobs:
   flatpak:
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 300
+    # the same image as build.yml (its index has an arm64 build): Flatpak 1.15.6 or newer for --device=input
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-51@sha256:78d969b18225ae107ca29497bf09c4a3f791e5f1838a9a912a529d0024fb6210
+      options: --privileged
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
-      - name: Install flatpak and flatpak-builder
-        run: |
-          # Flatpak 1.15.6 or newer for --device=input (Ubuntu 24.04 has 1.14.6)
-          sudo add-apt-repository -y ppa:flatpak/stable
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends -o Acquire::Retries=5 flatpak flatpak-builder
-          flatpak --version
-          # Ubuntu 24.04 limits unprivileged user namespaces, which bubblewrap needs
-          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+      - run: flatpak --version; flatpak-builder --version; uname -m
       - name: Add the Flathub remote for this user
         run: flatpak --user remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
       - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
