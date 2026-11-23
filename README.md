@@ -308,6 +308,40 @@ commits in the manifest: `meson subprojects update --reset` in `native/`, then `
 The libraries and programs are installed without debug information; for a build with it, configure a new build
 directory with `-Dstrip=false`.
 
+## AppImage (without sandbox)
+
+The AppImage is the native build above (with Digitalis for arm64-only apps), packed with Python, GTK 4, WebKitGTK
+and the other libraries of Debian 13 into one file for x86_64:
+
+```
+chmod +x APK_Starter-*-x86_64.AppImage
+./APK_Starter-*-x86_64.AppImage
+```
+
+What the computer needs: glibc 2.41 or newer (Debian 13, Ubuntu 25.04, Fedora 42, Arch Linux and newer), FUSE
+(`fusermount3`, package `fuse3`) and the libraries every desktop has: the graphics driver (Mesa or NVIDIA, with
+libGL/EGL/Vulkan, libdrm, libva), fontconfig/FreeType/HarfBuzz, ALSA with the PipeWire or PulseAudio client
+libraries, and a Wayland or X11 session (`packaging/appimage/excludelist` lists them all). Without FUSE, unpack it once
+(`./APK_Starter-*.AppImage --appimage-extract`) and start `squashfs-root/AppRun`.
+
+Data and menu entries are those of the native build (`~/.local/share/io.github.Jimbambuli.ApkStarter`, entries in
+`~/.local/share/applications`); the Flatpak's data in `~/.var/app/…` are not touched. The entries of the apps start
+the AppImage file: after moving or renaming it, start the starter once from the new place and add the entries again
+(app page, «Add to menu»). The Flatpak and the AppImage use the same application IDs: do not run both at the same
+time, and an app installed in both has one menu entry, that of the one that made it last.
+
+> **The AppImage has no sandbox.** Unlike the Flatpak, the starter and every app run with all the rights of your user
+> account: they can read and change all your files, use the network, the camera, the microphone and the other
+> devices. None of the limits in «Permissions» above apply (switched-off permissions are still answered «denied» to
+> the app, but nothing stops native code that ignores that). WebKit's own sandbox for web pages in apps (WebView)
+> is off as well: its helper processes run from a place inside the AppImage that its sandbox cannot set up. Install
+> only apps you trust; use the Flatpak where you can.
+
+Build (as root in a Debian 13 container or VM, x86_64; the network is needed for apt, the Digitalis bundle and
+appimagetool): `packaging/collect-sources.sh OUT` makes the source bundle, then
+`packaging/appimage/build.sh OUT/apk-starter-VERSION.tar.xz OUTDIR`. `packaging/appimage/ct-test.sh` tests it in a
+fresh container of another distribution.
+
 ## Translations
 
 The window, `--help`, the messages and the menu/AppStream texts follow the system language. Included: German,
