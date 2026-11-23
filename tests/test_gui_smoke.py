@@ -100,6 +100,28 @@ def test_window_speaks_the_system_language(tmp_path, lang, title, error):
 
 
 @needs_broadway
+@pytest.mark.skipif(not shutil.which("msgfmt"), reason="no msgfmt (gettext)")
+@pytest.mark.parametrize("lang", ["en", *(HERE.parent / "po/LINGUAS").read_text().split()])
+def test_details_buttons_fit_a_phone_in_every_language(tmp_path, lang):
+    """360 px (a phone): Start, Delete data, Uninstall and the Debug note wrap instead of widening the window."""
+    d = tmp_path / "d"
+    (d / "apps").mkdir(parents=True)
+    (d / "apps/org.a.alpha.json").write_text(json.dumps({"package": "org.a.alpha", "label": "Alpha"}))
+    (d / "window.json").write_text(json.dumps({"width": 360, "height": 700, "selected": "org.a.alpha"}))
+    loc = tmp_path / "prefix/share/locale" / lang / "LC_MESSAGES"
+    loc.mkdir(parents=True)
+    if lang != "en":
+        subprocess.run(["msgfmt", "-o", str(loc / "apk-starter.mo"), str(HERE.parent / "po" / f"{lang}.po")], check=True)
+    with broadway() as env:
+        env = {k: v for k, v in env.items() if k not in ("LC_ALL", "LC_MESSAGES", "LANG")} | {"LANGUAGE": lang}
+        out = subprocess.run([sys.executable, str(HERE / "gui_actions_probe.py"), str(d), str(tmp_path / "prefix")],
+                             env=env, capture_output=True, text=True, timeout=60)
+    report = json.loads(out.stdout.strip().splitlines()[-1])
+    assert report["width"] <= 360, (report, out.stderr)
+    assert all(0 <= left and right <= report["width"] for left, right, _top in report["buttons"]), report
+
+
+@needs_broadway
 def test_search_sort_keys_narrow_layout_and_remembered_state(tmp_path):
     d = tmp_path / "d"
     (d / "apps").mkdir(parents=True)

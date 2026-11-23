@@ -27,7 +27,7 @@ try:
     import gi
     gi.require_version("Gtk", "4.0")
     gi.require_version("Gdk", "4.0")
-    from gi.repository import Gdk, Gio, GLib, Gtk, Pango
+    from gi.repository import Gdk, Gio, GLib, GObject, Gtk, Pango
 except (ImportError, ValueError) as e:      # pragma: no cover - depends on the system
     raise StarterError(_("the window needs GTK 4: {reason}").format(reason=e)) from None
 
@@ -46,6 +46,7 @@ CSS = """
 .section-title { font-weight: 700; }
 .row-name { font-weight: 600; }
 .caption { font-size: 0.85em; }
+.actions > flowboxchild { padding: 0; }
 .drop-zone { margin: 12px; background-color: @theme_bg_color; }
 """
 
@@ -765,11 +766,18 @@ class Window(Gtk.ApplicationWindow):
         # a visible note instead of a dot: Debug makes the app slower and the archive grows
         self.debug_badge = label(_("Debug is on"), "caption", "accent", valign=Gtk.Align.CENTER,
                                  visible=app.debug or app.debug_full)
-        # one height and font for all (the box gives them its height), only the theme draws them
-        actions = Gtk.Box(spacing=8, valign=Gtk.Align.CENTER)
+        # one font for all, only the theme draws them; they flow onto a second line where the window is too narrow
+        # for one (a phone, long translations)
+        actions = Gtk.FlowBox(selection_mode=Gtk.SelectionMode.NONE, column_spacing=8, row_spacing=8,
+                              max_children_per_line=4, halign=Gtk.Align.START, focusable=False)
+        actions.add_css_class("actions")
         for w in (start, Gtk.Button(label=_("Delete data…"), action_name="win.clear-data", action_target=target),
                   uninstall, self.debug_badge):
             actions.append(w)
+            w.get_parent().set_focusable(False)         # Tab reaches the buttons, not their cells
+        # a hidden badge takes no cell
+        self.debug_badge.bind_property("visible", self.debug_badge.get_parent(), "visible",
+                                       GObject.BindingFlags.SYNC_CREATE)
         self.details.append(actions)
 
         try:
@@ -787,7 +795,7 @@ class Window(Gtk.ApplicationWindow):
                  (_("Data"), GLib.format_size(r.size) if r.size else _("no data")),
                  (_("Status"), self.status_text(r)))
         for i, (key, value) in enumerate(lines):
-            facts.attach(label(key, "dim-label"), 0, i, 1, 1)
+            facts.attach(label(key, "dim-label", wrap=True), 0, i, 1, 1)     # two lines rather than too wide
             value_label = label(value, wrap=True, selectable=True, hexpand=True, focusable=False)
             facts.attach(value_label, 1, i, 1, 1)
         self.status_value = value_label
