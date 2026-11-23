@@ -106,9 +106,22 @@ def rewrite_pc(stage_prefix: Path, prefix: str, pcdir: Path) -> None:
         (pcdir / pc.name).write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+def javac_rspfile(bdir: Path) -> None:
+    """ninja runs a rule's command as one `sh -c` argument, which Linux limits to 128 KiB (MAX_ARG_STRLEN). ATL's
+    javac call names every source of api-impl and has passed that (148 KB at fix-r22, also inside the source tree).
+    javac reads arguments from an @file: meson's rule for javac gets the rspfile its rules for other compilers have."""
+    f = bdir / "build.ninja"
+    text = f.read_text(encoding="utf-8")
+    old = "rule java_COMPILER\n command = javac $ARGS $in\n"
+    if old in text:
+        f.write_text(text.replace(old, "rule java_COMPILER\n command = javac $ARGS @$FOR_JAR.rsp\n"
+                                       " rspfile = $FOR_JAR.rsp\n rspfile_content = $in\n"), encoding="utf-8")
+
+
 def meson_component(src: Path, bdir: Path, prefix: str, stage: Path, env: dict, opts: list[str] = ()) -> None:
     if not (bdir / "build.ninja").is_file():
         run(["meson", "setup", bdir, src, f"--prefix={prefix}", "--libdir=lib", "--buildtype=release", *opts], env)
+    javac_rspfile(bdir)
     run(["meson", "compile", "-C", bdir], env)
     run(["meson", "install", "-C", bdir, "--destdir", stage, "--no-rebuild"], env)
 
