@@ -50,6 +50,9 @@ jobs:
           mkdir out
           flatpak build-bundle --arch=aarch64 --runtime-repo=https://dl.flathub.org/repo/flathub.flatpakrepo \
             repo out/apk-starter-aarch64.flatpak io.github.Jimbambuli.ApkStarter stable
+          # the translations are an extension of their own (installed with the app only from a repository)
+          flatpak build-bundle --arch=aarch64 --runtime repo out/apk-starter-aarch64.Locale.flatpak \
+            io.github.Jimbambuli.ApkStarter.Locale stable
           sha256sum out/*.flatpak
       - name: Version
         run: |
