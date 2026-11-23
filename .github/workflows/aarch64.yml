@@ -22,8 +22,11 @@ jobs:
           persist-credentials: false
       - name: Install flatpak and flatpak-builder
         run: |
+          # Flatpak 1.15.6 or newer for --device=input (Ubuntu 24.04 has 1.14.6)
+          sudo add-apt-repository -y ppa:flatpak/stable
           sudo apt-get update
           sudo apt-get install -y flatpak flatpak-builder
+          flatpak --version
           # Ubuntu 24.04 limits unprivileged user namespaces, which bubblewrap needs
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
       - name: Add the Flathub remote for this user
