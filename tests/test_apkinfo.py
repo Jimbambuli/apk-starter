@@ -150,7 +150,8 @@ VECTOR = ("vector", {"width": ("dimen", 108), "height": ("dimen", 108), "viewpor
             [("path", {"pathData": "M30,30h48v48h-48z", "fillColor": ("color", 0xFFFFFFFF)}, [])])])
 
 
-def test_adaptive_icon_with_a_vector_foreground_is_drawn_as_svg(tmp_path):
+def test_adaptive_icon_with_a_vector_foreground_is_drawn_as_svg(tmp_path, monkeypatch):
+    monkeypatch.setattr("apk_starter.icons.png_from_svg", lambda svg: None)
     names = _res({"anydpi-v26": "res/ic.xml"}, [Res("color", "bg", {"": (0x1C, 0xFF3366CC)}),
                                                Res("drawable", "fg", {"": "res/fg.xml"})])
     arsc, ids = arsc_table("org.example.demo", names)
@@ -161,9 +162,12 @@ def test_adaptive_icon_with_a_vector_foreground_is_drawn_as_svg(tmp_path):
     text = svg.decode()
     assert root.tag.endswith("svg") and 'fill="#3366cc"' in text and 'd="M30,30h48v48h-48z"' in text
     assert 'fill="#ffffff"' in text and "rotate(45" in text and "translate(64" in text
+    # Qt's SVG renderer (KDE portal dialog) draws a nested <svg> unscaled: only the root may be one
+    assert [e.tag for e in root.iter() if e.tag.endswith("svg")] == [root.tag]
 
 
-def test_adaptive_icon_with_a_bitmap_foreground_in_the_density_part(tmp_path):
+def test_adaptive_icon_with_a_bitmap_foreground_in_the_density_part(tmp_path, monkeypatch):
+    monkeypatch.setattr("apk_starter.icons.png_from_svg", lambda svg: None)
     from apk_starter.cli import read_parts
     extra = [Res("color", "bg", {"": (0x1C, 0xFF000000)}), Res("mipmap", "fg", {})]   # its bitmaps: only in the part
     _a, ids = arsc_table("org.example.demo", _res({}, extra))
@@ -173,6 +177,17 @@ def test_adaptive_icon_with_a_bitmap_foreground_in_the_density_part(tmp_path):
         {"res/fg.png": png_bytes(162, 162)})
     info, _parts = read_parts(None, [base, part], None, tmp_path)
     assert b"data:image/png;base64," in info.icon and ET.fromstring(info.icon) is not None
+
+
+def test_adaptive_icon_is_handed_on_as_a_png(tmp_path):
+    pytest.importorskip("gi")
+    names = _res({"anydpi-v26": "res/ic.xml"}, [Res("color", "bg", {"": (0x1C, 0xFF3366CC)}),
+                                               Res("drawable", "fg", {"": "res/fg.xml"})])
+    arsc, ids = arsc_table("org.example.demo", names)
+    apk = make_apk(tmp_path / "a.apk", manifest=axml_manifest(label=ids["string/app_name"], icon=ids["mipmap/ic"]),
+                   arsc=arsc, files={"res/ic.xml": _adaptive(ids, "drawable/fg"), "res/fg.xml": axml_doc(VECTOR)})
+    png = read_apk_info(apk).icon
+    assert png[:8] == b"\x89PNG\r\n\x1a\n" and png_size(png) == (256, 256)
 
 
 @pytest.mark.parametrize("strip_names", [False, True])
