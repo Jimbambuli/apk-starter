@@ -25,6 +25,7 @@ deps = [
   # android_translation_layer
   'vulkan', 'openxr', 'fontconfig', 'gl', 'wayland-client', 'libportal', 'sqlite3', 'libavfilter', 'libavformat',
   'libavutil', 'libswscale', 'libdrm', 'gudev-1.0', 'webkitgtk-6.0', 'libsecret-1', 'pangoft2', 'libwebp', 'alsa',
+  'libpipewire-0.3',
 ]
 versioned = {'libunwind': '>=1.8.0', 'gtk4': '>=4.14', 'wayland-protocols': '>=1.12', 'libavcodec': '>=59'}
 foreach d : deps
