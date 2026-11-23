@@ -1,0 +1,59 @@
+name: aarch64
+
+# The Flatpak for aarch64 (phones and ARM laptops) from the same manifest, on GitHub's arm64 runner. Keeps the bundle
+# as an artifact; publishing stays with build.yml.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, arm-094]
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  flatpak:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Install flatpak and flatpak-builder
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y flatpak flatpak-builder
+          # Ubuntu 24.04 limits unprivileged user namespaces, which bubblewrap needs
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+      - name: Add the Flathub remote for this user
+        run: flatpak --user remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: .flatpak-builder
+          key: fb-aarch64-${{ hashFiles('io.github.Jimbambuli.ApkStarter.yml') }}
+          restore-keys: fb-aarch64-
+      - name: Build
+        run: |
+          flatpak-builder --user --arch=aarch64 --ccache --force-clean --disable-rofiles-fuse --default-branch=stable \
+            --repo=repo --install-deps-from=flathub build-dir io.github.Jimbambuli.ApkStarter.yml
+      # the ARM features GCC builds ART with, i.e. what ART's own dex2oat calls pass (dexopt.ISAS)
+      - name: Compiler's ARM features
+        run: |
+          flatpak run --arch=aarch64 --command=sh org.gnome.Sdk//51 -c \
+            'echo | g++ -dM -E -x c++ - | grep -E "__ARM_(FEATURE_(CRC32|ATOMICS|FP16_SCALAR_ARITHMETIC|FP16_VECTOR_ARITHMETIC|DOTPROD)|ARCH_8_[12]A)" || echo none'
+      - name: Bundle
+        run: |
+          mkdir out
+          flatpak build-bundle --arch=aarch64 --runtime-repo=https://dl.flathub.org/repo/flathub.flatpakrepo \
+            repo out/apk-starter-aarch64.flatpak io.github.Jimbambuli.ApkStarter stable
+          sha256sum out/*.flatpak
+      - name: Version
+        run: |
+          flatpak --user install -y --noninteractive out/apk-starter-aarch64.flatpak
+          flatpak run io.github.Jimbambuli.ApkStarter --version
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: apk-starter-aarch64
+          path: out
+          retention-days: 14
