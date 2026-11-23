@@ -1,6 +1,6 @@
 """The app's icon for its menu entry and the window: the largest square PNG of the launcher icon, looked up in the
 base and in its configuration parts (a density part holds the bitmaps of an app from an app store); without one an
-adaptive icon (mipmap-anydpi-v26) is drawn as SVG like a launcher draws it: background and foreground layer of
+adaptive icon (mipmap-anydpi-v26) is drawn like a launcher draws it (SVG, then a 256 px PNG through GdkPixbuf): background and foreground layer of
 108 dp, the middle 72 dp shown in a rounded square. Layers: colours, bitmaps, vector drawables (paths, groups,
 clip paths, gradients) and insets; the monochrome layer is left out (it is for themed icons)."""
 import base64
@@ -81,8 +81,53 @@ def app_icon(sources: Sequence[Source], icon_id: int | None) -> bytes | None:
         if path and path.lower().endswith(".xml"):
             svg = _Renderer(sources).adaptive(z, path)
             if svg:
-                return svg
+                return png_from_svg(svg) or svg
     return None
+
+
+ICON_PX = 256
+
+
+def _pixbuf():
+    try:
+        import gi
+        gi.require_version("GdkPixbuf", "2.0")
+        from gi.repository import GdkPixbuf, GLib
+    except (ImportError, ValueError):
+        return None, None
+    return GdkPixbuf, GLib
+
+
+def png_from_svg(svg: bytes) -> bytes | None:
+    """The drawn adaptive icon as a ICON_PX square PNG (the portal and the desktop need no SVG/WebP support of their
+    own); None without GdkPixbuf, the SVG is used then."""
+    GdkPixbuf, GLib = _pixbuf()
+    if GdkPixbuf is None:
+        return None
+    try:
+        loader = GdkPixbuf.PixbufLoader.new_with_type("svg")
+        loader.connect("size-prepared", lambda ld, _w, _h: ld.set_size(ICON_PX, ICON_PX))
+        loader.write(svg)
+        loader.close()
+        ok, data = loader.get_pixbuf().save_to_bufferv("png", [], [])
+        return bytes(data) if ok else None
+    except (GLib.Error, AttributeError):
+        return None
+
+
+def webp_to_png(data: bytes) -> bytes:
+    """A WebP layer as PNG: the SVG renderers (librsvg, Qt) do not all read WebP. Unchanged if it cannot be decoded."""
+    GdkPixbuf, GLib = _pixbuf()
+    if GdkPixbuf is None:
+        return data
+    try:
+        loader = GdkPixbuf.PixbufLoader.new_with_type("webp")
+        loader.write(data)
+        loader.close()
+        ok, out = loader.get_pixbuf().save_to_bufferv("png", [], [])
+        return bytes(out) if ok else data
+    except (GLib.Error, AttributeError):
+        return data
 
 
 # -- binary XML -----------------------------------------------------------------------------------------------------
@@ -226,7 +271,11 @@ class _Renderer:
             data = _read(z, path, MAX_ICON)
             if not data:
                 return ""
-            href = f"data:{BITMAP_TYPES[ext]};base64,{base64.b64encode(data).decode()}"
+            mime = BITMAP_TYPES[ext]
+            if mime == "image/webp":
+                png = webp_to_png(data)
+                data, mime = png, ("image/png" if png[:4] == b"\x89PNG" else mime)
+            href = f"data:{mime};base64,{base64.b64encode(data).decode()}"
             return (f'<image width="{_num(w)}" height="{_num(h)}" preserveAspectRatio="none" xlink:href="{href}"/>')
         node = parse_xml(_read(z, path, MAX_XML) or b"")
         return self.element(node, w, h, depth + 1) if node else ""
