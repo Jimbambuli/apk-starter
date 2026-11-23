@@ -39,7 +39,7 @@ jobs:
       # the ARM features GCC builds ART with, i.e. what ART's own dex2oat calls pass (dexopt.ISAS)
       - name: Compiler's ARM features
         run: |
-          flatpak run --arch=aarch64 --command=sh org.gnome.Sdk//51 -c \
+          flatpak run --user --arch=aarch64 --command=sh org.gnome.Sdk//51 -c \
             'echo | g++ -dM -E -x c++ - | grep -E "__ARM_(FEATURE_(CRC32|ATOMICS|FP16_SCALAR_ARITHMETIC|FP16_VECTOR_ARITHMETIC|DOTPROD)|ARCH_8_[12]A)" || echo none'
       - name: Bundle
         run: |
@@ -53,7 +53,7 @@ jobs:
       - name: Version
         run: |
           flatpak --user install -y --noninteractive out/apk-starter-aarch64.flatpak
-          flatpak run io.github.Jimbambuli.ApkStarter --version
+          flatpak run --user io.github.Jimbambuli.ApkStarter --version
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: apk-starter-aarch64
