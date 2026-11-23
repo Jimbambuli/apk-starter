@@ -25,6 +25,7 @@ deps = [
   # android_translation_layer
   'vulkan', 'openxr', 'fontconfig', 'gl', 'wayland-client', 'libportal', 'sqlite3', 'libavfilter', 'libavformat',
   'libavutil', 'libswscale', 'libdrm', 'gudev-1.0', 'webkitgtk-6.0', 'libsecret-1', 'pangoft2', 'libwebp', 'alsa',
+  'libpipewire-0.3',
 ]
 versioned = {'libunwind': '>=1.8.0', 'gtk4': '>=4.14', 'wayland-protocols': '>=1.12', 'libavcodec': '>=59'}
 foreach d : deps
@@ -63,7 +64,8 @@ custom_target('components',
   output: 'components.stamp',
   command: [python, files('build.py'), 'build', '--source', meson.project_source_root(), '--build',
             meson.current_build_dir(), '--stage', stage, '--prefix', get_option('prefix'), '--jdk', jdk,
-            '--stamp', '@OUTPUT@'] + (get_option('strip') ? ['--strip'] : []),
+            '--stamp', '@OUTPUT@'] + (get_option('strip') ? ['--strip'] : []) +
+          (get_option('digitalis') ? ['--digitalis'] : []),
   build_by_default: true,
   build_always_stale: true,
   console: true)

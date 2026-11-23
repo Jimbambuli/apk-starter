@@ -36,6 +36,7 @@ class Paths:
     data_home: Path
     cache_home: Path
     prefix: Path
+    launcher: Path | None = None        # APK_STARTER_PROGRAM: what starts this starter, if not <prefix>/bin/apk-starter
 
     @classmethod
     def from_env(cls, env: Mapping[str, str]) -> "Paths":
@@ -44,6 +45,7 @@ class Paths:
             data_home=Path(env.get("XDG_DATA_HOME") or home / ".local/share"),
             cache_home=Path(env.get("XDG_CACHE_HOME") or home / ".cache"),
             prefix=Path(env.get("APK_STARTER_PREFIX") or "/app"),
+            launcher=Path(env["APK_STARTER_PROGRAM"]) if env.get("APK_STARTER_PROGRAM") else None,
         )
 
     def apps_dir(self) -> Path:
@@ -106,7 +108,9 @@ class Paths:
         return self.prefix / "share/apk-starter/stubs.tsv"
 
     def program(self) -> Path:
-        return self.prefix / "bin/apk-starter"
+        """The command for menu entries and ATL's call-backs. An AppImage sets APK_STARTER_PROGRAM to the AppImage
+        file: <prefix> is its mount point, which is gone when it ends."""
+        return self.launcher or self.prefix / "bin/apk-starter"
 
     def default_icon(self) -> Path:
         return self.prefix / "share/icons/hicolor/scalable/apps/io.github.Jimbambuli.ApkStarter.svg"

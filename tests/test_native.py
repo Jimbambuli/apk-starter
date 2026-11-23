@@ -48,3 +48,13 @@ def test_starter_entry_exec_quoted():
     spec.loader.exec_module(build)
     assert build.desktop_exec_arg("/opt/apk starter/bin/apk-starter") == '"/opt/apk starter/bin/apk-starter"'
     assert build.desktop_exec_arg('/o/a"b$c\\d%e') == '"/o/a\\\\"b\\\\$c\\\\\\\\d%%e"'
+
+
+def test_appimage_program(monkeypatch, tmp_path):
+    """An AppImage: menu entries and ATL's call-backs run the AppImage file, not a file below its mount point."""
+    _native(monkeypatch, tmp_path, "/tmp/.mount_APKxyz/usr/lib/apk-starter")
+    monkeypatch.setenv("APK_STARTER_PROGRAM", "/home/u/Apps/APK Starter.AppImage")
+    install_launcher("org.x.y", "Demo", b"")
+    assert 'Exec="/home/u/Apps/APK Starter.AppImage" org.x.y\n' in launcher_entry("org.x.y")
+    assert Paths.from_env({"APK_STARTER_PROGRAM": "/a/b.AppImage"}).program().as_posix() == "/a/b.AppImage"
+    assert Paths.from_env({"APK_STARTER_PREFIX": "/p"}).program().as_posix() == "/p/bin/apk-starter"

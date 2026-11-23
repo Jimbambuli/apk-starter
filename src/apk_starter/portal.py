@@ -11,6 +11,7 @@ from .axml import LinkFilter
 from .cli import ENTRY_PREFIX
 from .errors import StarterError, UsageError
 from .i18n import _
+from .paths import Paths
 
 RESPONSE_TIMEOUT = 300
 PORTAL_NAME = "org.freedesktop.portal.Desktop"
@@ -158,7 +159,7 @@ def _native_icon(pkg: str) -> Path:
 
 
 def _native_install(menu: Path, pkg: str, label: str, icon: bytes, mime_types: list[str]) -> None:
-    program = str(Path(os.environ["APK_STARTER_PREFIX"]) / "bin/apk-starter")
+    program = str(Paths.from_env(os.environ).program())
     # an Exec argument quoted as the Desktop Entry spec says
     program = '"' + re.sub(r'([\\"`$])', r'\\\1', program).replace("\\", "\\\\").replace("%", "%%") + '"'
     icon_file = _native_icon(pkg)

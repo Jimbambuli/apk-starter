@@ -1,6 +1,7 @@
 """Split APKs: a base APK and its configuration parts (ABI, screen density, language), given as several files or
 as one bundle (.apks from bundletool / SAI, .xapk from APKPure). ATL loads the base first and the parts after it
 (class path and resources), like Android's LoadedApk with splitSourceDirs."""
+import os
 import platform
 import re
 import zipfile
@@ -22,8 +23,9 @@ ABI_SPLITS = {"config.armeabi": "armeabi", "config.armeabi_v7a": "armeabi-v7a", 
 MAX_PARTS = 200
 # the Android ABI of this computer's processor (platform.machine())
 HOST_ABIS = {"x86_64": "x86_64", "aarch64": "arm64-v8a"}
-# ATL's native bridge, Digitalis (Flatpak module digitalis, only in x86_64 builds), and the ABIs it runs
-NATIVE_BRIDGE = Path("/app/lib/digitalis/system/lib64/libberberis_arm64.so")
+# ATL's native bridge, Digitalis (Flatpak module digitalis, only in x86_64 builds; a native build or the AppImage with
+# -Ddigitalis=true has it in its prefix), and the ABIs it runs
+NATIVE_BRIDGE = Path(os.environ.get("APK_STARTER_PREFIX") or "/app") / "lib/digitalis/system/lib64/libberberis_arm64.so"
 BRIDGED_ABIS = ("arm64-v8a",)
 # ABIs ATL never runs: it is a 64-bit process
 ABIS_32_BIT = {"armeabi", "armeabi-v7a", "x86", "mips"}

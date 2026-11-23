@@ -563,6 +563,12 @@ def test_uri_goes_to_atl(box):
     assert "--uri=demo://open?x=1&y=2" in json.loads(box.record.read_text())["argv"]
 
 
+def test_menu_entry_without_link_starts_the_app(box):
+    """Exec "--uri %u PKG" without a link: the desktop removes %u, the package arrives as the value of --uri."""
+    assert main(["--uri", str(box.apk)], env=box.env) == 0
+    assert not any(a.startswith("--uri") for a in json.loads(box.record.read_text())["argv"])
+
+
 def test_empty_uri_from_the_menu_starts_the_app(box):
     assert main(["--uri", "", str(box.apk)], env=box.env) == 0
     assert not any(a.startswith("--uri") for a in json.loads(box.record.read_text())["argv"])
