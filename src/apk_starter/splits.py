@@ -179,6 +179,9 @@ def select(s: SplitSet, label: str) -> SplitSet:
         if native <= ABIS_32_BIT:
             raise IncompatibleError(_("{app} contains program code only for 32-bit x86 or ARM processors, which is not "
                                       "supported.").format(app=label))
+        if platform.machine() == "aarch64":
+            raise IncompatibleError(_("{app} contains program code only for x86 processors and does not run on this "
+                                      "computer.").format(app=label))
         raise IncompatibleError(_("{app} contains program code only for ARM processors and does not run on this "
                                   "computer.").format(app=label))
     keep = tuple((n, p) for n, p in s.splits if n not in ABI_SPLITS or ABI_SPLITS[n] == abi)

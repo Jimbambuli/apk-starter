@@ -9,7 +9,7 @@ Here the same files are put where ART and ATL look for them, so the first start 
   ghax.jar is compiled with dex2oat.
 - app: dex2oat with the class loader context ATL loads it with (ghax.jar, then api-impl.jar), written to a
   temporary directory and renamed into place, so a running app keeps its mapped files.
-- native libraries: lib/x86_64/* to <data>/<pkg>/<pkg>.apk_/lib/, newer than the APK, so ATL skips them.
+- native libraries: lib/<abi>/* to <data>/<pkg>/<pkg>.apk_/lib/, newer than the APK, so ATL skips them.
 
 Every path and argument is spelled exactly as ART/ATL spell them (see rundgang/startzeit-2026-11-01):
 ART only takes a file whose name and recorded class loader context match its own."""
@@ -19,6 +19,7 @@ import fcntl
 import hashlib
 import json
 import os
+import platform
 import shutil
 import signal
 import subprocess
@@ -33,9 +34,10 @@ from .i18n import _
 from .paths import Paths
 
 FLATPAK_INFO = Path("/.flatpak-info")
-ISA = "x86_64"
-# what ART passes for this ISA (Runtime::AddCurrentRuntimeFeaturesAsDex2OatArguments)
-ISA_FEATURES = "-ssse3,-sse4.1,-sse4.2,-avx,-avx2,-popcnt"
+# ART's instruction set for this computer's processor (platform.machine()) and the features ART passes for it to
+# dex2oat (Runtime::AddCurrentRuntimeFeaturesAsDex2OatArguments: InstructionSetFeatures::FromCppDefines() of its build)
+ISAS = {"x86_64": ("x86_64", "-ssse3,-sse4.1,-sse4.2,-avx,-avx2,-popcnt"),
+        "aarch64": ("arm64", "-a53,-crc,-lse,-fp16,-dotprod")}
 FULL = "speed"          # what ART uses without a filter, i.e. the code quality apps had so far
 QUICK = "verify"        # Android's install filter without a profile: no AOT code, 6x faster to make
 STALE_TMP_S = 3600
@@ -67,7 +69,7 @@ def app_context(paths: Paths) -> str:
 def dalvik_cache(paths: Paths, env: Mapping[str, str] | None = None) -> Path:
     """art_standalone GetDalvikCache(): $ANDROID_DATA/dalvik-cache, else $XDG_CACHE_HOME/art."""
     data = (env if env is not None else os.environ).get("ANDROID_DATA")
-    return (Path(data) / "dalvik-cache" if data else paths.cache_home / "art") / ISA
+    return (Path(data) / "dalvik-cache" if data else paths.cache_home / "art") / ISAS[platform.machine()][0]
 
 
 def cache_file(paths: Paths, location: str, env: Mapping[str, str] | None = None) -> Path:
@@ -200,9 +202,10 @@ def _dex2oat(paths: Paths, env: Mapping[str, str], location: str, context: str, 
     out.parent.mkdir(parents=True, exist_ok=True)
     tmp = out.parent / f".apk-starter-{os.getpid()}-{time.monotonic_ns()}"
     tmp.mkdir()
+    isa, features = ISAS[platform.machine()]
     try:
         proc = _run(["dex2oat", f"--dex-file={location}", f"--oat-file={tmp / out.name}",
-                     f"--instruction-set={ISA}", f"--instruction-set-features={ISA_FEATURES}", "--host",
+                     f"--instruction-set={isa}", f"--instruction-set-features={features}", "--host",
                      f"--boot-image={boot_image(paths)}", f"--class-loader-context={context}",
                      f"--compiler-filter={flt}", f"-j{len(os.sched_getaffinity(0))}"],
                     env, idle, (lambda: urgent_active(paths, own=location)) if pausable else None)

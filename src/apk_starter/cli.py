@@ -214,7 +214,7 @@ def install_apk(paths: Paths, apk: Path, lang: str | None, env: Mapping[str, str
 
 def read_parts(paths: Paths, files: list[Path], lang: str | None, tmp: Path) -> tuple[ApkInfo, splits.SplitSet]:
     """The app of one APK, of a base with its configuration parts, or of a bundle (.apks/.xapk); only the parts
-    for this computer (refused with IncompatibleError if there is no x86_64 code)."""
+    for this computer (refused with IncompatibleError if there is no code for it)."""
     parts = splits.expand(files, tmp)
     if len(parts) == 1:
         info = read_apk_info(parts[0], lang)

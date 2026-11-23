@@ -57,6 +57,17 @@ def test_android_data_moves_the_cache(art):
     assert dexopt.dalvik_cache(p, {"ANDROID_DATA": "/x"}) == Path("/x/dalvik-cache/x86_64")
 
 
+def test_aarch64_compiles_for_arm64(art, tmp_path, monkeypatch):
+    """ART's names on aarch64: instruction set arm64 (also the dalvik-cache folder), the features of FromCppDefines()."""
+    monkeypatch.setattr(dexopt.platform, "machine", lambda: "aarch64")
+    assert dexopt.dalvik_cache(Paths.from_env(art.env), {"ANDROID_DATA": "/x"}) == Path("/x/dalvik-cache/arm64")
+    apk = make_apk(tmp_path / "demo.apk", manifest=axml_manifest())
+    dexopt.compile_app(art.paths, art.env, str(apk), "verify")
+    call = art.calls()[-1]
+    assert arg(call, "--instruction-set=") == "arm64"
+    assert arg(call, "--instruction-set-features=") == "-a53,-crc,-lse,-fp16,-dotprod"
+
+
 def test_runtime_key_follows_the_flatpak_commit(art):
     k1 = dexopt.runtime_key(art.paths)
     art.info.write_text("[Instance]\napp-commit=bbbb\n")

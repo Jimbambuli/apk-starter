@@ -128,6 +128,18 @@ def test_arm64_runs_natively_on_aarch64(tmp_path, monkeypatch):
     assert splits.primary_abi(splits.abis(s)) == "arm64-v8a" and not splits.translated("arm64-v8a")
 
 
+def test_arm64_part_is_kept_and_x86_only_app_refused_on_aarch64(tmp_path, monkeypatch):
+    monkeypatch.setattr(splits.platform, "machine", lambda: "aarch64")
+    monkeypatch.setattr(splits, "NATIVE_BRIDGE", tmp_path / "missing.so")
+    s = splits.collect([part(tmp_path, "b.apk"),
+                        part(tmp_path, "x.apk", "config.x86_64", files={"lib/x86_64/l.so": b"x"}),
+                        part(tmp_path, "a.apk", "config.arm64_v8a", files={"lib/arm64-v8a/l.so": b"x"})])
+    assert [n for n, _p in splits.select(s, "Demo").splits] == ["config.arm64_v8a"]
+    s = splits.collect([part(tmp_path, "c.apk", files={"lib/x86_64/l.so": b"x"})])
+    with pytest.raises(splits.IncompatibleError, match="only for x86 processors"):
+        splits.select(s, "Demo")
+
+
 def test_x86_64_part_is_kept_with_the_bridge(tmp_path, bridge):
     s = splits.collect([part(tmp_path, "b.apk"),
                         part(tmp_path, "x.apk", "config.x86_64", files={"lib/x86_64/l.so": b"x"}),

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-22 23:22+0000\n"
+"POT-Creation-Date: 2026-11-23 06:41+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -219,8 +219,8 @@ msgstr ""
 "не удалось прочитать {file}: файл не существует (в песочнице Flatpak видны "
 "только пути, переданные через --file-forwarding: {command})"
 
-#: src/apk_starter/cli.py:80 src/apk_starter/cli.py:374
-#: src/apk_starter/install_request.py:180
+#: src/apk_starter/cli.py:80 src/apk_starter/cli.py:380
+#: src/apk_starter/install_request.py:187
 #, python-brace-format
 msgid "not installed: {package}"
 msgstr "не установлено: {package}"
@@ -239,17 +239,17 @@ msgstr ""
 msgid "Different signature – not installed"
 msgstr "Другая подпись – не установлено"
 
-#: src/apk_starter/cli.py:176
+#: src/apk_starter/cli.py:181
 #, python-brace-format
 msgid "Preparing {app} for this computer…"
 msgstr "Подготовка {app} для этого компьютера…"
 
-#: src/apk_starter/cli.py:179
+#: src/apk_starter/cli.py:184
 #, python-brace-format
 msgid "{app} could not be prepared in advance: {reason}"
 msgstr "не удалось заранее подготовить {app}: {reason}"
 
-#: src/apk_starter/cli.py:241
+#: src/apk_starter/cli.py:246
 #, python-brace-format
 msgid ""
 "{app} contains program code only for ARM processors: it runs translated, "
@@ -258,7 +258,7 @@ msgstr ""
 "{app} содержит код только для процессоров ARM: приложение работает через "
 "трансляцию и поэтому медленнее."
 
-#: src/apk_starter/cli.py:265
+#: src/apk_starter/cli.py:271
 #, python-brace-format
 msgid ""
 "{app} is installed without a menu entry: the DynamicLauncher portal is not "
@@ -267,12 +267,12 @@ msgstr ""
 "Приложение {app} установлено без пункта меню: портал DynamicLauncher "
 "недоступен; запустите приложение командой: {command}"
 
-#: src/apk_starter/cli.py:270
+#: src/apk_starter/cli.py:276
 #, python-brace-format
 msgid "{app} is installed without a menu entry: {reason}"
 msgstr "Приложение {app} установлено без пункта меню: {reason}"
 
-#: src/apk_starter/cli.py:318
+#: src/apk_starter/cli.py:324
 msgid ""
 "In «microG settings» switch on «Google device registration» and «Cloud "
 "Messaging». To sign in: Accounts → Add Google account."
@@ -280,30 +280,30 @@ msgstr ""
 "В «Настройках microG» включите «Регистрация устройства» и «Облачные "
 "сообщения». Вход: Аккаунты → Добавить аккаунт Google."
 
-#: src/apk_starter/cli.py:358
+#: src/apk_starter/cli.py:364
 #, python-brace-format
 msgid "cannot remove {folder}: {reason}"
 msgstr "не удалось удалить {folder}: {reason}"
 
-#: src/apk_starter/cli.py:379
+#: src/apk_starter/cli.py:385
 msgid ""
 "the DynamicLauncher portal is not available; the menu entry was not removed"
 msgstr "портал DynamicLauncher недоступен; пункт меню не удалён"
 
-#: src/apk_starter/cli.py:381
+#: src/apk_starter/cli.py:387
 #, python-brace-format
 msgid "the menu entry was not removed: {reason}"
 msgstr "пункт меню не удалён: {reason}"
 
-#: src/apk_starter/cli.py:415
+#: src/apk_starter/cli.py:421
 msgid "(no arguments: open the management window)"
 msgstr "(без аргументов: открыть окно управления)"
 
-#: src/apk_starter/cli.py:416
+#: src/apk_starter/cli.py:422
 msgid "Start Android apps (APK) with Android Translation Layer."
 msgstr "Запуск Android-приложений (APK) с помощью Android Translation Layer."
 
-#: src/apk_starter/cli.py:418
+#: src/apk_starter/cli.py:424
 msgid ""
 "record the app for atl-doctor: exceptions, ATL stub calls, time line, view "
 "trees, clicks and typed text, verbose log; afterwards one archive cleaned of "
@@ -314,7 +314,7 @@ msgstr ""
 "затем один архив, очищенный от личных данных (по умолчанию: logs/<пакет>-"
 "<время>.tar.gz); используйте --debug=ПАПКА"
 
-#: src/apk_starter/cli.py:422
+#: src/apk_starter/cli.py:428
 msgid ""
 "like --debug, but the archive keeps everything in plain text, passwords and "
 "personal data and screenshots included (name ends in -FULL): do not pass it "
@@ -323,23 +323,23 @@ msgstr ""
 "как --debug, но архив хранит всё открытым текстом, включая пароли, личные "
 "данные и снимки экрана (имя заканчивается на -FULL): не передавать дальше"
 
-#: src/apk_starter/cli.py:424
+#: src/apk_starter/cli.py:430
 msgid "override the SDK level passed to ATL"
 msgstr "переопределить уровень SDK, передаваемый ATL"
 
-#: src/apk_starter/cli.py:425
+#: src/apk_starter/cli.py:431
 msgid "window size (remembered per app)"
 msgstr "размер окна (запоминается для каждого приложения)"
 
-#: src/apk_starter/cli.py:426
+#: src/apk_starter/cli.py:432
 msgid "open a link in the app (the menu entry passes it)"
 msgstr "открыть ссылку в приложении (её передаёт пункт меню)"
 
-#: src/apk_starter/cli.py:427
+#: src/apk_starter/cli.py:433
 msgid "with --remove/--remove-all: also delete the app data"
 msgstr "с --remove/--remove-all: также очистить данные приложения"
 
-#: src/apk_starter/cli.py:429
+#: src/apk_starter/cli.py:435
 msgid ""
 "install the APK and add a menu entry; a split APK: the base and its parts, "
 "or one .apks/.xapk file"
@@ -347,19 +347,19 @@ msgstr ""
 "установить APK и добавить пункт меню; разделённый APK: основа и её части или "
 "один файл .apks/.xapk"
 
-#: src/apk_starter/cli.py:436
+#: src/apk_starter/cli.py:442
 msgid "download Aurora Store from F-Droid, check its signature and install it"
 msgstr "загрузить Aurora Store из F-Droid, проверить подпись и установить"
 
-#: src/apk_starter/cli.py:437
+#: src/apk_starter/cli.py:443
 msgid "list installed apps"
 msgstr "показать установленные приложения"
 
-#: src/apk_starter/cli.py:438
+#: src/apk_starter/cli.py:444
 msgid "remove an installed app"
 msgstr "удалить установленное приложение"
 
-#: src/apk_starter/cli.py:440
+#: src/apk_starter/cli.py:446
 msgid ""
 "remove all installed apps and their menu entries (before uninstalling the "
 "Flatpak)"
@@ -367,11 +367,11 @@ msgstr ""
 "удалить все установленные приложения и их пункты меню (перед удалением "
 "Flatpak)"
 
-#: src/apk_starter/cli.py:441
+#: src/apk_starter/cli.py:447
 msgid "show the version and exit"
 msgstr "показать версию и выйти"
 
-#: src/apk_starter/cli.py:442
+#: src/apk_starter/cli.py:448
 msgid ""
 "download microG from its repository, check it and install it (Google "
 "services for the apps)"
@@ -379,7 +379,7 @@ msgstr ""
 "загрузить microG из его репозитория, проверить и установить (службы Google "
 "для приложений)"
 
-#: src/apk_starter/cli.py:487
+#: src/apk_starter/cli.py:493
 msgid ""
 "--install, --list, --remove, --remove-all and --version take no other "
 "arguments"
@@ -387,62 +387,62 @@ msgstr ""
 "--install, --list, --remove, --remove-all и --version не принимают других "
 "аргументов"
 
-#: src/apk_starter/cli.py:489
+#: src/apk_starter/cli.py:495
 msgid "--purge only works with --remove or --remove-all"
 msgstr "--purge работает только с --remove или --remove-all"
 
-#: src/apk_starter/cli.py:534
+#: src/apk_starter/cli.py:540
 msgid "no APK given and no display for the window"
 msgstr "APK не указан, и нет дисплея для окна"
 
-#: src/apk_starter/cli.py:538
+#: src/apk_starter/cli.py:544
 msgid "no APK given"
 msgstr "APK не указан"
 
-#: src/apk_starter/cli.py:591
+#: src/apk_starter/cli.py:597
 #, python-brace-format
 msgid "cannot write {file}: {reason}"
 msgstr "не удалось записать {file}: {reason}"
 
-#: src/apk_starter/cli.py:638 src/apk_starter/cli.py:664
+#: src/apk_starter/cli.py:644 src/apk_starter/cli.py:670
 #, python-brace-format
 msgid "the Android runtime could not be prepared in advance: {reason}"
 msgstr "не удалось заранее подготовить среду выполнения Android: {reason}"
 
-#: src/apk_starter/cli.py:660 src/apk_starter/cli.py:755
+#: src/apk_starter/cli.py:666 src/apk_starter/cli.py:761
 msgid "Preparing…"
 msgstr "Подготовка…"
 
-#: src/apk_starter/cli.py:670 src/apk_starter/gui.py:1136
+#: src/apk_starter/cli.py:676 src/apk_starter/gui.py:1136
 msgid "Updating the menu entry…"
 msgstr "Обновление пункта меню…"
 
-#: src/apk_starter/cli.py:673
+#: src/apk_starter/cli.py:679
 msgid "Preparing apps for this computer…"
 msgstr "Подготовка приложений для этого компьютера…"
 
-#: src/apk_starter/cli.py:728
+#: src/apk_starter/cli.py:734
 #, python-brace-format
 msgid "{app} keeps its old menu entry: {reason}"
 msgstr "{app} сохраняет старый пункт меню: {reason}"
 
-#: src/apk_starter/cli.py:747 src/apk_starter/gui.py:1003
+#: src/apk_starter/cli.py:753 src/apk_starter/gui.py:1003
 #, python-brace-format
 msgid "{app} ended unexpectedly."
 msgstr "{app} неожиданно завершилось."
 
-#: src/apk_starter/cli.py:747 src/apk_starter/gui.py:339
+#: src/apk_starter/cli.py:753 src/apk_starter/gui.py:339
 #: src/apk_starter/gui.py:565 src/apk_starter/gui.py:1004
-#: src/apk_starter/install_request.py:83
+#: src/apk_starter/install_request.py:84
 msgid "Close"
 msgstr "Закрыть"
 
-#: src/apk_starter/dexopt.py:170
+#: src/apk_starter/dexopt.py:172
 #, python-brace-format
 msgid "cannot run {program}: {reason}"
 msgstr "не удалось запустить {program}: {reason}"
 
-#: src/apk_starter/dexopt.py:246
+#: src/apk_starter/dexopt.py:249
 msgid "Preparing the Android runtime for this computer…"
 msgstr "Подготовка среды выполнения Android для этого компьютера…"
 
@@ -701,7 +701,8 @@ msgstr "Мышь как касание"
 
 #: src/apk_starter/gui.py:873
 msgid "The left mouse button acts as a finger, for games that ignore the mouse"
-msgstr "Левая кнопка мыши действует как палец, для игр, которые игнорируют мышь"
+msgstr ""
+"Левая кнопка мыши действует как палец, для игр, которые игнорируют мышь"
 
 #: src/apk_starter/gui.py:879
 msgid "Report updates"
@@ -765,11 +766,11 @@ msgstr "Установить APK"
 msgid "{app} installed"
 msgstr "Приложение {app} установлено"
 
-#: src/apk_starter/gui.py:1066 src/apk_starter/install_request.py:88
+#: src/apk_starter/gui.py:1066 src/apk_starter/install_request.py:89
 msgid "This app uses Google services. Set up microG?"
 msgstr "Это приложение использует сервисы Google. Настроить microG?"
 
-#: src/apk_starter/gui.py:1066 src/apk_starter/install_request.py:90
+#: src/apk_starter/gui.py:1066 src/apk_starter/install_request.py:91
 msgid "Not now"
 msgstr "Не сейчас"
 
@@ -801,13 +802,13 @@ msgstr ""
 "Входите анонимно: Google может заблокировать ваш собственный аккаунт."
 
 #: src/apk_starter/gui.py:1096 src/apk_starter/gui.py:1116
-#: src/apk_starter/gui.py:1121 src/apk_starter/install_request.py:29
-#: src/apk_starter/install_request.py:144
+#: src/apk_starter/gui.py:1121 src/apk_starter/install_request.py:30
+#: src/apk_starter/install_request.py:151
 msgid "Cancel"
 msgstr "Отмена"
 
 #: src/apk_starter/gui.py:1096 src/apk_starter/gui.py:1116
-#: src/apk_starter/install_request.py:90
+#: src/apk_starter/install_request.py:91
 msgid "Set up"
 msgstr "Настроить"
 
@@ -815,7 +816,7 @@ msgstr "Настроить"
 msgid "microG is set up"
 msgstr "microG настроен"
 
-#: src/apk_starter/gui.py:1106 src/apk_starter/microg.py:116
+#: src/apk_starter/gui.py:1106 src/apk_starter/microg.py:121
 msgid "Downloading microG…"
 msgstr "Загрузка microG…"
 
@@ -827,7 +828,7 @@ msgstr "Не удаётся настроить microG"
 msgid "Set up microG?"
 msgstr "Настроить microG?"
 
-#: src/apk_starter/gui.py:1114 src/apk_starter/install_request.py:89
+#: src/apk_starter/gui.py:1114 src/apk_starter/install_request.py:90
 msgid ""
 "Google services for apps (push messages, sign-in). Downloaded from the "
 "official microG repository and checked."
@@ -866,7 +867,7 @@ msgstr "Не удалось очистить данные {app}"
 msgid "Cannot change the menu entry of {app}"
 msgstr "Не удаётся изменить пункт меню {app}"
 
-#: src/apk_starter/gui.py:1141 src/apk_starter/install_request.py:144
+#: src/apk_starter/gui.py:1141 src/apk_starter/install_request.py:151
 msgid "Also delete app data"
 msgstr "Также очистить данные приложения"
 
@@ -875,7 +876,7 @@ msgstr "Также очистить данные приложения"
 msgid "{app} uninstalled"
 msgstr "Приложение {app} удалено"
 
-#: src/apk_starter/gui.py:1149 src/apk_starter/install_request.py:144
+#: src/apk_starter/gui.py:1149 src/apk_starter/install_request.py:151
 #, python-brace-format
 msgid "Uninstall {app}?"
 msgstr "Удалить {app}?"
@@ -885,7 +886,7 @@ msgid "The app and its menu entry are removed. Close the app first."
 msgstr ""
 "Приложение и его пункт меню будут удалены. Сначала закройте приложение."
 
-#: src/apk_starter/gui.py:1150 src/apk_starter/install_request.py:144
+#: src/apk_starter/gui.py:1150 src/apk_starter/install_request.py:151
 msgid "Uninstall"
 msgstr "Удалить"
 
@@ -973,49 +974,49 @@ msgstr "не допускается вместе с аргументом %s"
 msgid "invalid %(type)s value: %(value)r"
 msgstr "недопустимое значение %(type)s: %(value)r"
 
-#: src/apk_starter/install_request.py:27
+#: src/apk_starter/install_request.py:28
 #, python-brace-format
 msgid "Update {app}?"
 msgstr "Обновить {app}?"
 
-#: src/apk_starter/install_request.py:27
+#: src/apk_starter/install_request.py:28
 #, python-brace-format
 msgid "Install {app}?"
 msgstr "Установить {app}?"
 
-#: src/apk_starter/install_request.py:28
+#: src/apk_starter/install_request.py:29
 #, python-brace-format
 msgid "From {installer} · Version {version}"
 msgstr "Из {installer} · Версия {version}"
 
-#: src/apk_starter/install_request.py:29
+#: src/apk_starter/install_request.py:30
 msgid "Update"
 msgstr "Обновить"
 
-#: src/apk_starter/install_request.py:29
+#: src/apk_starter/install_request.py:30
 msgid "Install"
 msgstr "Установить"
 
-#: src/apk_starter/install_request.py:36
+#: src/apk_starter/install_request.py:37
 #, python-brace-format
 msgid "no display to ask whether to install {app}"
 msgstr "нет дисплея, чтобы спросить, устанавливать ли {app}"
 
-#: src/apk_starter/install_request.py:100
+#: src/apk_starter/install_request.py:107
 msgid "An app"
 msgstr "Приложение"
 
-#: src/apk_starter/install_request.py:108
+#: src/apk_starter/install_request.py:115
 #, python-brace-format
 msgid "Installation of {app} cancelled"
 msgstr "Установка {app} отменена"
 
-#: src/apk_starter/install_request.py:150
+#: src/apk_starter/install_request.py:157
 #, python-brace-format
 msgid "no display to ask whether to uninstall {app}"
 msgstr "нет экрана, чтобы спросить об удалении {app}"
 
-#: src/apk_starter/install_request.py:185
+#: src/apk_starter/install_request.py:192
 #, python-brace-format
 msgid "Uninstalling {app} cancelled"
 msgstr "Удаление {app} отменено"
@@ -1033,12 +1034,12 @@ msgstr "Начальная страница приложения"
 msgid "Open pages of the app"
 msgstr "Открытые страницы приложения"
 
-#: src/apk_starter/microg.py:52
+#: src/apk_starter/microg.py:56
 #, python-brace-format
 msgid "the microG repository lists no usable version of {package}"
 msgstr "репозиторий microG не содержит подходящей версии {package}"
 
-#: src/apk_starter/microg.py:72
+#: src/apk_starter/microg.py:76
 #, python-brace-format
 msgid ""
 "the microG repository index was downloaded incompletely {tries} times; check "
@@ -1047,12 +1048,12 @@ msgstr ""
 "индекс репозитория microG загружен не полностью (попыток: {tries}); "
 "проверьте соединение и повторите попытку"
 
-#: src/apk_starter/microg.py:91
+#: src/apk_starter/microg.py:95
 #, python-brace-format
 msgid "cannot download microG from the microG repository: {reason}"
 msgstr "не удаётся загрузить microG из репозитория microG: {reason}"
 
-#: src/apk_starter/microg.py:94
+#: src/apk_starter/microg.py:98
 #, python-brace-format
 msgid ""
 "the downloaded {package} does not match its checksum; it was not installed"
@@ -1060,7 +1061,7 @@ msgstr ""
 "загруженный {package} не совпадает со своей контрольной суммой; он не "
 "установлен"
 
-#: src/apk_starter/microg.py:99
+#: src/apk_starter/microg.py:103
 #, python-brace-format
 msgid ""
 "the downloaded microG is not signed by the NOGAPPS Project (certificate "
@@ -1069,12 +1070,12 @@ msgstr ""
 "загруженный microG не подписан проектом NOGAPPS (сертификат {found}); он не "
 "установлен"
 
-#: src/apk_starter/microg.py:103
+#: src/apk_starter/microg.py:107
 #, python-brace-format
 msgid "the downloaded file is not {package} {code}"
 msgstr "загруженный файл — не {package} {code}"
 
-#: src/apk_starter/microg.py:128
+#: src/apk_starter/microg.py:135
 msgid "microG settings"
 msgstr "Настройки microG"
 
@@ -1236,7 +1237,14 @@ msgstr ""
 "{app} содержит код только для 32-битных процессоров x86 или ARM, что не "
 "поддерживается."
 
-#: src/apk_starter/splits.py:182
+#: src/apk_starter/splits.py:183
+#, python-brace-format
+msgid ""
+"{app} contains program code only for x86 processors and does not run on this "
+"computer."
+msgstr "{app} содержит код только для процессоров x86 и не работает на этом компьютере."
+
+#: src/apk_starter/splits.py:185
 #, python-brace-format
 msgid ""
 "{app} contains program code only for ARM processors and does not run on this "

@@ -2,8 +2,8 @@
 user like Android's PackageInstallerActivity, then install like --install.
 
 The exit status is the PackageInstaller status ATL hands back to the app: 0 installed, 3 aborted by the user,
-4 not a valid APK, 5 conflict (signed by another certificate than the installed app), 7 incompatible (no x86_64
-code), 1 other failure; the last line on stderr is its message."""
+4 not a valid APK, 5 conflict (signed by another certificate than the installed app), 7 incompatible (no code
+for this computer), 1 other failure; the last line on stderr is its message."""
 import os
 import re
 import sys

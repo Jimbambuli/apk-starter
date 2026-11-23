@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: apk-starter\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-22 23:22+0000\n"
+"POT-Creation-Date: 2026-11-23 06:41+0000\n"
 "PO-Revision-Date: 2026-11-01 13:45+0100\n"
 "Last-Translator: Jimbambuli (machine-assisted)\n"
 "Language-Team: none\n"
@@ -218,8 +218,8 @@ msgstr ""
 "nelze přečíst {file}: soubor neexistuje (v izolovaném prostředí Flatpak jsou "
 "vidět jen cesty předané pomocí --file-forwarding: {command})"
 
-#: src/apk_starter/cli.py:80 src/apk_starter/cli.py:374
-#: src/apk_starter/install_request.py:180
+#: src/apk_starter/cli.py:80 src/apk_starter/cli.py:380
+#: src/apk_starter/install_request.py:187
 #, python-brace-format
 msgid "not installed: {package}"
 msgstr "není nainstalováno: {package}"
@@ -238,17 +238,17 @@ msgstr ""
 msgid "Different signature – not installed"
 msgstr "Jiný podpis – nenainstalováno"
 
-#: src/apk_starter/cli.py:176
+#: src/apk_starter/cli.py:181
 #, python-brace-format
 msgid "Preparing {app} for this computer…"
 msgstr "Příprava {app} pro tento počítač…"
 
-#: src/apk_starter/cli.py:179
+#: src/apk_starter/cli.py:184
 #, python-brace-format
 msgid "{app} could not be prepared in advance: {reason}"
 msgstr "{app} nebylo možné připravit předem: {reason}"
 
-#: src/apk_starter/cli.py:241
+#: src/apk_starter/cli.py:246
 #, python-brace-format
 msgid ""
 "{app} contains program code only for ARM processors: it runs translated, "
@@ -257,7 +257,7 @@ msgstr ""
 "{app} obsahuje kód pouze pro procesory ARM: aplikace běží v překladu, a "
 "proto pomaleji."
 
-#: src/apk_starter/cli.py:265
+#: src/apk_starter/cli.py:271
 #, python-brace-format
 msgid ""
 "{app} is installed without a menu entry: the DynamicLauncher portal is not "
@@ -266,12 +266,12 @@ msgstr ""
 "Aplikace {app} je nainstalována bez položky v nabídce: portál "
 "DynamicLauncher není dostupný; spusťte aplikaci příkazem: {command}"
 
-#: src/apk_starter/cli.py:270
+#: src/apk_starter/cli.py:276
 #, python-brace-format
 msgid "{app} is installed without a menu entry: {reason}"
 msgstr "Aplikace {app} je nainstalována bez položky v nabídce: {reason}"
 
-#: src/apk_starter/cli.py:318
+#: src/apk_starter/cli.py:324
 msgid ""
 "In «microG settings» switch on «Google device registration» and «Cloud "
 "Messaging». To sign in: Accounts → Add Google account."
@@ -279,31 +279,31 @@ msgstr ""
 "V «Nastavení microG» zapněte «Registrace zařízení Google» a «Cloudové "
 "zprávy». Přihlášení: Účty → Přidat účet Google."
 
-#: src/apk_starter/cli.py:358
+#: src/apk_starter/cli.py:364
 #, python-brace-format
 msgid "cannot remove {folder}: {reason}"
 msgstr "nelze odstranit {folder}: {reason}"
 
-#: src/apk_starter/cli.py:379
+#: src/apk_starter/cli.py:385
 msgid ""
 "the DynamicLauncher portal is not available; the menu entry was not removed"
 msgstr ""
 "portál DynamicLauncher není dostupný; položka v nabídce nebyla odstraněna"
 
-#: src/apk_starter/cli.py:381
+#: src/apk_starter/cli.py:387
 #, python-brace-format
 msgid "the menu entry was not removed: {reason}"
 msgstr "položka v nabídce nebyla odstraněna: {reason}"
 
-#: src/apk_starter/cli.py:415
+#: src/apk_starter/cli.py:421
 msgid "(no arguments: open the management window)"
 msgstr "(bez argumentů: otevře okno správy)"
 
-#: src/apk_starter/cli.py:416
+#: src/apk_starter/cli.py:422
 msgid "Start Android apps (APK) with Android Translation Layer."
 msgstr "Spouští aplikace pro Android (APK) pomocí Android Translation Layer."
 
-#: src/apk_starter/cli.py:418
+#: src/apk_starter/cli.py:424
 msgid ""
 "record the app for atl-doctor: exceptions, ATL stub calls, time line, view "
 "trees, clicks and typed text, verbose log; afterwards one archive cleaned of "
@@ -314,7 +314,7 @@ msgstr ""
 "očištěný od osobních údajů (výchozí: logs/<balíček>-<čas>.tar.gz); použijte "
 "--debug=SLOŽKA"
 
-#: src/apk_starter/cli.py:422
+#: src/apk_starter/cli.py:428
 msgid ""
 "like --debug, but the archive keeps everything in plain text, passwords and "
 "personal data and screenshots included (name ends in -FULL): do not pass it "
@@ -323,23 +323,23 @@ msgstr ""
 "jako --debug, ale archiv ponechá vše čitelným textem, včetně hesel, osobních "
 "údajů a snímků obrazovky (název končí na -FULL): nepředávat dál"
 
-#: src/apk_starter/cli.py:424
+#: src/apk_starter/cli.py:430
 msgid "override the SDK level passed to ATL"
 msgstr "přepíše úroveň SDK předávanou ATL"
 
-#: src/apk_starter/cli.py:425
+#: src/apk_starter/cli.py:431
 msgid "window size (remembered per app)"
 msgstr "velikost okna (pamatuje se pro každou aplikaci)"
 
-#: src/apk_starter/cli.py:426
+#: src/apk_starter/cli.py:432
 msgid "open a link in the app (the menu entry passes it)"
 msgstr "otevřít odkaz v aplikaci (předává ho položka nabídky)"
 
-#: src/apk_starter/cli.py:427
+#: src/apk_starter/cli.py:433
 msgid "with --remove/--remove-all: also delete the app data"
 msgstr "s --remove/--remove-all: smaže i data aplikace"
 
-#: src/apk_starter/cli.py:429
+#: src/apk_starter/cli.py:435
 msgid ""
 "install the APK and add a menu entry; a split APK: the base and its parts, "
 "or one .apks/.xapk file"
@@ -347,19 +347,19 @@ msgstr ""
 "nainstalovat APK a přidat položku nabídky; rozdělený APK: základ a jeho "
 "části, nebo jeden soubor .apks/.xapk"
 
-#: src/apk_starter/cli.py:436
+#: src/apk_starter/cli.py:442
 msgid "download Aurora Store from F-Droid, check its signature and install it"
 msgstr "stáhnout Aurora Store z F-Droid, ověřit podpis a nainstalovat"
 
-#: src/apk_starter/cli.py:437
+#: src/apk_starter/cli.py:443
 msgid "list installed apps"
 msgstr "vypíše nainstalované aplikace"
 
-#: src/apk_starter/cli.py:438
+#: src/apk_starter/cli.py:444
 msgid "remove an installed app"
 msgstr "odinstaluje nainstalovanou aplikaci"
 
-#: src/apk_starter/cli.py:440
+#: src/apk_starter/cli.py:446
 msgid ""
 "remove all installed apps and their menu entries (before uninstalling the "
 "Flatpak)"
@@ -367,11 +367,11 @@ msgstr ""
 "odstraní všechny nainstalované aplikace a jejich položky v nabídce (před "
 "odinstalací Flatpaku)"
 
-#: src/apk_starter/cli.py:441
+#: src/apk_starter/cli.py:447
 msgid "show the version and exit"
 msgstr "zobrazí verzi a skončí"
 
-#: src/apk_starter/cli.py:442
+#: src/apk_starter/cli.py:448
 msgid ""
 "download microG from its repository, check it and install it (Google "
 "services for the apps)"
@@ -379,7 +379,7 @@ msgstr ""
 "stáhnout microG z jeho repozitáře, zkontrolovat a nainstalovat (služby "
 "Google pro aplikace)"
 
-#: src/apk_starter/cli.py:487
+#: src/apk_starter/cli.py:493
 msgid ""
 "--install, --list, --remove, --remove-all and --version take no other "
 "arguments"
@@ -387,62 +387,62 @@ msgstr ""
 "--install, --list, --remove, --remove-all a --version nepřijímají další "
 "argumenty"
 
-#: src/apk_starter/cli.py:489
+#: src/apk_starter/cli.py:495
 msgid "--purge only works with --remove or --remove-all"
 msgstr "--purge funguje jen s --remove nebo --remove-all"
 
-#: src/apk_starter/cli.py:534
+#: src/apk_starter/cli.py:540
 msgid "no APK given and no display for the window"
 msgstr "nebylo zadáno APK a pro okno není k dispozici displej"
 
-#: src/apk_starter/cli.py:538
+#: src/apk_starter/cli.py:544
 msgid "no APK given"
 msgstr "nebylo zadáno APK"
 
-#: src/apk_starter/cli.py:591
+#: src/apk_starter/cli.py:597
 #, python-brace-format
 msgid "cannot write {file}: {reason}"
 msgstr "nelze zapsat {file}: {reason}"
 
-#: src/apk_starter/cli.py:638 src/apk_starter/cli.py:664
+#: src/apk_starter/cli.py:644 src/apk_starter/cli.py:670
 #, python-brace-format
 msgid "the Android runtime could not be prepared in advance: {reason}"
 msgstr "běhové prostředí Androidu nebylo možné připravit předem: {reason}"
 
-#: src/apk_starter/cli.py:660 src/apk_starter/cli.py:755
+#: src/apk_starter/cli.py:666 src/apk_starter/cli.py:761
 msgid "Preparing…"
 msgstr "Příprava…"
 
-#: src/apk_starter/cli.py:670 src/apk_starter/gui.py:1136
+#: src/apk_starter/cli.py:676 src/apk_starter/gui.py:1136
 msgid "Updating the menu entry…"
 msgstr "Aktualizace položky nabídky…"
 
-#: src/apk_starter/cli.py:673
+#: src/apk_starter/cli.py:679
 msgid "Preparing apps for this computer…"
 msgstr "Příprava aplikací pro tento počítač…"
 
-#: src/apk_starter/cli.py:728
+#: src/apk_starter/cli.py:734
 #, python-brace-format
 msgid "{app} keeps its old menu entry: {reason}"
 msgstr "{app} si ponechá starou položku nabídky: {reason}"
 
-#: src/apk_starter/cli.py:747 src/apk_starter/gui.py:1003
+#: src/apk_starter/cli.py:753 src/apk_starter/gui.py:1003
 #, python-brace-format
 msgid "{app} ended unexpectedly."
 msgstr "{app} neočekávaně skončila."
 
-#: src/apk_starter/cli.py:747 src/apk_starter/gui.py:339
+#: src/apk_starter/cli.py:753 src/apk_starter/gui.py:339
 #: src/apk_starter/gui.py:565 src/apk_starter/gui.py:1004
-#: src/apk_starter/install_request.py:83
+#: src/apk_starter/install_request.py:84
 msgid "Close"
 msgstr "Zavřít"
 
-#: src/apk_starter/dexopt.py:170
+#: src/apk_starter/dexopt.py:172
 #, python-brace-format
 msgid "cannot run {program}: {reason}"
 msgstr "nelze spustit {program}: {reason}"
 
-#: src/apk_starter/dexopt.py:246
+#: src/apk_starter/dexopt.py:249
 msgid "Preparing the Android runtime for this computer…"
 msgstr "Příprava běhového prostředí Androidu pro tento počítač…"
 
@@ -764,11 +764,11 @@ msgstr "Instalovat APK"
 msgid "{app} installed"
 msgstr "Aplikace {app} nainstalována"
 
-#: src/apk_starter/gui.py:1066 src/apk_starter/install_request.py:88
+#: src/apk_starter/gui.py:1066 src/apk_starter/install_request.py:89
 msgid "This app uses Google services. Set up microG?"
 msgstr "Tato aplikace používá služby Google. Nastavit microG?"
 
-#: src/apk_starter/gui.py:1066 src/apk_starter/install_request.py:90
+#: src/apk_starter/gui.py:1066 src/apk_starter/install_request.py:91
 msgid "Not now"
 msgstr "Teď ne"
 
@@ -800,13 +800,13 @@ msgstr ""
 "Přihlaste se anonymně: Google může váš vlastní účet zablokovat."
 
 #: src/apk_starter/gui.py:1096 src/apk_starter/gui.py:1116
-#: src/apk_starter/gui.py:1121 src/apk_starter/install_request.py:29
-#: src/apk_starter/install_request.py:144
+#: src/apk_starter/gui.py:1121 src/apk_starter/install_request.py:30
+#: src/apk_starter/install_request.py:151
 msgid "Cancel"
 msgstr "Zrušit"
 
 #: src/apk_starter/gui.py:1096 src/apk_starter/gui.py:1116
-#: src/apk_starter/install_request.py:90
+#: src/apk_starter/install_request.py:91
 msgid "Set up"
 msgstr "Nastavit"
 
@@ -814,7 +814,7 @@ msgstr "Nastavit"
 msgid "microG is set up"
 msgstr "microG je nastaven"
 
-#: src/apk_starter/gui.py:1106 src/apk_starter/microg.py:116
+#: src/apk_starter/gui.py:1106 src/apk_starter/microg.py:121
 msgid "Downloading microG…"
 msgstr "Stahování microG…"
 
@@ -826,7 +826,7 @@ msgstr "microG nelze nastavit"
 msgid "Set up microG?"
 msgstr "Nastavit microG?"
 
-#: src/apk_starter/gui.py:1114 src/apk_starter/install_request.py:89
+#: src/apk_starter/gui.py:1114 src/apk_starter/install_request.py:90
 msgid ""
 "Google services for apps (push messages, sign-in). Downloaded from the "
 "official microG repository and checked."
@@ -865,7 +865,7 @@ msgstr "Data aplikace {app} nelze smazat"
 msgid "Cannot change the menu entry of {app}"
 msgstr "Položku v nabídce pro {app} nelze změnit"
 
-#: src/apk_starter/gui.py:1141 src/apk_starter/install_request.py:144
+#: src/apk_starter/gui.py:1141 src/apk_starter/install_request.py:151
 msgid "Also delete app data"
 msgstr "Smazat i data aplikace"
 
@@ -874,7 +874,7 @@ msgstr "Smazat i data aplikace"
 msgid "{app} uninstalled"
 msgstr "Aplikace {app} odinstalována"
 
-#: src/apk_starter/gui.py:1149 src/apk_starter/install_request.py:144
+#: src/apk_starter/gui.py:1149 src/apk_starter/install_request.py:151
 #, python-brace-format
 msgid "Uninstall {app}?"
 msgstr "Odinstalovat aplikaci {app}?"
@@ -884,7 +884,7 @@ msgid "The app and its menu entry are removed. Close the app first."
 msgstr ""
 "Aplikace a její položka v nabídce budou odstraněny. Nejprve aplikaci zavřete."
 
-#: src/apk_starter/gui.py:1150 src/apk_starter/install_request.py:144
+#: src/apk_starter/gui.py:1150 src/apk_starter/install_request.py:151
 msgid "Uninstall"
 msgstr "Odinstalovat"
 
@@ -972,49 +972,49 @@ msgstr "nelze použít spolu s argumentem %s"
 msgid "invalid %(type)s value: %(value)r"
 msgstr "neplatná hodnota %(type)s: %(value)r"
 
-#: src/apk_starter/install_request.py:27
+#: src/apk_starter/install_request.py:28
 #, python-brace-format
 msgid "Update {app}?"
 msgstr "Aktualizovat {app}?"
 
-#: src/apk_starter/install_request.py:27
+#: src/apk_starter/install_request.py:28
 #, python-brace-format
 msgid "Install {app}?"
 msgstr "Nainstalovat {app}?"
 
-#: src/apk_starter/install_request.py:28
+#: src/apk_starter/install_request.py:29
 #, python-brace-format
 msgid "From {installer} · Version {version}"
 msgstr "Z {installer} · Verze {version}"
 
-#: src/apk_starter/install_request.py:29
+#: src/apk_starter/install_request.py:30
 msgid "Update"
 msgstr "Aktualizovat"
 
-#: src/apk_starter/install_request.py:29
+#: src/apk_starter/install_request.py:30
 msgid "Install"
 msgstr "Nainstalovat"
 
-#: src/apk_starter/install_request.py:36
+#: src/apk_starter/install_request.py:37
 #, python-brace-format
 msgid "no display to ask whether to install {app}"
 msgstr "není obrazovka pro dotaz, zda nainstalovat {app}"
 
-#: src/apk_starter/install_request.py:100
+#: src/apk_starter/install_request.py:107
 msgid "An app"
 msgstr "Aplikace"
 
-#: src/apk_starter/install_request.py:108
+#: src/apk_starter/install_request.py:115
 #, python-brace-format
 msgid "Installation of {app} cancelled"
 msgstr "Instalace {app} zrušena"
 
-#: src/apk_starter/install_request.py:150
+#: src/apk_starter/install_request.py:157
 #, python-brace-format
 msgid "no display to ask whether to uninstall {app}"
 msgstr "žádná obrazovka pro dotaz na odinstalaci {app}"
 
-#: src/apk_starter/install_request.py:185
+#: src/apk_starter/install_request.py:192
 #, python-brace-format
 msgid "Uninstalling {app} cancelled"
 msgstr "Odinstalace {app} zrušena"
@@ -1032,12 +1032,12 @@ msgstr "Úvodní stránka aplikace"
 msgid "Open pages of the app"
 msgstr "Otevřené stránky aplikace"
 
-#: src/apk_starter/microg.py:52
+#: src/apk_starter/microg.py:56
 #, python-brace-format
 msgid "the microG repository lists no usable version of {package}"
 msgstr "repozitář microG neuvádí použitelnou verzi {package}"
 
-#: src/apk_starter/microg.py:72
+#: src/apk_starter/microg.py:76
 #, python-brace-format
 msgid ""
 "the microG repository index was downloaded incompletely {tries} times; check "
@@ -1046,19 +1046,19 @@ msgstr ""
 "index repozitáře microG byl {tries}krát stažen neúplně; zkontrolujte "
 "připojení a zkuste to znovu"
 
-#: src/apk_starter/microg.py:91
+#: src/apk_starter/microg.py:95
 #, python-brace-format
 msgid "cannot download microG from the microG repository: {reason}"
 msgstr "microG nelze stáhnout z repozitáře microG: {reason}"
 
-#: src/apk_starter/microg.py:94
+#: src/apk_starter/microg.py:98
 #, python-brace-format
 msgid ""
 "the downloaded {package} does not match its checksum; it was not installed"
 msgstr ""
 "stažený {package} neodpovídá svému kontrolnímu součtu; nebyl nainstalován"
 
-#: src/apk_starter/microg.py:99
+#: src/apk_starter/microg.py:103
 #, python-brace-format
 msgid ""
 "the downloaded microG is not signed by the NOGAPPS Project (certificate "
@@ -1067,12 +1067,12 @@ msgstr ""
 "stažený microG není podepsán projektem NOGAPPS (certifikát {found}); nebyl "
 "nainstalován"
 
-#: src/apk_starter/microg.py:103
+#: src/apk_starter/microg.py:107
 #, python-brace-format
 msgid "the downloaded file is not {package} {code}"
 msgstr "stažený soubor není {package} {code}"
 
-#: src/apk_starter/microg.py:128
+#: src/apk_starter/microg.py:135
 msgid "microG settings"
 msgstr "Nastavení microG"
 
@@ -1234,7 +1234,14 @@ msgstr ""
 "{app} obsahuje kód pouze pro 32bitové procesory x86 nebo ARM, který není "
 "podporován."
 
-#: src/apk_starter/splits.py:182
+#: src/apk_starter/splits.py:183
+#, python-brace-format
+msgid ""
+"{app} contains program code only for x86 processors and does not run on this "
+"computer."
+msgstr "{app} obsahuje kód jen pro procesory x86 a na tomto počítači nepoběží."
+
+#: src/apk_starter/splits.py:185
 #, python-brace-format
 msgid ""
 "{app} contains program code only for ARM processors and does not run on this "
