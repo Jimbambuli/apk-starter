@@ -1,2 +1,3 @@
 option('jdk', type: 'string', value: '', description: 'JDK directory (default: JAVA_HOME, else the one of javac in PATH)')
+option('digitalis', type: 'boolean', value: false, description: 'x86_64: Digitalis (the manifest\'s bundle) as ATL\'s native bridge for arm64-only apps')
 option('download', type: 'boolean', value: true, description: 'fetch the components at the pinned commits (false: they are already in native/subprojects)')

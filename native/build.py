@@ -2,7 +2,7 @@
 """Build APK Starter's components one after the other into a staging tree, as flatpak-builder does with the
 modules of io.github.Jimbambuli.ApkStarter.yml, and copy that tree into the prefix (native/meson.build).
 
-  build.py build --source NATIVE_DIR --build BUILD_DIR --stage STAGE --prefix PREFIX --jdk JDK --stamp FILE
+  build.py build --source NATIVE_DIR --build BUILD_DIR --stage STAGE --prefix PREFIX --jdk JDK --stamp FILE [--digitalis]
   build.py install --stage STAGE --prefix PREFIX        (meson install; honours DESTDIR)
   build.py fetch-jars --source NATIVE_DIR --dest DIR    (packaging/collect-sources.sh)
 
@@ -61,6 +61,15 @@ def read_jars(source: Path) -> list[tuple[str, str, str]]:
             name, url, sha = line.split()
             out.append((name, url, sha))
     return out
+
+
+def digitalis_source(repo: Path) -> tuple[str, str]:
+    """URL and sha256 of the Digitalis bundle: the archive of the manifest's module «digitalis»."""
+    text = (repo / "io.github.Jimbambuli.ApkStarter.yml").read_text(encoding="utf-8")
+    m = re.search(r"- name: digitalis\n.*?\burl: (\S+)\n\s*sha256: ([0-9a-f]{64})", text, re.S)
+    if not m:
+        sys.exit("build.py: no archive of the module digitalis in the manifest")
+    return m[1], m[2]
 
 
 def fetch_jar(url: str, sha: str, dest: Path, local: Path | None = None) -> None:
@@ -159,6 +168,34 @@ def build(a: argparse.Namespace) -> None:
         # the script links with -rpath <staging>/lib/art; the plugin sits in that directory: $ORIGIN says the same
         run(["patchelf", "--set-rpath", "$ORIGIN", sp / "lib/art/libopenjdkjvmti.so"], env)
 
+    def do_digitalis() -> None:
+        # as the manifest's module «digitalis»: the bundle's system tree in <prefix>/lib/digitalis
+        url, sha = digitalis_source(repo)
+        archive = bld / "digitalis" / url.rsplit("/", 1)[1]
+        fetch_jar(url, sha, archive, source / "jars" / archive.name)
+        root = sp / "lib/digitalis"
+        shutil.rmtree(root, ignore_errors=True)
+        tmp = bld / "digitalis" / "tree"
+        shutil.rmtree(tmp, ignore_errors=True)
+        tmp.mkdir()
+        run(["tar", "-xf", archive, "-C", tmp, "--strip-components=1"], env)
+        root.mkdir(parents=True)
+        shutil.move(tmp / "system", root / "system")
+        # the guest linker's namespaces name the real place of the tree (Berberis points it at this file)
+        cfg = root / "system/etc/ld.config.arm64.txt"
+        cfg.write_text(cfg.read_text(encoding="utf-8").replace("/system", f"{prefix}/lib/digitalis/system"),
+                       encoding="utf-8")
+        for d in ("etc/init", "etc/binfmt_misc"):
+            shutil.rmtree(root / "system" / d, ignore_errors=True)
+        for f in (root / "system/bin").glob("berberis_program_runner*"):
+            f.unlink()
+        lic = sp / "share/licenses/digitalis"
+        shutil.rmtree(lic, ignore_errors=True)
+        lic.mkdir(parents=True)
+        for f in ("LICENSE", "NOTICE", "BUILD-INFO", "README.md"):
+            shutil.copy2(tmp / f, lic / f)
+        shutil.copytree(tmp / "NOTICES", lic / "NOTICES")
+
     def do_atl() -> None:
         jars = {}
         for name, url, sha in read_jars(source):
@@ -167,9 +204,11 @@ def build(a: argparse.Namespace) -> None:
         # inside its source tree, as flatpak-builder does: ninja runs a javac command line with every source file,
         # and with paths relative to a build directory elsewhere it passes the kernel's 128 KiB limit (E2BIG)
         bdir = atl / f"_build-{hashlib.sha256(str(bld).encode()).hexdigest()[:8]}"
+        bridge = ([f"-Dnative_bridge={prefix}/lib/digitalis/system/lib64/libberberis_arm64.so",
+                   "-Dnative_bridge_abi=arm64-v8a"] if a.digitalis else [])
         meson_component(atl, bdir, prefix, stage, env, [
             "-Ddownload_tool_deps=false", f"-Dasm_jar_path={jars['asm.jar']}",
-            f"-Dasm_tree_jar_path={jars['asm-tree.jar']}", f"-Dgetopt_jar_path={jars['java-getopt.jar']}"])
+            f"-Dasm_tree_jar_path={jars['asm-tree.jar']}", f"-Dgetopt_jar_path={jars['java-getopt.jar']}", *bridge])
 
     def do_doctor() -> None:
         b = bld / "atl-doctor"
@@ -196,7 +235,9 @@ def build(a: argparse.Namespace) -> None:
     step("libopensles-standalone", opensles_rev,
          lambda: meson_component(opensles, bld / "opensles", prefix, stage, env))
     step("art_standalone", art_rev, do_art)
-    step("android_translation_layer", atl_rev, do_atl)
+    if a.digitalis:
+        step("digitalis", digitalis_source(repo)[1], do_digitalis)
+    step("android_translation_layer", f"{atl_rev} digitalis={a.digitalis}", do_atl)
     step("atl-doctor", f"{doctor_rev} {atl_rev}", do_doctor)
     if a.strip:
         strip_tree(sp, env)
@@ -206,9 +247,11 @@ def build(a: argparse.Namespace) -> None:
 
 def strip_tree(sp: Path, env: dict) -> None:
     """Without debug information (meson option strip, the default): every ELF library and program of the staging
-    tree; ART's compiled boot image (.oat/.odex/.art) stays as it is. Done again each build, it is quick."""
+    tree; ART's compiled boot image (.oat/.odex/.art) and the Digitalis bundle (Android's binaries, partly arm64)
+    stay as they are. Done again each build, it is quick."""
     for f in sorted(sp.rglob("*")):
-        if f.is_symlink() or not f.is_file() or f.suffix in (".oat", ".odex", ".vdex", ".art"):
+        if (f.is_symlink() or not f.is_file() or f.suffix in (".oat", ".odex", ".vdex", ".art")
+                or (sp / "lib/digitalis") in f.parents):
             continue
         with open(f, "rb") as fh:
             if fh.read(4) != b"\x7fELF":
@@ -284,6 +327,7 @@ def main() -> None:
     for opt in ("--source", "--build", "--stage", "--prefix", "--jdk", "--stamp"):
         b.add_argument(opt, required=True)
     b.add_argument("--strip", action="store_true", help="install without debug information")
+    b.add_argument("--digitalis", action="store_true", help="x86_64: Digitalis as ATL's native bridge")
     i = sub.add_parser("install")
     i.add_argument("--stage", required=True)
     i.add_argument("--prefix", required=True)

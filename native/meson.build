@@ -63,7 +63,8 @@ custom_target('components',
   output: 'components.stamp',
   command: [python, files('build.py'), 'build', '--source', meson.project_source_root(), '--build',
             meson.current_build_dir(), '--stage', stage, '--prefix', get_option('prefix'), '--jdk', jdk,
-            '--stamp', '@OUTPUT@'] + (get_option('strip') ? ['--strip'] : []),
+            '--stamp', '@OUTPUT@'] + (get_option('strip') ? ['--strip'] : []) +
+          (get_option('digitalis') ? ['--digitalis'] : []),
   build_by_default: true,
   build_always_stale: true,
   console: true)
