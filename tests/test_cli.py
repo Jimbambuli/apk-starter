@@ -702,6 +702,55 @@ def test_starter_update_finds_the_icon_an_older_one_missed(box):
     assert box.calls[0][3] == png_bytes(144, 144) == paths.icon(PKG).read_bytes()
 
 
+def _old_svg_icon_app(box):
+    """An app installed by a starter before the PNG fix: SVG data under the .png name, no icon_version."""
+    from test_apkinfo import _split_app, _res
+    from apkgen import png_bytes
+    from apk_starter.portal import desktop_entry
+    base, part, _ids = _split_app(box.tmp, _res({"anydpi-v26": "res/c.xml"}), {"res/c.xml": b"<x/>"},
+                                  _res({"xxhdpi": "res/ic.png"}), {"res/ic.png": png_bytes(144, 144)})
+    assert main(["--install", str(base), str(part)], env=box.env) == 0
+    paths = apk_starter.paths.Paths.from_env(box.env)
+    paths.icon(PKG).write_bytes(b"<svg xmlns='http://www.w3.org/2000/svg'/>")
+    meta = json.loads(paths.meta(PKG).read_text())
+    meta.pop("icon_version")
+    paths.meta(PKG).write_text(json.dumps(meta))
+    box.fake.launcher_entry = {PKG: desktop_entry(PKG, "Demo")}.get
+    box.calls.clear()
+    box.info.write_text("[Instance]\napp-commit=bbbb\n")
+    return paths, png_bytes(144, 144)
+
+
+def test_starter_update_draws_an_old_svg_icon_again(box):
+    from apk_starter.cli import refresh_menu_entries, ICON_VERSION
+    paths, png = _old_svg_icon_app(box)
+    assert refresh_menu_entries(paths, None) == [PKG]
+    assert paths.icon(PKG).read_bytes() == png == box.calls[0][3]
+    assert json.loads(paths.meta(PKG).read_text())["icon_version"] == ICON_VERSION
+    box.calls.clear()
+    box.info.write_text("[Instance]\napp-commit=cccc\n")
+    assert refresh_menu_entries(paths, None) == []      # current now: no portal dialog again
+    assert box.calls == []
+
+
+def test_stale_icon_without_a_replacement_is_removed(box, monkeypatch):
+    from apk_starter.cli import refresh_stored_icon
+    paths, _png = _old_svg_icon_app(box)
+    meta = json.loads(paths.meta(PKG).read_text())
+    assert refresh_stored_icon(paths, PKG, meta, lambda: b"<svg/>") == b""     # SVG is no replacement
+    assert not paths.icon(PKG).exists()
+
+
+def test_install_never_stores_svg_under_the_png_name(box, monkeypatch):
+    from test_apkinfo import _split_app, _res
+    monkeypatch.setattr("apk_starter.icons.png_from_svg", lambda svg: None)   # no GdkPixbuf: the icon is an SVG
+    base, part, _ids = _split_app(box.tmp, _res({"anydpi-v26": "res/c.xml"}), {"res/c.xml": b"<x/>"},
+                                  _res({}), {})
+    main(["--install", str(base), str(part)], env=box.env)
+    paths = apk_starter.paths.Paths.from_env(box.env)
+    assert not paths.icon(PKG).exists() or paths.icon(PKG).read_bytes().startswith(b"\x89PNG")
+
+
 def test_menu_entry_offers_the_app_for_files_it_takes_shared(box):
     """Desktop -> app: «Open with» for the types of its SEND filters; ATL hands the file over as ACTION_SEND."""
     send = {"actions": ["android.intent.action.SEND"], "categories": ["android.intent.category.DEFAULT"],

@@ -156,16 +156,43 @@ def install_app(paths: Paths, info: ApkInfo, parts: tuple[tuple[str, Path], ...]
         shutil.copyfile(info.path, tmp)
         os.replace(tmp, dest)
     _install_splits(paths, info.package, parts)
-    if info.icon:
+    if info.icon and info.icon.startswith(_PNG_MAGIC):      # the .png file holds PNG data, never an SVG
         _write_atomic(paths.icon(info.package), info.icon)
     else:
         paths.icon(info.package).unlink(missing_ok=True)
     meta = {"package": info.package, "label": info.label, "version_name": info.version_name,
             "version_code": info.version_code, "target_sdk": info.target_sdk, "desktop_id": _desktop_id(info.package),
+            "icon_version": ICON_VERSION,
             "share_types": list(info.share_types)}  # ATL's share sheet offers the app for these (ATLLoadedAppManager)
     if installer:
         meta["installer"] = installer               # ATLLoadedAppManager.recordedInstaller()
     _write_atomic(paths.meta(info.package), json.dumps(meta).encode("utf-8"))
+
+
+ICON_VERSION = 2          # 1 (no entry): SVG kept under the .png name; 2: a real PNG (06489cb, 3db6193)
+_PNG_MAGIC = b"\x89PNG\r\n\x1a\n"
+
+
+def refresh_stored_icon(paths: Paths, pkg: str, meta: Mapping, apk_icon: Callable[[], bytes | None]) -> bytes | None:
+    """An icon an older starter stored (older ICON_VERSION, or not PNG data under the .png name) is drawn again
+    from the app. Returns the new icon when the file changed (a stale file nothing can replace is removed: the
+    starter's own icon is used then); None when it was current."""
+    f = paths.icon(pkg)
+    try:
+        data = f.read_bytes()
+    except OSError:
+        return None
+    if meta.get("icon_version", 1) >= ICON_VERSION and data.startswith(_PNG_MAGIC):
+        return None
+    new = apk_icon()
+    if new is not None and not new.startswith(_PNG_MAGIC):
+        new = None                          # PNG only: no SVG under a .png name
+    if new is not None:
+        _write_atomic(f, new)
+    else:
+        f.unlink(missing_ok=True)
+    _write_atomic(paths.meta(pkg), json.dumps({**meta, "icon_version": ICON_VERSION}).encode("utf-8"))
+    return new if new is not None else b""
 
 
 def _stderr(text: str) -> None:
@@ -721,9 +748,16 @@ def refresh_menu_entries(paths: Paths, lang: str | None, renewing: Callable[[str
             mime = menu_mime_types(portal, info)
             want = _entry_fields(portal.desktop_entry(pkg, have.get("Name", info.label), mime))
             # an icon an older starter did not find (density parts, adaptive icons)
-            new_icon = None if paths.icon(pkg).is_file() else \
-                read_icon(paths.apk(pkg), paths.installed_splits(pkg)) or info.icon
-            if new_icon is None and all(have.get(k) == v for k, v in want.items() if k not in ("Name", "Exec")):
+            def drawn():
+                return read_icon(paths.apk(pkg), paths.installed_splits(pkg)) or info.icon
+            new_icon = refresh_stored_icon(paths, pkg, meta, drawn)
+            if new_icon is not None:
+                new_icon = new_icon or None     # b"": the stale file was removed, the entry gets the default icon
+                stale = True
+            else:
+                stale = False
+                new_icon = None if paths.icon(pkg).is_file() else drawn()
+            if new_icon is None and not stale and all(have.get(k) == v for k, v in want.items() if k not in ("Name", "Exec")):
                 continue
             renewing(pkg)
             with package_lock(paths, pkg):
