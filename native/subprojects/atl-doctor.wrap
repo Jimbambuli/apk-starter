@@ -1,6 +1,6 @@
 [wrap-git]
 directory = atl-doctor
 url = https://github.com/Jimbambuli/atl-doctor.git
-revision = 24d82bc43552a8cf0e3c369f171472e0100a98cd
+revision = fe27011f2201d289e4f5590ba64223ff6b7a7551
 depth = 1
 patch_directory = atl-doctor
