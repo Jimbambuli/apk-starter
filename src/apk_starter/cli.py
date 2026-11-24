@@ -191,8 +191,43 @@ def refresh_stored_icon(paths: Paths, pkg: str, meta: Mapping, apk_icon: Callabl
         _write_atomic(f, new)
     else:
         f.unlink(missing_ok=True)
-    _write_atomic(paths.meta(pkg), json.dumps({**meta, "icon_version": ICON_VERSION}).encode("utf-8"))
+    # the menu entry still shows the old icon; the portal replaces it only after the user's confirmation, so it
+    # waits for the details page (renew_menu_icon), never bulk
+    _write_atomic(paths.meta(pkg), json.dumps({**meta, "icon_version": ICON_VERSION, "menu_icon_stale": True}).encode("utf-8"))
     return new if new is not None else b""
+
+
+def menu_icon_stale(paths: Paths, pkg: str) -> bool:
+    try:
+        return bool(json.loads(paths.meta(pkg).read_text(encoding="utf-8")).get("menu_icon_stale"))
+    except (OSError, ValueError):
+        return False
+
+
+def _menu_icon_done(paths: Paths, pkg: str) -> None:
+    with contextlib.suppress(OSError, ValueError):
+        meta = json.loads(paths.meta(pkg).read_text(encoding="utf-8"))
+        if meta.pop("menu_icon_stale", None):
+            _write_atomic(paths.meta(pkg), json.dumps(meta).encode("utf-8"))
+
+
+def renew_menu_icon(paths: Paths, pkg: str, lang: str | None) -> bool:
+    """The user's request (details page): the menu entry again with the redrawn icon, its name as the user has it.
+    One portal dialog; asked once, also when cancelled. False: cancelled."""
+    from . import portal
+    with package_lock(paths, pkg):
+        meta = json.loads(paths.meta(pkg).read_text(encoding="utf-8"))
+        current = portal.launcher_entry(pkg)
+        name = _entry_fields(current).get("Name") if current else None
+        info = cached_apk_info(paths, paths.apk(pkg), lang, read_apk_info)
+        try:
+            portal.install_launcher(pkg, name or meta.get("label") or info.label, _menu_icon(paths, pkg),
+                                    mime_types=menu_mime_types(portal, info))
+        except portal.LauncherCancelled:
+            _menu_icon_done(paths, pkg)
+            return False
+        _menu_icon_done(paths, pkg)
+    return True
 
 
 def _stderr(text: str) -> None:
@@ -757,14 +792,16 @@ def refresh_menu_entries(paths: Paths, lang: str | None, renewing: Callable[[str
             else:
                 stale = False
                 new_icon = None if paths.icon(pkg).is_file() else drawn()
-            if new_icon is None and not stale and all(have.get(k) == v for k, v in want.items() if k not in ("Name", "Exec")):
-                continue
+            fields_ok = all(have.get(k) == v for k, v in want.items() if k not in ("Name", "Exec"))
+            if fields_ok and (stale or new_icon is None):
+                continue                        # a redrawn icon alone: renew_menu_icon, on the user's request
             renewing(pkg)
             with package_lock(paths, pkg):
                 if new_icon is not None:
                     _write_atomic(paths.icon(pkg), new_icon)
                 icon = paths.icon(pkg).read_bytes() if paths.icon(pkg).is_file() else paths.default_icon().read_bytes()
                 portal.install_launcher(pkg, want["Name"], icon, mime_types=mime)
+                _menu_icon_done(paths, pkg)
             renewed.append(pkg)
         except portal.PortalUnavailable:
             return renewed              # no menu entries without the portal; tried again next time

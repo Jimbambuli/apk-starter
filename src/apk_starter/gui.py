@@ -10,7 +10,7 @@ from collections.abc import Callable, Mapping
 from pathlib import Path
 
 from . import aurora, dexopt, diag, microg, permissions, splits, theme
-from .cli import (APP_ID, ENTRY_PREFIX, add_menu_entry, clear_data, has_menu_entry, install_files, lang_from_env,
+from .cli import (APP_ID, ENTRY_PREFIX, add_menu_entry, clear_data, menu_icon_stale, renew_menu_icon, has_menu_entry, install_files, lang_from_env,
                   microg_hint, native_notice, prepare_all, remove_app, remove_menu_entry, setup_microg, VERSION)
 from .apkinfo import read_apk_info
 from .launch import cached_apk_info
@@ -852,6 +852,13 @@ class Window(Gtk.ApplicationWindow):
             menu_button.connect("clicked", lambda _b, pkg=r.package: self.change_menu_entry(pkg, remove=there))
             for w in menu_parts:
                 w.set_visible(True)
+            if there and menu_icon_stale(self.paths, r.package):    # one dialog, asked for by the user
+                note = label(_("The menu entry still shows an old icon. The desktop asks to confirm the change."),
+                             "dim-label", wrap=True, halign=Gtk.Align.START)
+                fix = Gtk.Button(label=_("Update menu icon"), halign=Gtk.Align.START)
+                fix.connect("clicked", lambda _b, pkg=r.package: self.update_menu_icon(pkg))
+                menu_parts[2].get_parent().insert_child_after(note, menu_button)
+                menu_parts[2].get_parent().insert_child_after(fix, note)
         self.background(lambda pkg=r.package: has_menu_entry(pkg), menu_state, None, job=False)
         box.append(label(_("Appearance"), "section-title"))
         box.append(label(_("Window bar"), "dim-label"))
@@ -1143,6 +1150,11 @@ class Window(Gtk.ApplicationWindow):
         work = (lambda: remove_menu_entry(pkg)) if remove else (lambda: add_menu_entry(self.paths, pkg, self.lang))
         self.run_for(pkg, _("Updating the menu entry…"), work, lambda _r: self.show_details(),
                      _("Cannot change the menu entry of {app}").format(app=label_))
+
+    def update_menu_icon(self, pkg: str) -> None:
+        label_ = self.rows[pkg].label if pkg in self.rows else pkg
+        self.run_for(pkg, _("Updating the menu entry…"), lambda: renew_menu_icon(self.paths, pkg, self.lang),
+                     lambda _r: self.show_details(), _("Cannot change the menu entry of {app}").format(app=label_))
 
     def ask_uninstall(self, pkg: str) -> None:
         label_ = self.rows[pkg].label if pkg in self.rows else pkg
