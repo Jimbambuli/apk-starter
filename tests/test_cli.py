@@ -721,16 +721,17 @@ def _old_svg_icon_app(box):
     return paths, png_bytes(144, 144)
 
 
-def test_starter_update_draws_an_old_svg_icon_again(box):
-    from apk_starter.cli import refresh_menu_entries, ICON_VERSION
+def test_starter_update_draws_an_old_svg_icon_again_but_asks_only_on_request(box):
+    from apk_starter.cli import refresh_menu_entries, renew_menu_icon, menu_icon_stale, ICON_VERSION
     paths, png = _old_svg_icon_app(box)
-    assert refresh_menu_entries(paths, None) == [PKG]
-    assert paths.icon(PKG).read_bytes() == png == box.calls[0][3]
-    assert json.loads(paths.meta(PKG).read_text())["icon_version"] == ICON_VERSION
-    box.calls.clear()
-    box.info.write_text("[Instance]\napp-commit=cccc\n")
-    assert refresh_menu_entries(paths, None) == []      # current now: no portal dialog again
+    assert refresh_menu_entries(paths, None) == []      # no portal dialog in bulk
     assert box.calls == []
+    assert paths.icon(PKG).read_bytes() == png
+    assert json.loads(paths.meta(PKG).read_text())["icon_version"] == ICON_VERSION
+    assert menu_icon_stale(paths, PKG)
+    assert renew_menu_icon(paths, PKG, None) is True    # the user's request on the details page
+    assert box.calls == [("install", PKG, "Demo", png)]
+    assert not menu_icon_stale(paths, PKG)
 
 
 def test_stale_icon_without_a_replacement_is_removed(box, monkeypatch):
