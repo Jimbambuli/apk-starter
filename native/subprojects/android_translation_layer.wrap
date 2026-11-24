@@ -1,5 +1,5 @@
 [wrap-git]
 directory = android_translation_layer
 url = https://github.com/Jimbambuli/android_translation_layer.git
-revision = 349adf1d8b0968dfaa0dbdfc03fd47673bd46fa0
+revision = 61c3bbef1e10962051f21aea98f9c64283034d53
 depth = 1
