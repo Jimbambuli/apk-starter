@@ -214,7 +214,7 @@ modules:
 
   # Digitalis (github.com/DigitalisX64/digitalis, Apache-2.0): the Berberis binary translator as ATL's native
   # bridge, so apps whose native code is only for arm64-v8a run on x86_64. Changes: branch atl-digitalis-3 of
-  # Jimbambuli/digitalis and branch atl-digitalis-threads of Jimbambuli/platform_frameworks_libs_binary_translation.
+  # Jimbambuli/digitalis and branch atl-digitalis-threads2 of Jimbambuli/platform_frameworks_libs_binary_translation.
   # The bundle is built from source in a Digitalis AOSP tree with build-aux/digitalis/build-bundle.sh (pinned
   # commits; revisions of all projects in BUILD-INFO; LICENSE, NOTICE, NOTICES/) and published as a release asset
   # of Jimbambuli/digitalis.
@@ -233,8 +233,8 @@ modules:
       - cp -r NOTICES /app/share/licenses/digitalis/
     sources:
       - type: archive
-        url: https://github.com/Jimbambuli/digitalis/releases/download/atl-bundle-7d9e1d1/digitalis-bundle-7d9e1d1.tar.gz
-        sha256: 1e9d921d804a37e3eb2c6bd9b3cb6da94ea3d3600b0d4cdf15b729757e8f2aef
+        url: https://github.com/Jimbambuli/digitalis/releases/download/atl-bundle-eaa900f/digitalis-bundle-eaa900f.tar.gz
+        sha256: c5ad1f0eef6f63c8acb3efb2d67a8eca855276318d394db76533c6037803f6c2
 
   - name: android_translation_layer
     buildsystem: meson
