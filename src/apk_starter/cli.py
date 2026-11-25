@@ -289,6 +289,8 @@ def install_parts(paths: Paths, info: ApkInfo, parts: tuple[tuple[str, Path], ..
         if not MENU_ENTRIES:
             return info
         try:
+            if portal.native_entry(info.package, info.label) is None and portal.launcher_entry(info.package):
+                return info                         # an update: the portal would ask again, the entry stays
             portal.install_launcher(info.package, info.label, _menu_icon(paths, info.package),
                                     mime_types=menu_mime_types(portal, info))
         except portal.LauncherCancelled:
@@ -727,9 +729,12 @@ def _entry_fields(entry: str) -> dict[str, str]:
 
 def refresh_menu_entries(paths: Paths, lang: str | None, renewing: Callable[[str], None] = lambda _p: None,
                          problems: list[tuple[str | None, str]] | None = None) -> list[str]:
-    """Once per starter build: menu entries made by an older starter get the fields it did not write yet
-    (e.g. MimeType). Name (the user may have changed it) and Exec (the portal rewrites it) are kept; removed
-    entries stay removed. Each renewed entry is a portal confirmation, like installing."""
+    """Once per starter build. Flatpak: entries made through the portal are never made again, each would be a
+    portal dialog (PrepareInstall) per app; their Exec (apk-starter [--uri %u] <package>) starts the app with every
+    starter, a new icon or MimeType reaches the entry when the user makes it again. Only the stored icon is drawn
+    again on disk. Native build and AppImage (entries written directly, no dialog): an entry that differs from
+    what this starter writes (MimeType, Exec, e.g. an AppImage under a new file name) is written again with the
+    user's Name; removed entries stay removed."""
     from . import portal
     marker = paths.cache_home / "apk-starter" / "menu-entries"
     key = dexopt.runtime_key(paths)
@@ -748,10 +753,11 @@ def refresh_menu_entries(paths: Paths, lang: str | None, renewing: Callable[[str
             have = _entry_fields(current)
             info = read_apk_info(paths.apk(pkg), lang)
             mime = menu_mime_types(portal, info)
-            want = _entry_fields(portal.desktop_entry(pkg, have.get("Name", info.label), mime))
+            native = portal.native_entry(pkg, have.get("Name", info.label), mime)
             # an icon an older starter did not find (density parts, adaptive icons)
             def drawn():
-                return read_icon(paths.apk(pkg), paths.installed_splits(pkg)) or info.icon
+                icon = read_icon(paths.apk(pkg), paths.installed_splits(pkg)) or info.icon
+                return icon if icon and icon.startswith(_PNG_MAGIC) else None
             new_icon = refresh_stored_icon(paths, pkg, meta, drawn)
             if new_icon is not None:
                 new_icon = new_icon or None     # b"": the stale file was removed, the entry gets the default icon
@@ -759,16 +765,20 @@ def refresh_menu_entries(paths: Paths, lang: str | None, renewing: Callable[[str
             else:
                 stale = False
                 new_icon = None if paths.icon(pkg).is_file() else drawn()
-            fields_ok = all(have.get(k) == v for k, v in want.items() if k not in ("Name", "Exec"))
-            if fields_ok and (stale or new_icon is None):
-                continue                        # a redrawn icon alone: the portal asks the user, so the entry gets it
-                                                # when it is made again (add_menu_entry)
+            if native is None:                  # portal: on disk only, the entry stays as it is (no dialog)
+                if new_icon is not None and not stale:
+                    with package_lock(paths, pkg):
+                        _write_atomic(paths.icon(pkg), new_icon)
+                continue
+            if all(have.get(k) == v for k, v in _entry_fields(native).items() if k != "Name") \
+                    and new_icon is None and not stale:
+                continue
             renewing(pkg)
             with package_lock(paths, pkg):
                 if new_icon is not None:
                     _write_atomic(paths.icon(pkg), new_icon)
                 icon = paths.icon(pkg).read_bytes() if paths.icon(pkg).is_file() else paths.default_icon().read_bytes()
-                portal.install_launcher(pkg, want["Name"], icon, mime_types=mime)
+                portal.install_launcher(pkg, have.get("Name", info.label), icon, mime_types=mime)
             renewed.append(pkg)
         except portal.PortalUnavailable:
             return renewed              # no menu entries without the portal; tried again next time
