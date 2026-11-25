@@ -158,18 +158,25 @@ def _native_icon(pkg: str) -> Path:
     return Path(os.environ["XDG_DATA_HOME"]) / "menu-icons" / f"{ENTRY_PREFIX}.{pkg}"
 
 
-def _native_install(menu: Path, pkg: str, label: str, icon: bytes, mime_types: list[str]) -> None:
+def native_entry(pkg: str, label: str, mime_types: list[str] = ()) -> str | None:
+    """The entry a native build (AppImage too) writes itself, None in the Flatpak (the portal writes it)."""
+    if _native_menu_dir() is None:
+        return None
     program = str(Paths.from_env(os.environ).program())
     # an Exec argument quoted as the Desktop Entry spec says
     program = '"' + re.sub(r'([\\"`$])', r'\\\1', program).replace("\\", "\\\\").replace("%", "%%") + '"'
+    entry = desktop_entry(pkg, label, mime_types).replace("Exec=apk-starter ", f"Exec={program} ", 1)
+    return entry + f"Icon={_native_icon(pkg)}\n"
+
+
+def _native_install(menu: Path, pkg: str, label: str, icon: bytes, mime_types: list[str]) -> None:
     icon_file = _native_icon(pkg)
     icon_file.parent.mkdir(parents=True, exist_ok=True)
     icon_file.write_bytes(icon)
-    entry = desktop_entry(pkg, label, mime_types).replace("Exec=apk-starter ", f"Exec={program} ", 1)
     menu.mkdir(parents=True, exist_ok=True)
     dest = menu / desktop_file_id(pkg)
     tmp = dest.with_name(f"{dest.name}.{os.getpid()}.tmp")
-    tmp.write_text(entry + f"Icon={icon_file}\n", encoding="utf-8")
+    tmp.write_text(native_entry(pkg, label, mime_types), encoding="utf-8")
     os.replace(tmp, dest)
 
 

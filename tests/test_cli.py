@@ -12,7 +12,7 @@ from pathlib import Path
 import pytest
 
 from apk_starter.portal import desktop_entry as real_desktop_entry, link_mime_types as real_link_mime_types, \
-    share_mime_types as real_share_mime_types
+    share_mime_types as real_share_mime_types, native_entry as real_native_entry
 
 import apk_starter
 from apk_starter.cli import main, split_diag_option
@@ -57,6 +57,7 @@ def box(tmp_path, monkeypatch):
     fake.link_mime_types = real_link_mime_types
     fake.share_mime_types = real_share_mime_types
     fake.desktop_entry = real_desktop_entry
+    fake.native_entry = lambda pkg, label, mime_types=(): None      # the Flatpak: entries through the portal
     fake.launcher_entry = lambda pkg: None
     def install_launcher(pkg, label, icon, mime_types=()):
         calls.append(("install", pkg, label, icon))
@@ -592,9 +593,33 @@ def _links_apk(box):
     return make_apk(box.tmp / "links.apk", manifest=axml_manifest(activities=[[dict(view, data=[{"scheme": "demo"}])]]))
 
 
-def test_starter_update_renews_menu_entries_without_new_fields(box):
-    """An entry from an older starter lacks MimeType: after an update it is made again, with the user's name."""
+def test_starter_update_never_makes_portal_entries_again(box):
+    """Flatpak: an entry from an older starter (no MimeType, an old icon) stays as it is: making it again would be
+    a portal dialog per app. Its Exec starts the app with this starter too."""
     from apk_starter.cli import refresh_menu_entries
+    assert main(["--install", str(_links_apk(box))], env=box.env) == 0
+    box.fake.launcher_entry = {PKG: OLD_ENTRY}.get
+    box.calls.clear()
+    box.info.write_text("[Instance]\napp-commit=bbbb\n")
+    paths = apk_starter.paths.Paths.from_env(box.env)
+    paths.icon(PKG).unlink(missing_ok=True)
+    assert refresh_menu_entries(paths, "de") == []
+    assert box.calls == []
+    assert main([PKG], env=box.env) == 0                 # OLD_ENTRY's Exec: apk-starter <package>
+
+
+def _native_box(box, monkeypatch):
+    """A native build / AppImage: the starter writes its entries itself (no portal, no dialog)."""
+    monkeypatch.setenv("APK_STARTER_MENU_DIR", str(box.tmp / "applications"))
+    for k in ("XDG_DATA_HOME", "APK_STARTER_PREFIX"):
+        monkeypatch.setenv(k, box.env[k])
+    box.fake.native_entry = real_native_entry
+
+
+def test_native_starter_update_renews_entries_without_new_fields(box, monkeypatch):
+    """Native/AppImage: an entry from an older starter lacks MimeType: it is written again, with the user's name."""
+    from apk_starter.cli import refresh_menu_entries
+    _native_box(box, monkeypatch)
     assert main(["--install", str(_links_apk(box))], env=box.env) == 0
     entries = {PKG: OLD_ENTRY}
     box.fake.launcher_entry = entries.get
@@ -609,13 +634,13 @@ def test_starter_update_renews_menu_entries_without_new_fields(box):
     assert box.calls == []
 
 
-def test_starter_update_leaves_current_and_removed_entries(box):
+def test_native_starter_update_leaves_current_and_removed_entries(box, monkeypatch):
     from apk_starter.cli import refresh_menu_entries
-    from apk_starter.portal import desktop_entry
+    _native_box(box, monkeypatch)
     assert main(["--install", str(_links_apk(box))], env=box.env) == 0
     paths = apk_starter.paths.Paths.from_env(box.env)
     box.calls.clear()
-    current = desktop_entry(PKG, "Demo", ["x-scheme-handler/demo"]).replace("Exec=apk-starter", "Exec=flatpak run x")
+    current = real_native_entry(PKG, "Mein Name", ["x-scheme-handler/demo"])     # the user's Name is kept
     box.fake.launcher_entry = {PKG: current}.get
     box.info.write_text("[Instance]\napp-commit=bbbb\n")
     assert refresh_menu_entries(paths, "de") == []
@@ -625,8 +650,19 @@ def test_starter_update_leaves_current_and_removed_entries(box):
     assert box.calls == []
 
 
-def test_window_after_update_renews_menu_entries(box):
+def test_window_after_update_asks_no_portal_dialog(box):
     from apk_starter.cli import prepare_all
+    assert main(["--install", str(_links_apk(box))], env=box.env) == 0
+    box.fake.launcher_entry = {PKG: OLD_ENTRY}.get
+    box.calls.clear()
+    box.info.write_text("[Instance]\napp-commit=bbbb\n")
+    assert prepare_all(apk_starter.paths.Paths.from_env(box.env), box.env, lambda _m: None) == []
+    assert box.calls == []
+
+
+def test_native_window_after_update_renews_menu_entries(box, monkeypatch):
+    from apk_starter.cli import prepare_all
+    _native_box(box, monkeypatch)
     assert main(["--install", str(_links_apk(box))], env=box.env) == 0
     box.fake.launcher_entry = {PKG: OLD_ENTRY}.get
     box.calls.clear()
@@ -635,9 +671,35 @@ def test_window_after_update_renews_menu_entries(box):
     assert [c[:3] for c in box.calls] == [("install", PKG, "Mein Demo")]
 
 
-def test_window_rebuild_names_the_apps_it_works_on_and_always_ends(box):
+def test_native_entry_of_a_moved_appimage_is_written_again(box, monkeypatch):
+    """An AppImage under a new file name: the entries' Exec would start a file that is gone."""
+    from apk_starter.cli import refresh_menu_entries
+    _native_box(box, monkeypatch)
+    monkeypatch.setenv("APK_STARTER_PROGRAM", "/home/u/APK_Starter-0.9.3.AppImage")
+    assert main(["--install", str(box.apk)], env=box.env) == 0
+    paths = apk_starter.paths.Paths.from_env(box.env)
+    box.fake.launcher_entry = {PKG: real_native_entry(PKG, "Demo")}.get
+    monkeypatch.setenv("APK_STARTER_PROGRAM", "/home/u/APK_Starter-0.9.4.AppImage")
+    box.calls.clear()
+    box.info.write_text("[Instance]\napp-commit=bbbb\n")
+    assert refresh_menu_entries(paths, None) == [PKG]
+    assert [c[:3] for c in box.calls] == [("install", PKG, "Demo")]
+
+
+def test_app_update_keeps_the_portal_entry(box):
+    """Installing an update of an app with a menu entry asks no portal dialog again (Android keeps the icon)."""
+    assert main(["--install", str(box.apk)], env=box.env) == 0
+    assert [c[0] for c in box.calls] == ["install"]
+    box.fake.launcher_entry = {PKG: OLD_ENTRY}.get
+    box.calls.clear()
+    assert main(["--install", str(box.apk)], env=box.env) == 0
+    assert box.calls == []
+
+
+def test_window_rebuild_names_the_apps_it_works_on_and_always_ends(box, monkeypatch):
     """The window shows a spinner per app: every state reaches {} at the end."""
     from apk_starter.cli import prepare_all
+    _native_box(box, monkeypatch)
     assert main(["--install", str(_links_apk(box))], env=box.env) == 0
     box.fake.launcher_entry = {PKG: OLD_ENTRY}.get
     box.info.write_text("[Instance]\napp-commit=bbbb\n")
@@ -657,8 +719,9 @@ def test_window_rebuild_failure_is_reported_per_app_and_ends(box):
     assert seen[-1] == {} and len(problems) == 1 and problems[0][0] is None
 
 
-def test_menu_entry_kept_old_is_a_problem_of_that_app(box):
+def test_menu_entry_kept_old_is_a_problem_of_that_app(box, monkeypatch):
     from apk_starter.cli import prepare_all
+    _native_box(box, monkeypatch)
     assert main(["--install", str(_links_apk(box))], env=box.env) == 0
     box.fake.launcher_entry = {PKG: OLD_ENTRY}.get
     def refused(*_a, **_k):
@@ -685,7 +748,8 @@ def test_update_with_another_signer_is_refused_like_android(box, capsys):
 
 
 def test_starter_update_finds_the_icon_an_older_one_missed(box):
-    """Apps from an app store had no icon (bitmaps in the density part): the update finds it and renews the entry."""
+    """Apps from an app store had no icon (bitmaps in the density part): the update finds it; the portal entry
+    stays (no dialog), the window and an entry made again use it."""
     from test_apkinfo import _split_app, _res
     from apkgen import Res, png_bytes
     from apk_starter.portal import desktop_entry
@@ -698,8 +762,8 @@ def test_starter_update_finds_the_icon_an_older_one_missed(box):
     box.fake.launcher_entry = {PKG: desktop_entry(PKG, "Demo")}.get
     box.calls.clear()
     box.info.write_text("[Instance]\napp-commit=bbbb\n")
-    assert refresh_menu_entries(paths, None) == [PKG]
-    assert box.calls[0][3] == png_bytes(144, 144) == paths.icon(PKG).read_bytes()
+    assert refresh_menu_entries(paths, None) == []
+    assert box.calls == [] and paths.icon(PKG).read_bytes() == png_bytes(144, 144)
 
 
 def _old_svg_icon_app(box):
