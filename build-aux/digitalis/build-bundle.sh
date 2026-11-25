@@ -12,7 +12,7 @@ TREE=$(realpath "$1"); OUT=$(realpath "$2")
 
 # project path, commit
 PINNED=(
-	"frameworks/libs/binary_translation 7d9e1d1"
+	"frameworks/libs/binary_translation eaa900f"
 	"digitalis 81c34d5"
 )
 # project files with the licences of what the bundle contains
@@ -64,7 +64,7 @@ Digitalis: https://github.com/DigitalisX64/digitalis, licensed under the Apache 
 Built from the Android Open Source Project (Berberis binary translator, native_bridge_support, bionic and
 the libraries in system/lib64/arm64) with the changes in https://github.com/Jimbambuli/digitalis (branch
 atl-digitalis-3) and https://github.com/Jimbambuli/platform_frameworks_libs_binary_translation (branch
-atl-digitalis-threads).
+atl-digitalis-threads2).
 Exact source revisions: BUILD-INFO. Licences of the projects the files are built from: NOTICES/.
 NOTICE
 mkdir -p "$PKG/NOTICES"
